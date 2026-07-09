@@ -1,6 +1,6 @@
 ---
 name: luminal-commerce
-description: Repository-specific guidance for developing the Luminal Factory storefront, including architecture, raffle-first commerce rules, Supabase contracts, UI and motion constraints, coding conventions, and development workflow.
+description: Use when changing Luminal Factory storefront architecture, commerce behavior, Supabase boundaries, UI, motion, 3D, or repository workflow.
 ---
 
 # Luminal Factory Commerce Skill

@@ -512,6 +512,24 @@ Update durable project guidance when changing:
 
 Do not update long-lived documentation for trivial implementation details.
 
+## Skill Authoring Rule
+
+When creating or materially changing a repository skill, consult the installed `writing-great-skills` skill.
+
+Repository skills should optimize for predictable process.
+
+Prefer:
+
+- explicit invocation triggers
+- checkable completion criteria
+- progressive disclosure
+- one authoritative location for each durable rule
+- the smallest context required for each branch
+
+When a skill grows, first inspect it for duplication, stale guidance, no-op instructions, and misplaced reference material before adding more rules.
+
+Do not create a new skill when an existing skill or reference file already owns the responsibility.
+
 ## Completion Behavior
 
 After non-trivial implementation work, report:
