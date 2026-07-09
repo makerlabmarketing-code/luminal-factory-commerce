@@ -19,6 +19,8 @@ The intended sequence is:
 
 Do not skip directly from a loose idea to full-page implementation.
 
+This file is the authoritative owner of the specification-first workflow, page approval gates, implementation sequence, validation expectations, documentation triggers, and completion summaries.
+
 ## Current Project Phase
 
 The storefront is currently in foundation and design-definition phase.
@@ -49,6 +51,14 @@ For any non-trivial task:
 6. Identify data and domain impact.
 
 Do not assume the project matches a generic Next.js starter.
+
+Completion criteria:
+
+- the relevant authoritative reference files have been read
+- the existing route, component, service, data, or document owners have been identified
+- callers or downstream consumers have been checked where behavior may change
+- available package scripts have been inspected before validation commands are chosen
+- commerce, Supabase, motion, 3D, or workflow contract impact has been classified
 
 ## Planning Rule
 
@@ -93,6 +103,15 @@ For each major page:
 14. Generate tasks.
 15. Implement.
 
+Completion criteria before implementation:
+
+- the page purpose, target user, primary action, narrative sequence, and section order are documented
+- primary and secondary motions are identified within the motion budget
+- data requirements, mobile behavior, and reduced-motion behavior are documented
+- the experience script and formal specification are approved
+- the technical plan separates product intent from implementation details
+- implementation tasks have clear completion boundaries
+
 ## Reference Analysis
 
 External references are studied for specific behavior.
@@ -105,6 +124,8 @@ For each reference, identify:
 4. How Luminal should adapt it.
 
 Do not combine multiple reference sites literally.
+
+Structured reference-analysis workflow is owned by `.codex/skills/reference-analysis/SKILL.md`.
 
 ## Implementation Scope
 
@@ -152,6 +173,8 @@ Current conceptual technology roles:
 - React Hook Form: complex interactive forms
 
 Do not install another library that duplicates these responsibilities without explicit justification.
+
+Animation technology choice is owned by `ui-rules.md`. Supabase responsibility is owned by `supabase-contract.md`. Validation and form-library responsibility is owned by `coding-style.md`.
 
 ## Validation
 

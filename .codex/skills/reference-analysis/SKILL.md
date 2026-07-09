@@ -23,6 +23,10 @@ The objective is to understand:
 - what must not be copied
 - how the concept should be adapted to Luminal's identity
 
+Use the full workflow when the reference may affect project direction, a page specification, a motion system, commerce structure, or implementation planning.
+
+For a quick scan, identify only the requested scope, observed behavior, useful principle, what should not be copied, and Luminal adaptation.
+
 ## Core Rule
 
 Never treat a reference website as the final design authority.
@@ -75,6 +79,8 @@ For commerce references, also consult:
 For architectural references, also consult:
 
     references/architecture.md
+
+Authority order is owned by `AGENTS.md`. Visual and motion rules are owned by `references/ui-rules.md`. Commerce meaning is owned by `references/commerce-domain.md`.
 
 ## Analysis Modes
 
@@ -296,53 +302,9 @@ If yes, identify whether it is:
 
 Identify the simplest plausible technology for the observed behavior.
 
-Use this project technology hierarchy:
+Apply the Luminal animation technology hierarchy from `references/ui-rules.md`.
 
-### CSS
-
-Appropriate for:
-
-- simple hover
-- opacity
-- basic transforms
-- static masks
-- simple state transitions
-
-### Motion
-
-Appropriate for:
-
-- local component transitions
-- layout transitions
-- interface state changes
-
-### GSAP
-
-Appropriate for:
-
-- choreographed timelines
-- scroll sequencing
-- pinned sections
-- multi-element state transitions
-- coordinated route transitions
-
-### React Three Fiber
-
-Appropriate for:
-
-- custom real-time 3D scenes
-- custom lights
-- pointer-reactive 3D objects
-- multiple spatial 3D layers
-- shaders
-
-### Model Viewer
-
-Appropriate for:
-
-- GLB product inspection
-- rotate and zoom controls
-- simple product presentation
+Additional reference-analysis options may include:
 
 ### Image Layers
 

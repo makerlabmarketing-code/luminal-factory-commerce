@@ -1,5 +1,11 @@
 # Architecture
 
+## Ownership
+
+This file is the authoritative owner of Next.js application structure, route responsibility, server/client boundaries, feature and service boundaries, data ownership at the application layer, performance boundaries, shared domain strategy, and future monorepo considerations.
+
+Use `commerce-domain.md` for commerce meaning, `supabase-contract.md` for database and RLS enforcement, and `ui-rules.md` for visual and motion decisions.
+
 ## Application Role
 
 This repository is a Next.js storefront application.
@@ -21,7 +27,7 @@ Operational administration belongs to the Luminal Factory ERP.
 
 ## Suggested Source Structure
 
-The current repository structure may evolve toward:
+The current repository structure may evolve toward the following directional shape:
 
     src/
     ├── app/
@@ -62,7 +68,7 @@ The current repository structure may evolve toward:
 
 Do not reorganize the repository solely to match this example.
 
-Use it as architectural direction.
+Use it as architectural direction, not as a migration target.
 
 Refactor structure only when the current implementation requires it.
 
@@ -240,6 +246,8 @@ Provide sensible fallbacks for:
 - low-performance environments
 
 ## Future Monorepo Consideration
+
+Read this section only for shared-code, repository-layout, or ERP/storefront contract work.
 
 A future architecture may become:
 

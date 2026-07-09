@@ -1,5 +1,11 @@
 # Commerce Domain
 
+## Ownership
+
+This file is the authoritative owner of Luminal Factory commerce meaning: products, variants, sale types, raffle concepts, lifecycle states, raffle entries, winners, payments, orders, refunds, shipments, inventory meaning, preorder, commissions, customers, archive meaning, revenue rules, and domain change rules.
+
+Use `supabase-contract.md` for persistence, RLS, data access, trusted enforcement, storage, schema changes, and generated database types.
+
 ## Core Principle
 
 Luminal Factory is raffle-first artisan commerce.

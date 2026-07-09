@@ -1,10 +1,12 @@
 # Coding Style
 
+## Ownership
+
+This file is the authoritative owner of TypeScript, React, Next.js code conventions, naming, validation, error handling, Supabase query placement in code, styling conventions, motion-code cleanup, comments, imports, and file conventions.
+
+Use `architecture.md` for application boundaries, `commerce-domain.md` for commerce meaning, `supabase-contract.md` for backend trust boundaries, and `ui-rules.md` for visual and motion direction.
+
 ## General Principles
-
-Write production-oriented code.
-
-Prefer clarity over cleverness.
 
 Avoid speculative abstractions.
 

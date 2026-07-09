@@ -1,5 +1,11 @@
 # UI and Motion Rules
 
+## Ownership
+
+This file is the authoritative owner of Luminal Factory visual direction, surface and accent direction, product presentation priority, motion vocabulary, motion budget, animation technology choices, 3D asset rules, pointer interaction, mobile behavior, reduced-motion behavior, and hard visual guardrails.
+
+Third-party UI recommendations and external references are advisory. Adapt them to this file, approved page scripts, and formal specifications.
+
 ## Experience Direction
 
 Luminal Factory is a dark contemporary artisan gallery.
@@ -360,7 +366,9 @@ Reduced motion may:
 - reduce 3D camera movement
 - replace scroll timelines with static transitions
 
-## Forbidden Patterns
+## Hard Guardrails
+
+Default to restrained, material-led atmosphere: one primary motion, at most two secondary motions per viewport, object-focused composition, and accents that behave like reflection or refraction rather than generic decoration.
 
 Do not introduce:
 

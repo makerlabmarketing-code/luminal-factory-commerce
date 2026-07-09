@@ -1,5 +1,11 @@
 # Project Context
 
+## Ownership
+
+This file is the authoritative owner of Luminal Factory storefront identity, product direction, repository role, ERP relationship, current development phase, high-level commerce priority, and high-level external reference purpose.
+
+Use `workflow.md` for the specification-first process, `commerce-domain.md` for commerce semantics, and `ui-rules.md` for visual and motion rules.
+
 ## Project
 
 Luminal Factory Commerce
@@ -167,13 +173,10 @@ Do not clone the layout.
 
 Purpose:
 
-- central real 3D object
-- pointer-driven camera orbit
+- 3D object-centered hero thinking
+- pointer-responsive spatial interaction
 - foreground and background depth
-- reusable GLB instances
-- proximity-based object interaction
-- GSAP state transitions
-- texture swapping
+- stateful motion sequencing
 
 Adapt its energetic behavior into slower, heavier, more controlled Luminal motion.
 

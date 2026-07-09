@@ -1,166 +1,83 @@
 ---
 name: luminal-commerce
-description: Use when changing Luminal Factory storefront architecture, commerce behavior, Supabase boundaries, UI, motion, 3D, or repository workflow.
+description: Use when working on the Luminal Factory storefront, page scripts/specs, raffle commerce, Supabase contracts, architecture, UI, motion, 3D, coding conventions, or repository workflow.
 ---
 
 # Luminal Factory Commerce Skill
 
-Use this skill when working on the Luminal Factory storefront.
+Use this skill for non-trivial Luminal Factory storefront work.
 
-This repository is not a generic ecommerce template and must not be treated as one.
+This skill is a progressive-disclosure map. Read the smallest reference set that can govern the task, then stop unless another branch becomes relevant.
 
-Luminal Factory is a raffle-first artisan commerce experience focused on collectible artisan keycaps and crafted objects.
+## Always Check
 
-Before making architectural, commerce, UI, data, or workflow decisions, consult the relevant reference documents in this skill.
+Before making architectural, commerce, UI, data, or workflow decisions:
 
-## Reference Map
+1. Identify the task branch below.
+2. Read the listed reference files.
+3. Confirm whether the task changes a durable project contract.
+4. If a durable contract changes, update the authoritative reference file before or with the implementation.
 
-Read the smallest relevant set of references required for the task.
+Completion criterion: the task is governed by the relevant authoritative reference files, not by duplicated rules from memory.
+
+## Authority
+
+`AGENTS.md` defines repository-level authority order and gates.
+
+Luminal Factory's approved product direction, commerce contracts, architecture boundaries, workflow, and visual identity override generic UI guidance and external references.
+
+External websites are references only. Use `.codex/skills/reference-analysis/SKILL.md` for structured reference analysis.
+
+## Branches
 
 ### Project identity and boundaries
 
 Read `references/project-context.md`.
 
-Use it for:
+Use it for repository purpose, product identity, current phase, storefront versus ERP responsibilities, and high-level commerce priority.
 
-- repository purpose
-- product identity
-- storefront versus ERP responsibilities
-- overall project direction
+### Specification-first workflow
 
-### Architecture
+Read `references/workflow.md`.
 
-Read `references/architecture.md`.
-
-Use it for:
-
-- application structure
-- client and server boundaries
-- shared domain strategy
-- service layer decisions
-- feature organization
+Use it for planning, page approval gates, implementation sequence, dependency decisions, validation, documentation updates, and completion summaries.
 
 ### Commerce behavior
 
 Read `references/commerce-domain.md`.
 
-Use it for:
+Use it for raffle, products, variants, sale types, orders, payments, refunds, shipments, preorder, commissions, inventory meaning, archive meaning, lifecycle states, revenue rules, and domain change rules.
 
-- raffle
-- products
-- orders
-- payments
-- preorder
-- commissions
-- inventory relationships
-- revenue rules
-
-### Supabase and data
+### Supabase and data contracts
 
 Read `references/supabase-contract.md`.
 
-Use it for:
+Use it for database access, Supabase clients, authentication, RLS assumptions, trusted enforcement, generated database types, storage, schema changes, and data ownership.
 
-- database access
-- Supabase clients
-- authentication
-- RLS assumptions
-- generated database types
-- data ownership
+### Architecture
 
-### UI and motion
+Read `references/architecture.md`.
+
+Use it for application structure, route responsibility, server/client boundaries, shared domain strategy, service layer decisions, feature organization, data ownership, performance boundaries, and future monorepo considerations.
+
+### UI, motion, and 3D
 
 Read `references/ui-rules.md`.
 
-Use it for:
-
-- visual direction
-- motion
-- animation technology choices
-- 3D
-- accessibility
-- responsive behavior
-- design constraints
+Use it for visual direction, motion vocabulary, motion budget, animation technology choices, 3D asset rules, pointer interaction, accessibility, responsive behavior, mobile strategy, and reduced-motion behavior.
 
 ### Coding conventions
 
 Read `references/coding-style.md`.
 
-Use it for:
+Use it for TypeScript, React, Next.js conventions, naming, validation, error handling, Supabase query placement, styling, motion code, comments, imports, and file conventions.
 
-- TypeScript
-- React
-- Next.js
-- naming
-- file organization
-- error handling
-- validation
+## Cross-Branch Contract Changes
 
-### Development workflow
+Some changes require more than one reference:
 
-Read `references/workflow.md`.
-
-Use it for:
-
-- planning
-- repository analysis
-- implementation sequence
-- tests
-- validation
-- documentation updates
-
-## Non-Negotiable Project Rules
-
-1. Do not turn the storefront into a generic high-volume ecommerce website.
-
-2. Raffle is the primary commerce experience.
-
-3. A product and a raffle are different domain concepts.
-
-4. Revenue is derived from successful financial transactions and refunds.
-
-5. The storefront is customer-facing.
-
-6. The Luminal Factory ERP is the operational back office.
-
-7. Storefront and ERP must eventually use the same Supabase project and compatible shared commerce contracts.
-
-8. Do not duplicate operational administration features inside the storefront.
-
-9. Do not add visual effects without a clear narrative or interaction purpose.
-
-10. Prefer the simplest motion technology capable of producing the required result.
-
-11. Do not introduce new frameworks, state libraries, animation systems, or infrastructure without reviewing existing project conventions.
-
-12. Do not clone visual references literally.
-
-13. Luminal Factory's visual identity is the final design authority.
-
-## Required Working Behavior
-
-Before editing:
-
-1. Inspect relevant files.
-2. Trace existing callers and dependencies.
-3. Read the relevant skill references.
-4. Identify important assumptions.
-5. Avoid speculative rewrites.
-
-During implementation:
-
-1. Keep scope focused.
-2. Preserve unrelated behavior.
-3. Use existing project patterns.
-4. Maintain strict TypeScript.
-5. Validate external data.
-6. Consider mobile and reduced motion.
-7. Avoid unnecessary abstractions.
-
-After implementation:
-
-1. Run the relevant checks.
-2. Inspect changed files.
-3. Verify no unintended commerce rule changes.
-4. Update documentation when the project contract changed.
-5. Summarize notable assumptions or remaining risks.
+- Commerce concept or lifecycle change: `commerce-domain.md`; also `supabase-contract.md` when persistence or enforcement changes.
+- Supabase schema, RLS, or storage change: `supabase-contract.md`; also `commerce-domain.md` when domain meaning changes.
+- Major page or feature implementation: `workflow.md`; plus the branch references for commerce, UI, architecture, or data impact.
+- Motion-heavy or 3D implementation: `ui-rules.md`; also `architecture.md` when component boundaries, asset loading, or performance boundaries change.
+- New dependency: `workflow.md`; also the domain reference that owns the problem being solved.

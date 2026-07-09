@@ -1,5 +1,11 @@
 # Supabase Contract
 
+## Ownership
+
+This file is the authoritative owner of Supabase persistence, clients, authentication, RLS, data access boundaries, trusted enforcement, storage, generated database types, schema changes, and shared database assumptions.
+
+Use `commerce-domain.md` for commerce concept meaning, lifecycle semantics, sale types, revenue rules, and domain change rules.
+
 ## Role of Supabase
 
 Supabase is the planned shared backend platform for Luminal Factory commerce.
