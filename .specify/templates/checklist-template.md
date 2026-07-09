@@ -26,6 +26,17 @@
 - [ ] CHK002 Second checklist item
 - [ ] CHK003 Third checklist item
 
+## Constitution Compliance
+
+- [ ] CHKXXX Raffle-first commerce boundaries are preserved or marked N/A with rationale
+- [ ] CHKXXX Major page work has approved experience script and specification before implementation
+- [ ] CHKXXX External references are adapted to Luminal and do not copy identity, assets, copy, product names, or complete layouts
+- [ ] CHKXXX Motion has a defined material, weight, assembly, depth, or state role and stays within the motion budget
+- [ ] CHKXXX Server/client, service/data, and motion/3D boundaries are explicit
+- [ ] CHKXXX Commerce, inventory, payment, and customer-data decisions use trusted boundaries
+- [ ] CHKXXX Strict TypeScript, boundary validation, focused components, and browser-effect cleanup are accounted for
+- [ ] CHKXXX Actual validation commands and manual checks are listed before completion
+
 ## [Category 2]
 
 - [ ] CHK004 Another category item

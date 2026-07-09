@@ -78,6 +78,22 @@
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
 
+## Constitution Alignment *(mandatory)*
+
+<!--
+  ACTION REQUIRED: Explain how this specification complies with the Luminal
+  Factory Commerce Constitution. Use N/A only when the principle genuinely does
+  not apply to this feature.
+-->
+
+- **Raffle-first commerce**: [How this preserves Product/Raffle/Raffle Entry/Order/Payment/Shipment/Commission boundaries or N/A]
+- **Specification-first status**: [Experience discussion, page script approval, and specification status]
+- **Luminal visual authority**: [How references are adapted without copying brand identity, assets, copy, product names, or complete layouts]
+- **Intentional motion**: [Primary motion, secondary motions, reduced-motion behavior, and mobile fallback or N/A]
+- **Server-first boundaries**: [Server Component, Client Component, service boundary, and motion/3D separation expectations]
+- **Domain and data integrity**: [Trusted boundary, authorization/RLS, duplicate submission, stale data, and time-based state considerations or N/A]
+- **Validation expectations**: [Relevant lint/typecheck/build/test/manual checks expected before completion]
+
 ## Requirements *(mandatory)*
 
 <!--
@@ -102,6 +118,13 @@
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
+
+### Domain Boundaries *(include if feature involves commerce data)*
+
+- **Commerce concepts affected**: [Product, Raffle, Raffle Entry, Order, Payment, Shipment, Commission Request, Customer, Archive, or N/A]
+- **Authoritative state owner**: [Database, trusted server workflow, payment provider, ERP operation, or N/A]
+- **Order creation rule**: [When an order may be created; confirm unsuccessful raffle entries do not create orders]
+- **Payment/revenue rule**: [How successful payments and refunds remain authoritative for revenue or N/A]
 
 ## Success Criteria *(mandatory)*
 

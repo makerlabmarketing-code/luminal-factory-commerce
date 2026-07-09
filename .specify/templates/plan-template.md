@@ -18,29 +18,50 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Language/Version**: TypeScript strict, Next.js App Router, React [version or NEEDS CLARIFICATION]
 
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Primary Dependencies**: [Next.js, React, Tailwind CSS, Supabase, GSAP/Motion/R3F/Model Viewer as applicable or NEEDS CLARIFICATION]
 
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Storage**: [Supabase/PostgreSQL, Supabase Storage, explicit mock adapter, or N/A]
 
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
+**Testing**: [actual repository scripts from npm run; do not assume check exists]
 
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Target Platform**: Public customer-facing Luminal Factory storefront
 
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]
+**Project Type**: Next.js storefront
 
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**Performance Goals**: [commerce usability, responsive interaction, motion/3D budget, or NEEDS CLARIFICATION]
 
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
+**Constraints**: [server-first boundary, trusted commerce enforcement, reduced motion, mobile fallback, or NEEDS CLARIFICATION]
 
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Scale/Scope**: [page/feature scope, user journeys, commerce surface, or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- **Raffle-first commerce**: Does this plan preserve Product, Raffle, Raffle Entry,
+  Order, Payment, Shipment, and Commission Request boundaries? If not
+  applicable, state why.
+- **Specification-first status**: For major page work, are the experience script
+  and specification approved before implementation tasks are created?
+- **Visual authority**: Are external references translated into Luminal-specific
+  visual direction without copying identity, assets, copy, product names, or
+  complete layouts?
+- **Intentional motion**: Is every motion assigned a role: material, weight,
+  assembly, depth, or state? Does each viewport stay within one primary motion
+  and no more than two secondary motions?
+- **Architecture boundaries**: Are Server Components used by default, Client
+  Components limited to browser interaction, Supabase access behind explicit
+  data/service boundaries, and motion/3D isolated from commerce/data logic?
+- **Domain and data integrity**: Are raffle, inventory, payment, and customer-data
+  rules enforced at trusted server or database boundaries?
+- **Code quality**: Does the approach preserve strict TypeScript, avoid `any`,
+  validate untrusted inputs, use focused components, and avoid speculative
+  abstractions?
+- **Validation plan**: Which actual repository scripts and manual checks will be
+  run before completion? Include motion, 3D, and commerce-specific checks when
+  applicable.
 
 ## Project Structure
 
@@ -65,39 +86,19 @@ specs/[###-feature]/
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
 src/
-├── models/
+├── app/
+├── components/
+├── features/
+├── lib/
 ├── services/
-├── cli/
-└── lib/
+└── types/
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+public/
+└── [public web assets; no production sculpt masters or manufacturing files]
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+specs/[###-feature]/
+└── [feature specification artifacts]
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real

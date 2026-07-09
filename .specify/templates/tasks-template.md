@@ -9,7 +9,9 @@ description: "Task list template for feature implementation"
 
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Tests**: Include tests and manual validation tasks required by the
+constitution, feature specification, and implementation plan. Do not claim a
+validation task passed unless it was actually performed.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -21,10 +23,13 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Next.js App Router**: `src/app/`
+- **Shared UI and layout components**: `src/components/`
+- **Feature-specific work**: `src/features/[feature]/`
+- **Data and service boundaries**: `src/services/`, `src/lib/`
+- **Public assets**: `public/`
+- **Specification artifacts**: `specs/[###-feature-name]/`
+- Adjust paths to the real structure documented in plan.md.
 
 <!--
   ============================================================================
@@ -63,12 +68,12 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T004 Identify authoritative service/data boundary for this feature
+- [ ] T005 [P] Define validation schemas for untrusted inputs
+- [ ] T006 [P] Confirm Server Component and Client Component split
+- [ ] T007 Confirm commerce domain boundaries affected by the feature
+- [ ] T008 Confirm authorization/RLS or trusted server boundary requirements
+- [ ] T009 Inspect actual repository scripts with `npm run`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -89,12 +94,12 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T012 [P] [US1] Create or update focused components in src/[path]
+- [ ] T013 [P] [US1] Create or update domain/data helpers in src/[path]
+- [ ] T014 [US1] Implement explicit service/data function in src/[path] (depends on T012, T013)
+- [ ] T015 [US1] Compose route or feature surface in src/[path]
+- [ ] T016 [US1] Add boundary validation and user-safe error handling
+- [ ] T017 [US1] Add cleanup for browser effects, observers, timers, or animation frames if applicable
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -113,9 +118,9 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T020 [P] [US2] Create or update focused components in src/[path]
+- [ ] T021 [US2] Implement explicit service/data function in src/[path]
+- [ ] T022 [US2] Compose route or feature surface in src/[path]
 - [ ] T023 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
@@ -135,9 +140,9 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T026 [P] [US3] Create or update focused components in src/[path]
+- [ ] T027 [US3] Implement explicit service/data function in src/[path]
+- [ ] T028 [US3] Compose route or feature surface in src/[path]
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -153,9 +158,12 @@ Examples of foundational tasks (adjust based on your project):
 
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
+- [ ] TXXX Verify strict TypeScript and no `any`
+- [ ] TXXX Verify Supabase and commerce access stays behind explicit boundaries
+- [ ] TXXX Verify reduced-motion behavior and mobile fallback for motion work
+- [ ] TXXX Verify 3D loading failure, slow loading, mobile performance, and scene cleanup for 3D work
+- [ ] TXXX Verify duplicate submissions, stale data, lifecycle rules, and time-based state for commerce work
+- [ ] TXXX Run applicable actual repository scripts: [lint/typecheck/build/test]
 - [ ] TXXX Run quickstart.md validation
 
 ---
@@ -179,9 +187,9 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Within Each User Story
 
-- Tests (if included) MUST be written and FAIL before implementation
-- Models before services
-- Services before endpoints
+- Tests or validation tasks required by the spec/plan MUST be created before implementation work that depends on them
+- Domain/data boundaries before visual composition
+- Services/data functions before route or component consumption
 - Core implementation before integration
 - Story complete before moving to next priority
 
@@ -247,6 +255,6 @@ With multiple developers:
 - [Story] label maps task to specific user story for traceability
 - Each user story should be independently completable and testable
 - Verify tests fail before implementing
-- Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
-- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence,
+  browser-only commerce enforcement, and unapproved page implementation

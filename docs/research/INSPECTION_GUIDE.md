@@ -1,80 +1,107 @@
-# Website Inspection Guide
+# Reference Inspection Guide
 
-## How to Reverse-Engineer Any Website
+## Purpose
 
-This guide outlines what to capture when inspecting a target website via Chrome MCP or browser DevTools.
+Use this guide when studying external websites as references for Luminal
+Factory. The goal is to understand useful behavior, structure, and technical
+patterns, then translate them into Luminal-specific direction.
 
-## Phase 1: Visual Audit
+This is not a cloning workflow. Do not copy another brand's identity, assets,
+copy, product names, or complete layouts.
 
-### Screenshots to Capture
-- [ ] Every distinct page — desktop, tablet, mobile
-- [ ] Dark mode variants (if applicable)
-- [ ] Light mode variants (if applicable)
-- [ ] Key interaction states (hover, active, open menus, modals)
-- [ ] Loading/skeleton states
-- [ ] Empty states
-- [ ] Error states
+## Phase 1: Scope
 
-### Design Tokens to Extract
-- [ ] **Colors** — background, text (primary/secondary/muted), accent, border, hover, error, success, warning
-- [ ] **Typography** — font family, sizes (h1-h6, body, caption, label), weights, line heights, letter spacing
-- [ ] **Spacing** — padding/margin patterns (look for a scale: 4px, 8px, 12px, 16px, 24px, 32px, etc.)
-- [ ] **Border radius** — buttons, cards, avatars, inputs
-- [ ] **Shadows/elevation** — card shadows, dropdown shadows, modal overlay
-- [ ] **Breakpoints** — when does the layout shift? (inspect with DevTools responsive mode)
-- [ ] **Icons** — which icon library? custom SVGs? sizes?
-- [ ] **Avatars** — sizes, shapes, fallback behavior
-- [ ] **Buttons** — all variants (primary, secondary, ghost, icon-only, danger)
-- [ ] **Inputs** — text fields, textareas, selects, checkboxes, toggles
+Identify:
 
-## Phase 2: Component Inventory
+- reference URL
+- exact page or section being studied
+- analysis mode: visual, motion, interaction, 3D, layout, commerce, content
+  structure, engineering architecture, or component behavior
+- Luminal page or feature the reference may inform
 
-For each distinct UI component, document:
-1. **Name** — what would you call this component?
-2. **Structure** — what HTML elements / child components does it contain?
-3. **Variants** — does it have different sizes, colors, or states?
-4. **States** — default, hover, active, disabled, loading, error, empty
-5. **Responsive behavior** — how does it change at different breakpoints?
-6. **Interactions** — click, hover, focus, keyboard navigation
-7. **Animations** — transitions, entrance/exit animations, micro-interactions
+Do not inspect an entire site when the request concerns one interaction or
+section.
 
-### Common Components to Look For
-- Navigation (top bar, sidebar, bottom bar)
-- Cards / list items
-- Buttons and links
-- Forms and inputs
-- Modals and dialogs
-- Dropdowns and menus
-- Tabs and segmented controls
-- Avatars and user badges
-- Loading skeletons
-- Toast notifications
-- Tooltips and popovers
+## Phase 2: Observed Experience
 
-## Phase 3: Layout Architecture
+Document what can be directly observed before inferring implementation:
 
-- [ ] **Grid system** — CSS Grid? Flexbox? Fixed widths?
-- [ ] **Column layout** — how many columns at each breakpoint?
-- [ ] **Max-width** — main content area max-width
-- [ ] **Sticky elements** — header, sidebar, floating buttons
-- [ ] **Z-index layers** — navigation, modals, tooltips, overlays
-- [ ] **Scroll behavior** — infinite scroll, pagination, virtual scrolling
+- page or section sequence
+- primary visual object or content focus
+- layout rhythm and spatial layers
+- interaction triggers
+- motion start state, transition, and settle behavior
+- responsive behavior
+- loading, empty, and error states when visible
 
-## Phase 4: Technical Stack Analysis
+Separate:
 
-- [ ] **Framework** — React? Vue? Angular? Check `__NEXT_DATA__`, `__NUXT__`, `ng-version`
-- [ ] **CSS approach** — Tailwind (utility classes), CSS Modules, Styled Components, Emotion, vanilla CSS
-- [ ] **State management** — Redux (check DevTools), React Query, Zustand, Pinia
-- [ ] **API patterns** — REST, GraphQL (check network tab for `/graphql` requests)
-- [ ] **Font loading** — Google Fonts, self-hosted, system fonts
-- [ ] **Image strategy** — CDN, lazy loading, srcset, WebP/AVIF
-- [ ] **Animation library** — Framer Motion, GSAP, CSS transitions only
+- `OBSERVED`: visible behavior
+- `SOURCE-CONFIRMED`: behavior verified by source, prompt, or code
+- `INFERRED`: plausible implementation based on inspection
 
-## Phase 5: Documentation Output
+## Phase 3: Luminal Adaptation
 
-After inspection, create these files in `docs/research/`:
-1. `DESIGN_TOKENS.md` — All extracted colors, typography, spacing
-2. `COMPONENT_INVENTORY.md` — Every component with structure notes
-3. `LAYOUT_ARCHITECTURE.md` — Page layouts, grid system, responsive behavior
-4. `INTERACTION_PATTERNS.md` — Animations, transitions, hover states
-5. `TECH_STACK_ANALYSIS.md` — What the site uses and our chosen equivalents
+For each useful reference behavior, record:
+
+```text
+REFERENCE BEHAVIOR
+
+WHY IT WORKS
+
+DO NOT COPY
+
+LUMINAL ADAPTATION
+```
+
+Luminal adaptation must respect:
+
+- raffle-first commerce priority
+- approved page scripts and specifications
+- dark, editorial, atmospheric, physical, object-focused, controlled, and
+  experimental visual direction
+- motion budget of one primary motion and no more than two secondary motions per
+  viewport
+- reduced-motion behavior and mobile fallbacks
+
+## Phase 4: Technical Assessment
+
+Identify the simplest plausible technology for the observed behavior.
+
+Use the Luminal motion hierarchy:
+
+- CSS for simple visual transitions
+- Motion for local component and layout interaction
+- GSAP for choreographed timelines, scrolling, and coordinated state transitions
+- React Three Fiber for custom real-time 3D scenes
+- Model Viewer for simple product GLB inspection
+
+Do not recommend WebGL merely because a scene looks visually rich.
+
+## Phase 5: Output
+
+When a reference materially affects project direction, a page specification, a
+motion system, commerce structure, or implementation planning, create or update
+a durable note under:
+
+```text
+docs/research/references/
+```
+
+Use sections for:
+
+- Scope
+- Why This Reference Matters
+- Observed Experience
+- Interaction Model
+- Spatial Layers
+- Motion Breakdown
+- Technical Assessment
+- Source-Confirmed Details
+- What Must Not Be Copied
+- Luminal Adaptation
+- Performance Considerations
+- Applicable Luminal Pages
+
+Reference analysis does not authorize major page implementation. The
+specification-first workflow still applies.
