@@ -16,4 +16,7 @@
 
 ## Checklist
 
-- [ ] `npm run check` passes (lint + typecheck + build)
+- [ ] Scope maps to one bounded roadmap slice
+- [ ] `npm run check` passes (lint + typecheck + tests + build)
+- [ ] Self-review has no unresolved P0/P1 findings
+- [ ] Data, security, live-approval, and deployment impacts are documented
