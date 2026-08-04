@@ -1,11 +1,13 @@
 ---
 name: clone-website
-description: Reverse-engineer and clone one or more websites in one shot — extracts assets, CSS, and content section-by-section and proactively dispatches parallel builder agents in worktrees as it goes. Use this whenever the user wants to clone, replicate, rebuild, reverse-engineer, or copy any website. Also triggers on phrases like "make a copy of this site", "rebuild this page", "pixel-perfect clone". Provide one or more target URLs as arguments.
+description: Deprecated upstream template skill retained temporarily for provenance. Do not invoke for Luminal Factory; use reference-analysis instead.
 argument-hint: "<url1> [<url2> ...]"
 user-invocable: true
 ---
 
 # Clone Website
+
+> **Deprecated here.** Do not execute this imported template workflow. It conflicts with Luminal Factory's adaptation and page-approval gates. Use `.codex/skills/reference-analysis/SKILL.md`; remove this file only after its unique upstream material is confirmed unnecessary.
 
 You are about to reverse-engineer and rebuild **$ARGUMENTS** as pixel-perfect clones.
 

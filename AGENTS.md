@@ -1,128 +1,30 @@
-# Luminal Factory Commerce Agent Guide
+# Luminal Factory Commerce — Codex Cloud Guide
 
-## Repository Identity
+## Identity and boundaries
 
-This repository is the public customer-facing storefront for Luminal Factory.
+This repository is the public, customer-facing **Luminal Factory storefront**. It owns brand presentation and, in later approved slices, customer commerce. The separate ERP owns staff, production, finance, operational inventory, raffle-winner, and internal commission administration. Never add ERP application workflows here.
 
-Luminal Factory is a raffle-first artisan commerce and collectible-object brand focused primarily on artisan keycaps and crafted objects.
+## Commands
 
-The storefront owns public brand experience and customer-facing commerce workflows.
-The Luminal Factory ERP owns operational back-office workflows.
+Use Node 24 and inspect `npm run` before validation. Current commands are `npm run dev`, `npm run start`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, and the aggregate `npm run check` (lint, typecheck, test, build).
 
-ERP-only workflows stay out of this repository unless an approved architecture change explicitly requires them. ERP-only concerns include staff operations, payroll, internal production administration, operational inventory administration, internal finance administration, raffle winner administration, and internal commission operations.
+## Architecture and code
 
-## Authority Order
+- Next.js App Router with strict TypeScript and Tailwind CSS is authoritative. Use Server Components by default; isolate the smallest browser-interactive unit as a Client Component.
+- Keep routes thin, business rules outside presentation components, and future Supabase calls behind typed service/data boundaries. Do not use `any`.
+- Reuse centralized tokens in `src/app/globals.css`; use semantic HTML, mobile-first responsive behavior, visible focus, useful alt text, stable media aspect ratios, and reduced-motion fallbacks.
+- Do not add overlapping styling, icon, state, form, or animation libraries. Do not invent products, prices, stock, reviews, metrics, deadlines, partners, or contact details.
 
-Use this order when guidance overlaps:
+## Security and live approval boundary
 
-1. The user's explicit request, when it stays within repository and safety boundaries.
-2. This `AGENTS.md` file.
-3. `.agents/skills/luminal-commerce/SKILL.md`.
-4. Approved Luminal Factory page scripts, specifications, and technical plans.
-5. Luminal Commerce reference files under `.agents/skills/luminal-commerce/references/`.
-6. Repository-owned workflow or research artifacts.
-7. Third-party skills and general UI recommendations, including UI UX Pro Max.
-8. External websites, repositories, screenshots, and inspiration references.
+Never print or commit secrets. `NEXT_PUBLIC_*` values must be safe for browsers; privileged credentials remain server-only. Codex must not automatically execute production SQL or migrations, change secrets, operate payments, or mutate live orders, inventory, raffles, commissions, or customer data. A live change requires explicit operator approval plus preflight, forward, validation, and rollback instructions where applicable.
 
-Luminal Factory product direction, commerce contracts, architecture boundaries, workflow, and visual identity override generic UI guidance and external references.
+## Roadmap workflow
 
-## Governing Project Skill
+`docs/ECOMMERCE_IMPLEMENTATION_ROADMAP.md` is the authoritative delivery roadmap. Work in bounded slices; update the roadmap, `docs/current-ecommerce-operator-handoff.md`, and durable architecture/domain references when their contracts change. Major pages still require an approved script/spec unless the user explicitly approves the bounded implementation.
 
-Repository-specific project guidance lives in:
+Use `.agents/skills/luminal-commerce/SKILL.md` as the repository skill router and load only relevant references. External sites are research inputs, never cloning authority.
 
-    .agents/skills/luminal-commerce/
+## Validation and delivery
 
-Use the Luminal Commerce skill for non-trivial work involving:
-
-- product direction
-- commerce terminology
-- architecture boundaries
-- Supabase assumptions
-- UI and motion direction
-- repository workflow
-- page scripts, specifications, or implementation planning
-
-Read the smallest relevant reference set for the task. Do not load every reference document when the task only concerns one area.
-
-The durable reference owners are:
-
-- `references/project-context.md`: repository purpose, product identity, current phase, storefront versus ERP responsibilities
-- `references/workflow.md`: specification-first workflow, page approval gates, implementation sequence, validation, completion summaries
-- `references/commerce-domain.md`: commerce concepts, lifecycle meaning, sale types, payment/order/refund/shipment semantics
-- `references/supabase-contract.md`: Supabase access, RLS, trusted enforcement, schema assumptions, storage, generated database types
-- `references/architecture.md`: Next.js structure, server/client boundaries, feature/service boundaries, shared-code strategy
-- `references/ui-rules.md`: visual direction, motion language, animation technology, 3D rules, mobile and reduced-motion behavior
-- `references/coding-style.md`: TypeScript, React, naming, validation, cleanup, imports, comments, file conventions
-
-## Page Approval Gate
-
-The storefront is currently in foundation and design-definition phase.
-
-Major page designs are implemented only after the experience script and specification are approved. Until then, analysis, documentation, prototypes, or isolated technical experiments may be appropriate.
-
-Do not silently turn an experiment or reference study into production page architecture.
-
-The full page workflow is owned by `references/workflow.md`.
-
-## Commerce Gate
-
-Preserve domain meaning:
-
-- A Product is not a Raffle.
-- A Raffle Entry is not an Order.
-- A Payment is not a Shipment.
-- A Commission Request is not automatically an Order.
-
-Revenue derives from authoritative financial transactions and refunds.
-
-Domain contract changes require documentation review in `references/commerce-domain.md` and, when persistence or trust boundaries change, `references/supabase-contract.md`.
-
-## Architecture Gate
-
-Use Server Components by default and Client Components only when browser interaction is required.
-
-Keep route files thin, business rules outside visual components, and Supabase access behind explicit data or service boundaries.
-
-Architecture details are owned by `references/architecture.md`.
-
-## Reference Analysis Gate
-
-External websites and repositories are references, not final design authorities.
-
-For structured reference analysis, use:
-
-    .codex/skills/reference-analysis/SKILL.md
-
-A reference analysis must distinguish observed behavior, source-confirmed behavior, and inferred technical implementation.
-
-Reference analysis does not grant permission to implement a major page. The page workflow in `references/workflow.md` still applies.
-
-## Validation Gate
-
-Before assuming a package script exists, inspect the repository scripts with:
-
-    npm run
-
-Use the actual scripts defined by the repository. Do not claim validation passed unless the command or check was actually performed.
-
-Validation expectations are owned by `references/workflow.md`.
-
-## Skill Authoring Gate
-
-When creating or materially changing a repository skill, consult the installed `writing-great-skills` skill.
-
-Repository skills should optimize for predictable process, single ownership, progressive disclosure, and checkable completion criteria.
-
-Do not create a new repository skill when an existing skill or reference file already owns the responsibility.
-
-## Completion Behavior
-
-After non-trivial implementation work, report:
-
-1. what changed
-2. important files changed
-3. validation performed
-4. known limitations
-5. unresolved domain or architecture decisions
-
-Do not claim a page, feature, test, or validation step is complete when it was not actually completed.
+Run `npm run check`, review the diff, and classify findings P0–P2 before PR. Fix directly related findings. PRs must state scope, validation, limitations, data/security impact, and roadmap evidence. Auto-merge only when checks pass, there are no conflicts, and no unresolved P0/P1 remains; deployment or live verification stays operator-controlled when credentials or approval are unavailable.

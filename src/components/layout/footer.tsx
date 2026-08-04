@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { navigation } from "./navigation";
+export function Footer() { return <footer className="site-footer"><div className="footer-grid"><div><p className="footer-mark">LF</p><h2>Made slowly.<br />Made to stay.</h2></div><nav aria-label="Điều hướng chân trang">{navigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</nav><p>Artisan keycap, nhân vật 3D và những vật thể sưu tầm được tạo tác tại Luminal Factory.</p></div><div className="footer-base"><span>© {new Date().getFullYear()} Luminal Factory</span><span>Privacy · Terms</span></div></footer>; }

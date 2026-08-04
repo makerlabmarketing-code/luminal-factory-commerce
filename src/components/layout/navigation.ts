@@ -1,0 +1,1 @@
+export const navigation = [{ href: "#creations", label: "Shop" }, { href: "#gallery", label: "Gallery" }, { href: "#commission", label: "Commission" }, { href: "#raffle", label: "Raffle" }, { href: "#about", label: "About" }] as const;

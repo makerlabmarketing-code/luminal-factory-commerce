@@ -72,6 +72,18 @@ Read `references/coding-style.md`.
 
 Use it for TypeScript, React, Next.js conventions, naming, validation, error handling, Supabase query placement, styling, motion code, comments, imports, and file conventions.
 
+### Storefront UI implementation
+
+Read `references/storefront-ui.md` when implementing responsive storefront presentation, reusable UI, accessibility, media, or loading/error/empty states.
+
+### Repository cleanup
+
+Read `references/repository-cleanup.md` when auditing duplicates, dead code, obsolete files, or canonical replacements.
+
+### PR delivery
+
+Read `references/pr-delivery.md` when preparing, reviewing, merging, deploying, or handing off a bounded roadmap slice.
+
 ## Cross-Branch Contract Changes
 
 Some changes require more than one reference:
