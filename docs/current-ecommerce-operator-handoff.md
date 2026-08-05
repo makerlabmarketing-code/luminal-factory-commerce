@@ -54,3 +54,13 @@
 - **Still blocked:** Full Shop/catalog system, production product/content/media approval, product detail pages, search/filter/sorting/pagination, Supabase-backed catalog, cart, checkout, payment, order, account/authentication, ERP workflows, deployment verification, and manual browser/a11y review.
 - **Operator-only actions:** Approve production shop content/media, configure any future server data source, inspect CI/PR checks, approve deployment, and perform production smoke/browser review.
 - **Next suggested slice:** Commission discovery/page foundation may follow only after owner approval; do not continue automatically.
+
+
+## 2026-08-05 Future LazyFactory asset handoff preparation
+
+- **Owner-provided source pending:** A future Google Drive folder may contain images and videos from older LazyFactory projects, but this slice does not wait for it, download it, hard-code its URL, or treat Google Drive as a production CDN.
+- **Current implementation boundary:** Home, Archive, and Shop presentation content continues to use clearly labeled internal placeholder media only. No logo, brand name, current copy, product claim, price, stock, or commerce status has been changed to LazyFactory.
+- **Presentation model readiness:** Storefront media records can distinguish image/video type, source path, alt text, dimensions, aspect ratio, poster, credit/source note, LazyFactory historical archive status, production approval status, focal/object positioning, and placeholder fallback.
+- **Asset classifications:** Future records must explicitly distinguish `lazyfactory-historical-archive`, `luminal-current-brand`, and `internal-placeholder` sources, and must keep `productionApproved` false until rights, brand, crop, alt text, optimization, and production usage review are complete.
+- **Future migration slice:** When assets arrive, run a separate approved slice for inventory, usage-rights and branding review, Home/Archive/Shop/Process/social metadata classification, production image/video selection, size/format optimization, video poster creation, alt-text completion, placeholder replacement, and performance/responsive crop validation.
+- **Still forbidden without approval:** External downloads, Google Drive URLs in source, Google Drive as production CDN, production-media claims, LazyFactory rebranding of current Luminal content, live data mutation, payments, orders, inventory, raffles, commissions, or ERP workflows.

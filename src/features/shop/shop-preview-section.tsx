@@ -23,7 +23,7 @@ export function ShopPreviewSection({ entries }: ShopPreviewSectionProps) {
           <ol className="shop-preview-list" aria-label="Curated shop presentation entries">
             {previewEntries.map((entry, index) => (
               <li key={entry.id} className="shop-preview-card" id={`preview-${entry.presentationKey}`}>
-                <div className={`shop-media shop-media-${entry.media.tone}`} role="img" aria-label={entry.mediaAlt}>
+                <div className={`shop-media shop-media-${entry.media.tone}`} role="img" aria-label={entry.media.alt}>
                   <span aria-hidden="true" />
                   <em>{entry.media.label}</em>
                 </div>

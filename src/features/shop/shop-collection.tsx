@@ -28,7 +28,7 @@ export function ShopCollection({ entries }: ShopCollectionProps) {
       <ol className="shop-route-list">
         {entries.map((entry, index) => (
           <li key={entry.id} id={entry.presentationKey} className="shop-route-card">
-            <div className={`shop-media shop-media-${entry.media.tone}`} role="img" aria-label={entry.mediaAlt}>
+            <div className={`shop-media shop-media-${entry.media.tone}`} role="img" aria-label={entry.media.alt}>
               <span aria-hidden="true" />
               <em>{entry.media.label}</em>
             </div>

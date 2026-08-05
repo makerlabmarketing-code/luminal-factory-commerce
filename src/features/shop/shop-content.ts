@@ -1,3 +1,5 @@
+import type { PresentationMedia } from "@/types/media";
+
 export type ShopPresentationStatus = "detail-coming-soon";
 
 export type ShopMediaTone = "ice" | "violet" | "rose";
@@ -10,11 +12,10 @@ export type ShopPresentationEntry = Readonly<{
   type: string;
   description: string;
   materialNote: string;
-  media: Readonly<{
+  media: PresentationMedia & Readonly<{
     label: string;
     tone: ShopMediaTone;
   }>;
-  mediaAlt: string;
   presentationStatus: ShopPresentationStatus;
   href: `/shop#${string}`;
   isPlaceholder: true;
@@ -32,8 +33,22 @@ export const curatedShopEntries = [
     type: "Artisan collectible",
     description: "A restrained shop placeholder for a collectible that may later support direct purchase presentation.",
     materialNote: "Dark metal base, cold crystal reflection, tactile hand-finished contour note.",
-    media: { label: "Internal shop media placeholder", tone: "ice" },
-    mediaAlt: "Abstract internal placeholder for shop collectible study one; not approved product media.",
+    media: {
+      type: "image",
+      src: "/placeholders/shop-ice-study.svg",
+      alt: "Abstract internal placeholder for shop collectible study one; not approved product media.",
+      width: 1500,
+      height: 1200,
+      aspectRatio: "5 / 4",
+      credit: "Internal Luminal Factory shop placeholder",
+      source: "internal-placeholder",
+      historicalBrand: false,
+      productionApproved: false,
+      objectPosition: "50% 42%",
+      placeholderFallback: "CSS shop object fallback",
+      label: "Internal shop media placeholder",
+      tone: "ice",
+    },
     presentationStatus: "detail-coming-soon",
     href: "/shop#object-study-direct-01",
     isPlaceholder: true,
@@ -46,8 +61,22 @@ export const curatedShopEntries = [
     type: "Keycap-scale object",
     description: "A quiet object-led slot for future directly available work, without price, stock, or order claims.",
     materialNote: "Lavender shadow, smoked edge, resin-like depth reserved for approved media.",
-    media: { label: "Internal shop media placeholder", tone: "violet" },
-    mediaAlt: "Abstract internal placeholder for shop collectible study two; not approved product media.",
+    media: {
+      type: "image",
+      src: "/placeholders/shop-violet-study.svg",
+      alt: "Abstract internal placeholder for shop collectible study two; not approved product media.",
+      width: 1500,
+      height: 1200,
+      aspectRatio: "5 / 4",
+      credit: "Internal Luminal Factory shop placeholder",
+      source: "internal-placeholder",
+      historicalBrand: false,
+      productionApproved: false,
+      objectPosition: "50% 42%",
+      placeholderFallback: "CSS shop object fallback",
+      label: "Internal shop media placeholder",
+      tone: "violet",
+    },
     presentationStatus: "detail-coming-soon",
     href: "/shop#object-study-direct-02",
     isPlaceholder: true,
@@ -60,8 +89,22 @@ export const curatedShopEntries = [
     type: "Collectible object",
     description: "An editorial presentation card for future shop discovery, separate from Archive release history.",
     materialNote: "Pale rose highlight, obsidian field, controlled crop placeholder composition.",
-    media: { label: "Internal shop media placeholder", tone: "rose" },
-    mediaAlt: "Abstract internal placeholder for shop collectible study three; not approved product media.",
+    media: {
+      type: "image",
+      src: "/placeholders/shop-rose-study.svg",
+      alt: "Abstract internal placeholder for shop collectible study three; not approved product media.",
+      width: 1500,
+      height: 1200,
+      aspectRatio: "5 / 4",
+      credit: "Internal Luminal Factory shop placeholder",
+      source: "internal-placeholder",
+      historicalBrand: false,
+      productionApproved: false,
+      objectPosition: "50% 42%",
+      placeholderFallback: "CSS shop object fallback",
+      label: "Internal shop media placeholder",
+      tone: "rose",
+    },
     presentationStatus: "detail-coming-soon",
     href: "/shop#object-study-direct-03",
     isPlaceholder: true,
