@@ -3,9 +3,12 @@ import { Header } from "@/components/layout/header";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { homeHeroContent } from "@/content/homepage";
+import { ArchivePreviewSection } from "@/features/archive/archive-preview-section";
+import { getCuratedArchiveEntries } from "@/features/archive/archive-content";
 
 export default function Home() {
   const hero = homeHeroContent;
+  const archiveEntries = getCuratedArchiveEntries();
 
   return (
     <>
@@ -52,6 +55,8 @@ export default function Home() {
             </div>
           </Container>
         </section>
+
+        <ArchivePreviewSection entries={archiveEntries} />
 
         <section id="about" className="about-minimal" aria-labelledby="about-title">
           <Container className="release-info-grid">
