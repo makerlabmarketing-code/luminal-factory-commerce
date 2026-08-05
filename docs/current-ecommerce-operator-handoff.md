@@ -2,12 +2,25 @@
 
 - **Baseline commit at slice start:** `e1cf50c02600ec8999f4a3378c08e359ccb4aac3` on local branch `work`. Remote/default-main identity was unavailable.
 - **Deployment status:** Unknown; no Vercel project metadata or authenticated remote is present. This PR must not be described as deployed.
-- **Completed slice:** Phase 0–2 code complete: repository foundation, storefront UI primitives, homepage skeleton.
-- **Blockers:** Approved raffle-first Home experience script, formal Home specification, approved brand imagery/logo, canonical production origin confirmation, remote/PR/check/deployment visibility, and manual browser/a11y review.
+- **Completed slice:** Phase 0–2 code complete: repository foundation, storefront UI primitives, homepage skeleton. Current documentation slice drafts the formal raffle-first Home specification only.
+- **Blockers:** Approval of the draft raffle-first Home experience script, approval of `specs/home/home-page-specification.md`, approved brand imagery/logo, approved hero mode/content/assets, canonical raffle time zone, canonical production origin confirmation, remote/PR/check/deployment visibility, and manual browser/a11y review.
 - **Deferred duplicates:** Deprecated GitHub clone skill, inspection guide, comparison image, and empty placeholder directories; see audit.
 - **Environment:** `NEXT_PUBLIC_APP_BASE_URL` is optional for local builds and required for an absolute production canonical. Supabase variables are not required by current source. `VERCEL_ENV` is platform-provided for robots behavior.
 - **Operator-only actions:** Configure/verify canonical origin; inspect CI; approve and trigger deployment; verify production; authorize any future secrets, SQL/migration, payment, or live mutation.
-- **Exact next approved Codex slice:** Review and approve the raffle-first Home Page Experience Script draft in `docs/page-scripts/home-raffle-first-experience-script-draft.md`; after approval, create the formal Home page specification before any Home UI implementation.
+- **Exact next approved Codex slice:** Review and approve the raffle-first Home Page Experience Script draft in `docs/page-scripts/home-raffle-first-experience-script-draft.md` and the formal Home Page Specification in `specs/home/home-page-specification.md`. After approval, the first implementation slice is Global visual foundation + Home raffle discovery hero shell.
 - **Production verification:** After deployment, request `/`, verify HTTP 200 and metadata, keyboard-test desktop/mobile navigation, crawl every internal link, test 390/768/1440px layouts, and confirm preview robots are noindex while production is indexable.
 - **Known warnings:** No approved media; abstract CSS studies are intentional. Social/contact links are omitted. Privacy/Terms are plain labels. Sitemap is deferred until stable routes exist. System font rendering may vary slightly by platform.
 - **Forbidden live actions:** Production SQL/migrations, secret edits, payment operations, order/inventory/customer mutations, raffle or commission mutations, and ERP changes without explicit operator approval and an applicable forward/validation/rollback package.
+
+
+## 2026-08-05 formal Home specification handoff
+
+- **Branch:** `docs/home-raffle-first-spec`.
+- **Commit:** This documentation commit; exact SHA is reported in the completion report because embedding the final SHA would change the commit hash.
+- **Documents created:** `specs/home/home-page-specification.md`.
+- **Documents updated:** `docs/ECOMMERCE_IMPLEMENTATION_ROADMAP.md`, `docs/current-ecommerce-operator-handoff.md`.
+- **Validation:** Passed before commit: `git diff --check`, `npm run check`, referenced-path check, approval/status review, ERP-boundary review.
+- **Specification status:** `DRAFT` / `REVIEW_REQUIRED` because the source experience script is still `DRAFT_FOR_REVIEW`.
+- **Home implementation status:** `BLOCKED` until the experience script, formal specification, hero mode, CTA, assets, time zone, and data boundaries are approved.
+- **Next approved slice after approval:** Global visual foundation + Home raffle discovery hero shell.
+- **Approval questions:** Hero mode, navigation order, primary CTA, account/cart visibility, first-hero 3D need, production assets, raffle time zone, no-active-raffle fallback, archive source, and Home-level prominence of Shop/Commission.
