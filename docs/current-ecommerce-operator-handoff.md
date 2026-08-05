@@ -43,3 +43,14 @@
 - **Still blocked:** Full Archive system, production archive content approval, Archive detail pages, search/filter/pagination, Supabase-backed archive collection, Shop and Commission routes, raffle transaction, payment, order, cart, account/authentication, ERP workflows, deployment verification, and manual browser/a11y review.
 - **Operator-only actions:** Approve production archive content/media, configure any future server data source, inspect CI/PR checks, approve deployment, and perform production smoke/browser review.
 - **Next suggested slice:** A bounded Shop or Commission discovery shell may follow only after owner approval; do not continue automatically.
+
+
+## 2026-08-05 Home Shop Discovery Preview + Shop route foundation
+
+- **Branch:** `feat/shop-discovery-foundation`.
+- **Technical plan:** `specs/shop/shop-discovery-foundation-technical-plan.md`.
+- **Implementation scope:** Home Shop Discovery Preview after Archive, `/shop` route foundation, curated static presentation data, typed presentation boundary, empty-state capability, and real Shop navigation href.
+- **Data status:** Curated placeholder presentation data only; not production product, price, inventory, cart, checkout, payment, order, customer, CMS, or Supabase data.
+- **Still blocked:** Full Shop/catalog system, production product/content/media approval, product detail pages, search/filter/sorting/pagination, Supabase-backed catalog, cart, checkout, payment, order, account/authentication, ERP workflows, deployment verification, and manual browser/a11y review.
+- **Operator-only actions:** Approve production shop content/media, configure any future server data source, inspect CI/PR checks, approve deployment, and perform production smoke/browser review.
+- **Next suggested slice:** Commission discovery/page foundation may follow only after owner approval; do not continue automatically.
