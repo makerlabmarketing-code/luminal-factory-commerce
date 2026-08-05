@@ -5,13 +5,15 @@
 | Field | Value |
 |---|---|
 | Title | Home Page Specification — Raffle-First |
-| Status | `DRAFT` |
+| Status | `APPROVED` / `IMPLEMENTATION_READY` |
 | Owner | Luminal Factory Commerce storefront |
 | Last updated | 2026-08-05 |
 | Source experience script | `docs/page-scripts/home-raffle-first-experience-script-draft.md` |
 | Related roadmap phase | Phase 3 — Static storefront routes / Home design-definition gate |
-| Implementation status | `BLOCKED` until this specification and required content/data decisions are approved |
-| Approval status | `REVIEW_REQUIRED`; source script is `DRAFT_FOR_REVIEW`, so this specification cannot be treated as approved |
+| Implementation status | `IMPLEMENTATION_READY` for first slice only |
+| Approval status | `OWNER_APPROVED_FOR_FIRST_IMPLEMENTATION_SLICE` |
+
+> Approval scope: owner approval applies only to the first implementation slice, “Global visual foundation + Home raffle discovery hero shell.” It does not approve the full Commerce architecture, production raffle business contract, database schema, account, cart, checkout, payment, order, or live transaction behavior. Raffle data/state modeling in this document remains a presentation proposal until a future approved commerce/data slice.
 
 This document formalizes the raffle-first Home architecture before UI implementation. It does not approve production UI, commerce mutations, database schema, raffle entry, payment, authentication, cart, or operational ERP workflows.
 
@@ -22,8 +24,8 @@ Home page authority order:
 1. Direct operator instructions and `AGENTS.md` repository rules.
 2. `.agents/skills/luminal-commerce/SKILL.md` and its authoritative references.
 3. `docs/ECOMMERCE_IMPLEMENTATION_ROADMAP.md` for bounded delivery status and gates.
-4. Approved page experience script. Current source is still `DRAFT_FOR_REVIEW`, so it is directional rather than approved.
-5. This formal Home specification after approval. Current status is `DRAFT`, so it is not implementation authority yet.
+4. Approved page experience script. Current source is owner-approved for the first implementation slice only.
+5. This formal Home specification as first-slice implementation authority only; broader commerce contracts remain unapproved.
 6. Current implementation source, including the static homepage skeleton, as foundation code only; it is not an approved raffle-first production design.
 7. Research, external references, abstract CSS object studies, visual experiments, and placeholder content; these are advisory only and are never production assets by default.
 
@@ -36,9 +38,9 @@ Conflict handling:
 
 Known conflicts or unresolved authority gaps:
 
-- The source experience script remains draft, so Home implementation is blocked.
+- The source experience script is owner-approved for the first implementation slice only; broader Home sections and commerce contracts remain gated by future approval.
 - The current homepage skeleton exists, but it was completed as a safe static foundation and does not lock production Home IA.
-- No approved real raffle, browser-safe hero asset, production logo/media set, canonical raffle time zone, or data contract is present in repository evidence.
+- No approved real raffle, browser-safe production hero asset, production logo/media set, or production data contract is present in repository evidence. Canonical raffle presentation time zone for this slice is Asia/Ho_Chi_Minh.
 
 ## 4.2 Page Purpose
 
@@ -66,7 +68,7 @@ Prohibited implication: Home must not offer raffle entry submission, payment, or
 
 ## 4.4 Information Architecture
 
-The proposed section order follows the source experience script and remains draft pending approval:
+The first-slice navigation and hero direction follow owner-approved decisions:
 
 1. Global navigation
 2. Raffle discovery hero
@@ -77,7 +79,7 @@ The proposed section order follows the source experience script and remains draf
 7. Shop or commission secondary entry
 8. Footer
 
-No order changes are proposed from the draft experience script.
+First-slice implementation is limited to the hero shell and minimal anchor destinations; lower Home sections remain future work.
 
 | Section | Purpose | Required content | Primary action | Secondary action | Component boundary | Data source | Loading | Empty | Error | Mobile | Reduced motion |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -99,8 +101,8 @@ Proposed raffle-first navigation order: `Raffle → Archive → Shop → Commiss
 - Active state: route-aware text, underline, or subtle material reflection; must not rely on color alone.
 - Keyboard behavior: links and menu controls reachable in DOM order; `Escape` closes mobile menu if an interactive menu exists; focus returns to trigger.
 - Focus behavior: visible focus ring/outline with sufficient contrast and no removal of default accessibility without replacement.
-- Sticky behavior: recommendation is non-sticky or minimally sticky after approval; avoid persistent obstruction of hero object. Decision remains review-required.
-- Account/cart visibility: hide by default in first release until authentication/cart contracts exist. If shown, label as disabled/forthcoming and do not imply a working account, cart, checkout, or session.
+- Sticky behavior: owner-approved for first slice as a light sticky header with restrained visual transition; avoid persistent obstruction of the hero object.
+- Account/cart visibility: hide for first release until authentication/cart contracts exist; do not imply a working account, cart, checkout, or session.
 - Placeholder handling: unimplemented destinations must either be real route shells with truthful empty states or omitted; no broken links.
 
 ## 4.6 Hero Specification
@@ -123,7 +125,7 @@ Hero content model proposal:
 - Mobile composition: stack status, title, media, and CTA so the primary action appears before archive/shop/commission.
 - Loading state: reserved media frame, pending status label, no false raffle claim.
 - Asset failure state: text-first release panel with approved fallback visual.
-- Missing raffle fallback: non-transactional object/brand study or archive-forward state, pending approval.
+- Missing raffle fallback: owner-approved for first slice as a non-transactional featured object/brand study with status copy “Đợt raffle tiếp theo đang được chuẩn bị”; archive-forward behavior may be added only when a real Archive route exists.
 
 Three hero possibilities:
 
@@ -131,7 +133,7 @@ A. Real upcoming/active raffle — strongest product fit, but requires approved 
 B. Non-transactional release placeholder — safer first implementation if raffle backend is not ready; must not pretend entries are available.
 C. Brand/object study — safest when no release data or asset is approved; useful for visual foundation but weaker as raffle-first commerce discovery.
 
-Recommendation: use option B for first UI slice if no real raffle contract is approved by implementation time, with option A becoming the target once public raffle data exists. Decision remains `REVIEW_REQUIRED`.
+Owner-approved first-slice decision: use option B, a non-transactional release placeholder. Option A remains a future target only after public raffle data, media, route, and commerce boundaries are approved.
 
 ## 4.7 Raffle State Model
 
@@ -202,7 +204,7 @@ Motion must support material, depth, state, hierarchy, or visual guidance. Budge
 
 ## 4.11 Optional 3D Decision Record
 
-Decision status: `REVIEW_REQUIRED`.
+Decision status: `OWNER_APPROVED_NOT_FOR_FIRST_SLICE`.
 
 - Is 3D needed for the first slice? Recommendation: no, unless an approved browser-safe asset and measurable experience need exist.
 - Value beyond 2D/CSS: true 3D may communicate object volume, refraction, and inspectability better than flat media; however, first slice can likely communicate raffle discovery with 2D/CSS material study.
@@ -214,7 +216,7 @@ Decision status: `REVIEW_REQUIRED`.
 - Reduced-motion fallback: no orbit/parallax; static object presentation.
 - Accessibility fallback: textual object description, decorative media hidden when appropriate, controls keyboard-accessible if inspection is interactive.
 
-Do not install React Three Fiber, Model Viewer, or any 3D dependency in this documentation slice.
+Do not install React Three Fiber, Model Viewer, or any 3D dependency in this first implementation slice.
 
 ## 4.12 Responsive Specification
 
@@ -311,7 +313,7 @@ Measurement method: `npm run build`, bundle output inspection, Lighthouse/Web Vi
 Specification acceptance:
 
 - Document contains metadata, authority order, IA, navigation, hero, raffle state, data, architecture, motion, 3D, responsive, accessibility, performance, content, state, security, SEO, acceptance, non-goal, and approval sections.
-- Status remains `DRAFT`/`REVIEW_REQUIRED` until source script and spec are approved.
+- Status is `APPROVED` / `IMPLEMENTATION_READY` only for the first implementation slice; broader Home and commerce contracts remain future-gated.
 - It does not treat current homepage skeleton or research assets as final production design.
 
 Implementation acceptance for future slice:
@@ -349,17 +351,17 @@ Data contract approval:
 - Do not refactor the whole repository.
 - Do not add ERP production workflows to the storefront.
 
-## 4.21 Approval Questions
+## 4.21 First-slice Approval Record
 
-1. Should the hero use a real raffle, a release placeholder, or a brand/object study?
-2. Should navigation use `Raffle → Archive → Shop → Commission → About`?
-3. What is the exact primary CTA copy and destination?
-4. Should account/cart be visible in the first release, hidden, or shown as disabled placeholders?
-5. Does the first hero need 3D?
-6. Which assets are approved for production use?
-7. What is the canonical raffle time zone?
-8. When no raffle is active, should Home show archive-forward content, an update-channel CTA, a release placeholder, or a brand study?
-9. Should archive preview use real data, manually curated approved content, or placeholders?
-10. How much should Shop and Commission appear on Home while raffle remains first priority?
+1. Hero uses a non-transactional release placeholder, not a raffle entry flow.
+2. Navigation order is `Raffle → Archive → Shop → Commission → About`.
+3. Primary CTA copy is “Khám phá bản phát hành” and targets release/raffle information on Home.
+4. Account/cart are hidden in the first release.
+5. 3D is not used in the first implementation slice.
+6. Internal placeholder media may be used only when clearly labeled as not production-approved.
+7. Canonical raffle presentation time zone is `Asia/Ho_Chi_Minh`.
+8. No-active-raffle fallback is a featured object or brand study with “Đợt raffle tiếp theo đang được chuẩn bị”.
+9. Archive preview starts as curated static content with a future server-data boundary; no Supabase schema/query is approved.
+10. Shop and Commission remain secondary and show “Sắp mở” when routes are unavailable.
 11. Should the header be sticky, non-sticky, or minimally sticky after scroll?
 12. Should unavailable secondary paths be hidden, disabled, or labeled forthcoming?

@@ -24,3 +24,11 @@
 - **Home implementation status:** `BLOCKED` until the experience script, formal specification, hero mode, CTA, assets, time zone, and data boundaries are approved.
 - **Next approved slice after approval:** Global visual foundation + Home raffle discovery hero shell.
 - **Approval questions:** Hero mode, navigation order, primary CTA, account/cart visibility, first-hero 3D need, production assets, raffle time zone, no-active-raffle fallback, archive source, and Home-level prominence of Shop/Commission.
+
+
+## 2026-08-05 owner-approved Home hero first slice
+
+- **Approval recorded:** The raffle-first Home experience script and formal Home specification are approved only for the first implementation slice.
+- **Implementation scope:** Global visual foundation + Home raffle discovery hero shell.
+- **Approved decisions:** Non-transactional release placeholder; navigation order Raffle, Archive, Shop, Commission, About; CTA “Khám phá bản phát hành” anchors to Home release/raffle information; account/cart hidden; no 3D; presentation time zone Asia/Ho_Chi_Minh; no-active-raffle fallback copy “Đợt raffle tiếp theo đang được chuẩn bị”; curated static archive preview boundary for future server data; Shop/Commission are secondary and marked “Sắp mở” when unavailable; light sticky header; internal placeholder media clearly labeled.
+- **Still blocked:** Real raffle entry, payment, order, cart, account/authentication, production raffle schema/enum, Supabase queries, production media approval, full Archive/Shop/Commission pages, ERP workflows, live data mutation, deployment verification, and manual browser/a11y review.
