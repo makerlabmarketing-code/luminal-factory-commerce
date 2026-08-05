@@ -5,10 +5,13 @@ import { Container } from "@/components/ui/container";
 import { homeHeroContent } from "@/content/homepage";
 import { ArchivePreviewSection } from "@/features/archive/archive-preview-section";
 import { getCuratedArchiveEntries } from "@/features/archive/archive-content";
+import { getCuratedShopEntries } from "@/features/shop/shop-content";
+import { ShopPreviewSection } from "@/features/shop/shop-preview-section";
 
 export default function Home() {
   const hero = homeHeroContent;
   const archiveEntries = getCuratedArchiveEntries();
+  const shopEntries = getCuratedShopEntries();
 
   return (
     <>
@@ -57,6 +60,8 @@ export default function Home() {
         </section>
 
         <ArchivePreviewSection entries={archiveEntries} />
+
+        <ShopPreviewSection entries={shopEntries} />
 
         <section id="about" className="about-minimal" aria-labelledby="about-title">
           <Container className="release-info-grid">

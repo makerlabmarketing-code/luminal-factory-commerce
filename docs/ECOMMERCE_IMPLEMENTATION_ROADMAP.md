@@ -55,8 +55,9 @@ Every phase uses the same contract fields below.
 - **Validation:** Route build, link crawl, semantics, responsive/a11y checks.
 - **Production gate:** Design approval for each route.
 - **Completion evidence:** Route manifest, screenshots, checks.
-- **Current slice:** Home Archive Preview + Archive route foundation.
-- **Current slice scope:** Adds a Home archive preview, real `/archive` route foundation, curated placeholder presentation data, typed data boundary, and navigation link update without marking the full Archive phase complete.
+- **Current slice:** Home Shop Discovery Preview + `/shop` route foundation.
+- **Current slice scope:** Adds a Home Shop Discovery Preview after Archive, real `/shop` route foundation, curated placeholder shop presentation data, typed data boundary, empty-state capability, and navigation link update without marking the full Shop phase complete.
+- **Previous slice evidence:** Home Archive Preview + `/archive` route foundation remains present as a bounded foundation slice only; full Archive remains future-gated.
 
 ## Phase 4 — Commerce data model — `LIVE_APPROVAL_REQUIRED`
 
