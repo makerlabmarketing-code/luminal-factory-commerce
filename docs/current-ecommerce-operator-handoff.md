@@ -32,3 +32,14 @@
 - **Implementation scope:** Global visual foundation + Home raffle discovery hero shell.
 - **Approved decisions:** Non-transactional release placeholder; navigation order Raffle, Archive, Shop, Commission, About; CTA “Khám phá bản phát hành” anchors to Home release/raffle information; account/cart hidden; no 3D; presentation time zone Asia/Ho_Chi_Minh; no-active-raffle fallback copy “Đợt raffle tiếp theo đang được chuẩn bị”; curated static archive preview boundary for future server data; Shop/Commission are secondary and marked “Sắp mở” when unavailable; light sticky header; internal placeholder media clearly labeled.
 - **Still blocked:** Real raffle entry, payment, order, cart, account/authentication, production raffle schema/enum, Supabase queries, production media approval, full Archive/Shop/Commission pages, ERP workflows, live data mutation, deployment verification, and manual browser/a11y review.
+
+
+## 2026-08-05 Home Archive Preview + Archive route foundation
+
+- **Branch:** `feat/home-archive-preview-foundation`.
+- **Technical plan:** `specs/archive/archive-preview-foundation-technical-plan.md`.
+- **Implementation scope:** Home Archive Preview section after raffle-first release information, `/archive` route foundation, curated static presentation data, typed presentation boundary, and real Archive navigation href.
+- **Data status:** Curated placeholder presentation data only; not production product, inventory, raffle, order, customer, CMS, or Supabase data.
+- **Still blocked:** Full Archive system, production archive content approval, Archive detail pages, search/filter/pagination, Supabase-backed archive collection, Shop and Commission routes, raffle transaction, payment, order, cart, account/authentication, ERP workflows, deployment verification, and manual browser/a11y review.
+- **Operator-only actions:** Approve production archive content/media, configure any future server data source, inspect CI/PR checks, approve deployment, and perform production smoke/browser review.
+- **Next suggested slice:** A bounded Shop or Commission discovery shell may follow only after owner approval; do not continue automatically.
