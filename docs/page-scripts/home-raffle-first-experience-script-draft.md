@@ -1,8 +1,8 @@
 # Home Page Experience Script Draft — Raffle-First
 
-Status: `DRAFT_FOR_REVIEW`  
-Date: 2026-08-05  
-Gate: Experience script only; not an implementation specification and not approval to build the full Home page.
+Status: `OWNER_APPROVED_FOR_FIRST_IMPLEMENTATION_SLICE`
+Date: 2026-08-05
+Gate: Owner-approved experience direction for the first implementation slice only; not approval to build the full Home page or commerce transaction flows.
 
 ## Authority and evidence
 
@@ -48,7 +48,7 @@ Role: orient visitors without behaving like a SaaS dashboard or generic ecommerc
 Content responsibilities:
 
 - Luminal Factory mark/name.
-- Raffle, Archive, Shop, Commission, About/Process, and account/cart placeholders only when their routes or behavior are approved.
+- Raffle, Archive, Shop, Commission, and About in the approved order. Account/cart are hidden for the first release.
 - Raffle should receive first-commerce priority in navigation order.
 
 Interaction model:
@@ -60,7 +60,7 @@ Interaction model:
 Approval needed:
 
 - Final route labels and order.
-- Whether account/cart appear before commerce contracts are implemented.
+- Account/cart are hidden before commerce contracts are implemented.
 
 ### 2. Active or upcoming raffle discovery hero
 
@@ -289,9 +289,9 @@ Approval needed:
 
 ## Questions for approval
 
-1. Approve or revise the proposed Home section order.
-2. Confirm whether the first hero should represent a real upcoming raffle, a non-transactional release placeholder, or a brand/object study until raffle data is ready.
-3. Confirm navigation order and labels, especially whether `Raffle` precedes `Archive` and `Shop`.
-4. Confirm whether account/cart links should remain hidden or clearly placeholder-only until commerce contracts exist.
-5. Confirm whether the first implementation slice may proceed after a formal spec, limited to global visual foundation plus Home raffle discovery hero shell.
-6. Confirm whether 3D is required for the first hero; if yes, provide approved browser-safe assets or approve an asset-production plan.
+1. Approved for first slice: section implementation is limited to global visual foundation plus Home raffle discovery hero shell.
+2. Approved for first slice: the first hero represents a non-transactional release placeholder until raffle data is ready.
+3. Approved: navigation order is `Raffle → Archive → Shop → Commission → About`.
+4. Approved: account/cart links remain hidden until commerce contracts exist.
+5. Approved: first implementation slice may proceed after the formal spec and technical plan.
+6. Approved: 3D is not required and must not be added for the first hero slice.

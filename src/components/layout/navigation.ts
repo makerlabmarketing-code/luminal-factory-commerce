@@ -1,1 +1,7 @@
-export const navigation = [{ href: "#creations", label: "Shop" }, { href: "#gallery", label: "Gallery" }, { href: "#commission", label: "Commission" }, { href: "#raffle", label: "Raffle" }, { href: "#about", label: "About" }] as const;
+export const navigation = [
+  { href: "#raffle", label: "Raffle", isAvailable: true },
+  { href: "#release-information", label: "Archive", isAvailable: true },
+  { href: "#release-information", label: "Shop", isAvailable: false },
+  { href: "#release-information", label: "Commission", isAvailable: false },
+  { href: "#about", label: "About", isAvailable: true },
+] as const;

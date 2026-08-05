@@ -1,21 +1,41 @@
 export type PresentationCreation = Readonly<{ id: string; title: string; category: string; status: "Khái niệm" | "Lưu trữ" | "Sắp tới"; tone: string }>;
 
-export const homepageContent = {
-  featuredCreations: [
-    { id: "study-01", title: "Nghiên cứu Tinh thể", category: "Artisan keycap", status: "Khái niệm", tone: "ice" },
-    { id: "study-02", title: "Nhân vật Số 02", category: "3D character", status: "Lưu trữ", tone: "violet" },
-    { id: "study-03", title: "Vật thể Ánh kim", category: "Collectible study", status: "Sắp tới", tone: "rose" },
-  ] satisfies readonly PresentationCreation[],
-  commissionSteps: [
-    { title: "Gửi ý tưởng", description: "Chia sẻ câu chuyện, hình ảnh tham chiếu và mong muốn của bạn." },
-    { title: "Cùng duyệt phạm vi", description: "Xưởng trao đổi hướng tạo hình, vật liệu và khả năng thực hiện." },
-    { title: "Thiết kế & sản xuất", description: "Tạo hình, thử mẫu và hoàn thiện theo phạm vi đã thống nhất." },
-    { title: "Bàn giao", description: "Kiểm tra, đóng gói và gửi tạo tác đã hoàn thiện." },
+export type HomeHeroContent = Readonly<{
+  mode: "releasePlaceholder";
+  eyebrow: string;
+  statusLabel: string;
+  title: string;
+  description: string;
+  primaryAction: Readonly<{ label: string; href: "#release-information" }>;
+  timingLabel: string;
+  timeZoneLabel: string;
+  media: Readonly<{ label: string; placeholderNotice: string; alt: string }>;
+  metadata: readonly Readonly<{ label: string; value: string }>[];
+  secondaryEntries: readonly Readonly<{ label: string; status: "Sắp mở" }>[];
+}>;
+
+export const homeHeroContent = {
+  mode: "releasePlaceholder",
+  eyebrow: "Luminal Release",
+  statusLabel: "Đợt raffle tiếp theo đang được chuẩn bị",
+  title: "Featured Object Study",
+  description:
+    "Một nghiên cứu vật thể sưu tầm theo tinh thần raffle-first của Luminal Factory: tập trung vào chất liệu, nhịp phát hành có chủ đích và thông tin minh bạch trước khi có bất kỳ entry hoặc thanh toán nào.",
+  primaryAction: { label: "Khám phá bản phát hành", href: "#release-information" },
+  timingLabel: "Lịch phát hành sẽ được công bố",
+  timeZoneLabel: "Múi giờ trình bày: Asia/Ho_Chi_Minh",
+  media: {
+    label: "Object study placeholder",
+    placeholderNotice: "PLACEHOLDER MEDIA — NOT PRODUCTION APPROVED",
+    alt: "Nghiên cứu vật thể trừu tượng nội bộ dùng làm placeholder, chưa phải media sản phẩm được phê duyệt.",
+  },
+  metadata: [
+    { label: "Release mode", value: "Non-transactional placeholder" },
+    { label: "Entry flow", value: "Chưa mở" },
+    { label: "Schedule", value: "Sẽ được công bố" },
   ],
-  processSteps: ["Ý niệm", "Điêu khắc", "Thử mẫu", "Đúc & hoàn thiện", "Đóng gói"],
-  galleryStudies: [
-    { id: "gallery-01", label: "Form study / translucent", tone: "ice" },
-    { id: "gallery-02", label: "Character study / silhouette", tone: "violet" },
-    { id: "gallery-03", label: "Material study / reflection", tone: "rose" },
+  secondaryEntries: [
+    { label: "Shop", status: "Sắp mở" },
+    { label: "Commission", status: "Sắp mở" },
   ],
-} as const;
+} as const satisfies HomeHeroContent;

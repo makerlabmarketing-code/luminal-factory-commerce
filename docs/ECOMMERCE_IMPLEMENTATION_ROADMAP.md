@@ -43,9 +43,9 @@ Every phase uses the same contract fields below.
 - **Completion evidence:** Root route implementation and test suite.
 - **Next approved slice:** Phase 3 route shells.
 
-## Phase 3 — Static storefront routes — `NOT_STARTED`
+## Phase 3 — Static storefront routes — `IN_PROGRESS`
 
-- **2026-08-05 audit note:** Raffle-first Home experience script is drafted and pending approval; the formal Home specification is drafted at `specs/home/home-page-specification.md`. Do not proceed to Home UI implementation until both are approved.
+- **2026-08-05 approval note:** Raffle-first Home experience script is owner-approved for the first implementation slice; the formal Home specification at `specs/home/home-page-specification.md` is approved for the first implementation slice. Phase 3 implementation has started with the current slice: Global visual foundation + Home raffle discovery hero shell.
 - **Objective:** Define Shop, Product detail, Gallery, Commission, Raffle, About, Contact, Cart, and Account shells.
 - **Scope:** Approved page scripts, metadata, empty/loading/error patterns, non-broken navigation.
 - **Non-goals:** Persistence or functional commerce.
@@ -55,7 +55,7 @@ Every phase uses the same contract fields below.
 - **Validation:** Route build, link crawl, semantics, responsive/a11y checks.
 - **Production gate:** Design approval for each route.
 - **Completion evidence:** Route manifest, screenshots, checks.
-- **Next approved slice:** Review and approve `docs/page-scripts/home-raffle-first-experience-script-draft.md` and `specs/home/home-page-specification.md`. First implementation slice after approval: Global visual foundation + Home raffle discovery hero shell.
+- **Current slice:** Global visual foundation + Home raffle discovery hero shell.
 
 ## Phase 4 — Commerce data model — `LIVE_APPROVAL_REQUIRED`
 
