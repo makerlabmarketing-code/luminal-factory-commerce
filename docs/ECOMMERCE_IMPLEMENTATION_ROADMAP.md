@@ -45,6 +45,7 @@ Every phase uses the same contract fields below.
 
 ## Phase 3 — Static storefront routes — `NOT_STARTED`
 
+- **2026-08-05 audit note:** Raffle-first Home experience is gated at draft script review; do not proceed to full Home implementation until the script and formal specification are approved.
 - **Objective:** Define Shop, Product detail, Gallery, Commission, Raffle, About, Contact, Cart, and Account shells.
 - **Scope:** Approved page scripts, metadata, empty/loading/error patterns, non-broken navigation.
 - **Non-goals:** Persistence or functional commerce.
@@ -54,7 +55,7 @@ Every phase uses the same contract fields below.
 - **Validation:** Route build, link crawl, semantics, responsive/a11y checks.
 - **Production gate:** Design approval for each route.
 - **Completion evidence:** Route manifest, screenshots, checks.
-- **Next approved slice:** Shop/Gallery/Raffle information architecture and route shells only.
+- **Next approved slice:** Review and approve `docs/page-scripts/home-raffle-first-experience-script-draft.md`, then create the formal Home page specification before any Home UI implementation.
 
 ## Phase 4 — Commerce data model — `LIVE_APPROVAL_REQUIRED`
 
