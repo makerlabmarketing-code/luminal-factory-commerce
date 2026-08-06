@@ -8,7 +8,7 @@ Status: `SOURCE_VALIDATED_BROWSER_REVIEW_REQUIRED` — source and automated chec
 
 Root `AGENTS.md` is the only repository instruction that scopes the changed files; dependency-local `node_modules/**/AGENTS.md` files do not apply. Read `.agents/skills/luminal-commerce/SKILL.md` and its focused `ui-rules.md`, `storefront-ui.md`, `workflow.md`, `coding-style.md`, and `pr-delivery.md` references; `.codex/skills/ui-ux-pro-max/SKILL.md`; the approved Home specification; the asset technical plan; roadmap; and operator handoff.
 
-UI UX Pro Max was applied as a review layer for optical scale, whitespace, header balance, navigation hierarchy, mobile fit, explicit image dimensions/CLS, visible focus, 44 px touch target, sticky behavior, contrast, and reduced motion. It does not authorize a generated design system, logo animation, Header redesign, or new navigation. Where generic advice could expand scope, root instructions, Luminal Commerce, the approved specification, and this bounded task prevail.
+UI UX Pro Max was applied as a review layer for optical scale, whitespace, header balance, navigation hierarchy, mobile fit, explicit image dimensions/CLS, visible focus, 44 px touch target, sticky behavior, contrast, and reduced motion. Its design-system search and focused UX searches for sticky navigation, focus visibility, keyboard order, mobile touch sizing, responsive images, and reduced motion were reviewed. The generated Liquid Glass, pink CTA, Google Fonts, horizontal-scroll journey, and added-motion suggestions conflict with Luminal's restrained dark-gallery direction and/or this bounded integration, so they were not applied. The skill does not authorize a generated design system, logo animation, Header redesign, or new navigation. Root instructions, Luminal Commerce, the approved specification, and this bounded task prevail.
 
 ## Validated asset
 
@@ -18,6 +18,7 @@ UI UX Pro Max was applied as a review layer for optical scale, whitespace, heade
 - Read/decode and PNG integrity pass. Alpha contains transparent, partially transparent, and opaque pixels.
 - Nontransparent bounds: x 703–3296, y 528–3471 (2594 × 2944 px). Transparent whitespace: 703 px left/right and 528 px top/bottom. No artwork touches an outer edge.
 - No opaque near-black pixels were found, so no accidental black matte is present. A small number of near-white opaque artwork pixels are internal highlights, not an edge-connected white matte. The alpha was preserved without conversion, cropping, filtering, recoloring, or redesign.
+- The repository contains no second logo-named binary, so this integration does not introduce an unnecessary duplicate.
 
 ## Integration decisions
 
