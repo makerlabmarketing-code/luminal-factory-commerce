@@ -1,5 +1,15 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-06 Luminal brand and legacy recovery slice
+
+- **Branch:** `feat/brand-assets-and-legacy-recovery` created from the clean available `work` baseline at `f55a711`; this environment has no configured remote or local `master`, so fetch/pull and verification against remote master are blocked and must be reported rather than inferred.
+- **Technical plan:** `specs/assets/brand-and-legacy-asset-recovery-technical-plan.md`.
+- **Result:** Technical plan, bounded recovery tooling, blocked-run inventory/report, empty shortlist, and tests are complete. Outbound CONNECT returned HTTP 403 for Drive and Hostinger, so the approved logo was not downloaded/integrated and no legacy asset was discovered; current Header, Footer, metadata, favicon, and product placeholders remain unchanged.
+- **Approval boundary:** Historical product images/videos remain non-production and must not replace Home, Archive, or Shop placeholders in this slice. Public availability is not evidence of production reuse rights.
+- **Data/security impact:** No Supabase, ERP, commerce transaction, secret, credential, or remote mutation. Drive and the legacy site are development-time evidence sources only, never runtime hosts.
+- **Next gate:** Owner must review shortlist subjects, ownership/license, historical-brand treatment, crops, destination, and alt text before a separate bounded production-media replacement slice.
+- **Immediate unblock:** Re-run the documented recovery from an environment authorized to access the two public sources, validate the exact logo binary, then finish logo integration and populate the inventory on this same bounded slice before production approval.
+
 - **Baseline commit at slice start:** `e1cf50c02600ec8999f4a3378c08e359ccb4aac3` on local branch `work`. Remote/default-main identity was unavailable.
 - **Deployment status:** Unknown; no Vercel project metadata or authenticated remote is present. This PR must not be described as deployed.
 - **Completed slice:** Phase 0–2 code complete: repository foundation, storefront UI primitives, homepage skeleton. Current documentation slice drafts the formal raffle-first Home specification only.
