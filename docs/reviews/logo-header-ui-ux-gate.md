@@ -3,6 +3,8 @@
 Date: 2026-08-06  
 Scope: approved Luminal logo integration in the existing global Header and Footer only.
 
+Status: `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`. The exact logo is owner-confirmed, but its binary is not in this PR because the Codex PR UI blocks binary diffs. Header/Footer use an accessible `Luminal Factory` text fallback; visual logo integration remains incomplete until the owner uploads the binary through GitHub Web.
+
 ## Discovery method and instruction scope
 
 Discovery started at root `AGENTS.md`, then enumerated case-insensitive `SKILL.md` files while excluding dependencies, checked UI/UX/design-named documentation, read the governing skill and only its UI, storefront, architecture, workflow, and PR-delivery references, and inspected the Header/Footer/navigation/styles and approved Home/asset plans. No nested repository instruction exists below root for the files in this slice. `node_modules/**/AGENTS.md` applies only to dependency source and is irrelevant because dependencies are untouched.
@@ -49,7 +51,7 @@ Resolved conflicts: the deprecated clone workflow is not invoked; generic UI sty
 - Owner source: `assets/source/luminal/brand/OK logo-01.png`; PNG, 4000 × 4000, RGBA, 6,036,257 bytes; SHA-256 `758397de87097ed08d8cff0945dd27f9a4e6b36be2b267b138d5759ce68da5ee`.
 - Transparent crop bounds: 2572 × 2920 at source offset `(714, 540)`; transparent outer canvas was removed without redrawing, recoloring, filtering, or changing artwork proportions.
 - Deferred runtime output: `public/brand/luminal-factory-logo-primary.png` (runtime `/brand/luminal-factory-logo-primary.png`). The derived PNG is intentionally absent from this branch because the Codex PR UI blocks its binary diff; the owner will upload it directly through GitHub Web after merge.
-- Header/Footer do not reference the absent path. They retain the accessible `LF` / `Luminal Factory` text fallback, so no broken local image or remote request is produced. A later integration change must verify that the owner-uploaded file exists before replacing this fallback.
+- Header/Footer do not reference the absent path. They retain the accessible `Luminal Factory` text fallback, so no broken local image or remote request is produced. A later integration change must verify that the owner-uploaded file exists before replacing this fallback.
 
 ## Logo/Header compliance checklist
 

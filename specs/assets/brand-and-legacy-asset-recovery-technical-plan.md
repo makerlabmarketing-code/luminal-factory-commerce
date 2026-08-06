@@ -1,16 +1,16 @@
 # Brand and Legacy Asset Recovery Technical Plan
 
-Status: `BINARY_INTEGRATION_DEFERRED`
+Status: `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`
 Date: 2026-08-06
 Scope: owner-approved Luminal logo integration and a review-gated LazyFactory historical-media inventory.
 
-> Status: `BINARY_INTEGRATION_DEFERRED`. The owner has confirmed the supplied logo source, but the derived production PNG is excluded because the Codex PR UI blocks this binary diff. Header and Footer use the accessible `LF` / `Luminal Factory` text fallback without an image request. The reserved owner-upload path after merge is `public/brand/luminal-factory-logo-primary.png` (runtime `/brand/luminal-factory-logo-primary.png`).
+> Status: `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`. The owner has confirmed the exact supplied logo, but the production PNG is excluded because the Codex PR UI blocks binary diffs. Header and Footer use the accessible `Luminal Factory` text fallback without an image request. Visual logo integration is not complete. The reserved owner-upload path after merge is `public/brand/luminal-factory-logo-primary.png` (runtime `/brand/luminal-factory-logo-primary.png`).
 
 ## Source assessment
 
 - The owner-approved current-brand source is Google Drive file `1TUYpcL9S0EbmvsnXQYgpG1rV_MuOUkIk`. It may be downloaded during this development task, but no Drive URL or temporary credential may enter runtime source.
 - The legacy source is the public site at `adelina-builder-wzacpt1wtxwbfh5y.hostingersite.com` and only asset hosts it explicitly references. LazyFactory is a historical brand, not the current global identity.
-- The current Header and Footer use text-only `LF` placeholders. Root metadata has no explicit Open Graph image and retains `src/app/favicon.ico`. Home, Archive, and Shop use typed internal placeholders; those media assignments remain unchanged.
+- The current Header and Footer use the text-only `Luminal Factory` fallback. Root metadata has no explicit Open Graph image and retains `src/app/favicon.ico`. Home, Archive, and Shop use typed internal placeholders; those media assignments remain unchanged.
 - `public/` has no approved brand binary, `next.config.ts` has no remote-image allowlist, and the repository has no Git LFS or explicit large-binary workflow. Recovered, unapproved binaries therefore remain outside `public/` and are committed only when size and ownership risk are acceptable.
 
 ## Download and controlled-crawl strategy
@@ -67,7 +67,7 @@ Revert the local logo binary, Header/Footer references and minimal CSS, tests, i
 
 ## Tests and validation
 
-- Assert the Header uses the approved local asset, links Home, exposes the accessible Luminal name, preserves navigation order, and does not restore account/cart.
+- Assert the Header text fallback links Home, exposes the accessible Luminal name, preserves navigation order, and does not restore account/cart.
 - Assert production source contains no Drive, Hostinger, legacy-CDN, or LazyFactory global-brand hotlink and that referenced local assets exist.
 - Parse and validate inventory classification/approval fields; require historical product media to remain unapproved.
 - Validate MIME/extension, dimensions, hashes, duplicates, JSON determinism, broken references, asset sizes, and source allowlisting.

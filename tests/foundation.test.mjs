@@ -81,7 +81,7 @@ test("documentation reflects bounded brand recovery slice without completing med
   assert.match(roadmap, /Current slice:.*Luminal Brand Asset Integration \+ Legacy LazyFactory Asset Recovery Inventory/);
   assert.doesNotMatch(roadmap, /Full Shop.*CODE_COMPLETE/);
   assert.match(read("docs/current-ecommerce-operator-handoff.md"), /Luminal brand and legacy recovery slice/);
-  assert.match(read("specs/assets/brand-and-legacy-asset-recovery-technical-plan.md"), /Status: `BINARY_INTEGRATION_DEFERRED`/);
+  assert.match(read("specs/assets/brand-and-legacy-asset-recovery-technical-plan.md"), /Status: `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`/);
 });
 
 test("legacy inventory is parseable and keeps historical product media outside production approval", () => {
@@ -111,10 +111,21 @@ test("production source has no Drive or legacy hotlink and preserves current bra
 test("approved Luminal logo path is reserved while brand surfaces use an accessible fallback", () => {
   const brandSurfaces = read("src/components/layout/header.tsx") + read("src/components/layout/footer.tsx");
   assert.match(brandSurfaces, /Luminal Factory — trang chủ/);
-  assert.match(brandSurfaces, />LF</);
+  assert.match(read("src/components/layout/header.tsx"), /href="\/"[\s\S]*<strong>Luminal Factory<\/strong>/);
+  assert.match(read("src/components/layout/footer.tsx"), /href="\/"[\s\S]*>Luminal Factory<\/Link>/);
+  assert.equal((brandSurfaces.match(/href="\/"/g) ?? []).length, 2);
   assert.doesNotMatch(brandSurfaces, /next\/image|<Image|luminal-factory-logo-primary\.png/);
+  assert.doesNotMatch(brandSurfaces, /drive\.google|googleusercontent|hostingersite/i);
   assert.equal(existsSync(join("public", "brand", "luminal-factory-logo-primary.png")), false);
-  assert.match(read("specs/assets/brand-and-legacy-asset-recovery-technical-plan.md"), /public\/brand\/luminal-factory-logo-primary\.png/);
+  const assetDocuments = [
+    "docs/ECOMMERCE_IMPLEMENTATION_ROADMAP.md",
+    "docs/current-ecommerce-operator-handoff.md",
+    "docs/reviews/logo-header-ui-ux-gate.md",
+    "specs/assets/brand-and-legacy-asset-recovery-technical-plan.md",
+  ].map(read).join("\n");
+  assert.match(assetDocuments, /public\/brand\/luminal-factory-logo-primary\.png/);
+  assert.match(assetDocuments, /PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED/);
+  assert.doesNotMatch(assetDocuments, /logo (?:is|has been) (?:production[- ]integrated|integrated)/i);
 });
 
 test("recovery tool is bounded, allowlisted, and absent from production build scripts", () => {
