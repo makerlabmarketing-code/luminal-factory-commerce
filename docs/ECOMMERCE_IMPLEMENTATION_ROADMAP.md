@@ -56,7 +56,7 @@ Every phase uses the same contract fields below.
 - **Production gate:** Design approval for each route.
 - **Completion evidence:** Route manifest, screenshots, checks.
 - **Current slice:** Luminal Brand Asset Integration + Legacy LazyFactory Asset Recovery Inventory.
-- **Current slice scope:** The owner-approved Luminal logo source is confirmed, but the production PNG is deferred because the Codex PR UI blocks the binary diff. Header/Footer retain the accessible text fallback with no broken image request; `public/brand/luminal-factory-logo-primary.png` is reserved for owner upload through GitHub Web after merge. Historical LazyFactory inventory remains review-gated and empty because its remote source was blocked.
+- **Current slice scope — `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`:** The exact owner-approved Luminal logo is confirmed, but the production PNG is excluded because the Codex PR UI blocks binary diffs. Header/Footer retain the accessible `Luminal Factory` text fallback with no broken image request; `public/brand/luminal-factory-logo-primary.png` is reserved for owner upload through GitHub Web after merge. Visual logo integration is not complete. Historical LazyFactory inventory remains review-gated and empty because its Hostinger source is still blocked.
 - **Previous slice evidence:** Home Shop Discovery Preview + `/shop` and Home Archive Preview + `/archive` remain bounded foundation slices; full Shop, Archive, and production media replacement remain future-gated.
 
 ## Phase 4 — Commerce data model — `LIVE_APPROVAL_REQUIRED`

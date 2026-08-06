@@ -4,7 +4,8 @@
 
 - **Branch:** `feat/brand-assets-and-legacy-recovery` created from the clean available `work` baseline at `f55a711`; this environment has no configured remote or local `master`, so fetch/pull and verification against remote master are blocked and must be reported rather than inferred.
 - **Technical plan:** `specs/assets/brand-and-legacy-asset-recovery-technical-plan.md`.
-- **Result:** Owner source `assets/source/luminal/brand/OK logo-01.png` is confirmed, but the derived production PNG was removed because the Codex PR UI blocks the binary diff. Header/Footer use their accessible `LF` / `Luminal Factory` text fallback and make no missing-image request. Navigation, mobile behavior, metadata, favicon, and product placeholders remain unchanged.
+- **Status:** `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`.
+- **Result:** The exact Luminal logo is owner-confirmed, but all logo binaries are excluded because the Codex PR UI blocks binary diffs. Header/Footer use the accessible `Luminal Factory` text fallback and make no missing-image request. Visual logo integration is not complete. Navigation, mobile behavior, metadata, favicon, and product placeholders remain unchanged. The legacy Hostinger crawl remains blocked.
 - **Approval boundary:** Historical product images/videos remain non-production and must not replace Home, Archive, or Shop placeholders in this slice. Public availability is not evidence of production reuse rights.
 - **Data/security impact:** No Supabase, ERP, commerce transaction, secret, credential, or remote mutation. Drive and the legacy site are development-time evidence sources only, never runtime hosts.
 - **Next gate:** Owner must review shortlist subjects, ownership/license, historical-brand treatment, crops, destination, and alt text before a separate bounded production-media replacement slice.
