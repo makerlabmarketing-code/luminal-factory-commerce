@@ -1,5 +1,13 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-06 approved Luminal logo integration
+
+- **Status:** `SOURCE_VALIDATED_BROWSER_REVIEW_REQUIRED`. The approved local PNG at `public/brand/luminal-factory-logo-primary.png` was validated and integrated into the existing Header and Footer; navigation and account/cart boundaries are unchanged.
+- **Decisions:** Existing favicon retained because the detailed full mark was not approved as a clear 16–48 px icon. No Open Graph artwork was created.
+- **Scope boundary:** Legacy recovery remains separate and partial/blocked. Home, Archive, and Shop product media were not replaced. No Supabase, database, cart, payment, order, dependency, or transaction-flow change.
+- **Gate:** Automated checks may pass independently, but browser review at 1440/390 px, top/scrolled Header, mobile menu, keyboard focus, logo clarity, layout stability, and Footer balance remains required; do not claim UI/UX PASS before that review.
+
+
 ## 2026-08-06 Luminal brand and legacy recovery slice
 
 - **Branch:** `feat/brand-assets-and-legacy-recovery` created from the clean available `work` baseline at `f55a711`; this environment has no configured remote or local `master`, so fetch/pull and verification against remote master are blocked and must be reported rather than inferred.

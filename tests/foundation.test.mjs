@@ -81,7 +81,7 @@ test("documentation reflects bounded brand recovery slice without completing med
   assert.match(roadmap, /Current slice:.*Luminal Brand Asset Integration \+ Legacy LazyFactory Asset Recovery Inventory/);
   assert.doesNotMatch(roadmap, /Full Shop.*CODE_COMPLETE/);
   assert.match(read("docs/current-ecommerce-operator-handoff.md"), /Luminal brand and legacy recovery slice/);
-  assert.match(read("specs/assets/brand-and-legacy-asset-recovery-technical-plan.md"), /Status: `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`/);
+  assert.match(read("specs/assets/brand-and-legacy-asset-recovery-technical-plan.md"), /Status: `SOURCE_VALIDATED_BROWSER_REVIEW_REQUIRED`/);
 });
 
 test("legacy inventory is parseable and keeps historical product media outside production approval", () => {
@@ -108,15 +108,17 @@ test("production source has no Drive or legacy hotlink and preserves current bra
   assert.doesNotMatch(productionSource, /from\(["'`] |supabase\.|create table|service_role/i);
 });
 
-test("approved Luminal logo path is reserved while brand surfaces use an accessible fallback", () => {
+test("approved local Luminal logo is integrated accessibly without changing navigation", () => {
   const brandSurfaces = read("src/components/layout/header.tsx") + read("src/components/layout/footer.tsx");
-  assert.match(brandSurfaces, /Luminal Factory — trang chủ/);
-  assert.match(read("src/components/layout/header.tsx"), /href="\/"[\s\S]*<strong>Luminal Factory<\/strong>/);
-  assert.match(read("src/components/layout/footer.tsx"), /href="\/"[\s\S]*>Luminal Factory<\/Link>/);
+  assert.match(brandSurfaces, /aria-label="Luminal Factory"/);
+  assert.match(read("src/components/layout/header.tsx"), /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png"/);
+  assert.match(read("src/components/layout/footer.tsx"), /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png"/);
   assert.equal((brandSurfaces.match(/href="\/"/g) ?? []).length, 2);
-  assert.doesNotMatch(brandSurfaces, /next\/image|<Image|luminal-factory-logo-primary\.png/);
+  assert.match(brandSurfaces, /next\/image/);
+  assert.equal((brandSurfaces.match(/width=\{4000\}/g) ?? []).length, 2);
+  assert.equal((brandSurfaces.match(/height=\{4000\}/g) ?? []).length, 2);
   assert.doesNotMatch(brandSurfaces, /drive\.google|googleusercontent|hostingersite/i);
-  assert.equal(existsSync(join("public", "brand", "luminal-factory-logo-primary.png")), false);
+  assert.equal(existsSync(join("public", "brand", "luminal-factory-logo-primary.png")), true);
   const assetDocuments = [
     "docs/ECOMMERCE_IMPLEMENTATION_ROADMAP.md",
     "docs/current-ecommerce-operator-handoff.md",
@@ -124,8 +126,17 @@ test("approved Luminal logo path is reserved while brand surfaces use an accessi
     "specs/assets/brand-and-legacy-asset-recovery-technical-plan.md",
   ].map(read).join("\n");
   assert.match(assetDocuments, /public\/brand\/luminal-factory-logo-primary\.png/);
-  assert.match(assetDocuments, /PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED/);
-  assert.doesNotMatch(assetDocuments, /logo (?:is|has been) (?:production[- ]integrated|integrated)/i);
+  assert.match(assetDocuments, /SOURCE_VALIDATED_BROWSER_REVIEW_REQUIRED/);
+  assert.match(assetDocuments, /browser review/i);
+});
+
+test("logo review gate preserves favicon, OG, and bounded commerce scope", () => {
+  const gate = read("docs/reviews/logo-header-ui-ux-gate.md");
+  assert.match(gate, /does \*\*not\*\* declare UI\/UX PASS/);
+  assert.match(gate, /Favicon:[\s\S]*retained/i);
+  assert.match(gate, /Open Graph:[\s\S]*unchanged/i);
+  assert.doesNotMatch(src(), /drive\.google\.com|hostingersite\.com/i);
+  assert.doesNotMatch(read("src/components/layout/header.tsx") + read("src/components/layout/mobile-navigation.tsx"), /cart|account|giỏ hàng|tài khoản/i);
 });
 
 test("recovery tool is bounded, allowlisted, and absent from production build scripts", () => {

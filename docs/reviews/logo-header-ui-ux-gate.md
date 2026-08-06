@@ -1,79 +1,39 @@
-# Logo/Header UI/UX skill discovery and review gate
+# Logo/Header UI/UX review gate
 
-Date: 2026-08-06  
-Scope: approved Luminal logo integration in the existing global Header and Footer only.
+Date: 2026-08-06
+Scope: approved local Luminal logo integration in the existing global Header and Footer only.
+Status: `SOURCE_VALIDATED_BROWSER_REVIEW_REQUIRED` — source and automated checks pass; UI/UX PASS is not claimed without browser review.
 
-Status: `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`. The exact logo is owner-confirmed, but its binary is not in this PR because the Codex PR UI blocks binary diffs. Header/Footer use an accessible `Luminal Factory` text fallback; visual logo integration remains incomplete until the owner uploads the binary through GitHub Web.
+## Instructions and skills read
 
-## Discovery method and instruction scope
+Root `AGENTS.md` is the only repository instruction that scopes the changed files; dependency-local `node_modules/**/AGENTS.md` files do not apply. Read `.agents/skills/luminal-commerce/SKILL.md` and its focused `ui-rules.md`, `storefront-ui.md`, `workflow.md`, `coding-style.md`, and `pr-delivery.md` references; `.codex/skills/ui-ux-pro-max/SKILL.md`; the approved Home specification; the asset technical plan; roadmap; and operator handoff.
 
-Discovery started at root `AGENTS.md`, then enumerated case-insensitive `SKILL.md` files while excluding dependencies, checked UI/UX/design-named documentation, read the governing skill and only its UI, storefront, architecture, workflow, and PR-delivery references, and inspected the Header/Footer/navigation/styles and approved Home/asset plans. No nested repository instruction exists below root for the files in this slice. `node_modules/**/AGENTS.md` applies only to dependency source and is irrelevant because dependencies are untouched.
+UI UX Pro Max was applied as a review layer for optical scale, whitespace, header balance, navigation hierarchy, mobile fit, explicit image dimensions/CLS, visible focus, 44 px touch target, sticky behavior, contrast, and reduced motion. It does not authorize a generated design system, logo animation, Header redesign, or new navigation. Where generic advice could expand scope, root instructions, Luminal Commerce, the approved specification, and this bounded task prevail.
 
-| File changed | Direct instruction | Additional governing material |
-|---|---|---|
-| `src/components/layout/header.tsx`, `footer.tsx`, `src/app/globals.css`, `tests/foundation.test.mjs` | root `AGENTS.md` | Luminal Commerce `ui-rules`, `storefront-ui`, `architecture`, `workflow`; approved Home specification and brand recovery plan; UI UX Pro Max as review aid |
-| Reserved `public/brand/luminal-factory-logo-primary.png` contract and source/plan/handoff/review documents | root `AGENTS.md` | approved brand recovery plan, Luminal workflow and PR delivery references |
+## Validated asset
 
-## Skill inventory
+- Repository/runtime path: `public/brand/luminal-factory-logo-primary.png` / `/brand/luminal-factory-logo-primary.png`.
+- PNG MIME/signature; 4000 × 4000 px; sRGB RGBA, 8-bit, four channels with alpha; 6,036,257 bytes.
+- SHA-256: `758397de87097ed08d8cff0945dd27f9a4e6b36be2b267b138d5759ce68da5ee`.
+- Read/decode and PNG integrity pass. Alpha contains transparent, partially transparent, and opaque pixels.
+- Nontransparent bounds: x 703–3296, y 528–3471 (2594 × 2944 px). Transparent whitespace: 703 px left/right and 528 px top/bottom. No artwork touches an outer edge.
+- No opaque near-black pixels were found, so no accidental black matte is present. A small number of near-white opaque artwork pixels are internal highlights, not an edge-connected white matte. The alpha was preserved without conversion, cropping, filtering, recoloring, or redesign.
 
-| Path | Skill | Scope / concern | Commerce? | Header/logo? | Authority | Overlap or conflict |
-|---|---|---|---:|---:|---|---|
-| `.agents/skills/luminal-commerce/SKILL.md` | Luminal Commerce | Storefront identity, architecture, UI/motion, commerce, data, workflow; routes to focused references | Yes | Yes | Governing repository skill below scoped instructions | Overrides generic UI advice and external references |
-| `.codex/skills/ui-ux-pro-max/SKILL.md` | UI UX Pro Max | Responsive UI, accessibility, layout, typography, color, interaction, performance, Next.js guidance and visual review | Advisory | Yes | Specialist review aid | Its generated-design-system step is not used: existing Luminal tokens/spec and bounded slice have higher authority; generic motion/style advice cannot expand the Header |
-| `.codex/skills/reference-analysis/SKILL.md` | Reference Analysis | Evidence-led analysis and Luminal adaptation of external sites | Potentially | Only with an external reference | Specialist, below Luminal rules | Replaces literal cloning; no URL/reference analysis is needed here |
-| `.github/skills/clone-website/SKILL.md` | Clone Website (deprecated) | Imported pixel-perfect clone workflow | No | No | Explicitly deprecated / must not invoke | Conflicts with brand adaptation, accessibility, and page approval gates; Reference Analysis supersedes it |
-| `.agents/skills/speckit-specify/SKILL.md` | Spec Kit Specify | Create/update formal feature specifications | Yes | Only during specification work | Workflow tool when invoked | Complements the approved spec; not needed for this bounded implementation |
-| `.agents/skills/speckit-clarify/SKILL.md` | Spec Kit Clarify | Resolve spec ambiguity | Yes | Conditional | Workflow tool when invoked | No active ambiguity requiring a spec rewrite |
-| `.agents/skills/speckit-plan/SKILL.md` | Spec Kit Plan | Create technical plan | Yes | Conditional | Workflow tool when invoked | Existing brand recovery technical plan already owns implementation decisions |
-| `.agents/skills/speckit-tasks/SKILL.md` | Spec Kit Tasks | Generate dependency-ordered implementation tasks | Yes | Conditional | Workflow tool when invoked | Not invoked; this is an already-planned bounded continuation |
-| `.agents/skills/speckit-analyze/SKILL.md` | Spec Kit Analyze | Non-destructive spec/plan/task consistency review | Yes | Conditional | Workflow QA when invoked | No generated task set exists for this continuation |
-| `.agents/skills/speckit-implement/SKILL.md` | Spec Kit Implement | Execute an existing `tasks.md` | Yes | Conditional | Workflow execution when invoked | Not applicable without a feature `tasks.md` |
-| `.agents/skills/speckit-converge/SKILL.md` | Spec Kit Converge | Append remaining implementation gaps to tasks | Yes | Conditional | Workflow completion when invoked | Not applicable without the corresponding task artifacts |
-| `.agents/skills/speckit-checklist/SKILL.md` | Spec Kit Checklist | Generate requirement-specific checklists | Yes | Conditional | Workflow QA when invoked | User supplied the required checklist directly, so it is recorded below instead |
-| `.agents/skills/speckit-taskstoissues/SKILL.md` | Spec Kit Tasks to Issues | Convert tasks to GitHub issues | Yes | No direct UI authority | Delivery utility when invoked | No issue conversion requested |
-| `.agents/skills/speckit-constitution/SKILL.md` | Spec Kit Constitution | Maintain project constitution/templates | Indirect | No | Project-governance tool when invoked | No constitution change |
-| `.agents/skills/writing-great-skills/SKILL.md` | Writing Great Skills | Skill authoring quality and predictability | Indirect | No | Governs skill authoring only | Not applicable because no skill is changed |
+## Integration decisions
 
-`docs/research/INSPECTION_GUIDE.md` was also discovered by the UI/design documentation search. It is a legacy visual inspection guide, not a skill; the repository audit and root instruction keep it subordinate to the Luminal reference-analysis process.
+- **Header:** existing 4.75rem sticky height is unchanged. The image uses explicit 4000 × 4000 intrinsic dimensions and a fixed 3.75rem layout box; its transparent source margins yield a restrained optical mark inside a 60 px Home-link target. The shared desktop/mobile Header keeps its navigation order and existing sticky surface. `aria-label="Luminal Factory"` names the link while empty image alt prevents duplicate speech. Existing 2 px focus outline remains visible. No filter, glow, or logo animation was added.
+- **Footer:** the text placeholder is replaced with the same asset in a smaller-hierarchy 4.5rem box. The existing grid, copy, navigation, and footer hierarchy remain intact.
+- **Favicon:** retained. The detailed full mark was not substituted at 16, 32, or 48 px; a separately approved simplified mark is recommended.
+- **Open Graph:** unchanged. No OG artwork was created or inferred.
+- **Reduced motion:** no logo motion exists, so reduced-motion behavior is unaffected.
+- **Product media:** Home, Archive, and Shop media remain unchanged. Legacy recovery remains a separate partial/blocked scope.
 
-## Effective authority and conflict decisions
+## Visual review gate
 
-1. Root `AGENTS.md` is the only scoped instruction for every changed file.
-2. Luminal Commerce and its authoritative UI/architecture/workflow references govern brand direction and component boundaries.
-3. The approved Home specification and brand recovery technical plan provide the most specific product/slice contract: minimal Header/Footer replacement, unchanged navigation, no account/cart, explicit image dimensions, no filter/glow/animation.
-4. UI UX Pro Max supplies checks for 44 px targets, focus, contrast, responsive hierarchy, CLS, and image clarity; it does not authorize a new design system or Header redesign.
-5. Existing source supplies implementation context, not permission to expand scope.
+No browser executable or browser automation is available in this environment. Visual review is therefore **blocked**, and this document does **not** declare UI/UX PASS. Review Home, `/archive`, and `/shop` at 1440 px and 390 px; top/scrolled Header; mobile menu; keyboard focus; logo clarity on the dark surface; layout stability; and Footer balance before merge. Capture screenshots during that review.
 
-Resolved conflicts: the deprecated clone workflow is not invoked; generic UI style generation is rejected in favor of existing tokens; generic animation suggestions are rejected because the approved slice prohibits logo animation; and the Server Component Header remains server-rendered while the existing mobile menu stays the narrow client island. No dependency, typography, color token, navigation order, account/cart affordance, or unrelated page UI is added.
+## Remaining recommendations
 
-## Asset decision
-
-- Owner source: `assets/source/luminal/brand/OK logo-01.png`; PNG, 4000 × 4000, RGBA, 6,036,257 bytes; SHA-256 `758397de87097ed08d8cff0945dd27f9a4e6b36be2b267b138d5759ce68da5ee`.
-- Transparent crop bounds: 2572 × 2920 at source offset `(714, 540)`; transparent outer canvas was removed without redrawing, recoloring, filtering, or changing artwork proportions.
-- Deferred runtime output: `public/brand/luminal-factory-logo-primary.png` (runtime `/brand/luminal-factory-logo-primary.png`). The derived PNG is intentionally absent from this branch because the Codex PR UI blocks its binary diff; the owner will upload it directly through GitHub Web after merge.
-- Header/Footer do not reference the absent path. They retain the accessible `Luminal Factory` text fallback, so no broken local image or remote request is produced. A later integration change must verify that the owner-uploaded file exists before replacing this fallback.
-
-## Logo/Header compliance checklist
-
-| Check | Source-level result | Visual gate |
-|---|---|---|
-| Visual size and breathing room | Existing text fallback geometry is restored; binary artwork is not rendered in this branch | Recheck after later asset integration |
-| Balanced header height | Existing `4.75rem` height unchanged | Confirm at 1440/390 px |
-| Clear on dark surface; no navigation competition | Existing monochrome `LF` mark and brand text remain on the established dark surface | Confirm visually |
-| Same desktop/mobile hierarchy | One shared Header logo; navigation config/order unchanged | Confirm menu closed/open at 390 px |
-| Visible focus and touch target | Existing global focus ring and brand/header geometry retained; mobile menu target remains existing 44 px minimum | Keyboard/browser check required |
-| Sticky header does not cover content | Existing sticky height and section scroll margins unchanged | Check top and scrolled states on all routes |
-| No CLS, crop, blur | No image is requested while the binary is absent, preventing a broken image and image-driven CLS | Re-evaluate explicit dimensions after owner upload |
-| Dark/editorial/controlled treatment | No new surface, token, typography, glow, filter, or animation | Confirm against owner expectation |
-| Reduced motion | No logo motion introduced; existing reduced-motion behavior untouched | Browser preference check required |
-| Account/cart absent; navigation order unchanged | Automated source assertions retained | Confirm rendered desktop/mobile order |
-
-## Required visual review matrix
-
-No browser automation package or browser executable is available in this environment. Therefore this document does **not** declare UI/UX PASS. Before merge, owner/browser review remains required for Home, `/archive`, and `/shop` at approximately 1440 px and 390 px; Header at top and after scroll; mobile menu closed/open; keyboard focus; dark-background contrast; and normal DPR clarity. Screenshots must be captured during that review. Source, test, and build validation can pass independently of this visual gate.
-
-## Future recommendations (not implemented)
-
-- Perform the required browser matrix and store screenshots only when suitable browser tooling is available.
-- Evaluate whether a separately supplied horizontal wordmark or simplified small-size mark improves sub-40 px legibility; do not derive or redraw one from this artwork without owner approval.
-- Consider metadata artwork only as a separate approved asset/composition slice.
+- Approve a simplified small-size mark before changing the favicon.
+- Consider a dedicated horizontal wordmark only in a separate approved brand slice if browser review finds the primary mark too quiet.
+- Create dedicated OG artwork only in a separately scoped metadata task.

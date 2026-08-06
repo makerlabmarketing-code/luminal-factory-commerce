@@ -1,17 +1,17 @@
 # Brand and Legacy Asset Recovery Technical Plan
 
-Status: `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`
+Status: `SOURCE_VALIDATED_BROWSER_REVIEW_REQUIRED`
 Date: 2026-08-06
 Scope: owner-approved Luminal logo integration and a review-gated LazyFactory historical-media inventory.
 
-> Status: `PARTIALLY_COMPLETE_OWNER_BINARY_UPLOAD_REQUIRED`. The owner has confirmed the exact supplied logo, but the production PNG is excluded because the Codex PR UI blocks binary diffs. Header and Footer use the accessible `Luminal Factory` text fallback without an image request. Visual logo integration is not complete. The reserved owner-upload path after merge is `public/brand/luminal-factory-logo-primary.png` (runtime `/brand/luminal-factory-logo-primary.png`).
+> Status: `SOURCE_VALIDATED_BROWSER_REVIEW_REQUIRED`. The exact approved PNG exists in the repository, passes binary/alpha/bounds validation, and is integrated into Header and Footer. Favicon and Open Graph remain unchanged; browser review is still required. Legacy recovery remains a separate partial/blocked scope.
 
 ## Source assessment
 
 - The owner-approved current-brand source is Google Drive file `1TUYpcL9S0EbmvsnXQYgpG1rV_MuOUkIk`. It may be downloaded during this development task, but no Drive URL or temporary credential may enter runtime source.
 - The legacy source is the public site at `adelina-builder-wzacpt1wtxwbfh5y.hostingersite.com` and only asset hosts it explicitly references. LazyFactory is a historical brand, not the current global identity.
-- The current Header and Footer use the text-only `Luminal Factory` fallback. Root metadata has no explicit Open Graph image and retains `src/app/favicon.ico`. Home, Archive, and Shop use typed internal placeholders; those media assignments remain unchanged.
-- `public/` has no approved brand binary, `next.config.ts` has no remote-image allowlist, and the repository has no Git LFS or explicit large-binary workflow. Recovered, unapproved binaries therefore remain outside `public/` and are committed only when size and ownership risk are acceptable.
+- The current Header and Footer use the approved local logo. Root metadata has no explicit Open Graph image and retains `src/app/favicon.ico`. Home, Archive, and Shop use typed internal placeholders; those media assignments remain unchanged.
+- `public/brand/` contains the validated approved logo binary, `next.config.ts` has no remote-image allowlist, and the repository has no Git LFS or explicit large-binary workflow. Recovered, unapproved binaries therefore remain outside `public/` and are committed only when size and ownership risk are acceptable.
 
 ## Download and controlled-crawl strategy
 
@@ -27,7 +27,7 @@ Canonicalized URLs detect query variants; SHA-256 detects binary duplicates. Dim
 
 ## Naming and directories
 
-- Reserved approved runtime brand: `public/brand/luminal-factory-logo-primary.png` (runtime `/brand/luminal-factory-logo-primary.png`); owner uploads the binary directly through GitHub Web after merge.
+- Approved runtime brand: `public/brand/luminal-factory-logo-primary.png` (runtime `/brand/luminal-factory-logo-primary.png`), validated and tracked in this branch.
 - Optional owner-source reference: `assets/source/luminal/brand/`, only if materially distinct and repository-safe.
 - Unapproved legacy staging: ignored `assets/source/lazyfactory/recovered/` during recovery.
 - Durable evidence: `docs/assets/legacy-asset-inventory.json`, `docs/assets/legacy-asset-inventory.md`, `docs/assets/legacy-recovery-report.md`, and `docs/assets/production-asset-shortlist.md`.
@@ -35,7 +35,7 @@ Canonicalized URLs detect query variants; SHA-256 detects binary duplicates. Dim
 
 ## Image optimization policy
 
-Do not upscale, redraw, recolor, filter, or reshape the approved logo. Preserve alpha and aspect ratio. Use installed, trustworthy tooling to strip unnecessary metadata and create a browser-sized PNG or lossless/near-lossless WebP only after visual/edge inspection. Record source and output dimensions, bytes, modes, alpha, crop bounds, and hashes. The Header must not ship the multi-megabyte source.
+Do not upscale, redraw, recolor, filter, or reshape the approved logo. Preserve alpha and aspect ratio. Use installed, trustworthy tooling to strip unnecessary metadata and create a browser-sized PNG or lossless/near-lossless WebP only after visual/edge inspection. Record source and output dimensions, bytes, modes, alpha, crop bounds, and hashes. The approved multi-megabyte PNG is retained as supplied; a later optimization may only occur with visual equivalence review.
 
 Recovered historical images are not automatically optimized for production in this slice. Inventory prefers the largest safely evidenced accessible variant; no watermark is removed or hidden.
 
@@ -55,7 +55,7 @@ Replace only the Header current-brand placeholder and the Footer mark, when the 
 
 ## Performance and accessibility
 
-Use one optimized local logo asset, explicit dimensions, responsive CSS bounds, and no remote runtime request, animation, glow, 3D, or CSS color filter. Avoid layout shift. Keep the Home link's accessible label, informative logo alt text, visible focus, dark-background contrast, and no duplicate spoken brand text. Historical alt drafts remain neutral and review-gated when identity is uncertain.
+Use one optimized local logo asset, explicit dimensions, responsive CSS bounds, and no remote runtime request, animation, glow, 3D, or CSS color filter. Avoid layout shift. Keep the Home link's accessible label, decorative empty logo alt to prevent duplicate speech, visible focus, and dark-background contrast. Historical alt drafts remain neutral and review-gated when identity is uncertain.
 
 ## Copyright and ownership assumptions
 
@@ -67,7 +67,7 @@ Revert the local logo binary, Header/Footer references and minimal CSS, tests, i
 
 ## Tests and validation
 
-- Assert the Header text fallback links Home, exposes the accessible Luminal name, preserves navigation order, and does not restore account/cart.
+- Assert the Header local logo links Home, exposes the accessible Luminal name, preserves navigation order, and does not restore account/cart.
 - Assert production source contains no Drive, Hostinger, legacy-CDN, or LazyFactory global-brand hotlink and that referenced local assets exist.
 - Parse and validate inventory classification/approval fields; require historical product media to remain unapproved.
 - Validate MIME/extension, dimensions, hashes, duplicates, JSON determinism, broken references, asset sizes, and source allowlisting.
