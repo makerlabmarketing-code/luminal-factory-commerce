@@ -81,7 +81,7 @@ test("documentation reflects bounded brand recovery slice without completing med
   assert.match(roadmap, /Current slice:.*Luminal Brand Asset Integration \+ Legacy LazyFactory Asset Recovery Inventory/);
   assert.doesNotMatch(roadmap, /Full Shop.*CODE_COMPLETE/);
   assert.match(read("docs/current-ecommerce-operator-handoff.md"), /Luminal brand and legacy recovery slice/);
-  assert.match(read("specs/assets/brand-and-legacy-asset-recovery-technical-plan.md"), /Status: `PARTIALLY_COMPLETE_NETWORK_BLOCKED`/);
+  assert.match(read("specs/assets/brand-and-legacy-asset-recovery-technical-plan.md"), /Status: `BINARY_INTEGRATION_DEFERRED`/);
 });
 
 test("legacy inventory is parseable and keeps historical product media outside production approval", () => {
@@ -106,6 +106,15 @@ test("production source has no Drive or legacy hotlink and preserves current bra
   assert.doesNotMatch(productionSource, /https?:\/\/[^\s"')]+\.(?:png|jpe?g|webp|avif|gif|mp4|webm)/i);
   assert.doesNotMatch(read("src/components/layout/header.tsx") + read("src/components/layout/footer.tsx"), /LazyFactory/i);
   assert.doesNotMatch(productionSource, /from\(["'`] |supabase\.|create table|service_role/i);
+});
+
+test("approved Luminal logo path is reserved while brand surfaces use an accessible fallback", () => {
+  const brandSurfaces = read("src/components/layout/header.tsx") + read("src/components/layout/footer.tsx");
+  assert.match(brandSurfaces, /Luminal Factory — trang chủ/);
+  assert.match(brandSurfaces, />LF</);
+  assert.doesNotMatch(brandSurfaces, /next\/image|<Image|luminal-factory-logo-primary\.png/);
+  assert.equal(existsSync(join("public", "brand", "luminal-factory-logo-primary.png")), false);
+  assert.match(read("specs/assets/brand-and-legacy-asset-recovery-technical-plan.md"), /public\/brand\/luminal-factory-logo-primary\.png/);
 });
 
 test("recovery tool is bounded, allowlisted, and absent from production build scripts", () => {
