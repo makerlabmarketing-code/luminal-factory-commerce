@@ -8,7 +8,7 @@
 - **Gate:** Automated checks may pass independently, but browser review at 1440/390 px, top/scrolled Header, mobile menu, keyboard focus, logo clarity, layout stability, and Footer balance remains required; do not claim UI/UX PASS before that review.
 
 
-## 2026-08-06 Luminal brand and legacy recovery slice
+## 2026-08-06 Luminal brand and legacy recovery slice (historical; logo blocker superseded)
 
 - **Branch:** `feat/brand-assets-and-legacy-recovery` created from the clean available `work` baseline at `f55a711`; this environment has no configured remote or local `master`, so fetch/pull and verification against remote master are blocked and must be reported rather than inferred.
 - **Technical plan:** `specs/assets/brand-and-legacy-asset-recovery-technical-plan.md`.
@@ -17,7 +17,7 @@
 - **Approval boundary:** Historical product images/videos remain non-production and must not replace Home, Archive, or Shop placeholders in this slice. Public availability is not evidence of production reuse rights.
 - **Data/security impact:** No Supabase, ERP, commerce transaction, secret, credential, or remote mutation. Drive and the legacy site are development-time evidence sources only, never runtime hosts.
 - **Next gate:** Owner must review shortlist subjects, ownership/license, historical-brand treatment, crops, destination, and alt text before a separate bounded production-media replacement slice.
-- **Immediate gate:** After merge, the owner uploads the approved binary through GitHub Web at `public/brand/luminal-factory-logo-primary.png`. A later code slice may switch Header/Footer to runtime path `/brand/luminal-factory-logo-primary.png` only after the file exists, then complete the desktop/mobile browser matrix and screenshots. Separately re-run historical recovery from an authorized environment if that inventory is still desired.
+- **Immediate gate (superseded):** The approved binary now exists at `public/brand/luminal-factory-logo-primary.png` and Header/Footer use its local runtime path. The desktop/mobile browser matrix and screenshots remain outstanding. Separately re-run historical recovery from an authorized environment if that inventory is still desired.
 
 - **Baseline commit at slice start:** `e1cf50c02600ec8999f4a3378c08e359ccb4aac3` on local branch `work`. Remote/default-main identity was unavailable.
 - **Deployment status:** Unknown; no Vercel project metadata or authenticated remote is present. This PR must not be described as deployed.

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
@@ -130,6 +131,21 @@ test("approved local Luminal logo is integrated accessibly without changing navi
   assert.match(assetDocuments, /browser review/i);
 });
 
+test("approved Luminal logo binary keeps its validated PNG contract", () => {
+  const logoPath = join("public", "brand", "luminal-factory-logo-primary.png");
+  const logo = readFileSync(logoPath);
+
+  assert.ok(logo.byteLength > 0);
+  assert.equal(logo.byteLength, 6_036_257);
+  assert.deepEqual([...logo.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+  assert.equal(logo.subarray(12, 16).toString("ascii"), "IHDR");
+  assert.equal(logo.readUInt32BE(16), 4000);
+  assert.equal(logo.readUInt32BE(20), 4000);
+  assert.equal(logo[24], 8);
+  assert.equal(logo[25], 6); // PNG truecolor with alpha; do not flatten the approved source.
+  assert.equal(createHash("sha256").update(logo).digest("hex"), "758397de87097ed08d8cff0945dd27f9a4e6b36be2b267b138d5759ce68da5ee");
+});
+
 test("logo review gate preserves favicon, OG, and bounded commerce scope", () => {
   const gate = read("docs/reviews/logo-header-ui-ux-gate.md");
   assert.match(gate, /does \*\*not\*\* declare UI\/UX PASS/);
@@ -137,6 +153,7 @@ test("logo review gate preserves favicon, OG, and bounded commerce scope", () =>
   assert.match(gate, /Open Graph:[\s\S]*unchanged/i);
   assert.doesNotMatch(src(), /drive\.google\.com|hostingersite\.com/i);
   assert.doesNotMatch(read("src/components/layout/header.tsx") + read("src/components/layout/mobile-navigation.tsx"), /cart|account|giỏ hàng|tài khoản/i);
+  assert.doesNotMatch(read("src/app/globals.css").match(/\.brand[^}]*}/g)?.join("\n") ?? "", /filter|animation|glow/i);
 });
 
 test("recovery tool is bounded, allowlisted, and absent from production build scripts", () => {
