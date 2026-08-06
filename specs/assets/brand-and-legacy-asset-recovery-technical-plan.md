@@ -1,10 +1,10 @@
 # Brand and Legacy Asset Recovery Technical Plan
 
-Status: `PARTIALLY_COMPLETE_NETWORK_BLOCKED`
+Status: `BINARY_INTEGRATION_DEFERRED`
 Date: 2026-08-06
 Scope: owner-approved Luminal logo integration and a review-gated LazyFactory historical-media inventory.
 
-> Execution result: documentation, bounded tooling, empty blocked-run inventory, and approval gates are complete. The environment proxy rejected both approved sources with HTTP 403, so the logo was not downloaded or integrated and no historical media was discovered. Existing brand placeholders remain unchanged as required by the fallback policy.
+> Status: `BINARY_INTEGRATION_DEFERRED`. The owner has confirmed the supplied logo source, but the derived production PNG is excluded because the Codex PR UI blocks this binary diff. Header and Footer use the accessible `LF` / `Luminal Factory` text fallback without an image request. The reserved owner-upload path after merge is `public/brand/luminal-factory-logo-primary.png` (runtime `/brand/luminal-factory-logo-primary.png`).
 
 ## Source assessment
 
@@ -27,7 +27,7 @@ Canonicalized URLs detect query variants; SHA-256 detects binary duplicates. Dim
 
 ## Naming and directories
 
-- Approved runtime brand: `public/brand/luminal-factory-logo-primary.<ext>`.
+- Reserved approved runtime brand: `public/brand/luminal-factory-logo-primary.png` (runtime `/brand/luminal-factory-logo-primary.png`); owner uploads the binary directly through GitHub Web after merge.
 - Optional owner-source reference: `assets/source/luminal/brand/`, only if materially distinct and repository-safe.
 - Unapproved legacy staging: ignored `assets/source/lazyfactory/recovered/` during recovery.
 - Durable evidence: `docs/assets/legacy-asset-inventory.json`, `docs/assets/legacy-asset-inventory.md`, `docs/assets/legacy-recovery-report.md`, and `docs/assets/production-asset-shortlist.md`.
