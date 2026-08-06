@@ -73,12 +73,49 @@ test("design tokens have one source and reduced motion is supported", () => {
   assert.match(read(cssFiles[0]), /prefers-reduced-motion/);
 });
 
-test("documentation reflects shop discovery foundation without completing full shop", () => {
+test("documentation reflects bounded brand recovery slice without completing media migration", () => {
   assert.match(read("specs/archive/archive-preview-foundation-technical-plan.md"), /Home Archive Preview \+ `\/archive` route foundation only/);
   assert.match(read("specs/shop/shop-discovery-foundation-technical-plan.md"), /Home Shop Discovery Preview \+ `\/shop` route foundation only/);
   const roadmap = read("docs/ECOMMERCE_IMPLEMENTATION_ROADMAP.md");
   for (const status of ["NOT_STARTED", "IN_PROGRESS", "CODE_COMPLETE", "MERGED", "DEPLOYED", "OPERATOR_RETEST_REQUIRED", "LIVE_APPROVAL_REQUIRED", "BLOCKED", "COMPLETED"]) assert.match(roadmap, new RegExp(status));
-  assert.match(roadmap, /Current slice:.*Home Shop Discovery Preview \+ `\/shop` route foundation/);
+  assert.match(roadmap, /Current slice:.*Luminal Brand Asset Integration \+ Legacy LazyFactory Asset Recovery Inventory/);
   assert.doesNotMatch(roadmap, /Full Shop.*CODE_COMPLETE/);
-  assert.match(read("docs/current-ecommerce-operator-handoff.md"), /Home Shop Discovery Preview \+ Shop route foundation/);
+  assert.match(read("docs/current-ecommerce-operator-handoff.md"), /Luminal brand and legacy recovery slice/);
+  assert.match(read("specs/assets/brand-and-legacy-asset-recovery-technical-plan.md"), /Status: `PARTIALLY_COMPLETE_NETWORK_BLOCKED`/);
+});
+
+test("legacy inventory is parseable and keeps historical product media outside production approval", () => {
+  const inventory = JSON.parse(read("docs/assets/legacy-asset-inventory.json"));
+  assert.equal(inventory.schemaVersion, 1);
+  assert.equal(inventory.sourceSite, "https://adelina-builder-wzacpt1wtxwbfh5y.hostingersite.com/");
+  assert.equal(inventory.policy.historicalBrand, "lazyfactory-historical");
+  assert.equal(inventory.policy.defaultProductionApproved, false);
+  assert.ok(Array.isArray(inventory.records));
+  for (const record of inventory.records) {
+    assert.ok(record.sourceUrl);
+    assert.ok(record.sourceBrand);
+    assert.ok(record.approval);
+    assert.equal(record.historicalBrand, true);
+    assert.equal(record.productionApproved, false);
+  }
+});
+
+test("production source has no Drive or legacy hotlink and preserves current brand boundaries", () => {
+  const productionSource = src();
+  assert.doesNotMatch(productionSource, /drive\.google\.com|googleusercontent\.com|hostingersite\.com/i);
+  assert.doesNotMatch(productionSource, /https?:\/\/[^\s"')]+\.(?:png|jpe?g|webp|avif|gif|mp4|webm)/i);
+  assert.doesNotMatch(read("src/components/layout/header.tsx") + read("src/components/layout/footer.tsx"), /LazyFactory/i);
+  assert.doesNotMatch(productionSource, /from\(["'`] |supabase\.|create table|service_role/i);
+});
+
+test("recovery tool is bounded, allowlisted, and absent from production build scripts", () => {
+  const recovery = read("scripts/recover-legacy-assets.mjs");
+  const packageJson = JSON.parse(read("package.json"));
+  assert.match(recovery, /MAX_PAGES = 40/);
+  assert.match(recovery, /MAX_ASSETS = 400/);
+  assert.match(recovery, /CONCURRENCY = 3/);
+  assert.match(recovery, /TIMEOUT_MS = 15_000/);
+  assert.match(recovery, /ROOT_HOST/);
+  assert.equal(packageJson.scripts.build, "next build");
+  assert.equal(Object.values(packageJson.scripts).some((command) => command.includes("recover-legacy-assets")), false);
 });

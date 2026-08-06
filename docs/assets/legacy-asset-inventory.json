@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-06T00:00:00.000Z",
+  "sourceSite": "https://adelina-builder-wzacpt1wtxwbfh5y.hostingersite.com/",
+  "policy": {
+    "historicalBrand": "lazyfactory-historical",
+    "defaultProductionApproved": false
+  },
+  "summary": {
+    "pagesRequested": 3,
+    "pagesCrawled": 0,
+    "assetUrlsDiscovered": 0,
+    "downloaded": 0,
+    "failed": 3,
+    "images": 0,
+    "videos": 0,
+    "duplicates": 0,
+    "thumbnailOnly": 0,
+    "originalCandidates": 0
+  },
+  "records": []
+}
