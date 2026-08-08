@@ -4,14 +4,14 @@
 
 | Field | Value |
 |---|---|
-| Status | `DRAFT` / `REVIEW_REQUIRED` |
+| Status | `APPROVED` / `IMPLEMENTATION_READY` |
 | Owner | Luminal Factory Commerce storefront |
-| Last updated | 2026-08-08 |
+| Last updated | 2026-08-09 |
 | Source experience script | `docs/page-scripts/commission-experience-script-draft.md` |
 | Related roadmap phase | Phase 3 — Static storefront routes |
-| Implementation status | `BLOCKED_PENDING_OWNER_APPROVAL` |
+| Implementation status | `IMPLEMENTATION_READY` for the bounded static discovery slice |
 
-This specification defines the first Commission page foundation. It does not approve persistence, Supabase schema, authentication, payment, deposit, order creation, file uploads, or ERP changes.
+This specification defines the owner-approved first Commission page foundation. It does not approve persistence, Supabase schema, authentication, payment, deposit, order creation, file uploads, or ERP changes.
 
 ## Page purpose
 
@@ -55,13 +55,13 @@ These names are presentation contracts only and must not become database columns
 
 ## Availability behavior
 
-The first implementation must not invent live availability. If no approved source exists, use a neutral presentation such as `Commission đang được chuẩn bị` or `Yêu cầu commission sẽ mở trong một đợt riêng`.
+The first implementation must not invent live availability. With no approved authoritative availability source in this slice, use the neutral `coming-soon` presentation and discovery-only copy.
 
 A future dynamic availability state must be supplied by a trusted service/data boundary. The browser must not independently determine whether commissions can be accepted.
 
 ## Commission categories
 
-Initial presentation categories proposed for owner approval:
+Owner-approved initial presentation categories:
 
 1. Artisan keycap.
 2. Collectible object.
@@ -125,15 +125,15 @@ Reduced-motion mode must preserve all content and actions in a static layout.
 
 ## Route and architecture
 
-Future implementation target: `/commission`.
+Implementation target: `/commission`.
 
-The route should remain a thin Server Component and compose feature-level presentation components. Client components are permitted only for genuine browser interaction.
+The route remains a thin Server Component and composes feature-level presentation components. Client components are permitted only for genuine browser interaction.
 
-Suggested feature boundary:
+Approved first-slice feature boundary:
 
 - `src/app/commission/page.tsx`
 - `src/features/commission/commission-content.ts`
-- `src/features/commission/commission-page.tsx` or focused section components as needed
+- `src/features/commission/commission-discovery.tsx`
 
 No raw Supabase query belongs in visual components.
 
@@ -155,19 +155,17 @@ Canonical behavior follows the repository's existing metadata/environment contra
 
 ## Validation for first implementation slice
 
-When implementation is approved, validate:
+Validate:
 
-- `npm run lint`
-- `npm run typecheck`
-- `npm test`
-- `npm run build`
-- `npm run check` if still defined
 - route existence and link crawl
 - one-h1/semantic checks
-- 390px and 1440px layout review
+- typed static presentation contract
+- navigation points Commission to `/commission`
+- 390px and 1440px preview review
 - keyboard/focus review
 - reduced-motion behavior
 - no Supabase, payment, order, ERP, or file-upload code introduced
+- repository lint/typecheck/test/build gates when available through CI or local tooling
 
 ## Non-goals
 
@@ -183,6 +181,6 @@ When implementation is approved, validate:
 
 ## Approval gate
 
-Implementation remains blocked until the owner approves the experience script and this specification for the bounded static `/commission` foundation.
+Owner approval was granted on 2026-08-09 for the bounded static `/commission` discovery foundation.
 
-After approval, create a separate technical plan and implementation branch for the static Commission discovery page. The future request form must remain a later independently approved slice.
+The future request form, persistence, uploads, availability service, Supabase contract, ERP handoff mutations, pricing, quote, deposit, and order behavior remain separately gated and are not approved by this document.
