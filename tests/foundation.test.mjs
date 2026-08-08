@@ -47,12 +47,12 @@ test("archive and shop route foundations exist with one h1 and shared typed mode
   assert.match(read("src/features/shop/shop-collection.tsx"), /entries\.length === 0/);
 });
 
-test("navigation follows approved order with real archive link and safe unavailable destinations", () => {
+test("navigation follows approved order with real storefront routes", () => {
   const navigation = read("src/components/layout/navigation.ts");
   assert.match(navigation, /Raffle[\s\S]*Archive[\s\S]*Shop[\s\S]*Commission[\s\S]*About/);
   assert.match(navigation, /href: "\/archive", label: "Archive", isAvailable: true/);
   assert.match(navigation, /href: "\/shop", label: "Shop", isAvailable: true/);
-  assert.match(navigation, /label: "Commission", isAvailable: false/);
+  assert.match(navigation, /href: "\/commission", label: "Commission", isAvailable: true/);
   assert.doesNotMatch(read("src/components/layout/header.tsx") + read("src/components/layout/mobile-navigation.tsx"), /cart|giỏ hàng|account|tài khoản/i);
   assert.match(read("src/components/layout/mobile-navigation.tsx"), /aria-expanded/);
 });
