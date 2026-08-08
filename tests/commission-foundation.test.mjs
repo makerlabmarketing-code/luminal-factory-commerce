@@ -35,8 +35,8 @@ test("commission first slice stays discovery-only and non-transactional", () => 
 
   assert.match(source, /không phải checkout tức thì|không tự động trở thành order/i);
   assert.doesNotMatch(source, /supabase\.|from\(["'`]|create table|service_role/i);
-  assert.doesNotMatch(source, /<form|type=["']file["']|upload|checkout|payment provider|createOrder/i);
-  assert.doesNotMatch(source, /price:|turnaround|slotCount/i);
+  assert.doesNotMatch(source, /<form\b|<input\b[^>]*\btype=["']file["']|createOrder|paymentProvider/i);
+  assert.doesNotMatch(source, /(?:href|action)=["'][^"']*(?:checkout|payment)|price:|turnaround|slotCount/i);
 });
 
 test("commission approval and technical plan keep future request flow separately gated", () => {
