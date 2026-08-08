@@ -1,8 +1,8 @@
 # Commission Page Experience Script Draft
 
-Status: `DRAFT_FOR_OWNER_REVIEW`
-Date: 2026-08-08
-Gate: Experience direction only. This document does not approve a live commission submission workflow, database schema, payment, deposit, order creation, or ERP mutation.
+Status: `OWNER_APPROVED_FOR_FIRST_IMPLEMENTATION_SLICE`
+Date: 2026-08-09
+Gate: Owner-approved for the bounded static `/commission` discovery foundation only. This approval does not include a live commission submission workflow, database schema, payment, deposit, order creation, file upload, or ERP mutation.
 
 ## Authority and scope
 
@@ -137,11 +137,11 @@ Reuse global footer and only link to implemented destinations.
 - File uploads.
 - Automated acceptance or rejection.
 
-## Approval questions
+## Owner-approved first-slice decisions
 
-1. Approve the page purpose as a curated commission discovery/inquiry surface.
-2. Approve first implementation as a static `/commission` foundation only.
-3. Approve the public process sequence above.
-4. Approve the initial commission categories: artisan keycap, collectible object, and small branded/custom object.
-5. Approve that pricing, turnaround, availability counts, and file uploads stay out of the first slice.
-6. Approve a future separate slice for the actual commission request form and Supabase contract.
+1. Commission is a curated discovery/inquiry surface.
+2. The first implementation is a static `/commission` foundation only.
+3. The public process sequence above is approved for presentation.
+4. Initial categories are artisan keycap, collectible object, and small branded/custom object.
+5. Pricing, turnaround, availability counts, and file uploads stay out of the first slice.
+6. The actual commission request form and any Supabase contract remain a future separately approved slice.
