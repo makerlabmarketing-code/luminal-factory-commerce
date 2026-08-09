@@ -1,11 +1,13 @@
 import Link from "next/link";
 import type { CommissionPresentation } from "./commission-content";
+import { CommissionInquiryForm } from "./commission-inquiry-form";
 
 type CommissionDiscoveryProps = Readonly<{
   content: CommissionPresentation;
+  inquiryEnabled: boolean;
 }>;
 
-export function CommissionDiscovery({ content }: CommissionDiscoveryProps) {
+export function CommissionDiscovery({ content, inquiryEnabled }: CommissionDiscoveryProps) {
   return (
     <>
       <section className="section" aria-labelledby="commission-title">
@@ -16,8 +18,12 @@ export function CommissionDiscovery({ content }: CommissionDiscoveryProps) {
             <p className="lede">{content.summary}</p>
           </div>
           <div>
-            <span className="status-badge">{content.availabilityLabel}</span>
-            <p className="lede">{content.availabilityDescription}</p>
+            <span className="status-badge">{inquiryEnabled ? "Commission inquiry đang mở" : content.availabilityLabel}</span>
+            <p className="lede">
+              {inquiryEnabled
+                ? "Bạn có thể gửi context để studio review. Inquiry không tạo order, quote, payment hoặc giữ production slot."
+                : content.availabilityDescription}
+            </p>
           </div>
         </div>
       </section>
@@ -58,8 +64,8 @@ export function CommissionDiscovery({ content }: CommissionDiscoveryProps) {
       <section className="section section-surface" aria-labelledby="commission-prepare-title">
         <div className="section-heading">
           <p className="eyebrow">Prepare</p>
-          <h2 id="commission-prepare-title">Những thông tin hữu ích trước khi inquiry mở.</h2>
-          <p>Không có upload hoặc submit ở slice này. Danh sách dưới đây chỉ giúp chuẩn bị context cho một trao đổi tương lai.</p>
+          <h2 id="commission-prepare-title">Những thông tin hữu ích trước khi gửi inquiry.</h2>
+          <p>First inquiry slice không có file upload. Reference URL có thể dùng để chia sẻ context bạn có quyền chia sẻ.</p>
         </div>
         <ol className="process-list">
           {content.preparationItems.map((item, index) => (
@@ -87,16 +93,16 @@ export function CommissionDiscovery({ content }: CommissionDiscoveryProps) {
         </ul>
       </section>
 
+      <CommissionInquiryForm enabled={inquiryEnabled} />
+
       <section className="section" aria-labelledby="commission-next-title">
         <div className="contact-panel">
-          <p className="eyebrow">Discovery only</p>
-          <h2 id="commission-next-title">Inquiry form chưa mở trong phiên bản này.</h2>
-          <p>
-            Bạn có thể xem Archive để hiểu thêm về ngôn ngữ object của Luminal. Form commission, upload, availability và dữ liệu khách hàng sẽ được thiết kế trong một slice riêng.
-          </p>
+          <p className="eyebrow">Explore further</p>
+          <h2 id="commission-next-title">Xem thêm ngôn ngữ object của Luminal.</h2>
+          <p>Archive lưu các object study theo hướng editorial, còn Shop trình bày các object discovery trực tiếp. Inquiry vẫn là một luồng review riêng.</p>
           <div className="actions">
             <Link className="button-link" href="/archive">Xem Archive</Link>
-            <Link className="button-link button-secondary" href="/#raffle">Quay về Raffle</Link>
+            <Link className="button-link button-secondary" href="/shop">Xem Shop</Link>
           </div>
         </div>
       </section>
