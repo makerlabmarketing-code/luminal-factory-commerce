@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { shopDetailAvailability, shopPlaceholderNotice, type ShopPresentationEntry } from "./shop-content";
+import { shopPlaceholderNotice, type ShopPresentationEntry } from "./shop-content";
 
 type ShopCollectionProps = Readonly<{
   entries: readonly ShopPresentationEntry[];
@@ -27,7 +27,7 @@ export function ShopCollection({ entries }: ShopCollectionProps) {
       </div>
       <ol className="shop-route-list">
         {entries.map((entry, index) => (
-          <li key={entry.id} id={entry.presentationKey} className="shop-route-card">
+          <li key={entry.id} className="shop-route-card">
             <div className={`shop-media shop-media-${entry.media.tone}`} role="img" aria-label={entry.media.alt}>
               <span aria-hidden="true" />
               <em>{entry.media.label}</em>
@@ -35,11 +35,11 @@ export function ShopCollection({ entries }: ShopCollectionProps) {
             <div className="shop-route-copy">
               <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
               <p>{entry.collection} · {entry.type}</p>
-              <h3>{entry.title}</h3>
+              <h3><Link href={entry.href}>{entry.title}</Link></h3>
               <p>{entry.description}</p>
               <dl>
-                <div><dt>Material note</dt><dd>{entry.materialNote}</dd></div>
-                <div><dt>Detail availability</dt><dd>{shopDetailAvailability}</dd></div>
+                <div><dt>Availability</dt><dd>{entry.availabilityLabel}</dd></div>
+                <div><dt>Detail</dt><dd><Link href={entry.href}>Xem object detail</Link></dd></div>
                 <div><dt>Placeholder marker</dt><dd>{entry.isPlaceholder ? shopPlaceholderNotice : entry.presentationStatus}</dd></div>
               </dl>
             </div>
