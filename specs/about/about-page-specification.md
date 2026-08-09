@@ -2,9 +2,9 @@
 
 ## Document metadata
 
-- Status: `DRAFT` / `REVIEW_REQUIRED`
+- Status: `APPROVED` / `IMPLEMENTATION_READY`
 - Date: 2026-08-09
-- Implementation status: `BLOCKED_PENDING_OWNER_APPROVAL`
+- Implementation status: `OWNER_APPROVED_FOR_FIRST_IMPLEMENTATION_SLICE`
 - Database status: `NOT_APPLICABLE_NO_DATA_CHANGE`
 - Source experience script: `docs/page-scripts/about-experience-script-draft.md`
 
@@ -16,9 +16,23 @@ This specification defines the bounded static `/about` foundation. It does not a
 
 Primary user outcome: understand what the studio makes, how objects move from concept to finished presentation, and where to go next for Raffle, Archive, Shop, or Commission.
 
+## Approved brand line
+
+The legacy footer line `Made slowly. Made to stay.` is retired in this slice.
+
+Approved replacement:
+
+**Shaped by light. Crafted to last.**
+
+Usage rules:
+- Footer uses the new two-part line.
+- About may use it once as supporting identity language if compositionally useful.
+- Do not repeat it across every section or route.
+- Treat `Shaped by light` as brand metaphor, not a literal manufacturing/material claim.
+
 ## Route scope
 
-Approved implementation target after owner review:
+Approved implementation target:
 
 - `/about`
 
@@ -26,6 +40,7 @@ After route verification:
 - Header About navigation changes from `#about` to `/about`.
 - Footer About navigation changes from `#about` to `/about`.
 - Home keeps a concise About teaser and adds a normal link to `/about`.
+- Footer replaces the old slogan with the approved brand line.
 
 ## Information architecture
 
@@ -45,6 +60,7 @@ Suggested repository-only presentation model:
 ```ts
 type AboutPresentation = Readonly<{
   eyebrow: string;
+  brandLine: string;
   title: string;
   summary: string;
   objectCategories: readonly {
@@ -130,6 +146,7 @@ About must not create another commission/contact submission route.
 - Principles should remain text-led rather than dashboard/card-heavy.
 - Existing ice/lavender/rose accents are sufficient.
 - No new image dependency is required for the first slice.
+- The approved brand line should feel integrated with the logo/identity, not styled as a loud marketing banner.
 
 ## SEO/metadata
 
@@ -174,6 +191,7 @@ Keep the route component thin and presentation data typed.
 - `/about` returns 200
 - Header/Footer About links resolve to `/about`
 - Home About teaser links to `/about`
+- Footer renders `Shaped by light. Crafted to last.` and no longer renders `Made slowly. Made to stay.`
 - exactly one `h1` on `/about`
 - no Supabase/CMS/ERP code introduced
 - database gate remains `NOT_APPLICABLE_NO_DATA_CHANGE`
@@ -195,4 +213,4 @@ Keep the route component thin and presentation data typed.
 
 ## Approval gate
 
-Implementation remains blocked until owner approval of the static `/about` foundation. After approval, create a separate technical plan and feature branch from the latest `master`.
+Owner approval recorded on 2026-08-09. Implementation may proceed in a separate technical-plan/feature branch from the latest `master` after this documentation PR passes its delivery gates and merges.
