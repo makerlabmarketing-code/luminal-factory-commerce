@@ -1,6 +1,6 @@
 # About Experience Script Draft
 
-Status: `DRAFT_FOR_OWNER_REVIEW`
+Status: `OWNER_APPROVED_FOR_FIRST_IMPLEMENTATION_SLICE`
 Date: 2026-08-09
 Gate: Experience definition only. This document does not authorize ecommerce, Supabase, ERP, hiring, customer accounts, or operational claims.
 
@@ -9,6 +9,17 @@ Gate: Experience definition only. This document does not authorize ecommerce, Su
 Define a dedicated `/about` page for Luminal Factory and replace the current navigation-only `#about` anchor with a real route after implementation is verified.
 
 The page should explain what Luminal Factory is, what kinds of objects it makes, how the studio approaches craft and small-batch production, and how the public storefront surfaces relate to one another.
+
+## Approved brand line
+
+Replace the legacy footer line `Made slowly. Made to stay.` with:
+
+**Shaped by light. Crafted to last.**
+
+Rationale:
+- `Shaped by light` connects the Luminal name and the approved logo's luminous/faceted object language without making a literal material claim.
+- `Crafted to last` keeps the studio's maker/craft character while sounding more intentional and contemporary than the old slow-craft line.
+- Use this as a restrained brand line, not repeated as filler across every page.
 
 ## Experience goal
 
@@ -19,6 +30,7 @@ Give a visitor enough context to understand the studio without turning the page 
 1. **Studio identity**
    - Luminal Factory as a small creative/maker studio focused on artisan keycaps, collectible objects, character/object studies, and custom commission work.
    - Keep language concise, object-led, and craft-focused.
+   - The approved brand line may appear once as supporting identity language when compositionally useful.
 
 2. **What we make**
    - Artisan keycaps.
@@ -88,10 +100,12 @@ Suggested content groups:
 - Supabase migration.
 - ERP changes.
 
-## Approval questions
+## Approval decision
 
-1. Approve `/about` as the dedicated About route.
-2. Approve keeping the existing compact Home About teaser while making it link to `/about`.
-3. Approve a studio/craft narrative without team biographies in the first slice.
-4. Approve static repository content with no database/CMS.
-5. Approve routing Commission/contact intent back to `/commission` rather than adding a second form.
+Owner approved on 2026-08-09:
+1. `/about` as the dedicated About route.
+2. Keep the compact Home About teaser and link it to `/about`.
+3. Use a studio/craft narrative without team biographies in the first slice.
+4. Use static repository content with no database/CMS.
+5. Keep Commission/contact intent on `/commission` rather than adding a second form.
+6. Replace the old footer slogan with `Shaped by light. Crafted to last.` as part of the About implementation slice.
