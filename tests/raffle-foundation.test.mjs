@@ -38,7 +38,7 @@ test("raffle first slice stays truthful, static, and non-transactional", () => {
   assert.match(source, /không phải order|not an order/i);
   assert.doesNotMatch(source, /<form|type=["'](?:file|email|password)["']|onSubmit=|createOrder|payment provider/i);
   assert.doesNotMatch(source, /supabase\.|from\(["'`]|create table|service_role/i);
-  assert.doesNotMatch(source, /countdown|setInterval|Date\.now\(|winnerCount|slotCount|price:/i);
+  assert.doesNotMatch(source, /setInterval|setTimeout|Date\.now\(|winnerCount|slotCount|price:/i);
 });
 
 test("raffle technical plan keeps detail and entry flow separately gated", () => {
