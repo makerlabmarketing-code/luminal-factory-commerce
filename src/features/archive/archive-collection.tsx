@@ -27,19 +27,21 @@ export function ArchiveCollection({ entries }: ArchiveCollectionProps) {
       </div>
       <ol className="archive-route-grid">
         {entries.map((entry) => (
-          <li key={entry.id} id={entry.slug} className="archive-route-card">
-            <div className={`archive-media archive-media-${entry.media.tone}`} role="img" aria-label={entry.media.alt}>
-              <span aria-hidden="true" />
-            </div>
-            <div className="archive-route-card-copy">
-              <p>{entry.collection} · {entry.year}</p>
-              <h3>{entry.title}</h3>
-              <p>{entry.description}</p>
-              <dl>
-                <div><dt>Material note</dt><dd>{entry.materialNote}</dd></div>
-                <div><dt>Status</dt><dd>{entry.isPlaceholder ? archivePlaceholderNotice : entry.status}</dd></div>
-              </dl>
-            </div>
+          <li key={entry.id} className="archive-route-card">
+            <Link href={entry.href} aria-label={`Xem archive detail: ${entry.title}`}>
+              <div className={`archive-media archive-media-${entry.media.tone}`} role="img" aria-label={entry.media.alt}>
+                <span aria-hidden="true" />
+              </div>
+              <div className="archive-route-card-copy">
+                <p>{entry.collection} · {entry.year}</p>
+                <h3>{entry.title}</h3>
+                <p>{entry.description}</p>
+                <dl>
+                  <div><dt>Material note</dt><dd>{entry.materialNote}</dd></div>
+                  <div><dt>Status</dt><dd>{entry.isPlaceholder ? archivePlaceholderNotice : entry.status}</dd></div>
+                </dl>
+              </div>
+            </Link>
           </li>
         ))}
       </ol>
