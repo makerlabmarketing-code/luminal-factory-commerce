@@ -1,8 +1,9 @@
-# Raffle Detail + Entry Experience Script Draft
+# Raffle Detail + Entry Experience Script
 
-Status: `DRAFT_FOR_OWNER_REVIEW`
+Status: `OWNER_APPROVED_FOR_FIRST_INTERACTIVE_SLICE`
 Date: 2026-08-09
-Gate: Experience/data-contract definition only. No form, auth, Supabase mutation, payment, order, or ERP change is approved by this document.
+Owner approval: `2026-08-09`
+Gate: Guest-email detail/entry experience approved for technical planning. Payment, order creation, winner administration, and ERP changes remain separately gated.
 
 ## Scope
 
@@ -15,46 +16,48 @@ The critical boundary remains:
 - Winner selection/admin belongs to approved operational workflow.
 - Payment/order behavior happens only after a successful winner path according to the final commerce contract.
 
-## Experience goal
+## Approved experience goal
 
 Give a collector enough verified information to decide whether they are eligible and want to submit exactly one valid raffle entry, while making the submission state, duplication rules, timing, and later winner/payment boundary unambiguous.
 
-## Proposed narrative
+## Approved narrative
 
 1. Release identity and authoritative raffle status.
 2. Approved opening/closing timestamps in `Asia/Ho_Chi_Minh`.
 3. Public eligibility and stable rules summary.
 4. Entry form only when authoritative state is `open` and server-side eligibility permits submission.
-5. Submission acknowledgement with immutable entry reference.
+5. Submission acknowledgement with a stable public entry reference for a newly accepted entry.
 6. Duplicate/retry handling that never creates multiple valid entries accidentally.
 7. Post-close status explains that winner selection is not performed by the public page.
 8. Winner/payment/order flow remains a later surface unless separately approved.
 
-## Proposed entry fields
+## Approved entry fields
 
-Minimum proposed fields for owner review:
+First interactive slice:
 - email
 - display/name for communication
 - raffle identifier supplied by trusted server route, never editable by client
 - required agreement to approved raffle rules/privacy copy
 
-Potentially deferred unless business rules require them:
+Deferred unless later business rules require them:
 - phone
 - shipping address
 - social handle
 - region/country
+- file upload
 
-No file upload is proposed for raffle entry.
+## Approved identity model
 
-## Identity proposal
+First implementation uses **guest email entry**.
 
-Preferred first implementation direction: guest entry by verified/normalized email, with server-side uniqueness per raffle.
+Identity rules:
+- normalize email server-side
+- one valid entry per normalized email per raffle
+- database uniqueness is the hard duplicate guard
+- no customer account/authentication is required for the first entry slice
+- duplicate lookup/response must not expose another entrant's private information
 
-Alternative: require authenticated customer account before entry.
-
-This decision must be owner-approved before implementation because it materially changes friction, duplicate enforcement, privacy, and Supabase RLS design.
-
-## Entry lifecycle proposal
+## Entry lifecycle
 
 Presentation states:
 - `ready`
@@ -70,10 +73,11 @@ The server/database is authoritative for open/closed state and duplicate/eligibi
 
 ## Duplicate and idempotency principles
 
-- One valid entry per normalized identity per raffle unless final rules explicitly approve otherwise.
-- Repeated submit/retry must return the existing valid entry or an equivalent stable result, not create duplicates.
+- One valid entry per normalized email per raffle.
+- Repeated submit/retry must return a stable semantic result and never create duplicates.
 - Client-generated request token may assist idempotency, but database uniqueness remains the hard guard.
-- Duplicate responses should be calm and informative, not treated as a fatal system error.
+- Duplicate responses are calm and privacy-safe.
+- Public duplicate response defaults to a generic `already_entered` acknowledgement rather than returning private details from an existing entry.
 
 ## Privacy and security principles
 
@@ -84,9 +88,15 @@ The server/database is authoritative for open/closed state and duplicate/eligibi
 - Entry writes require server-side validation and anti-abuse/rate limiting.
 - Secrets/service-role credentials never reach the browser.
 
+## Persistence direction
+
+Supabase is approved as the persistence direction for the first interactive slice, subject to direct inspection of the current commerce project before any migration is authored or applied.
+
+No schema change is authorized by this experience document alone. The implementation branch must first inspect current tables, policies, migrations, and naming conventions, then produce a reviewed migration/RLS plan.
+
 ## Future winner boundary
 
-This spec does not approve public winner selection or order creation.
+This approval does not authorize public winner selection or order creation.
 
 A later winner/payment slice must define:
 - how selected winners are notified
@@ -106,13 +116,17 @@ A later winner/payment slice must define:
 - Public entrant list.
 - File upload.
 - Browser-authoritative eligibility.
+- Mandatory customer account/authentication.
 
-## Owner approval questions
+## Approval record
 
-1. Approve `/raffle/[slug]` as the public detail route.
-2. Choose identity model: guest email entry or required customer account.
-3. Approve one valid entry per normalized identity per raffle as the default uniqueness rule.
-4. Approve minimal fields: email + display/name + required rules/privacy agreement.
-5. Confirm that phone, shipping address, social handle and file upload stay out of the entry form unless later required.
-6. Approve server/database-authoritative timing and eligibility with no browser-only enforcement.
-7. Approve that payment/order/winner administration remain a later separately approved slice.
+Owner approved on 2026-08-09:
+1. `/raffle/[slug]` as the public detail route.
+2. Guest email as the first identity model.
+3. One valid entry per normalized email per raffle.
+4. Minimal fields: email + display/name + required rules/privacy agreement.
+5. Phone, shipping address, social handle, region/country, and file upload remain deferred.
+6. Server/database-authoritative timing and eligibility with no browser-only enforcement.
+7. Supabase as the intended persistence layer, pending direct schema inspection and migration/RLS review.
+8. Privacy-safe generic acknowledgement for duplicate submissions.
+9. Payment/order/winner administration remain a later separately approved slice.
