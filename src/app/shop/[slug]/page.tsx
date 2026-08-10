@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { Container } from "@/components/ui/container";
-import { getCuratedShopEntries, getShopEntryBySlug } from "@/features/shop/shop-content";
+import { getShopCatalogEntryBySlug } from "@/features/shop/catalog-adapter";
+import { getCuratedShopEntries } from "@/features/shop/shop-content";
 import { ShopProductDetail } from "@/features/shop/shop-product-detail";
 
 type ShopProductDetailPageProps = Readonly<{
@@ -16,24 +17,24 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: ShopProductDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const entry = getShopEntryBySlug(slug);
+  const entry = await getShopCatalogEntryBySlug(slug);
 
   if (!entry) {
     return {
       title: "Shop object not found | Luminal Factory",
-      description: "The requested Luminal Factory shop presentation object was not found.",
+      description: "The requested Luminal Factory shop object was not found.",
     };
   }
 
   return {
     title: `${entry.title} | Luminal Factory Shop`,
-    description: `${entry.description} Presentation-only object detail; no live price, stock, or checkout is implied.`,
+    description: `${entry.description} Public catalog presentation; checkout is not implied.`,
   };
 }
 
 export default async function ShopProductDetailPage({ params }: ShopProductDetailPageProps) {
   const { slug } = await params;
-  const entry = getShopEntryBySlug(slug);
+  const entry = await getShopCatalogEntryBySlug(slug);
 
   if (!entry) {
     notFound();
