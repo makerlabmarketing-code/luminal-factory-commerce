@@ -43,34 +43,36 @@ Every phase uses the same contract fields below.
 - **Completion evidence:** Root route implementation and test suite.
 - **Next approved slice:** Phase 3 route shells.
 
-## Phase 3 — Static storefront routes — `IN_PROGRESS`
+## Phase 3 — Static storefront routes — `OPERATOR_RETEST_REQUIRED`
 
-- **2026-08-05 approval note:** Raffle-first Home experience script is owner-approved for the first implementation slice; the formal Home specification at `specs/home/home-page-specification.md` is approved for the first implementation slice. Phase 3 implementation has started with the current slice: Global visual foundation + Home raffle discovery hero shell.
-- **Objective:** Define Shop, Product detail, Gallery, Commission, Raffle, About, Contact, Cart, and Account shells.
-- **Scope:** Approved page scripts, metadata, empty/loading/error patterns, non-broken navigation.
-- **Non-goals:** Persistence or functional commerce.
-- **Dependencies:** Page-by-page experience approval; Phase 1 foundations.
-- **Data/schema impact:** Static fixtures only.
-- **Security impact:** Account shell must not imply authentication exists.
-- **Validation:** Route build, link crawl, semantics, responsive/a11y checks.
-- **Production gate:** Design approval for each route.
-- **Completion evidence:** Route manifest, screenshots, checks.
-- **Current slice:** Luminal Brand Asset Integration + Legacy LazyFactory Asset Recovery Inventory.
-- **Current slice scope — `SOURCE_VALIDATED_BROWSER_REVIEW_REQUIRED`:** The exact owner-approved PNG now exists at `public/brand/luminal-factory-logo-primary.png`, has been validated, and is integrated locally in Header and Footer with explicit dimensions and accessible Home links. Favicon remains unchanged because this detailed mark is unsuitable for an unreviewed 16–48 px substitution; no OG artwork was created. Historical LazyFactory recovery remains separate, review-gated, and partial/blocked. Home, Archive, and Shop product media remain unchanged.
-- **Previous slice evidence:** Home Shop Discovery Preview + `/shop` and Home Archive Preview + `/archive` remain bounded foundation slices; full Shop, Archive, and production media replacement remain future-gated.
+- **Objective:** Define the public storefront route architecture without implying unavailable commerce/auth capabilities.
+- **Scope:** Home, Raffle discovery, Archive index/detail, Shop index/detail, Commission discovery/inquiry, About, metadata, navigation and presentation states.
+- **Resolved route architecture:** Gallery is fulfilled by Archive; Contact is fulfilled by Commission inquiry; Cart and Account are intentionally deferred to Phase 6.
+- **Non-goals:** Persistence, transactional raffle participation, functional catalog/cart/checkout/payment/order/auth.
+- **Dependencies:** Phase 1 foundations and approved page contracts.
+- **Data/schema impact:** Static fixtures only; no Phase 3 Supabase/ERP schema change.
+- **Security impact:** No customer auth or privileged data access introduced.
+- **Validation:** GitHub quality gates passed for merged slices. Current-head Vercel verification for the final About slice remains externally blocked by the team `build-rate-limit`.
+- **Production gate:** Re-run Vercel current-head/production smoke verification when build capacity returns. Low-risk merge exception was used only for the static About slice after GitHub quality passed.
+- **Completion evidence:** Shop and Archive detail routes, Commission inquiry boundary, dedicated About route, approved brand line `Shaped by light. Crafted to last.`, and `specs/storefront/phase3-route-completion-audit.md`.
+- **Historical marker:** Current slice: Luminal Brand Asset Integration + Legacy LazyFactory Asset Recovery Inventory. This historical slice remains bounded; media migration was not silently completed.
+- **Current state:** Route architecture and code are merged. Deployment verification is the only remaining Phase 3 closeout item.
+- **Next approved slice:** Phase 4 read-only commerce data-boundary audit.
 
-## Phase 4 — Commerce data model — `LIVE_APPROVAL_REQUIRED`
+## Phase 4 — Commerce data model — `IN_PROGRESS`
 
-- **Objective:** Specify products, variants, collections, media, pricing, stock, release/status types, raffle configuration, and commission slots.
-- **Scope:** Contract design and ERP impact audit before migrations.
-- **Non-goals:** Automatic production SQL.
-- **Dependencies:** ERP/schema audit and operator approval.
-- **Data/schema impact:** High; shared schema decision.
-- **Security impact:** RLS, privileged mutation, public-field design.
-- **Validation:** Contract review, migration preflight/rollback, generated types, both-app impact checks.
-- **Production gate:** Explicit live approval.
-- **Completion evidence:** Approved model and migration package.
-- **Next approved slice:** ERP/Supabase read-only contract audit.
+- **Objective:** Specify the safe commerce persistence boundary and model products, variants, collections, media, pricing, stock, direct-sale/preorder status and commission-facing contracts before migrations.
+- **Scope:** Read-only contract audit first; schema proposal and migration package only after architecture boundary is resolved.
+- **Safety boundary:** Do not operationalize chance-based raffle entry, random winner selection, or raffle participation persistence in this project work. Existing raffle presentation remains informational only.
+- **Current architecture issue:** The repository Supabase contract says storefront and ERP should eventually share one project, while the connected Supabase project is the live ERP database and this commerce conversation is explicitly prohibited from mutating ERP. Resolving shared-vs-dedicated commerce persistence is a system-wide architecture decision.
+- **Non-goals:** Automatic production SQL; implicit reuse/mutation of the ERP Supabase project; payment/order implementation.
+- **Dependencies:** Read-only ERP/schema audit, persistence-boundary decision, and migration preflight.
+- **Data/schema impact:** High once implementation starts; zero during the current audit slice.
+- **Security impact:** RLS, privileged mutation, public-field design and secret boundaries must be defined before any persistence implementation.
+- **Validation:** Contract review, migration preflight/rollback, generated types, storefront impact review, and ERP impact review when/if integration is approved.
+- **Production gate:** System-wide persistence-boundary decision before creating or migrating a commerce database; destructive or security-sensitive changes require explicit operator review.
+- **Completion evidence:** Approved model, persistence-boundary decision and migration package.
+- **Current slice:** Read-only commerce data-boundary audit.
 
 ## Phase 5 — Catalog integration — `NOT_STARTED`
 
@@ -136,3 +138,9 @@ Every phase uses the same contract fields below.
 - **Production gate:** Launch checklist and operator sign-off.
 - **Completion evidence:** Reports, dashboards, runbooks, retest record.
 - **Next approved slice:** Launch-readiness audit.
+
+## Standing owner authorization — 2026-08-10
+
+The owner authorized automatic progression through the roadmap and automatic selection of the simplest reasonable implementation option without per-slice approval.
+
+Escalate only when a decision has material system-wide consequences, introduces meaningful recurring cost, changes production security/access boundaries, performs destructive production data changes, or presents serious production risk. Normal low-risk branch/PR/CI work proceeds automatically.
