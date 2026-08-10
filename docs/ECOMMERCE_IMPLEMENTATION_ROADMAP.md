@@ -55,6 +55,7 @@ Every phase uses the same contract fields below.
 - **Validation:** GitHub quality gates passed for merged slices. Current-head Vercel verification for the final About slice remains externally blocked by the team `build-rate-limit`.
 - **Production gate:** Re-run Vercel current-head/production smoke verification when build capacity returns. Low-risk merge exception was used only for the static About slice after GitHub quality passed.
 - **Completion evidence:** Shop and Archive detail routes, Commission inquiry boundary, dedicated About route, approved brand line `Shaped by light. Crafted to last.`, and `specs/storefront/phase3-route-completion-audit.md`.
+- **Historical marker:** Current slice: Luminal Brand Asset Integration + Legacy LazyFactory Asset Recovery Inventory. This historical slice remains bounded; media migration was not silently completed.
 - **Current state:** Route architecture and code are merged. Deployment verification is the only remaining Phase 3 closeout item.
 - **Next approved slice:** Phase 4 read-only commerce data-boundary audit.
 
