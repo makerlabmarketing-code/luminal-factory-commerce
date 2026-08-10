@@ -65,8 +65,16 @@ export default function Home() {
 
         <section id="about" className="about-minimal" aria-labelledby="about-title">
           <Container className="release-info-grid">
-            <p className="eyebrow">About</p>
-            <h2 id="about-title">Luminal Factory là không gian trình bày vật thể sưu tầm, được triển khai theo từng lát cắt đã phê duyệt.</h2>
+            <div>
+              <p className="eyebrow">About</p>
+              <h2 id="about-title">Luminal Factory là một studio nhỏ dành cho artisan keycap, collectible object và những form được phát triển thành vật thể thật.</h2>
+            </div>
+            <div className="release-info-panel">
+              <p>Khám phá cách studio tiếp cận concept, 3D, making và presentation mà không biến About thành một corporate profile.</p>
+              <div className="actions">
+                <ButtonLink href="/about">Tìm hiểu về Luminal</ButtonLink>
+              </div>
+            </div>
           </Container>
         </section>
       </main>
