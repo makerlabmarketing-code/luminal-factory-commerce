@@ -59,34 +59,34 @@ Every phase uses the same contract fields below.
 - **Current state:** Phase 3 route architecture, code and production verification are complete.
 - **Next approved slice:** Phase 4 commerce data model and Supabase boundary.
 
-## Phase 4 — Commerce data model — `IN_PROGRESS`
+## Phase 4 — Commerce data model — `COMPLETED`
 
-- **Objective:** Specify the safe commerce persistence boundary and model products, variants, collections, media, pricing, stock, direct-sale/preorder status and commission-facing contracts before migrations.
-- **Scope:** Read-only contract audit first; schema proposal and migration package only after architecture boundary is resolved.
-- **Safety boundary:** Do not operationalize chance-based raffle entry, random winner selection, or raffle participation persistence in this project work. Existing raffle presentation remains informational only.
-- **Current schema audit:** The connected Supabase project contains no public `products`, `raffles`, `customers`, `orders`, `order_items`, or `payments` tables. Existing `product_categories` and `production_orders` belong to the ERP/internal production domain and must not be treated as storefront commerce entities.
-- **Current architecture issue:** The repository Supabase contract says storefront and ERP should eventually share one project, while the connected Supabase project is the live ERP database and this commerce conversation is explicitly prohibited from mutating ERP. Resolving shared-vs-dedicated commerce persistence is a system-wide architecture decision.
-- **Non-goals:** Automatic production SQL; implicit reuse/mutation of the ERP Supabase project; payment/order implementation.
-- **Dependencies:** Read-only ERP/schema audit, persistence-boundary decision, and migration preflight.
-- **Data/schema impact:** High once implementation starts; zero during the current audit slice.
-- **Security impact:** RLS, privileged mutation, public-field design and secret boundaries must be defined before any persistence implementation.
-- **Validation:** Contract review, migration preflight/rollback, generated types, storefront impact review, and ERP impact review when/if integration is approved.
-- **Production gate:** System-wide persistence-boundary decision before creating or migrating a commerce database; destructive or security-sensitive changes require explicit operator review.
-- **Completion evidence:** Approved model, persistence-boundary decision and migration package.
-- **Current slice:** `specs/commerce/phase4-supabase-schema-audit.md` + `specs/commerce/phase4-commerce-schema-contract-draft.md`.
+- **Objective:** Establish a dedicated, versioned Commerce persistence boundary for catalog, customers, orders, payments and future ERP financial synchronization.
+- **Scope:** Dedicated Commerce Supabase project, versioned migrations, RLS/grants, generated database types, payment-state projection and idempotent commerce event outbox.
+- **Safety boundary:** Raffle remains static/editorial only and has no Commerce database table, participation, winner, draw, randomization or raffle-payment persistence.
+- **Persistence boundary:** Commerce project `bkmbhcfokobmhfzgsfzh` (`Luminal Factory Commerce`, `ap-northeast-1`) is separate from ERP project `kwfmfmpgpbfewpiizesv`.
+- **Implemented schema:** `products`, `product_variants`, `product_media`, `product_prices`, `inventory_items`, `customers`, `orders`, `order_items`, `payments`, `refunds`, `commerce_events`, plus `order_payment_summary`.
+- **Money/payment contract:** Monetary values use integer minor units. Successful `payments` plus successful `refunds` are authoritative; order payment status is derived rather than stored as a second editable source of truth.
+- **ERP preparation:** `commerce_events` carries idempotent ordinary-commerce events (`order_paid`, `payment_refunded`, `order_cancelled`) for a later Phase 8 financial projection; no ERP mutation occurs in Phase 4.
+- **Security impact:** RLS is enabled for every new table. Only published catalog data has anon/authenticated select policies. Inventory, customer, order, payment, refund and event tables remain default-deny to public/client roles.
+- **Validation:** Migrations `20260810045019_create_commerce_core` and `20260810045219_add_commerce_fk_indexes` applied successfully; schema/RLS inspected; generated TypeScript types committed; security and performance advisors reviewed. FK index findings were remediated; remaining unused-index notices are expected on a new zero-traffic database.
+- **Production gate:** PR #32 passed GitHub `quality`, exact-head Vercel Preview reached `READY`, and production deployment for merge commit `12c0f538513b0a7d8baffaf0ea4664568f8619a8` reached `READY` on 2026-08-10.
+- **Completion evidence:** `supabase/migrations`, `src/lib/supabase/database.types.ts`, `specs/commerce/phase4-commerce-core-schema-technical-plan.md`, PR #32 and live Commerce Supabase verification.
+- **Current state:** Phase 4 is complete; ERP remains untouched.
+- **Next approved slice:** Phase 5 read-only catalog adapter.
 
-## Phase 5 — Catalog integration — `NOT_STARTED`
+## Phase 5 — Catalog integration — `IN_PROGRESS`
 
-- **Objective:** Add server queries, listing, filter/search/pagination, detail/media, and SEO.
-- **Scope:** Published public catalog reads behind services.
-- **Non-goals:** Cart/checkout.
-- **Dependencies:** Approved Phase 4 and media strategy.
-- **Data/schema impact:** Read contracts only after schema approval.
-- **Security impact:** Explicit public field selection and RLS.
-- **Validation:** Service, boundary, route, SEO, performance, empty/error tests.
-- **Production gate:** Staging data and query/security review.
-- **Completion evidence:** Catalog smoke tests and deployment verification.
-- **Next approved slice:** Read-only catalog adapter.
+- **Objective:** Replace Shop presentation fixtures with safe server-side reads from the published Commerce catalog while preserving truthful empty/fallback behavior.
+- **Scope:** Read-only catalog adapter, listing/detail mapping, media/price presentation, SEO, empty/error handling and deployment verification.
+- **Non-goals:** Cart, checkout, payment writes, customer identity, inventory mutation, ERP mutation or raffle persistence.
+- **Dependencies:** Completed Phase 4 schema, project URL/publishable key configuration and approved media strategy.
+- **Data/schema impact:** Read-only against published catalog policies; no Phase 5 migration required for the first adapter slice.
+- **Security impact:** Explicit public field selection; no service-role key in browser code; inventory quantities remain private.
+- **Validation:** Adapter/service tests, route/detail tests, public-policy smoke queries, build/Preview/production verification and graceful behavior when catalog configuration/data is absent.
+- **Production gate:** Exact-head GitHub CI and Vercel Preview, followed by production smoke after merge.
+- **Completion evidence:** Catalog adapter and Shop routes reading authoritative published catalog data.
+- **Current slice:** Server-first read-only catalog adapter with safe fallback.
 
 ## Phase 6 — Cart and customer identity — `NOT_STARTED`
 
