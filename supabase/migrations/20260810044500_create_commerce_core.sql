@@ -1,6 +1,6 @@
 -- Luminal Factory Commerce core schema
 -- Dedicated project only: bkmbhcfokobmhfzgsfzh
--- Raffle scope is informational metadata only. No participation, winner, draw, or raffle-payment persistence.
+-- Raffle remains static/editorial and is intentionally not persisted in Commerce DB.
 
 create or replace function public.commerce_set_updated_at()
 returns trigger
@@ -80,22 +80,6 @@ create unique index inventory_items_product_no_variant_uidx
 create unique index inventory_items_variant_uidx
   on public.inventory_items(variant_id)
   where variant_id is not null;
-
-create table public.raffles (
-  id uuid primary key default gen_random_uuid(),
-  product_id uuid references public.products(id) on delete set null,
-  slug text not null unique,
-  title text not null,
-  description text,
-  status text not null default 'upcoming' check (status in ('upcoming', 'open', 'closed', 'drawing', 'completed', 'unavailable')),
-  opens_at timestamptz,
-  closes_at timestamptz,
-  timezone text not null default 'Asia/Ho_Chi_Minh',
-  public_note text,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  check (closes_at is null or opens_at is null or closes_at > opens_at)
-);
 
 create table public.customers (
   id uuid primary key default gen_random_uuid(),
@@ -194,7 +178,6 @@ create table public.commerce_events (
 create index product_variants_product_idx on public.product_variants(product_id);
 create index product_media_product_sort_idx on public.product_media(product_id, sort_order);
 create index product_prices_product_active_idx on public.product_prices(product_id, is_active);
-create index raffles_status_dates_idx on public.raffles(status, opens_at, closes_at);
 create index orders_customer_created_idx on public.orders(customer_id, created_at desc);
 create index order_items_order_idx on public.order_items(order_id);
 create index payments_order_status_idx on public.payments(order_id, status);
@@ -204,8 +187,6 @@ create index commerce_events_unprocessed_idx on public.commerce_events(occurred_
 create trigger products_set_updated_at before update on public.products
 for each row execute function public.commerce_set_updated_at();
 create trigger product_variants_set_updated_at before update on public.product_variants
-for each row execute function public.commerce_set_updated_at();
-create trigger raffles_set_updated_at before update on public.raffles
 for each row execute function public.commerce_set_updated_at();
 create trigger customers_set_updated_at before update on public.customers
 for each row execute function public.commerce_set_updated_at();
@@ -221,7 +202,6 @@ alter table public.product_variants enable row level security;
 alter table public.product_media enable row level security;
 alter table public.product_prices enable row level security;
 alter table public.inventory_items enable row level security;
-alter table public.raffles enable row level security;
 alter table public.customers enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
@@ -230,12 +210,12 @@ alter table public.refunds enable row level security;
 alter table public.commerce_events enable row level security;
 
 revoke all on table public.products, public.product_variants, public.product_media, public.product_prices,
-  public.inventory_items, public.raffles, public.customers, public.orders, public.order_items,
+  public.inventory_items, public.customers, public.orders, public.order_items,
   public.payments, public.refunds, public.commerce_events from anon, authenticated;
 
-grant select on table public.products, public.product_variants, public.product_media, public.product_prices, public.raffles to anon, authenticated;
+grant select on table public.products, public.product_variants, public.product_media, public.product_prices to anon, authenticated;
 grant all on table public.products, public.product_variants, public.product_media, public.product_prices,
-  public.inventory_items, public.raffles, public.customers, public.orders, public.order_items,
+  public.inventory_items, public.customers, public.orders, public.order_items,
   public.payments, public.refunds, public.commerce_events to service_role;
 
 create policy "published products are public"
@@ -285,11 +265,6 @@ using (
       and p.published_at <= now()
   )
 );
-
-create policy "raffle presentation metadata is public"
-on public.raffles for select
-to anon, authenticated
-using (status in ('upcoming', 'open', 'closed', 'drawing', 'completed', 'unavailable'));
 
 create or replace view public.order_payment_summary
 with (security_invoker = true)
