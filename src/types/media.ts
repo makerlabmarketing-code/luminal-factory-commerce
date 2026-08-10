@@ -3,6 +3,7 @@ export type PresentationMediaKind = "image" | "video";
 export type PresentationMediaSource =
   | "lazyfactory-historical-archive"
   | "luminal-current-brand"
+  | "commerce-catalog"
   | "internal-placeholder";
 
 export type PresentationMedia = Readonly<{
