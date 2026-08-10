@@ -43,7 +43,7 @@ Every phase uses the same contract fields below.
 - **Completion evidence:** Root route implementation and test suite.
 - **Next approved slice:** Phase 3 route shells.
 
-## Phase 3 — Static storefront routes — `OPERATOR_RETEST_REQUIRED`
+## Phase 3 — Static storefront routes — `COMPLETED`
 
 - **Objective:** Define the public storefront route architecture without implying unavailable commerce/auth capabilities.
 - **Scope:** Home, Raffle discovery, Archive index/detail, Shop index/detail, Commission discovery/inquiry, About, metadata, navigation and presentation states.
@@ -52,18 +52,19 @@ Every phase uses the same contract fields below.
 - **Dependencies:** Phase 1 foundations and approved page contracts.
 - **Data/schema impact:** Static fixtures only; no Phase 3 Supabase/ERP schema change.
 - **Security impact:** No customer auth or privileged data access introduced.
-- **Validation:** GitHub quality gates passed for merged slices. Current-head Vercel verification for the final About slice remains externally blocked by the team `build-rate-limit`.
-- **Production gate:** Re-run Vercel current-head/production smoke verification when build capacity returns. Low-risk merge exception was used only for the static About slice after GitHub quality passed.
-- **Completion evidence:** Shop and Archive detail routes, Commission inquiry boundary, dedicated About route, approved brand line `Shaped by light. Crafted to last.`, and `specs/storefront/phase3-route-completion-audit.md`.
+- **Validation:** GitHub quality gates passed for merged slices. Vercel production deployment for `master` commit `3627c4397b623651a1e238f5bce043544e3b60fb` reached `READY`, and production `/about` returned HTTP 200 with the dedicated About route, `/about` navigation links and the approved brand line `Shaped by light. Crafted to last.`.
+- **Production gate:** Cleared on 2026-08-10 after Vercel build capacity returned.
+- **Completion evidence:** Shop and Archive detail routes, Commission inquiry boundary, dedicated About route, approved brand line, and `specs/storefront/phase3-route-completion-audit.md`.
 - **Historical marker:** Current slice: Luminal Brand Asset Integration + Legacy LazyFactory Asset Recovery Inventory. This historical slice remains bounded; media migration was not silently completed.
-- **Current state:** Route architecture and code are merged. Deployment verification is the only remaining Phase 3 closeout item.
-- **Next approved slice:** Phase 4 read-only commerce data-boundary audit.
+- **Current state:** Phase 3 route architecture, code and production verification are complete.
+- **Next approved slice:** Phase 4 commerce data model and Supabase boundary.
 
 ## Phase 4 — Commerce data model — `IN_PROGRESS`
 
 - **Objective:** Specify the safe commerce persistence boundary and model products, variants, collections, media, pricing, stock, direct-sale/preorder status and commission-facing contracts before migrations.
 - **Scope:** Read-only contract audit first; schema proposal and migration package only after architecture boundary is resolved.
 - **Safety boundary:** Do not operationalize chance-based raffle entry, random winner selection, or raffle participation persistence in this project work. Existing raffle presentation remains informational only.
+- **Current schema audit:** The connected Supabase project contains no public `products`, `raffles`, `customers`, `orders`, `order_items`, or `payments` tables. Existing `product_categories` and `production_orders` belong to the ERP/internal production domain and must not be treated as storefront commerce entities.
 - **Current architecture issue:** The repository Supabase contract says storefront and ERP should eventually share one project, while the connected Supabase project is the live ERP database and this commerce conversation is explicitly prohibited from mutating ERP. Resolving shared-vs-dedicated commerce persistence is a system-wide architecture decision.
 - **Non-goals:** Automatic production SQL; implicit reuse/mutation of the ERP Supabase project; payment/order implementation.
 - **Dependencies:** Read-only ERP/schema audit, persistence-boundary decision, and migration preflight.
@@ -72,7 +73,7 @@ Every phase uses the same contract fields below.
 - **Validation:** Contract review, migration preflight/rollback, generated types, storefront impact review, and ERP impact review when/if integration is approved.
 - **Production gate:** System-wide persistence-boundary decision before creating or migrating a commerce database; destructive or security-sensitive changes require explicit operator review.
 - **Completion evidence:** Approved model, persistence-boundary decision and migration package.
-- **Current slice:** Read-only commerce data-boundary audit.
+- **Current slice:** `specs/commerce/phase4-supabase-schema-audit.md` + `specs/commerce/phase4-commerce-schema-contract-draft.md`.
 
 ## Phase 5 — Catalog integration — `NOT_STARTED`
 
