@@ -17,7 +17,6 @@ Create the first versioned Commerce persistence layer without mutating the exist
 - `product_media`
 - `product_prices`
 - `inventory_items`
-- `raffles` as informational release metadata only
 - `customers`
 - `orders`
 - `order_items`
@@ -35,18 +34,19 @@ All amounts are stored as integer minor units (`*_minor`). No floating-point mon
 - Commerce customer/order/payment data lives only in the dedicated Commerce project.
 - Existing ERP project `kwfmfmpgpbfewpiizesv` is not mutated by this migration.
 - ERP financial synchronization is deferred to Phase 8 and will consume idempotent Commerce events / financial projections rather than copy the full customer database.
+- Raffle remains static/editorial in the storefront and is intentionally excluded from Commerce database persistence.
 
 ## RLS and grants
 - RLS is enabled on every new table in `public`.
-- Public read access is limited to published catalog metadata, active prices, and informational raffle presentation metadata.
+- Public read access is limited to published product/variant/media/price catalog data.
 - Inventory quantities, customers, orders, order items, payments, refunds, and commerce events receive no `anon` or `authenticated` policies in Phase 4.
 - Server-side privileged operations use `service_role`; no service-role secret is exposed to browser code.
 
-## Raffle safety boundary
-`raffles` stores public descriptive state only. This migration intentionally contains no entry, participant, ticket, winner, draw, selection, randomization, raffle payment, or customer-to-raffle participation tables or functions.
+## Raffle boundary
+This migration contains no raffle table, entry, participant, ticket, winner, draw, selection, randomization, raffle payment, or customer-to-raffle participation persistence or functions.
 
 ## ERP integration preparation
-`commerce_events` supports only non-raffle financial/fulfillment events in this slice:
+`commerce_events` supports only ordinary commerce financial/fulfillment events in this slice:
 - `order_paid`
 - `payment_refunded`
 - `order_cancelled`
