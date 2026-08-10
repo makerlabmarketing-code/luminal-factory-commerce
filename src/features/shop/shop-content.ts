@@ -1,8 +1,9 @@
 import type { PresentationMedia } from "@/types/media";
 
-export type ShopPresentationStatus = "detail-only" | "coming-soon" | "unavailable" | "archived";
+export type ShopPresentationStatus = "detail-only" | "coming-soon" | "unavailable" | "archived" | "published";
 
 export type ShopMediaTone = "ice" | "violet" | "rose";
+export type ShopDataSource = "commerce-catalog" | "fixture-fallback";
 
 export type ShopPresentationEntry = Readonly<{
   id: string;
@@ -22,8 +23,10 @@ export type ShopPresentationEntry = Readonly<{
   }>;
   presentationStatus: ShopPresentationStatus;
   availabilityLabel: string;
+  priceLabel?: string;
   href: `/shop/${string}`;
-  isPlaceholder: true;
+  isPlaceholder: boolean;
+  dataSource: ShopDataSource;
 }>;
 
 export const shopPlaceholderNotice = "Presentation placeholder — pending production catalog approval";
@@ -70,6 +73,7 @@ export const curatedShopEntries = [
     availabilityLabel: shopDetailAvailability,
     href: "/shop/object-study-direct-01",
     isPlaceholder: true,
+    dataSource: "fixture-fallback",
   },
   {
     id: "shop-object-study-02",
@@ -111,6 +115,7 @@ export const curatedShopEntries = [
     availabilityLabel: "Chi tiết tham khảo · trạng thái mở bán chưa được công bố",
     href: "/shop/object-study-direct-02",
     isPlaceholder: true,
+    dataSource: "fixture-fallback",
   },
   {
     id: "shop-object-study-03",
@@ -152,6 +157,7 @@ export const curatedShopEntries = [
     availabilityLabel: "Chi tiết tham khảo · hiện không mở bán trực tiếp",
     href: "/shop/object-study-direct-03",
     isPlaceholder: true,
+    dataSource: "fixture-fallback",
   },
 ] as const satisfies readonly ShopPresentationEntry[];
 

@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { Container } from "@/components/ui/container";
+import { getShopCatalog } from "@/features/shop/catalog-adapter";
 import { ShopCollection } from "@/features/shop/shop-collection";
-import { getCuratedShopEntries } from "@/features/shop/shop-content";
 
 export const metadata: Metadata = {
   title: "Shop | Luminal Factory",
-  description: "Presentation-only shop discovery foundation for future directly available Luminal Factory collectibles.",
+  description: "Published Luminal Factory object catalog with a safe presentation fallback when Commerce data is unavailable.",
 };
 
-export default function ShopPage() {
-  const entries = getCuratedShopEntries();
+export default async function ShopPage() {
+  const catalog = await getShopCatalog();
+  const isLiveCatalog = catalog.source === "commerce-catalog";
 
   return (
     <>
@@ -21,13 +21,14 @@ export default function ShopPage() {
         <Container>
           <section className="shop-route-hero" aria-labelledby="shop-title">
             <p className="eyebrow">Luminal shop</p>
-            <h1 id="shop-title">A restrained shelf for future direct collectible discovery.</h1>
+            <h1 id="shop-title">Object catalog, presented without pretending checkout is already open.</h1>
             <p>
-              Shop là route foundation cho các object có thể mua trực tiếp trong tương lai. Hiện tại nội dung chỉ là presentation placeholder: chưa có giá, tồn kho, cart, checkout, payment, order hoặc Supabase catalog.
+              {isLiveCatalog
+                ? "Shop đang đọc các object đã publish từ Commerce catalog. Giá có thể được hiển thị khi catalog có giá active, nhưng cart, checkout, payment và order creation vẫn chưa mở trong Phase 5."
+                : "Commerce catalog hiện chưa được cấu hình hoặc tạm thời không truy cập được trên deployment này, nên Shop đang dùng presentation fallback đã kiểm duyệt. Không có cart, checkout, payment hoặc order creation."}
             </p>
-            <Link href="/#raffle">Quay về raffle discovery</Link>
           </section>
-          <ShopCollection entries={entries} />
+          <ShopCollection entries={catalog.entries} source={catalog.source} />
         </Container>
       </main>
       <Footer />

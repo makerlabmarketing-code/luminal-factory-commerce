@@ -7,12 +7,15 @@ type ShopProductDetailProps = Readonly<{
 }>;
 
 export function ShopProductDetail({ entry }: ShopProductDetailProps) {
+  const isCatalogEntry = entry.dataSource === "commerce-catalog";
+
   return (
     <>
       <section className="shop-route-hero" aria-labelledby="shop-detail-title">
         <p className="eyebrow">{entry.collection} · {entry.type}</p>
         <h1 id="shop-detail-title">{entry.title}</h1>
         <p>{entry.description}</p>
+        {entry.priceLabel ? <p className="quiet-label">Published price · {entry.priceLabel}</p> : null}
         <p className="quiet-label">{entry.availabilityLabel}</p>
         <Link href="/shop">← Quay lại Shop</Link>
       </section>
@@ -24,13 +27,13 @@ export function ShopProductDetail({ entry }: ShopProductDetailProps) {
             <em>{entry.media.label}</em>
           </div>
           <div className="shop-route-copy">
-            <p className="eyebrow">Object study</p>
+            <p className="eyebrow">Object</p>
             <h2 id="shop-object-title">Object story</h2>
             <p>{entry.story}</p>
             <dl>
               <div><dt>Material note</dt><dd>{entry.materialNote}</dd></div>
               <div><dt>Presentation status</dt><dd>{entry.presentationStatus}</dd></div>
-              <div><dt>Media authority</dt><dd>{entry.media.productionApproved ? "Production approved" : shopPlaceholderNotice}</dd></div>
+              <div><dt>Data authority</dt><dd>{isCatalogEntry ? "Luminal Factory Commerce catalog" : shopPlaceholderNotice}</dd></div>
             </dl>
           </div>
         </div>
@@ -40,13 +43,13 @@ export function ShopProductDetail({ entry }: ShopProductDetailProps) {
         <div className="shop-route-heading">
           <p className="eyebrow">Craft notes</p>
           <h2 id="shop-craft-title">What is known now</h2>
-          <p>Only approved presentation information is shown. Unknown production facts are intentionally omitted.</p>
+          <p>Only information present in the active source is shown. Unknown production facts are intentionally omitted.</p>
         </div>
         <ol className="steps-grid">
           {entry.craftNotes.map((note, index) => (
             <li key={note}>
               <span>{String(index + 1).padStart(2, "0")}</span>
-              <h3>Study note</h3>
+              <h3>Object note</h3>
               <p>{note}</p>
             </li>
           ))}
@@ -56,8 +59,8 @@ export function ShopProductDetail({ entry }: ShopProductDetailProps) {
       <section className="shop-route-section" aria-labelledby="shop-facts-title">
         <div className="shop-route-heading">
           <p className="eyebrow">Object facts</p>
-          <h2 id="shop-facts-title">Presentation facts</h2>
-          <p>No price, stock, shipping promise, SKU, cart, checkout, payment, or order state is implied by this page.</p>
+          <h2 id="shop-facts-title">Published facts</h2>
+          <p>{isCatalogEntry ? "Catalog facts may include a published price, but no stock quantity or purchase state is exposed." : "Fallback facts are presentation-only and do not imply price, stock or purchase state."}</p>
         </div>
         <dl className="process-list">
           {entry.facts.map((fact, index) => (
@@ -71,9 +74,9 @@ export function ShopProductDetail({ entry }: ShopProductDetailProps) {
 
       <section className="shop-route-section" aria-labelledby="shop-purchase-boundary-title">
         <div className="feedback-state" role="status">
-          <h2 id="shop-purchase-boundary-title">Direct purchase chưa được mở trong slice này.</h2>
-          <p>Trang detail hiện chỉ dùng để khám phá object. Khi catalog, giá, tồn kho, checkout và order contract được duyệt, transaction controls sẽ được thiết kế ở một slice riêng.</p>
-          <Link href="/shop">Khám phá các object study khác</Link>
+          <h2 id="shop-purchase-boundary-title">Purchase flow chưa được mở trong Phase 5.</h2>
+          <p>Shop hiện chỉ đọc catalog public. Cart, checkout, payment capture và order creation sẽ được thiết kế ở các phase riêng sau khi identity và payment contracts sẵn sàng.</p>
+          <Link href="/shop">Khám phá các object khác</Link>
         </div>
       </section>
     </>

@@ -30,7 +30,7 @@ test("home archive and shop previews follow raffle-first hierarchy", () => {
   assert.match(read("src/features/shop/shop-preview-section.tsx"), /Curated shop presentation entries/);
 });
 
-test("archive and shop route foundations exist with one h1 and shared typed models", () => {
+test("archive and shop routes keep one h1 while Shop advances to the Phase 5 catalog adapter", () => {
   assert.ok(existsSync("src/app/archive/page.tsx"));
   assert.ok(existsSync("src/app/shop/page.tsx"));
   const archivePage = read("src/app/archive/page.tsx");
@@ -38,7 +38,8 @@ test("archive and shop route foundations exist with one h1 and shared typed mode
   assert.equal((archivePage.match(/<h1\b/g) ?? []).length, 1);
   assert.equal((shopPage.match(/<h1\b/g) ?? []).length, 1);
   assert.match(archivePage, /getCuratedArchiveEntries/);
-  assert.match(shopPage, /getCuratedShopEntries/);
+  assert.match(shopPage, /getShopCatalog/);
+  assert.match(read("src/features/shop/catalog-adapter.ts"), /getCuratedShopEntries/);
   assert.match(read("src/features/archive/archive-content.ts"), /export type ArchivePresentationEntry/);
   assert.match(read("src/features/shop/shop-content.ts"), /export type ShopPresentationEntry/);
   assert.match(read("src/features/shop/shop-content.ts"), /satisfies readonly ShopPresentationEntry\[\]/);
@@ -57,15 +58,20 @@ test("navigation follows approved order with real storefront routes", () => {
   assert.match(read("src/components/layout/mobile-navigation.tsx"), /aria-expanded/);
 });
 
-test("archive and shop foundations remain non-transactional and have no Supabase query", () => {
-  const source = src();
-  assert.match(source, /Curated placeholder|curated placeholder|PLACEHOLDER MEDIA/);
-  assert.doesNotMatch(source, /\$\d|price:/i);
-  assert.doesNotMatch(source, />\s*(add to cart|buy now|mua ngay|sold out|checkout)\s*</i);
-  assert.doesNotMatch(source, /inventory system|cart state|checkout flow|payment provider|order creation/i);
-  assert.doesNotMatch(source, /from\(["'`]|supabase\./i);
-  assert.doesNotMatch(source, /create table|service_role|SUPABASE_DB_PASSWORD/i);
-  assert.doesNotMatch(source, /interface\s+(Product|Order|Payment|Inventory|Customer)\b/);
+test("Archive stays static while Phase 5 Shop catalog reads remain non-transactional", () => {
+  const productionSource = src();
+  const archiveSource = read("src/app/archive/page.tsx") + read("src/features/archive/archive-content.ts");
+  const catalogAdapter = read("src/features/shop/catalog-adapter.ts");
+  const shopSurface = read("src/app/shop/page.tsx") + read("src/app/shop/[slug]/page.tsx") + read("src/features/shop/shop-product-detail.tsx");
+
+  assert.match(productionSource, /Curated placeholder|curated placeholder|PLACEHOLDER MEDIA/);
+  assert.doesNotMatch(archiveSource, /NEXT_PUBLIC_SUPABASE|rest\/v1|supabase\./i);
+  assert.match(catalogAdapter, /rest\/v1\/products/);
+  assert.match(catalogAdapter, /product_prices\(currency,amount_minor\)/);
+  assert.doesNotMatch(catalogAdapter, /\.insert\(|\.update\(|\.upsert\(|\.delete\(|service_role|SUPABASE_SECRET/i);
+  assert.doesNotMatch(shopSurface, />\s*(add to cart|buy now|mua ngay|checkout)\s*</i);
+  assert.doesNotMatch(shopSurface, /addToCart|createOrder\(|paymentIntent|checkoutSession/i);
+  assert.doesNotMatch(productionSource, /create table|SUPABASE_DB_PASSWORD/i);
 });
 
 test("design tokens have one source and reduced motion is supported", () => {
