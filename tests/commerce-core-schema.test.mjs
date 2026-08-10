@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-const migrationPath = "supabase/migrations/20260810044500_create_commerce_core.sql";
+const migrationPath = "supabase/migrations/20260810045019_create_commerce_core.sql";
 const sql = fs.readFileSync(migrationPath, "utf8");
 
 const requiredTables = [
