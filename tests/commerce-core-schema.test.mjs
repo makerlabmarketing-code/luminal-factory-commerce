@@ -11,7 +11,6 @@ const requiredTables = [
   "product_media",
   "product_prices",
   "inventory_items",
-  "raffles",
   "customers",
   "orders",
   "order_items",
@@ -40,8 +39,8 @@ test("does not publicly grant sensitive commerce tables", () => {
   }
 });
 
-test("raffle persistence is presentation metadata only", () => {
-  for (const forbiddenTable of ["raffle_entries", "raffle_participants", "raffle_tickets", "raffle_winners", "raffle_draws"]) {
+test("keeps raffle out of Commerce persistence", () => {
+  for (const forbiddenTable of ["raffles", "raffle_entries", "raffle_participants", "raffle_tickets", "raffle_winners", "raffle_draws"]) {
     assert.doesNotMatch(sql, new RegExp(`create table public\\.${forbiddenTable}\\b`, "i"));
   }
 });
