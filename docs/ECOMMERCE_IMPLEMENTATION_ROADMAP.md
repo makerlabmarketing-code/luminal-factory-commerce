@@ -86,7 +86,10 @@ Every phase uses the same contract fields below.
 - **Validation:** Adapter/service tests, route/detail tests, public-policy smoke queries, build/Preview/production verification and graceful behavior when catalog configuration/data is absent.
 - **Production gate:** Exact-head GitHub CI and Vercel Preview, followed by production smoke after merge.
 - **Completion evidence:** Catalog adapter and Shop routes reading authoritative published catalog data.
-- **Current slice:** Server-first read-only catalog adapter with safe fallback.
+- **Merged evidence:** PR #34 added the read-only listing/detail adapter; PR #35 and PR #36 added URL-driven search, allowlisted filters and bounded pagination. Merge commit `955d4f99bbd308b9dbe82192cf19dc43ac2e5771` has successful Vercel status.
+- **Current slice:** Catalog hardening, public-media rendering and truthful SEO metadata on branch `feat/catalog-hardening-media-seo`. The live Commerce project is healthy but contains zero published catalog rows and no Storage bucket, so this slice remains code-only/read-only and preserves the authoritative empty state.
+- **Current gate:** `CODE_COMPLETE_PENDING_CI_PREVIEW` after local validation; Phase 5 remains `IN_PROGRESS` until the exact branch head passes GitHub `quality`, one grouped Vercel Preview reaches `READY`, the merged production deployment is smoke-tested, and the zero-row public catalog response remains truthful.
+- **Next approved slice after Phase 5 completion:** Phase 6 identity architecture decision; no cart or auth implementation begins before that decision and privacy/security review.
 
 ## Phase 6 — Cart and customer identity — `NOT_STARTED`
 

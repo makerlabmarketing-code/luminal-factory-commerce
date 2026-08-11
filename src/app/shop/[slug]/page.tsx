@@ -21,14 +21,28 @@ export async function generateMetadata({ params }: ShopProductDetailPageProps): 
 
   if (!entry) {
     return {
-      title: "Shop object not found | Luminal Factory",
+      title: "Không tìm thấy object",
       description: "The requested Luminal Factory shop object was not found.",
+      robots: { index: false, follow: false },
     };
   }
 
+  const canonicalPath = `/shop/${entry.slug}`;
+  const catalogImage = entry.media.source === "commerce-catalog" && entry.media.productionApproved && entry.media.type === "image"
+    ? [{ url: entry.media.src, alt: entry.media.alt, width: entry.media.width, height: entry.media.height }]
+    : undefined;
+
   return {
-    title: `${entry.title} | Luminal Factory Shop`,
+    title: entry.title,
     description: `${entry.description} Public catalog presentation; checkout is not implied.`,
+    alternates: { canonical: canonicalPath },
+    openGraph: {
+      type: "website",
+      title: entry.title,
+      description: entry.description,
+      url: canonicalPath,
+      images: catalogImage,
+    },
   };
 }
 
