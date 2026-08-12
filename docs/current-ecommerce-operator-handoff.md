@@ -10,6 +10,7 @@
 - **Gate:** Local `npm run check`, diff/secret review, exact-head GitHub `quality`, Vercel Preview `READY`, merge, then production smoke for `/shop`, a filtered `/shop` URL and an unknown product slug.
 - **Known limitation:** Real catalog media cannot be visually smoke-tested until the operator creates an approved public media bucket and publishes a catalog record in a separately authorized content operation. The current successful empty catalog must remain empty rather than silently using fixtures.
 - **Exact next slice after delivery:** Close Phase 5 with production smoke evidence, then create the Phase 6 identity architecture decision record. Cart/auth/customer data changes remain out of scope until that review.
+- **Security checkpoint (2026-08-12):** Next.js and its matching ESLint config were updated from `16.2.1` to `16.3.0`; the `shadcn` CLI moved out of production dependencies. `npm audit --omit=dev` now reports zero vulnerabilities. A tracked static secret/public-env/code-execution/outbound-host gate and a production dependency audit are part of `npm run check` and must pass before the grouped release train is pushed.
 
 ## 2026-08-06 approved Luminal logo integration
 

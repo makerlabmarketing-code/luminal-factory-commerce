@@ -148,3 +148,10 @@ Every phase uses the same contract fields below.
 The owner authorized automatic progression through the roadmap and automatic selection of the simplest reasonable implementation option without per-slice approval.
 
 Escalate only when a decision has material system-wide consequences, introduces meaningful recurring cost, changes production security/access boundaries, performs destructive production data changes, or presents serious production risk. Normal low-risk branch/PR/CI work proceeds automatically.
+
+## Standing security gate — 2026-08-12
+
+- Every grouped release train must pass `npm run security` before push/PR.
+- The static gate rejects committed credential signatures, privileged `NEXT_PUBLIC_*` names, `next.config` environment bundling, dynamic runtime code execution, unreviewed package lifecycle hooks and unapproved hard-coded outbound fetch hosts.
+- The dependency gate rejects high or critical vulnerabilities in production dependencies. Development-only tooling remains outside the production runtime boundary but still receives review during dependency changes.
+- This automated gate supplements rather than replaces RLS review, authorization tests, browser security testing and production monitoring in the phases that introduce those boundaries.
