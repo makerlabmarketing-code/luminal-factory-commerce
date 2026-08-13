@@ -15,7 +15,9 @@ function getSupabaseHostname(): string | undefined {
 const supabaseHostname = getSupabaseHostname();
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Vercel injects a build adapter that is incompatible with standalone output
+  // in Next 16.3. Keep standalone artifacts only for self-hosted builds.
+  output: process.env.VERCEL ? undefined : "standalone",
   images: {
     remotePatterns: supabaseHostname
       ? [{ protocol: "https", hostname: supabaseHostname, pathname: "/storage/v1/object/public/**" }]
