@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { shopPlaceholderNotice, type ShopDataSource, type ShopPresentationEntry } from "./shop-content";
+import { ShopMedia } from "./shop-media";
 
 type ShopCollectionProps = Readonly<{
   entries: readonly ShopPresentationEntry[];
@@ -34,10 +35,7 @@ export function ShopCollection({ entries, source }: ShopCollectionProps) {
       <ol className="shop-route-list">
         {entries.map((entry, index) => (
           <li key={entry.id} className="shop-route-card">
-            <div className={`shop-media shop-media-${entry.media.tone}`} role="img" aria-label={entry.media.alt}>
-              <span aria-hidden="true" />
-              <em>{entry.media.label}</em>
-            </div>
+            <ShopMedia media={entry.media} />
             <div className="shop-route-copy">
               <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
               <p>{entry.collection} · {entry.type}</p>

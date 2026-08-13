@@ -1,5 +1,17 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-11 Phase 5 catalog hardening, media and SEO
+
+- **Branch:** `feat/catalog-hardening-media-seo`, based on merged `master` commit `955d4f99bbd308b9dbe82192cf19dc43ac2e5771` after PR #35 and PR #36.
+- **Status:** `CODE_COMPLETE_PENDING_CI_PREVIEW`.
+- **Scope:** Validate unknown PostgREST catalog payloads with Zod; restrict remote catalog media to HTTPS public Storage objects on the configured Commerce origin; render catalog image/video with a labeled failure fallback; add canonical/noindex metadata for Shop result URLs and stable product detail metadata; memoize duplicate detail reads.
+- **Live read-only evidence:** Supabase project `bkmbhcfokobmhfzgsfzh` is `ACTIVE_HEALTHY`; all Commerce tables have RLS enabled; there are zero published products, zero associated media rows, zero active published prices and no Storage bucket. No DDL, DML, bucket, secret, ERP or raffle mutation occurred.
+- **Delivery policy:** Group this entire slice into one push and one Vercel Preview attempt. Do not create no-op commits to retrigger Vercel because Commerce and ERP share the deployment quota.
+- **Gate:** Local `npm run check`, diff/secret review, exact-head GitHub `quality`, Vercel Preview `READY`, merge, then production smoke for `/shop`, a filtered `/shop` URL and an unknown product slug.
+- **Known limitation:** Real catalog media cannot be visually smoke-tested until the operator creates an approved public media bucket and publishes a catalog record in a separately authorized content operation. The current successful empty catalog must remain empty rather than silently using fixtures.
+- **Exact next slice after delivery:** Close Phase 5 with production smoke evidence, then create the Phase 6 identity architecture decision record. Cart/auth/customer data changes remain out of scope until that review.
+- **Security checkpoint (2026-08-12):** Next.js and its matching ESLint config were updated from `16.2.1` to `16.3.0`; the `shadcn` CLI moved out of production dependencies. `npm audit --omit=dev` now reports zero vulnerabilities. A tracked static secret/public-env/code-execution/outbound-host gate and a production dependency audit are part of `npm run check` and must pass before the grouped release train is pushed.
+
 ## 2026-08-06 approved Luminal logo integration
 
 - **Status:** `SOURCE_VALIDATED_BROWSER_REVIEW_REQUIRED`. The approved local PNG at `public/brand/luminal-factory-logo-primary.png` was validated and integrated into the existing Header and Footer; navigation and account/cart boundaries are unchanged.

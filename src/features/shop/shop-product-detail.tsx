@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ShopPresentationEntry } from "./shop-content";
 import { shopPlaceholderNotice } from "./shop-content";
+import { ShopMedia } from "./shop-media";
 
 type ShopProductDetailProps = Readonly<{
   entry: ShopPresentationEntry;
@@ -22,10 +23,7 @@ export function ShopProductDetail({ entry }: ShopProductDetailProps) {
 
       <section className="shop-route-section" aria-labelledby="shop-object-title">
         <div className="shop-route-card">
-          <div className={`shop-media shop-media-${entry.media.tone}`} role="img" aria-label={entry.media.alt}>
-            <span aria-hidden="true" />
-            <em>{entry.media.label}</em>
-          </div>
+          <ShopMedia media={entry.media} priority />
           <div className="shop-route-copy">
             <p className="eyebrow">Object</p>
             <h2 id="shop-object-title">Object story</h2>

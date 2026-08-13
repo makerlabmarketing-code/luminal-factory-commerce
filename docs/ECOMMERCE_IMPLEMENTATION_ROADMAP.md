@@ -86,7 +86,10 @@ Every phase uses the same contract fields below.
 - **Validation:** Adapter/service tests, route/detail tests, public-policy smoke queries, build/Preview/production verification and graceful behavior when catalog configuration/data is absent.
 - **Production gate:** Exact-head GitHub CI and Vercel Preview, followed by production smoke after merge.
 - **Completion evidence:** Catalog adapter and Shop routes reading authoritative published catalog data.
-- **Current slice:** Server-first read-only catalog adapter with safe fallback.
+- **Merged evidence:** PR #34 added the read-only listing/detail adapter; PR #35 and PR #36 added URL-driven search, allowlisted filters and bounded pagination. Merge commit `955d4f99bbd308b9dbe82192cf19dc43ac2e5771` has successful Vercel status.
+- **Current slice:** Catalog hardening, public-media rendering and truthful SEO metadata on branch `feat/catalog-hardening-media-seo`. The live Commerce project is healthy but contains zero published catalog rows and no Storage bucket, so this slice remains code-only/read-only and preserves the authoritative empty state.
+- **Current gate:** `CODE_COMPLETE_PENDING_CI_PREVIEW` after local validation; Phase 5 remains `IN_PROGRESS` until the exact branch head passes GitHub `quality`, one grouped Vercel Preview reaches `READY`, the merged production deployment is smoke-tested, and the zero-row public catalog response remains truthful.
+- **Next approved slice after Phase 5 completion:** Phase 6 identity architecture decision; no cart or auth implementation begins before that decision and privacy/security review.
 
 ## Phase 6 — Cart and customer identity — `NOT_STARTED`
 
@@ -145,3 +148,10 @@ Every phase uses the same contract fields below.
 The owner authorized automatic progression through the roadmap and automatic selection of the simplest reasonable implementation option without per-slice approval.
 
 Escalate only when a decision has material system-wide consequences, introduces meaningful recurring cost, changes production security/access boundaries, performs destructive production data changes, or presents serious production risk. Normal low-risk branch/PR/CI work proceeds automatically.
+
+## Standing security gate — 2026-08-12
+
+- Every grouped release train must pass `npm run security` before push/PR.
+- The static gate rejects committed credential signatures, privileged `NEXT_PUBLIC_*` names, `next.config` environment bundling, dynamic runtime code execution, unreviewed package lifecycle hooks and unapproved hard-coded outbound fetch hosts.
+- The dependency gate rejects high or critical vulnerabilities in production dependencies. Development-only tooling remains outside the production runtime boundary but still receives review during dependency changes.
+- This automated gate supplements rather than replaces RLS review, authorization tests, browser security testing and production monitoring in the phases that introduce those boundaries.

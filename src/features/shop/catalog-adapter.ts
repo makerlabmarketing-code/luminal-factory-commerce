@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+import { z } from "zod";
 import {
   getCuratedShopEntries,
   getShopEntryBySlug as getFixtureShopEntryBySlug,
@@ -8,37 +10,43 @@ import {
   type ShopPresentationEntry,
 } from "./shop-content";
 
-type CatalogPriceRow = Readonly<{
-  currency: string;
-  amount_minor: number;
-}>;
-
-type CatalogMediaRow = Readonly<{
-  media_type: "image" | "video";
-  storage_path: string;
-  alt_text: string | null;
-  sort_order: number;
-  is_primary: boolean;
-}>;
-
-type CatalogProductRow = Readonly<{
-  id: string;
-  slug: string;
-  name: string;
-  description: string | null;
-  product_type: string;
-  release_type: string;
-  published_at: string | null;
-  product_prices: readonly CatalogPriceRow[] | null;
-  product_media: readonly CatalogMediaRow[] | null;
-}>;
-
 export const SHOP_PAGE_SIZE = 12;
 export const SHOP_PRODUCT_TYPES = ["artisan_keycap", "collectible_object", "custom_object", "other"] as const;
 export const SHOP_RELEASE_TYPES = ["direct", "preorder", "informational"] as const;
 
 type ShopProductType = (typeof SHOP_PRODUCT_TYPES)[number];
 type ShopReleaseType = (typeof SHOP_RELEASE_TYPES)[number];
+
+const catalogPriceRowSchema = z.object({
+  currency: z.string().length(3),
+  amount_minor: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+});
+
+const catalogMediaRowSchema = z.object({
+  media_type: z.enum(["image", "video"]),
+  storage_path: z.string().trim().min(1).max(2048),
+  alt_text: z.string().max(500).nullable(),
+  sort_order: z.number().int(),
+  is_primary: z.boolean(),
+});
+
+const catalogProductRowSchema = z.object({
+  id: z.uuid(),
+  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  name: z.string().trim().min(1).max(160),
+  description: z.string().max(5000).nullable(),
+  product_type: z.enum(SHOP_PRODUCT_TYPES),
+  release_type: z.enum(SHOP_RELEASE_TYPES),
+  published_at: z.string().nullable(),
+  product_prices: z.array(catalogPriceRowSchema).nullable(),
+  product_media: z.array(catalogMediaRowSchema).nullable(),
+});
+
+const catalogProductRowsSchema = z.array(catalogProductRowSchema);
+
+type CatalogPriceRow = z.infer<typeof catalogPriceRowSchema>;
+type CatalogMediaRow = z.infer<typeof catalogMediaRowSchema>;
+type CatalogProductRow = z.infer<typeof catalogProductRowSchema>;
 
 export type ShopCatalogQuery = Readonly<{
   q: string;
@@ -139,9 +147,26 @@ function toneForSlug(slug: string): ShopMediaTone {
 
 function directMediaSource(media: CatalogMediaRow | undefined): string | null {
   if (!media) return null;
-  if (media.storage_path.startsWith("https://") || media.storage_path.startsWith("http://") || media.storage_path.startsWith("/")) {
+
+  if (media.storage_path.startsWith("/") && !media.storage_path.startsWith("//")) {
     return media.storage_path;
   }
+
+  const config = getCatalogConfig();
+  if (!config) return null;
+
+  try {
+    const mediaUrl = new URL(media.storage_path);
+    const catalogUrl = new URL(config.url);
+    const isPublicStorageObject = mediaUrl.pathname.startsWith("/storage/v1/object/public/");
+
+    if (mediaUrl.protocol === "https:" && mediaUrl.origin === catalogUrl.origin && isPublicStorageObject) {
+      return mediaUrl.toString();
+    }
+  } catch {
+    return null;
+  }
+
   return null;
 }
 
@@ -198,13 +223,13 @@ function mapProduct(row: CatalogProductRow): ShopPresentationEntry {
       width: 1500,
       height: 1200,
       aspectRatio: "5 / 4",
-      credit: primaryMedia ? "Luminal Factory Commerce catalog" : "Internal Luminal Factory fallback",
-      source: primaryMedia ? "commerce-catalog" : "internal-placeholder",
+      credit: catalogMediaSrc ? "Luminal Factory Commerce catalog" : "Internal Luminal Factory fallback",
+      source: catalogMediaSrc ? "commerce-catalog" : "internal-placeholder",
       historicalBrand: false,
-      productionApproved: false,
+      productionApproved: Boolean(catalogMediaSrc),
       objectPosition: "50% 42%",
       placeholderFallback: "CSS shop object fallback",
-      label: primaryMedia ? "Commerce catalog media" : "Catalog media chưa được cấu hình",
+      label: catalogMediaSrc ? "Commerce catalog media" : "Catalog media chưa được cấu hình",
       tone,
     },
     presentationStatus: "published",
@@ -252,7 +277,8 @@ async function requestProducts(options?: {
 
     if (!response.ok) return null;
     const payload: unknown = await response.json();
-    return Array.isArray(payload) ? (payload as readonly CatalogProductRow[]) : null;
+    const parsedRows = catalogProductRowsSchema.safeParse(payload);
+    return parsedRows.success ? parsedRows.data : null;
   } catch {
     return null;
   }
@@ -285,8 +311,8 @@ export async function getShopCatalog(
   };
 }
 
-export async function getShopCatalogEntryBySlug(slug: string): Promise<ShopPresentationEntry | undefined> {
+export const getShopCatalogEntryBySlug = cache(async (slug: string): Promise<ShopPresentationEntry | undefined> => {
   const rows = await requestProducts({ slug });
   if (rows === null) return getFixtureShopEntryBySlug(slug);
   return rows[0] ? mapProduct(rows[0]) : undefined;
-}
+});

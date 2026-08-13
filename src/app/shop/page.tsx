@@ -5,20 +5,33 @@ import { Header } from "@/components/layout/header";
 import { Container } from "@/components/ui/container";
 import {
   getShopCatalog,
+  normalizeShopCatalogQuery,
   SHOP_PRODUCT_TYPES,
   SHOP_RELEASE_TYPES,
   type ShopCatalogQuery,
 } from "@/features/shop/catalog-adapter";
 import { ShopCollection } from "@/features/shop/shop-collection";
 
-export const metadata: Metadata = {
-  title: "Shop | Luminal Factory",
-  description: "Published Luminal Factory object catalog with server-side search, filters and safe pagination.",
-};
-
 type ShopPageProps = Readonly<{
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }>;
+
+export async function generateMetadata({ searchParams }: ShopPageProps): Promise<Metadata> {
+  const query = normalizeShopCatalogQuery(await searchParams);
+  const hasActiveQuery = Boolean(query.q || query.type || query.release || query.page > 1);
+
+  return {
+    title: hasActiveQuery ? "Kết quả tìm kiếm trong Shop" : "Shop",
+    description: "Published Luminal Factory object catalog with server-side search, filters and safe pagination.",
+    alternates: { canonical: "/shop" },
+    robots: hasActiveQuery ? { index: false, follow: true } : undefined,
+    openGraph: {
+      title: "Luminal Factory Shop",
+      description: "Published artisan keycaps and collectible objects from the Luminal Factory catalog.",
+      url: "/shop",
+    },
+  };
+}
 
 const productTypeLabels: Record<(typeof SHOP_PRODUCT_TYPES)[number], string> = {
   artisan_keycap: "Artisan keycap",

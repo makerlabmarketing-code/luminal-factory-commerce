@@ -5,6 +5,8 @@ import test from "node:test";
 const adapter = readFileSync("src/features/shop/catalog-adapter.ts", "utf8");
 const shopPage = readFileSync("src/app/shop/page.tsx", "utf8");
 const detailPage = readFileSync("src/app/shop/[slug]/page.tsx", "utf8");
+const shopMedia = readFileSync("src/features/shop/shop-media.tsx", "utf8");
+const nextConfig = readFileSync("next.config.ts", "utf8");
 
 test("catalog adapter uses the publishable API-key boundary", () => {
   assert.match(adapter, /NEXT_PUBLIC_SUPABASE_URL/);
@@ -50,6 +52,32 @@ test("successful empty catalog is not replaced with fixtures", () => {
   assert.doesNotMatch(adapter, /rows\.length === 0[\s\S]*getCuratedShopEntries/);
 });
 
+test("external catalog payloads are validated before mapping", () => {
+  assert.match(adapter, /catalogProductRowsSchema\.safeParse\(payload\)/);
+  assert.match(adapter, /z\.uuid\(\)/);
+  assert.match(adapter, /z\.enum\(SHOP_PRODUCT_TYPES\)/);
+  assert.match(adapter, /z\.enum\(SHOP_RELEASE_TYPES\)/);
+  assert.doesNotMatch(adapter, /payload as readonly CatalogProductRow\[\]/);
+});
+
+test("catalog media accepts only local paths or public Storage objects from the configured origin", () => {
+  assert.match(adapter, /!media\.storage_path\.startsWith\("\/\/"\)/);
+  assert.match(adapter, /mediaUrl\.protocol === "https:"/);
+  assert.match(adapter, /mediaUrl\.origin === catalogUrl\.origin/);
+  assert.match(adapter, /\/storage\/v1\/object\/public\//);
+  assert.match(nextConfig, /pathname: "\/storage\/v1\/object\/public\/\*\*"/);
+});
+
+test("catalog image and video media render with a recoverable presentation fallback", () => {
+  assert.match(shopMedia, /import Image from "next\/image"/);
+  assert.match(shopMedia, /media\.type === "image"/);
+  assert.match(shopMedia, /media\.type === "video"/);
+  assert.match(shopMedia, /media\.productionApproved/);
+  assert.match(shopMedia, /controls/);
+  assert.match(shopMedia, /onError=\{\(\) => setHasLoadError\(true\)\}/);
+  assert.match(shopMedia, /media\.placeholderFallback/);
+});
+
 test("Shop listing and detail route through the adapter", () => {
   assert.match(shopPage, /await getShopCatalog\(rawSearchParams\)/);
   assert.match(shopPage, /searchParams: Promise/);
@@ -64,6 +92,14 @@ test("Shop controls use GET URLs and preserve pagination state", () => {
   assert.match(shopPage, /name="release"/);
   assert.match(shopPage, /pageHref/);
   assert.match(shopPage, /aria-label="Phân trang Shop"/);
+});
+
+test("Shop metadata canonicalizes query pages and keeps filtered URLs out of the index", () => {
+  assert.match(shopPage, /alternates: \{ canonical: "\/shop" \}/);
+  assert.match(shopPage, /robots: hasActiveQuery \? \{ index: false, follow: true \}/);
+  assert.match(detailPage, /alternates: \{ canonical: canonicalPath \}/);
+  assert.match(detailPage, /entry\.media\.source === "commerce-catalog"/);
+  assert.match(adapter, /cache\(async \(slug: string\)/);
 });
 
 test("Phase 5 remains read-only and non-transactional", () => {
