@@ -1,15 +1,34 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-14 Phase 6 Slice A production schema applied
+
+- **Branch:** `docs/phase6-identity-architecture-decision`, based on merged `master` commit `c646d8df8edea4f3880e3171d16a7602bb818ff9`.
+- **Status:** `SLICE_A_SCHEMA_APPLIED_POSTFLIGHT_PASS`; all cart/Auth runtime remains disabled.
+- **Decision:** Guest carts use a server-issued opaque `HttpOnly` cookie token with only a cryptographic hash persisted. Permanent customer accounts use Supabase Auth with `@supabase/ssr`, PKCE and cookie-backed sessions. The verified Auth subject links to `customers.auth_user_id`; email text and `user_metadata` are not authorization keys.
+- **Deferred option:** Supabase anonymous Auth is not used for the first guest-cart slice because it creates durable Auth users, shares the `authenticated` role with permanent users, requires explicit `is_anonymous` policy handling, anti-abuse and cleanup, and complicates existing-account cart merges.
+- **Commerce boundary:** Cart is purchase intent only, not an order, payment, stock reservation or authoritative price record. Raffle guest-email identity remains independent and is never silently linked by matching email.
+- **Data/live impact:** The inert guest-cart schema migration was applied only to Commerce project `bkmbhcfokobmhfzgsfzh`. No runtime, Auth setting, secret, customer record, ERP, inventory, order or payment change was made.
+- **Review completed:** `specs/commerce/phase6-privacy-security-review.md` and `specs/commerce/phase6-cart-identity-schema-rls-technical-plan.md` now contain recommended privacy defaults and a three-slice guest-cart/Auth/address delivery plan. Live Supabase inspection was read-only and found the Phase 4 sensitive tables still default-deny with no customer policies or client grants.
+- **Owner approval:** On 2026-08-13 the owner approved all four defaults: guest cart expires after 30 inactive days and is deleted within 7 more days; first account uses email OTP only; Cloudflare Turnstile protects Auth; saved addresses wait until guest-cart/Auth isolation passes staging.
+- **Slice A production evidence:** On 2026-08-14 the exact reviewed migration was applied once after clean preflight. Supabase recorded `20260814035441_create_guest_cart_foundation`; `carts` and `cart_items` are RLS-enabled, policy-free, unavailable to `anon`/`authenticated`, zero-row and structurally complete. Products, customers and orders remain zero-row. Advisor output contains only expected informational default-deny and unused-index notices.
+- **Generated contract:** `src/lib/supabase/database.types.ts` was refreshed from the post-migration production schema.
+- **Server service:** Guest cart create/read/set/remove, opaque token hashing, expiry/activity refresh and published catalog reconciliation are code-complete behind default-false `COMMERCE_GUEST_CART_ENABLED`. The adapter uses only server-side `SUPABASE_SECRET_KEY`; neither value has been added to production.
+- **Request boundary:** `POST /api/cart` is code-complete with exact-origin/CSRF/content-type/body-size checks, HMAC source keys, cookie-only token handling and private/no-store responses. It short-circuits while disabled.
+- **Durable limiter:** The Supabase Postgres migration and adapter are code-complete. Fixed limits live in a private RLS-enabled table/RPC contract, browser roles have no access, atomic upsert prevents counter races, and existing-database Cron provides bounded cleanup without another paid vendor. The migration is not applied.
+- **Limiter preflight:** Read-only production inspection found the project healthy, the expected three-entry migration ledger, no limiter table/function, and `pg_cron` available but not installed. Security/performance advisors contain only the existing informational default-deny and zero-traffic unused-index notices.
+- **Delivery package:** `specs/commerce/phase6-guest-cart-production-migration-runbook.md` records the passed preflight, forward operation, postflight evidence and rollback boundary.
+- **Exact next gate:** Obtain explicit approval for limiter production rollback validation and one exact migration operation using `phase6-guest-cart-rate-limit-production-runbook.md`; keep runtime false, complete postflight and refresh generated types. Cart UI, Auth, email OTP, Turnstile, PII and addresses remain disabled/out of scope.
+
 ## 2026-08-11 Phase 5 catalog hardening, media and SEO
 
 - **Branch:** `feat/catalog-hardening-media-seo`, based on merged `master` commit `955d4f99bbd308b9dbe82192cf19dc43ac2e5771` after PR #35 and PR #36.
-- **Status:** `CODE_COMPLETE_PENDING_CI_PREVIEW`.
+- **Status:** `OPERATOR_RETEST_REQUIRED`. PR #37 merged as `c646d8df8edea4f3880e3171d16a7602bb818ff9`; GitHub `quality` run `31682479292` and the Vercel production deployment passed. This environment could not independently fetch the production routes after merge, so final content smoke remains explicit rather than inferred.
 - **Scope:** Validate unknown PostgREST catalog payloads with Zod; restrict remote catalog media to HTTPS public Storage objects on the configured Commerce origin; render catalog image/video with a labeled failure fallback; add canonical/noindex metadata for Shop result URLs and stable product detail metadata; memoize duplicate detail reads.
 - **Live read-only evidence:** Supabase project `bkmbhcfokobmhfzgsfzh` is `ACTIVE_HEALTHY`; all Commerce tables have RLS enabled; there are zero published products, zero associated media rows, zero active published prices and no Storage bucket. No DDL, DML, bucket, secret, ERP or raffle mutation occurred.
 - **Delivery policy:** Group this entire slice into one push and one Vercel Preview attempt. Do not create no-op commits to retrigger Vercel because Commerce and ERP share the deployment quota.
 - **Gate:** Local `npm run check`, diff/secret review, exact-head GitHub `quality`, Vercel Preview `READY`, merge, then production smoke for `/shop`, a filtered `/shop` URL and an unknown product slug.
 - **Known limitation:** Real catalog media cannot be visually smoke-tested until the operator creates an approved public media bucket and publishes a catalog record in a separately authorized content operation. The current successful empty catalog must remain empty rather than silently using fixtures.
-- **Exact next slice after delivery:** Close Phase 5 with production smoke evidence, then create the Phase 6 identity architecture decision record. Cart/auth/customer data changes remain out of scope until that review.
+- **Remaining gate:** Complete the three-route production content smoke to close Phase 5. The Phase 6 identity ADR now exists; its next action is privacy/security review and schema/RLS planning, while cart/auth/customer-data implementation remains out of scope.
 - **Security checkpoint (2026-08-12):** Next.js and its matching ESLint config were updated from `16.2.1` to `16.3.0`; the `shadcn` CLI moved out of production dependencies. `npm audit --omit=dev` now reports zero vulnerabilities. A tracked static secret/public-env/code-execution/outbound-host gate and a production dependency audit are part of `npm run check` and must pass before the grouped release train is pushed.
 
 ## 2026-08-06 approved Luminal logo integration

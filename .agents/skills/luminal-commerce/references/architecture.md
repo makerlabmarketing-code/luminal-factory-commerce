@@ -175,6 +175,19 @@ The storefront owns customer-initiated mutations such as:
 
 Public UI must not directly perform privileged administrative mutations.
 
+## Customer Identity and Cart Boundary
+
+The approved Phase 6 planning direction uses two separate boundaries:
+
+- guest carts use a server-issued opaque cookie token whose hash is persisted;
+- permanent customer accounts use Supabase Auth with server-rendered cookie sessions.
+
+Guest cart mutations are server-mediated and do not require a Supabase anonymous Auth user. Permanent customer ownership derives from the verified Auth subject linked to `customers.auth_user_id`, never from email text alone.
+
+A cart represents purchase intent only. It is not an inventory reservation, order, payment, or authoritative price record. Account attachment and guest-cart merge must be transactional and idempotent.
+
+See `specs/commerce/phase6-identity-architecture-decision.md` for the approved planning contract and remaining privacy/security gate.
+
 ## Motion Architecture
 
 Motion code should be separated by responsibility.

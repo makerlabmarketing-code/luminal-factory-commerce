@@ -2,6 +2,7 @@
   "name": "luminal-factory-commerce",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Raffle-first artisan commerce storefront for Luminal Factory.",
   "author": "Luminal Factory",
   "license": "MIT",
@@ -31,6 +32,7 @@
     "security:static": "node scripts/security-gate.mjs",
     "security:audit": "npm audit --omit=dev --audit-level=high",
     "security": "npm run security:static && npm run security:audit",
+    "verify:guest-cart-staging": "node scripts/verify-guest-cart-staging.mjs",
     "check": "npm run lint && npm run typecheck && npm test && npm run security && npm run build"
   },
   "dependencies": {

@@ -269,6 +269,12 @@ Customer identity and ERP staff identity are different access concerns.
 
 Do not expose ERP role logic through public customer interfaces.
 
+Permanent customer ownership is established by a verified authentication subject, not by email text alone. A guest cart may later attach to a permanent customer through an explicit, trusted and idempotent transition.
+
+A cart represents purchase intent. It is not an order, payment, stock reservation or authoritative price record.
+
+The approved guest-email raffle identity remains independent: an email match must not silently attach a raffle entry to a customer account.
+
 ## Archive
 
 The archive is a collectible history.
