@@ -47,6 +47,7 @@ next-env.d.ts
 
 # Local temp files
 temp/
+supabase/.temp/
 
 # Review-gated legacy recovery staging; inventory/report evidence is committed separately.
 assets/source/lazyfactory/recovered/

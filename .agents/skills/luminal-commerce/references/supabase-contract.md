@@ -72,6 +72,29 @@ Do not use a privileged service role client in browser code.
 
 Never expose a service role key through a `NEXT_PUBLIC_` environment variable.
 
+## Customer Authentication and Guest Cart
+
+The approved Phase 6 planning direction is:
+
+- Supabase Auth with `@supabase/ssr`, PKCE and cookie-backed sessions for permanent customer accounts;
+- an opaque, server-issued guest cart cookie with only its cryptographic hash persisted;
+- no Supabase anonymous Auth user for the first guest-cart implementation;
+- server-mediated guest cart mutations and default-deny browser access;
+- authorization by verified Auth subject mapped to `customers.auth_user_id`, never by mutable email or `user_metadata`.
+
+Authenticated routes that handle customer data must be dynamic and private rather than statically cached. Use verified claims for normal authorization and a fresh Auth user lookup where current revocation/user state is required. Do not authorize from an unverified cookie session object.
+
+Email remains a contact attribute. Matching email strings must not silently link a customer, order, cart, address or raffle entry.
+
+The owner approved the first Phase 6 privacy defaults on 2026-08-13:
+
+- guest carts expire after 30 days of inactivity and are deleted within 7 further days;
+- the first permanent account method is email OTP;
+- Cloudflare Turnstile is the production Auth bot-protection direction;
+- saved addresses wait until guest-cart and Auth isolation pass staging.
+
+This approval permits isolated migration/runtime planning. Applying production SQL, enabling Auth/Turnstile or collecting PII still requires its applicable reviewed delivery gate.
+
 ## Environment Variables
 
 Public client configuration may include:
@@ -84,6 +107,15 @@ Privileged credentials must remain server-only.
 Do not commit environment secrets.
 
 Environment-specific local files must be reviewed against `.gitignore`.
+
+The Phase 6 guest-cart service uses:
+
+- `COMMERCE_GUEST_CART_ENABLED`, exact value `true` only after its reviewed runtime gate;
+- `SUPABASE_SECRET_KEY`, a server-only Commerce project secret key.
+- `COMMERCE_GUEST_CART_ALLOWED_ORIGINS`, exact comma-separated Preview/Production origins;
+- `COMMERCE_GUEST_CART_RATE_LIMIT_SECRET`, a server-only HMAC secret for source limiter keys.
+
+The POST-only request boundary and Supabase rate-limit adapter are code-complete. The durable design uses a private RLS-enabled counter table, a fixed-policy service-role-only `SECURITY INVOKER` RPC and Supabase Cron cleanup inside the existing database. On 2026-08-15 the exact reviewed limiter migration passed transactional rollback validation, was applied once as `20260815022728_add_guest_cart_rate_limits`, and passed production database postflight. The counter table remains zero-row and default-deny. An isolated Preview-only staging runbook and guarded create/delete verifier are prepared, but no secret, deployment or runtime activation is configured. There is no Cart UI consumer; the runtime flag remains default-false and staging execution is separately gated.
 
 ## Row-Level Security
 

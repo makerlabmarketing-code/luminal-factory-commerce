@@ -75,7 +75,7 @@ Every phase uses the same contract fields below.
 - **Current state:** Phase 4 is complete; ERP remains untouched.
 - **Next approved slice:** Phase 5 read-only catalog adapter.
 
-## Phase 5 — Catalog integration — `IN_PROGRESS`
+## Phase 5 — Catalog integration — `OPERATOR_RETEST_REQUIRED`
 
 - **Objective:** Replace Shop presentation fixtures with safe server-side reads from the published Commerce catalog while preserving truthful empty/fallback behavior.
 - **Scope:** Read-only catalog adapter, listing/detail mapping, media/price presentation, SEO, empty/error handling and deployment verification.
@@ -87,11 +87,11 @@ Every phase uses the same contract fields below.
 - **Production gate:** Exact-head GitHub CI and Vercel Preview, followed by production smoke after merge.
 - **Completion evidence:** Catalog adapter and Shop routes reading authoritative published catalog data.
 - **Merged evidence:** PR #34 added the read-only listing/detail adapter; PR #35 and PR #36 added URL-driven search, allowlisted filters and bounded pagination. Merge commit `955d4f99bbd308b9dbe82192cf19dc43ac2e5771` has successful Vercel status.
-- **Current slice:** Catalog hardening, public-media rendering and truthful SEO metadata on branch `feat/catalog-hardening-media-seo`. The live Commerce project is healthy but contains zero published catalog rows and no Storage bucket, so this slice remains code-only/read-only and preserves the authoritative empty state.
-- **Current gate:** `CODE_COMPLETE_PENDING_CI_PREVIEW` after local validation; Phase 5 remains `IN_PROGRESS` until the exact branch head passes GitHub `quality`, one grouped Vercel Preview reaches `READY`, the merged production deployment is smoke-tested, and the zero-row public catalog response remains truthful.
-- **Next approved slice after Phase 5 completion:** Phase 6 identity architecture decision; no cart or auth implementation begins before that decision and privacy/security review.
+- **Delivered slice:** PR #37 merged catalog hardening, public-media rendering and truthful SEO metadata as merge commit `c646d8df8edea4f3880e3171d16a7602bb818ff9`. GitHub `quality` run `31682479292` passed and Vercel reported the production deployment successful. The live Commerce project remained zero-row/no-bucket during the read-only validation, preserving the authoritative empty state.
+- **Current gate:** Production deployment is green, but this execution environment could not independently fetch the production Shop routes after merge. Phase 5 therefore remains `OPERATOR_RETEST_REQUIRED` until `/shop`, one filtered `/shop` URL and an unknown product slug receive a final production content smoke. Real catalog-media smoke remains separately blocked until approved media and a published catalog row exist.
+- **Next approved slice after Phase 5 completion:** The Phase 6 identity architecture decision is now documented; continue with its privacy/security review and schema/RLS plan. No cart or Auth implementation begins before that review.
 
-## Phase 6 — Cart and customer identity — `NOT_STARTED`
+## Phase 6 — Cart and customer identity — `IN_PROGRESS`
 
 - **Objective:** Cart persistence, guest/customer boundary, account and addresses.
 - **Scope:** Identity and cart contracts.
@@ -102,7 +102,17 @@ Every phase uses the same contract fields below.
 - **Validation:** Guest/auth transitions, authorization, persistence, accessibility.
 - **Production gate:** Security and privacy approval.
 - **Completion evidence:** Tested staging flows.
-- **Next approved slice:** Identity architecture decision.
+- **Current decision:** `specs/commerce/phase6-identity-architecture-decision.md` approves, for technical planning, an opaque server-owned guest-cart token plus permanent Supabase Auth accounts using SSR cookie sessions. Supabase anonymous Auth is deferred for the first guest-cart slice. No Auth setting, PII access or cart runtime has been enabled.
+- **Review evidence:** `specs/commerce/phase6-privacy-security-review.md` and `specs/commerce/phase6-cart-identity-schema-rls-technical-plan.md` document data minimization, retention, Auth/anti-abuse controls, three-slice schema direction, RLS/grants, rollback and staging test matrix.
+- **Owner approval:** On 2026-08-13 the owner approved 30-day inactive guest-cart retention plus deletion within 7 days, email OTP as the first account method, Cloudflare Turnstile, and deferring saved addresses until guest-cart/Auth isolation passes staging.
+- **Current slice:** Slice A guest-cart persistence is applied without PII, direct client policies, Auth configuration, inventory reservation, order or payment behavior. Generated database types include `carts` and `cart_items`.
+- **Production evidence:** On 2026-08-14 clean preflight preceded one exact migration operation. Ledger entry `20260814035441_create_guest_cart_foundation` exists; both tables are RLS-enabled, policy-free, unavailable to `anon`/`authenticated`, zero-row and have all reviewed indexes, constraints and triggers. Core commerce tables remain zero-row; advisors report only expected informational findings.
+- **Delivery package:** `specs/commerce/phase6-guest-cart-production-migration-runbook.md` records preflight, exact forward boundary, postflight, rollback and success scope.
+- **Service slice:** `src/features/cart/guest-cart-service.ts` and `src/lib/supabase/guest-cart-server.ts` implement token/hash, create/read/set/remove, expiry/activity, published catalog reconciliation and server-only persistence behind `COMMERCE_GUEST_CART_ENABLED`. No inventory, price, order, payment, PII or Auth authority was added.
+- **Request boundary:** `POST /api/cart` now has strict action schemas, exact-origin/content-type/custom-header checks, 4 KiB bodies, keyed source identifiers, cookie-only tokens and private/no-store generic responses. The route short-circuits while disabled and has no UI consumer.
+- **Durable limiter slice:** The existing Supabase Postgres project is the zero-recurring-cost backend. `private.guest_cart_rate_limits` plus a service-role-only invoker RPC uses atomic upsert with database-owned fixed hourly thresholds; Supabase Cron removes expired counters. The server adapter fails closed on every RPC/configuration failure.
+- **Current gate:** `SLICE_A_RATE_LIMIT_CODE_COMPLETE_PRODUCTION_MIGRATION_APPROVAL_REQUIRED`. Migration `20260814075546_add_guest_cart_rate_limits.sql` and its production runbook are reviewed but unapplied. Runtime and all production cart environment configuration remain disabled.
+- **Next approved operation:** After explicit production DDL approval, perform rollback validation, apply the exact limiter migration once, complete postflight and refresh generated types. Only then configure isolated staging with the flag initially false. Production runtime activation requires separate approval.
 
 ## Phase 7 — Checkout and payment — `LIVE_APPROVAL_REQUIRED`
 

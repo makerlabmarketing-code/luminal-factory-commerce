@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { extname } from "node:path";
 
 const binaryExtensions = new Set([
@@ -22,7 +22,7 @@ const trackedFiles = execFileSync(
   { encoding: "utf8" },
 )
   .split("\0")
-  .filter(Boolean);
+  .filter((file) => Boolean(file) && existsSync(file));
 const textFiles = trackedFiles.filter((file) => !binaryExtensions.has(extname(file).toLowerCase()));
 const failures = [];
 
