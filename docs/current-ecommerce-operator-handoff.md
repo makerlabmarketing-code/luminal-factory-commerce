@@ -1,5 +1,14 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-20 Phase 6 guest-cart staging protection gate
+
+- **Merged checkpoint:** PR #39 merged to `master` as `e0f13ca43e19783439abaca845ee8baa4cc01bf6`; GitHub CI and Vercel Preview passed.
+- **Production database:** The durable limiter migration previously passed rollback validation and was applied once as `20260815022728_add_guest_cart_rate_limits`; postflight passed with zero retained counters.
+- **Runtime:** Guest cart and Auth remain disabled in Production. No Cart UI, OTP, Turnstile, PII, address, order or payment behavior is enabled.
+- **Staging observation:** The non-mutating disabled probe on 2026-08-20 reached Vercel Deployment Protection and received its `401` protection envelope before `/api/cart`; no database write occurred.
+- **Verifier hardening:** The staging verifier now supports the official `x-vercel-protection-bypass` header through operator-only `VERCEL_AUTOMATION_BYPASS_SECRET`, reports protected previews explicitly and accepts Vercel's safe removal of the redundant `private` cache directive while still requiring `no-store` and rejecting shared-cache directives.
+- **Exact next gate:** Generate/configure a Vercel Protection Bypass for Automation secret in the operator environment and rerun `--mode=disabled`. Do not paste the secret into chat or add it to Vercel application runtime variables. Enabled Preview runtime/redeployment and one bounded create/delete smoke still require separate approval.
+
 ## 2026-08-14 Phase 6 Slice A production schema applied
 
 - **Branch:** `docs/phase6-identity-architecture-decision`, based on merged `master` commit `c646d8df8edea4f3880e3171d16a7602bb818ff9`.
@@ -14,10 +23,10 @@
 - **Generated contract:** `src/lib/supabase/database.types.ts` was refreshed from the post-migration production schema.
 - **Server service:** Guest cart create/read/set/remove, opaque token hashing, expiry/activity refresh and published catalog reconciliation are code-complete behind default-false `COMMERCE_GUEST_CART_ENABLED`. The adapter uses only server-side `SUPABASE_SECRET_KEY`; neither value has been added to production.
 - **Request boundary:** `POST /api/cart` is code-complete with exact-origin/CSRF/content-type/body-size checks, HMAC source keys, cookie-only token handling and private/no-store responses. It short-circuits while disabled.
-- **Durable limiter:** The Supabase Postgres migration and adapter are code-complete. Fixed limits live in a private RLS-enabled table/RPC contract, browser roles have no access, atomic upsert prevents counter races, and existing-database Cron provides bounded cleanup without another paid vendor. The migration is not applied.
-- **Limiter preflight:** Read-only production inspection found the project healthy, the expected three-entry migration ledger, no limiter table/function, and `pg_cron` available but not installed. Security/performance advisors contain only the existing informational default-deny and zero-traffic unused-index notices.
+- **Durable limiter:** Fixed limits live in a private RLS-enabled table/RPC contract, browser roles have no access, atomic upsert prevents counter races, and existing-database Cron provides bounded cleanup without another paid vendor. The migration later passed rollback validation and was applied once as `20260815022728_add_guest_cart_rate_limits`.
+- **Limiter postflight:** Production inspection found the expected limiter objects, zero retained counters and no new security/performance warning or error.
 - **Delivery package:** `specs/commerce/phase6-guest-cart-production-migration-runbook.md` records the passed preflight, forward operation, postflight evidence and rollback boundary.
-- **Exact next gate:** Obtain explicit approval for limiter production rollback validation and one exact migration operation using `phase6-guest-cart-rate-limit-production-runbook.md`; keep runtime false, complete postflight and refresh generated types. Cart UI, Auth, email OTP, Turnstile, PII and addresses remain disabled/out of scope.
+- **Superseded next gate:** The limiter migration gate was completed on 2026-08-15. Continue with the isolated staging protection gate recorded above; keep Cart UI, Auth, email OTP, Turnstile, PII and addresses disabled/out of scope.
 
 ## 2026-08-11 Phase 5 catalog hardening, media and SEO
 

@@ -7,6 +7,7 @@ const EXPECTED_SUPABASE_ORIGIN = "https://bkmbhcfokobmhfzgsfzh.supabase.co";
 const GUEST_CART_COOKIE_NAME = "lf_guest_cart";
 const GUEST_CART_REQUEST_HEADER = "x-luminal-cart-request";
 const GUEST_CART_REQUEST_HEADER_VALUE = "1";
+const VERCEL_PROTECTION_BYPASS_HEADER = "x-vercel-protection-bypass";
 const WRITE_CONFIRMATION = "I_UNDERSTAND_THIS_CREATES_AND_DELETES_ONE_STAGING_CART";
 const blockedHosts = new Set([
   "luminalfactory.com",
@@ -57,6 +58,9 @@ async function postCart(target, body, options = {}) {
     "sec-fetch-site": origin === target.origin ? "same-origin" : "cross-site",
     [GUEST_CART_REQUEST_HEADER]: GUEST_CART_REQUEST_HEADER_VALUE,
   };
+  if (options.protectionBypassSecret) {
+    headers[VERCEL_PROTECTION_BYPASS_HEADER] = options.protectionBypassSecret;
+  }
   if (options.cookie) headers.cookie = `${GUEST_CART_COOKIE_NAME}=${options.cookie}`;
   if (options.omitRequestHeader) delete headers[GUEST_CART_REQUEST_HEADER];
 
@@ -68,17 +72,47 @@ async function postCart(target, body, options = {}) {
   });
 }
 
+export function assertNoStoreResponse(response) {
+  const cacheControl = response.headers.get("cache-control") ?? "";
+  const directives = new Set(
+    cacheControl
+      .split(",")
+      .map((directive) => directive.trim().toLowerCase())
+      .filter(Boolean),
+  );
+
+  assert.equal(directives.has("no-store"), true, "The application response must be no-store.");
+  assert.equal(directives.has("public"), false, "The application response must not be public-cacheable.");
+  assert.equal(
+    [...directives].some((directive) => directive.startsWith("s-maxage=")),
+    false,
+    "The application response must not define a shared-cache lifetime.",
+  );
+}
+
+export function assertApplicationResponse(response) {
+  const setCookie = response.headers.get("set-cookie") ?? "";
+  if (response.status === 401 && /(?:^|[,;]\s*)_vercel_sso_nonce=/i.test(setCookie)) {
+    throw new Error(
+      "The Preview is blocked by Vercel Deployment Protection. Configure an Automation Bypass secret and expose it to this verifier only as VERCEL_AUTOMATION_BYPASS_SECRET.",
+    );
+  }
+}
+
 async function readJsonResponse(response) {
+  assertApplicationResponse(response);
   assert.match(response.headers.get("content-type") ?? "", /^application\/json\b/i);
   const body = await response.json();
-  assert.equal(response.headers.get("cache-control"), "private, no-store, max-age=0");
+  // Vercel may remove the redundant `private` directive while preserving `no-store`.
+  assertNoStoreResponse(response);
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   return body;
 }
 
-export async function verifyDisabledStaging(target) {
+export async function verifyDisabledStaging(target, environment = process.env) {
   const response = await postCart(target, { action: "create" }, {
     origin: "https://disabled-probe.invalid",
+    protectionBypassSecret: environment.VERCEL_AUTOMATION_BYPASS_SECRET?.trim(),
   });
   const body = await readJsonResponse(response);
   assert.equal(response.status, 404);
@@ -116,19 +150,24 @@ export async function verifyEnabledStaging(target, environment = process.env) {
   });
   let guestToken = null;
   let guestTokenHash = null;
+  const protectionBypassSecret = environment.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
 
   try {
     const crossOrigin = await postCart(target, { action: "create" }, {
       origin: "https://cross-origin.invalid",
+      protectionBypassSecret,
     });
     assert.equal(crossOrigin.status, 403);
     assert.deepEqual(await readJsonResponse(crossOrigin), { ok: false, code: "invalid_request" });
 
-    const missingHeader = await postCart(target, { action: "create" }, { omitRequestHeader: true });
+    const missingHeader = await postCart(target, { action: "create" }, {
+      omitRequestHeader: true,
+      protectionBypassSecret,
+    });
     assert.equal(missingHeader.status, 403);
     assert.deepEqual(await readJsonResponse(missingHeader), { ok: false, code: "invalid_request" });
 
-    const created = await postCart(target, { action: "create" });
+    const created = await postCart(target, { action: "create" }, { protectionBypassSecret });
     const createdBody = await readJsonResponse(created);
     assert.equal(created.status, 201);
     assert.equal(createdBody.ok, true);
@@ -148,7 +187,10 @@ export async function verifyEnabledStaging(target, environment = process.env) {
       throw new Error("The staging cookie security contract differs from the reviewed contract.");
     }
 
-    const idempotentCreate = await postCart(target, { action: "create" }, { cookie: guestToken });
+    const idempotentCreate = await postCart(target, { action: "create" }, {
+      cookie: guestToken,
+      protectionBypassSecret,
+    });
     assert.equal(idempotentCreate.status, 200);
     assert.equal((await readJsonResponse(idempotentCreate)).ok, true);
     if (extractGuestCartToken(idempotentCreate.headers.get("set-cookie"))) {
@@ -156,7 +198,10 @@ export async function verifyEnabledStaging(target, environment = process.env) {
     }
 
     const concurrentReads = await Promise.all(
-      Array.from({ length: 5 }, () => postCart(target, { action: "read" }, { cookie: guestToken })),
+      Array.from({ length: 5 }, () => postCart(target, { action: "read" }, {
+        cookie: guestToken,
+        protectionBypassSecret,
+      })),
     );
     for (const response of concurrentReads) {
       assert.equal(response.status, 200);
@@ -165,7 +210,10 @@ export async function verifyEnabledStaging(target, environment = process.env) {
 
     const replacement = guestToken.endsWith("A") ? "B" : "A";
     const tamperedToken = `${guestToken.slice(0, -1)}${replacement}`;
-    const tampered = await postCart(target, { action: "read" }, { cookie: tamperedToken });
+    const tampered = await postCart(target, { action: "read" }, {
+      cookie: tamperedToken,
+      protectionBypassSecret,
+    });
     assert.equal(tampered.status, 404);
     assert.deepEqual(await readJsonResponse(tampered), { ok: false, code: "cart_unavailable" });
     assert.match(tampered.headers.get("set-cookie") ?? "", /Max-Age=0/i);
