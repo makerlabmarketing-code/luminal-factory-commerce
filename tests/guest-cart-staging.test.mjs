@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
+  assertApplicationResponse,
+  assertNoStoreResponse,
   extractGuestCartToken,
   hashGuestCartTokenForCleanup,
   parseStagingTarget,
@@ -41,4 +43,27 @@ test("enabled staging mode is separately confirmed and always attempts exact car
   assert.match(source, /\.eq\("guest_token_hash", guestTokenHash\)/);
   assert.match(source, /data\?\.length !== 1/);
   assert.doesNotMatch(source, /console\.log\([^\n]*(?:guestToken|guestTokenHash|secretKey)/);
+});
+
+test("staging verifier accepts Vercel no-store normalization without allowing shared caching", () => {
+  for (const cacheControl of ["private, no-store, max-age=0", "no-store, max-age=0"]) {
+    const response = new Response("{}", { headers: { "cache-control": cacheControl } });
+    assert.doesNotThrow(() => assertNoStoreResponse(response));
+  }
+
+  for (const cacheControl of ["private, max-age=0", "public, no-store", "no-store, s-maxage=60"]) {
+    const response = new Response("{}", { headers: { "cache-control": cacheControl } });
+    assert.throws(() => assertNoStoreResponse(response));
+  }
+});
+
+test("staging verifier reports Vercel Deployment Protection before application assertions", () => {
+  const protectedResponse = new Response("{}", {
+    status: 401,
+    headers: { "set-cookie": "_vercel_sso_nonce=opaque; Secure; HttpOnly; SameSite=Lax" },
+  });
+  assert.throws(
+    () => assertApplicationResponse(protectedResponse),
+    /VERCEL_AUTOMATION_BYPASS_SECRET/,
+  );
 });
