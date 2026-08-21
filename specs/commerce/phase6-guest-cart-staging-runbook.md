@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `DISABLED_PROBE_EXACT_HEAD_PREVIEW_REQUIRED`
+- **Status:** `ENABLED_SMOKE_RUNNER_REQUIRED`
 - **Date:** 2026-08-21
 - **Application target:** one non-production Vercel Preview deployment
 - **Database target:** Supabase project `bkmbhcfokobmhfzgsfzh` (`Luminal Factory Commerce`)
@@ -58,6 +58,10 @@ The Preview is protected by Vercel Authentication. Generate a project-scoped Pro
 The disabled probe deliberately sends an invalid origin. A disabled runtime returns the generic JSON `404 cart_unavailable` before parsing or database access. An enabled runtime would return `403`, so the probe cannot create a cart.
 
 On 2026-08-20 the public probe reached Vercel Deployment Protection and returned its `401` protection envelope before the application. A later attempt was blocked by the Codex outbound proxy before reaching Vercel. On 2026-08-21 preflight found that the only deployment sourced from local `HEAD` was classified as Production while the available PR Preview belonged to an older commit, so no staging probe was run against an invalid target. The verifier reports the protection boundary explicitly and accepts Vercel's safe normalization of `private, no-store, max-age=0` to `no-store, max-age=0`; it still rejects missing `no-store`, `public` and `s-maxage` responses. No cart request reached the application and no database write occurred.
+
+An exact-head Preview was later created for `8d030115ddf24991d2086e026f7eaf35f4b5e7de`. Preview-only runtime was briefly enabled under the approved smoke boundary, but the current execution environment could not issue the required POST and the storefront intentionally had no Cart UI or published product to use as a substitute. No cart was created. Preview runtime was restored to false and redeployed as `dpl_6syWnHQLescZjUQpMPtNFPurgeTF`; postflight remained zero carts, zero cart items, zero Auth users and zero limiter rows, with one active cleanup job.
+
+The reviewed continuation is the manual GitHub Actions runner in `.github/workflows/phase6-guest-cart-staging.yml`, documented by `phase6-guest-cart-staging-ci-runner-technical-plan.md`. It keeps secrets out of application runtime and provides normal HTTPS egress without connecting Cart UI or Auth.
 
 ## Enabled smoke
 
