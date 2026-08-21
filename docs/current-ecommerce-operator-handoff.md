@@ -1,13 +1,16 @@
 # Current Ecommerce operator handoff
 
-## 2026-08-20 Phase 6 guest-cart staging protection gate
+## 2026-08-21 Phase 6 guest-cart staging execution gate
 
 - **Merged checkpoint:** PR #39 merged to `master` as `e0f13ca43e19783439abaca845ee8baa4cc01bf6`. PR #40 hardened the Vercel protection verifier and was squash-merged as `7aa81537be22be0bd2ac7c3ae5cfb9a70089a174`; GitHub CI and the production Vercel deployment passed.
 - **Production database:** The durable limiter migration previously passed rollback validation and was applied once as `20260815022728_add_guest_cart_rate_limits`; postflight passed with zero retained counters.
 - **Runtime:** Guest cart and Auth remain disabled in Production. No Cart UI, OTP, Turnstile, PII, address, order or payment behavior is enabled.
-- **Staging observation:** The first non-mutating disabled probe reached Vercel Deployment Protection and received its `401` envelope before `/api/cart`. A later Codex Cloud task was rejected by its outbound proxy before Vercel. On 2026-08-21 preflight then found no non-production Preview sourced from the full current `HEAD`: the exact-head deployment was Production and the available PR #40 Preview belonged to an older commit. No invalid target was substituted and no database write occurred.
+- **Staging observation:** Exact-head Preview `8d030115ddf24991d2086e026f7eaf35f4b5e7de` reached `READY`. Preview-only runtime was briefly enabled under the approved smoke boundary, but this execution environment could not send the required POST and the storefront intentionally had no Cart UI or published product to substitute. No cart was created. Preview runtime was restored to false and redeployed as `dpl_6syWnHQLescZjUQpMPtNFPurgeTF`.
 - **Verifier hardening:** The staging verifier now supports the official `x-vercel-protection-bypass` header through operator-only `VERCEL_AUTOMATION_BYPASS_SECRET`, reports protected previews explicitly and accepts Vercel's safe removal of the redundant `private` cache directive while still requiring `no-store` and rejecting shared-cache directives.
-- **Exact next gate:** Push this documentation checkpoint once and create one PR to obtain a non-production Preview whose Vercel source commit equals the full branch `HEAD` SHA. Keep `COMMERCE_GUEST_CART_ENABLED=false`; then rerun `--mode=disabled` with the operator-only bypass secret. Do not paste the secret into chat or add it to Vercel application runtime variables. Enabled Preview runtime and one bounded create/delete smoke still require separate approval.
+- **Postflight:** Commerce production data remains zero carts, zero cart items, zero Auth users and zero limiter rows; the cleanup Cron job remains active. Production and Auth were untouched.
+- **Prepared continuation:** `.github/workflows/phase6-guest-cart-staging.yml` runs the existing verifier manually from GitHub Actions with read-only repository permission, serialized execution and a hard enabled-write confirmation gate. It does not edit Vercel or deploy automatically.
+- **Operator setup required before execution:** add `VERCEL_AUTOMATION_BYPASS_SECRET` and `COMMERCE_SUPABASE_SECRET_KEY` as GitHub Actions repository secrets. Never place their values in workflow inputs, repository variables, application runtime code, logs, screenshots or chat.
+- **Exact next gate:** Validate and merge the runner once, prove the target Preview source equals the selected full SHA, run disabled mode first, then use the already approved Preview-only enabled smoke sequence. Cart UI, Auth, OTP, Turnstile and addresses remain disconnected until the backend smoke passes.
 
 ## 2026-08-20 Phase 5 production content and media smoke
 

@@ -1,0 +1,62 @@
+name: Phase 6 guest-cart staging smoke
+
+"on":
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Probe mode. Run disabled before enabled.
+        required: true
+        type: choice
+        options:
+          - disabled
+          - enabled
+      staging_url:
+        description: Exact non-production Vercel Preview origin.
+        required: true
+        type: string
+      confirm_writes:
+        description: Allow exactly one create/delete smoke cart in enabled mode.
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commerce-phase6-guest-cart-staging
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify isolated Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout selected ref
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Reject enabled mode without write confirmation
+        if: inputs.mode == 'enabled' && inputs.confirm_writes != true
+        run: |
+          echo "Enabled staging verification requires the workflow write-confirmation checkbox."
+          exit 1
+
+      - name: Verify guest-cart staging boundary
+        env:
+          COMMERCE_GUEST_CART_STAGING_URL: ${{ inputs.staging_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          NEXT_PUBLIC_SUPABASE_URL: https://bkmbhcfokobmhfzgsfzh.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.COMMERCE_SUPABASE_SECRET_KEY }}
+          ALLOW_GUEST_CART_STAGING_WRITES: ${{ inputs.mode == 'enabled' && inputs.confirm_writes && 'I_UNDERSTAND_THIS_CREATES_AND_DELETES_ONE_STAGING_CART' || '' }}
+        run: npm run verify:guest-cart-staging -- --mode=${{ inputs.mode }}
