@@ -2,8 +2,8 @@
 
 ## Document metadata
 
-- **Status:** `DISABLED_PROBE_BLOCKED_AUTOMATION_BYPASS_REQUIRED`
-- **Date:** 2026-08-20
+- **Status:** `DISABLED_PROBE_EXACT_HEAD_PREVIEW_REQUIRED`
+- **Date:** 2026-08-21
 - **Application target:** one non-production Vercel Preview deployment
 - **Database target:** Supabase project `bkmbhcfokobmhfzgsfzh` (`Luminal Factory Commerce`)
 - **Runtime:** production remains disabled throughout
@@ -46,9 +46,10 @@ The Preview is protected by Vercel Authentication. Generate a project-scoped Pro
 1. Confirm the branch/worktree and require the full repository quality gate to pass.
 2. Confirm production is still on an earlier `master` deployment and no Cart UI consumes `/api/cart`.
 3. Confirm the Preview URL is not `luminalfactory.com`, the production Vercel alias or the `master` branch alias.
-4. Confirm the production limiter ledger is still exactly `20260815022728_add_guest_cart_rate_limits`, carts/cart items are zero-row, and advisors have no new warning/error.
-5. Add branch-scoped Preview values with the runtime flag false and create one batched Preview deployment.
-6. Set `COMMERCE_GUEST_CART_STAGING_URL` and, because this Preview is protected, `VERCEL_AUTOMATION_BYPASS_SECRET` only in the operator environment and run:
+4. Require the Preview deployment source commit to equal the full local `HEAD` SHA. A Preview for an older commit or a deployment classified as Production cannot substitute for this gate.
+5. Confirm the production limiter ledger is still exactly `20260815022728_add_guest_cart_rate_limits`, carts/cart items are zero-row, and advisors have no new warning/error.
+6. Add branch-scoped Preview values with the runtime flag false and create one batched Preview deployment.
+7. Set `COMMERCE_GUEST_CART_STAGING_URL` and, because this Preview is protected, `VERCEL_AUTOMATION_BYPASS_SECRET` only in the operator environment and run:
 
    ```text
    npm run verify:guest-cart-staging -- --mode=disabled
@@ -56,7 +57,7 @@ The Preview is protected by Vercel Authentication. Generate a project-scoped Pro
 
 The disabled probe deliberately sends an invalid origin. A disabled runtime returns the generic JSON `404 cart_unavailable` before parsing or database access. An enabled runtime would return `403`, so the probe cannot create a cart.
 
-On 2026-08-20 the public probe reached Vercel Deployment Protection and returned its `401` protection envelope before the application. The verifier now reports that boundary explicitly and accepts Vercel's safe normalization of `private, no-store, max-age=0` to `no-store, max-age=0`; it still rejects missing `no-store`, `public` and `s-maxage` responses. No cart request reached the application and no database write occurred.
+On 2026-08-20 the public probe reached Vercel Deployment Protection and returned its `401` protection envelope before the application. A later attempt was blocked by the Codex outbound proxy before reaching Vercel. On 2026-08-21 preflight found that the only deployment sourced from local `HEAD` was classified as Production while the available PR Preview belonged to an older commit, so no staging probe was run against an invalid target. The verifier reports the protection boundary explicitly and accepts Vercel's safe normalization of `private, no-store, max-age=0` to `no-store, max-age=0`; it still rejects missing `no-store`, `public` and `s-maxage` responses. No cart request reached the application and no database write occurred.
 
 ## Enabled smoke
 
