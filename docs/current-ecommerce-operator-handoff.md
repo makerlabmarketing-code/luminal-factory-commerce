@@ -2,12 +2,19 @@
 
 ## 2026-08-20 Phase 6 guest-cart staging protection gate
 
-- **Merged checkpoint:** PR #39 merged to `master` as `e0f13ca43e19783439abaca845ee8baa4cc01bf6`; GitHub CI and Vercel Preview passed.
+- **Merged checkpoint:** PR #39 merged to `master` as `e0f13ca43e19783439abaca845ee8baa4cc01bf6`. PR #40 hardened the Vercel protection verifier and was squash-merged as `7aa81537be22be0bd2ac7c3ae5cfb9a70089a174`; GitHub CI and the production Vercel deployment passed.
 - **Production database:** The durable limiter migration previously passed rollback validation and was applied once as `20260815022728_add_guest_cart_rate_limits`; postflight passed with zero retained counters.
 - **Runtime:** Guest cart and Auth remain disabled in Production. No Cart UI, OTP, Turnstile, PII, address, order or payment behavior is enabled.
-- **Staging observation:** The non-mutating disabled probe on 2026-08-20 reached Vercel Deployment Protection and received its `401` protection envelope before `/api/cart`; no database write occurred.
+- **Staging observation:** The first non-mutating disabled probe reached Vercel Deployment Protection and received its `401` envelope before `/api/cart`. A later Codex Cloud task was rejected by its outbound proxy before Vercel. On 2026-08-21 preflight then found no non-production Preview sourced from the full current `HEAD`: the exact-head deployment was Production and the available PR #40 Preview belonged to an older commit. No invalid target was substituted and no database write occurred.
 - **Verifier hardening:** The staging verifier now supports the official `x-vercel-protection-bypass` header through operator-only `VERCEL_AUTOMATION_BYPASS_SECRET`, reports protected previews explicitly and accepts Vercel's safe removal of the redundant `private` cache directive while still requiring `no-store` and rejecting shared-cache directives.
-- **Exact next gate:** Generate/configure a Vercel Protection Bypass for Automation secret in the operator environment and rerun `--mode=disabled`. Do not paste the secret into chat or add it to Vercel application runtime variables. Enabled Preview runtime/redeployment and one bounded create/delete smoke still require separate approval.
+- **Exact next gate:** Push this documentation checkpoint once and create one PR to obtain a non-production Preview whose Vercel source commit equals the full branch `HEAD` SHA. Keep `COMMERCE_GUEST_CART_ENABLED=false`; then rerun `--mode=disabled` with the operator-only bypass secret. Do not paste the secret into chat or add it to Vercel application runtime variables. Enabled Preview runtime and one bounded create/delete smoke still require separate approval.
+
+## 2026-08-20 Phase 5 production content and media smoke
+
+- **Status:** `PRODUCTION_CONTENT_SMOKE_PASS_MEDIA_ONBOARDING_REQUIRED`.
+- **Route evidence:** Production `/shop` rendered the authoritative live-empty Commerce catalog; a filtered Shop URL rendered live-empty with canonical `/shop` and `noindex, follow`; an unknown product slug rendered the dedicated not-found state. The local Luminal logo loaded through Next Image at 3840×3840 intrinsic size.
+- **Live data evidence:** A read-only production query confirmed zero products, zero published products, zero product-media rows, zero Storage buckets and zero Storage objects. Guest carts, cart items and Auth users also remain zero-row.
+- **Drive decision:** No Drive upload is required to repair loading because no production product media exists yet. When catalog onboarding is approved, the owner must provide or approve product images and their ownership, product mapping, crop, primary ordering and alt text before Storage upload and product publication.
 
 ## 2026-08-14 Phase 6 Slice A production schema applied
 
