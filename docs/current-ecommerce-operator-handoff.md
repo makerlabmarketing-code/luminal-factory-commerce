@@ -1,16 +1,15 @@
 # Current Ecommerce operator handoff
 
-## 2026-08-21 Phase 6 guest-cart staging execution gate
+## 2026-08-26 Phase 6 guest-cart staging smoke passed
 
-- **Merged checkpoint:** PR #39 merged to `master` as `e0f13ca43e19783439abaca845ee8baa4cc01bf6`. PR #40 hardened the Vercel protection verifier and was squash-merged as `7aa81537be22be0bd2ac7c3ae5cfb9a70089a174`; GitHub CI and the production Vercel deployment passed.
+- **Merged checkpoint:** PR #42 merged the manual staging runner to `master` as `243ebdf`. Earlier guest-cart foundation and protection hardening remain in PR #39 and PR #40.
 - **Production database:** The durable limiter migration previously passed rollback validation and was applied once as `20260815022728_add_guest_cart_rate_limits`; postflight passed with zero retained counters.
 - **Runtime:** Guest cart and Auth remain disabled in Production. No Cart UI, OTP, Turnstile, PII, address, order or payment behavior is enabled.
-- **Staging observation:** Exact-head Preview `8d030115ddf24991d2086e026f7eaf35f4b5e7de` reached `READY`. Preview-only runtime was briefly enabled under the approved smoke boundary, but this execution environment could not send the required POST and the storefront intentionally had no Cart UI or published product to substitute. No cart was created. Preview runtime was restored to false and redeployed as `dpl_6syWnHQLescZjUQpMPtNFPurgeTF`.
+- **Staging evidence:** Manual workflow run `Phase 6 guest-cart staging smoke #6` passed against the isolated Preview at source `4b69b2446df63bd559ffc1d6201f2bbdddc8c3bd`. The guarded enabled mode created and deleted exactly one guest cart as approved.
 - **Verifier hardening:** The staging verifier now supports the official `x-vercel-protection-bypass` header through operator-only `VERCEL_AUTOMATION_BYPASS_SECRET`, reports protected previews explicitly and accepts Vercel's safe removal of the redundant `private` cache directive while still requiring `no-store` and rejecting shared-cache directives.
-- **Postflight:** Commerce production data remains zero carts, zero cart items, zero Auth users and zero limiter rows; the cleanup Cron job remains active. Production and Auth were untouched.
-- **Prepared continuation:** `.github/workflows/phase6-guest-cart-staging.yml` runs the existing verifier manually from GitHub Actions with read-only repository permission, serialized execution and a hard enabled-write confirmation gate. It does not edit Vercel or deploy automatically.
-- **Operator setup required before execution:** add `VERCEL_AUTOMATION_BYPASS_SECRET` and `COMMERCE_SUPABASE_SECRET_KEY` as GitHub Actions repository secrets. Never place their values in workflow inputs, repository variables, application runtime code, logs, screenshots or chat.
-- **Exact next gate:** Validate and merge the runner once, prove the target Preview source equals the selected full SHA, run disabled mode first, then use the already approved Preview-only enabled smoke sequence. Cart UI, Auth, OTP, Turnstile and addresses remain disconnected until the backend smoke passes.
+- **Postflight:** Commerce data returned to zero carts, zero cart items and zero Auth users. Two valid short-lived limiter rows remained for Cron expiry; there were no invalid limiter hashes and the cleanup job remained active. Production and Auth were untouched.
+- **Runtime rollback:** The branch-scoped Preview value `COMMERCE_GUEST_CART_ENABLED=false` was saved and exact source `4b69b2446df63bd559ffc1d6201f2bbdddc8c3bd` redeployed successfully as Preview `dpl_AZTbwYbXWhq6LyDXjN88wHS842yX` in `READY` state.
+- **Current continuation:** Guest-cart backend isolation is proven. Cart UI remains disconnected while Phase 6 proceeds to a default-off permanent-customer Auth foundation using email OTP, Supabase SSR cookies and Cloudflare Turnstile. No Auth dashboard setting, customer RLS migration, PII collection or saved-address work is enabled yet.
 
 ## 2026-08-20 Phase 5 production content and media smoke
 

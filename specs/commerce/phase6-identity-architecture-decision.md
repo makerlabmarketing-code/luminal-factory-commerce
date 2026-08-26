@@ -4,7 +4,7 @@
 
 - **Status:** `APPROVED_FOR_TECHNICAL_PLANNING`
 - **Date:** 2026-08-13
-- **Implementation status:** `SLICE_A_RATE_LIMIT_CODE_COMPLETE_MIGRATION_APPROVAL_REQUIRED`
+- **Implementation status:** `SLICE_B_AUTH_FOUNDATION_IN_PROGRESS`
 - **Approval boundary:** The owner separately approved and completed the inert Slice A schema/service boundary. Production runtime activation, Auth configuration, customer-data access and later migrations still require their applicable privacy/security gate.
 
 ## Context
@@ -171,7 +171,7 @@ Rejected because email can change, may be unverified, and must not become an aut
 
 ## Current approval gate
 
-The owner approved the Slice A persistence, server-service and disabled request-boundary implementation. The cart schema is applied; the internal service and POST-only endpoint remain behind a default-false flag with no UI consumer. On 2026-08-15 the durable-limiter migration passed rollback validation, was applied once as `20260815022728_add_guest_cart_rate_limits`, and passed production database postflight with zero retained counters. The isolated staging runbook and guarded smoke verifier are prepared, but no Preview secret, deployment or runtime activation has occurred. The next gate is explicit branch-scoped staging configuration and bounded smoke approval. Auth, Turnstile, PII, saved addresses and production runtime activation remain separately gated.
+The owner approved and completed the isolated Slice A guest-cart smoke: the guarded GitHub Actions run created and deleted exactly one cart, postflight returned to zero carts/items/Auth users, and the branch-scoped Preview runtime was restored to false. Slice B now contains a local default-off OTP request/verification boundary using Supabase SSR cookies, exact-origin checks, generic failures, Turnstile-token input and durable keyed-hash limiter code. The new Auth limiter migration is review-only and has not been applied. No Account UI, Auth/Turnstile dashboard setting, customer RLS grant, PII, address, production runtime or cart attachment is enabled.
 
 ## Current official references
 
