@@ -171,7 +171,7 @@ Rejected because email can change, may be unverified, and must not become an aut
 
 ## Current approval gate
 
-The owner approved and completed the isolated Slice A guest-cart smoke: the guarded GitHub Actions run created and deleted exactly one cart, postflight returned to zero carts/items/Auth users, and the branch-scoped Preview runtime was restored to false. Slice B now contains a local default-off OTP request/verification boundary using Supabase SSR cookies, exact-origin checks, generic failures, Turnstile-token input and durable keyed-hash limiter code. The new Auth limiter migration is review-only and has not been applied. No Account UI, Auth/Turnstile dashboard setting, customer RLS grant, PII, address, production runtime or cart attachment is enabled.
+The owner approved and completed the isolated Slice A guest-cart smoke: the guarded GitHub Actions run created and deleted exactly one cart, postflight returned to zero carts/items/Auth users, and the branch-scoped Preview runtime was restored to false. Slice B contains a local default-off OTP request/verification boundary using Supabase SSR cookies, exact-origin checks, generic failures, Turnstile-token input and durable keyed-hash limiter code. The Auth limiter passed rollback validation, was applied once as `20260826105102_add_customer_auth_rate_limits`, and passed zero-row postflight. No Account UI, Auth/Turnstile dashboard setting, customer RLS grant, PII, address, production runtime or cart attachment is enabled.
 
 ## Current official references
 

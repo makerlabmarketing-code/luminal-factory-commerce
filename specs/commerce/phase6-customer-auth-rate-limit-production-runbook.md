@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `REVIEW_REQUIRED_NOT_APPLIED`
+- **Status:** `APPLIED_POSTFLIGHT_PASS_RUNTIME_DISABLED`
 - **Date:** 2026-08-26
 - **Target:** Supabase project `bkmbhcfokobmhfzgsfzh` (`Luminal Factory Commerce`)
 - **Migration:** `20260826091055_add_customer_auth_rate_limits.sql`
@@ -77,3 +77,14 @@ Dropping the function, table or Cron job after forward application is destructiv
 ## Success scope
 
 Successful postflight proves only that the default-deny Auth limiter exists. It does not authorize enabling email OTP, configuring Turnstile/SMTP, creating users or customers, exposing Account UI, attaching carts, storing addresses or changing Production runtime.
+
+## Execution record — 2026-08-26
+
+- Read-only preflight confirmed project `bkmbhcfokobmhfzgsfzh` was `ACTIVE_HEALTHY` in `ap-northeast-1`, `pg_cron` 1.6.4 and the guest-cart limiter/job were intact, all proposed Auth limiter objects were absent, and carts, cart items, customers and Auth users were zero-row.
+- The local migration SHA-256 matched `b099020aad64570ae9cb65553968f7e46c55020e2637f701543a5762281c6725`.
+- Transactional rollback validation passed the 3/10/10 thresholds, invalid-input rejection, RLS/no-policy, least-privilege grants, `SECURITY INVOKER`, empty `search_path`, Cron schedule and guest-cart coexistence checks. Rollback proof confirmed every proposed Auth object and test row was absent afterward.
+- The exact migration was applied once as ledger entry `20260826105102_add_customer_auth_rate_limits`.
+- Postflight repeated structural and behavioral checks. Direct table and RPC access failed for `anon` and `authenticated`; `service_role` access passed. Threshold test rows were rolled back, leaving zero customer-Auth limiter rows, zero business/Auth rows and both cleanup jobs active.
+- Generated production types now include `consume_customer_auth_rate_limit` and PostgREST 14.17.
+- Advisors added only the intentional informational no-policy finding for the private default-deny table and the expected unused cleanup index before runtime traffic. No warning/error finding was introduced. See the [security advisor explanation](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy) and [unused-index explanation](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index).
+- No Supabase Auth, SMTP, Turnstile or Vercel setting changed. Guest-cart Production and all customer-Auth runtime remain disabled.

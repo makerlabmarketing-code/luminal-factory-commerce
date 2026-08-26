@@ -189,7 +189,7 @@ The owner approved these four items on 2026-08-13:
 
 At the time of this record, the four-default approval permitted isolated Slice A migration and test authoring but did not itself authorize production application or live Auth/Turnstile.
 
-On 2026-08-26 the separately guarded guest-cart workflow passed its isolated Preview create/delete smoke and returned cart/Auth data to zero rows; the Preview flag was restored to false. Slice B now has a local default-off OTP request/verification boundary with exact-origin, strict-input, no-store, identity-generic and fresh-user checks. A private keyed-hash Auth limiter migration and adapter are prepared for review but are not applied. No Account UI, production Auth/Turnstile configuration, customer RLS access, PII, address, cart attachment or production runtime is enabled. Migration rollback validation, isolated Auth configuration and staging approval remain mandatory before activation.
+On 2026-08-26 the separately guarded guest-cart workflow passed its isolated Preview create/delete smoke and returned cart/Auth data to zero rows; the Preview flag was restored to false. Slice B has a default-off OTP request/verification boundary with exact-origin, strict-input, no-store, identity-generic and fresh-user checks. Its private keyed-hash Auth limiter passed rollback validation, was applied once as `20260826105102_add_customer_auth_rate_limits`, and passed zero-row postflight. No Account UI, production Auth/Turnstile configuration, customer RLS access, PII, address, cart attachment or production runtime is enabled. Isolated Auth configuration and staging approval remain mandatory before activation.
 
 ## References
 

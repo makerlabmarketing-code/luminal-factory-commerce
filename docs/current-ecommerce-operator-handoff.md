@@ -1,5 +1,12 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-26 Phase 6 customer-Auth limiter applied
+
+- **Production database:** The reviewed migration was applied once as `20260826105102_add_customer_auth_rate_limits` after a complete transactional rollback validation.
+- **Postflight:** RLS/no-policy, grants, invoker/empty-search-path RPC, 3/10/10 thresholds, invalid-input rejection and hourly cleanup all passed. `anon` and `authenticated` cannot access the table or RPC; the service role can. All test counters rolled back to zero, business/Auth tables remain zero-row, and the guest-cart limiter/job are intact.
+- **Runtime:** Guest cart remains disabled in Production and customer Auth remains disabled everywhere. No Supabase Auth, SMTP, Turnstile or Vercel configuration changed.
+- **Next gate:** Review and approve an isolated Auth staging configuration/runbook before adding Preview-only Turnstile/SMTP values or exercising OTP. Account UI, customer RLS, cart attachment, PII and addresses remain out of scope.
+
 ## 2026-08-26 Phase 6 guest-cart staging smoke passed
 
 - **Merged checkpoint:** PR #42 merged the manual staging runner to `master` as `243ebdf`. Earlier guest-cart foundation and protection hardening remain in PR #39 and PR #40.
@@ -9,7 +16,7 @@
 - **Verifier hardening:** The staging verifier now supports the official `x-vercel-protection-bypass` header through operator-only `VERCEL_AUTOMATION_BYPASS_SECRET`, reports protected previews explicitly and accepts Vercel's safe removal of the redundant `private` cache directive while still requiring `no-store` and rejecting shared-cache directives.
 - **Postflight:** Commerce data returned to zero carts, zero cart items and zero Auth users. Two valid short-lived limiter rows remained for Cron expiry; there were no invalid limiter hashes and the cleanup job remained active. Production and Auth were untouched.
 - **Runtime rollback:** The branch-scoped Preview value `COMMERCE_GUEST_CART_ENABLED=false` was saved and exact source `4b69b2446df63bd559ffc1d6201f2bbdddc8c3bd` redeployed successfully as Preview `dpl_AZTbwYbXWhq6LyDXjN88wHS842yX` in `READY` state.
-- **Current continuation:** Guest-cart backend isolation is proven. Cart UI remains disconnected while Phase 6 proceeds to a default-off permanent-customer Auth foundation using email OTP, Supabase SSR cookies and Cloudflare Turnstile. No Auth dashboard setting, customer RLS migration, PII collection or saved-address work is enabled yet.
+- **Current continuation:** Guest-cart backend isolation is proven. The default-off permanent-customer Auth boundary and durable limiter are complete; isolated Turnstile/SMTP staging configuration remains the next gate. No Auth dashboard setting, customer RLS migration, PII collection or saved-address work is enabled yet.
 
 ## 2026-08-20 Phase 5 production content and media smoke
 
