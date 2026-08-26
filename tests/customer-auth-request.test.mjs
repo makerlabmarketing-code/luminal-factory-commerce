@@ -64,7 +64,7 @@ function createRequest(body, headers = {}) {
 }
 
 function createService(overrides = {}) {
-  const calls = { requestOtp: [], verifyOtp: [] };
+  const calls = { requestOtp: [], verifyOtp: [], signOut: 0 };
   return {
     calls,
     service: {
@@ -74,6 +74,10 @@ function createService(overrides = {}) {
       },
       async verifyOtp(input) {
         calls.verifyOtp.push(input);
+        return true;
+      },
+      async signOut() {
+        calls.signOut += 1;
         return true;
       },
       ...overrides,
@@ -129,7 +133,7 @@ test("disabled Auth short-circuits without reading input or calling the provider
     service,
   });
   assert.deepEqual(outcome, { status: 404, body: { ok: false, code: "auth_unavailable" } });
-  assert.deepEqual(calls, { requestOtp: [], verifyOtp: [] });
+  assert.deepEqual(calls, { requestOtp: [], verifyOtp: [], signOut: 0 });
 });
 
 test("Auth limiter keys hide raw email and source identifiers", () => {
@@ -215,6 +219,18 @@ test("OTP verification accepts only six digits and maps provider failures generi
   });
 });
 
+test("sign out clears only the current Auth session without consuming an abuse bucket", async () => {
+  const { service, calls } = createService();
+  const unavailableLimiter = createRateLimiter("unavailable");
+  const outcome = await handleCustomerAuthRequest(
+    createRequest({ action: "sign_out" }),
+    dependencies({ service, rateLimiter: unavailableLimiter.rateLimiter, sourceIdentifier: undefined }),
+  );
+  assert.deepEqual(outcome, { status: 200, body: { ok: true, state: "signed_out" } });
+  assert.equal(calls.signOut, 1);
+  assert.equal(unavailableLimiter.calls.length, 0);
+});
+
 test("Auth initiation and verification apply distinct durable limits before provider calls", async () => {
   const { service, calls: serviceCalls } = createService();
   const allowed = createRateLimiter();
@@ -248,6 +264,7 @@ test("Auth initiation and verification apply distinct durable limits before prov
 test("route and server adapter keep Auth dynamic, private and fresh-user verified", () => {
   const route = readFileSync("src/app/api/account/auth/route.ts", "utf8");
   const adapter = readFileSync("src/lib/supabase/customer-auth-server.ts", "utf8");
+  const proxy = readFileSync("src/lib/supabase/customer-auth-proxy.ts", "utf8");
   const limiter = readFileSync("src/lib/supabase/customer-auth-rate-limit-server.ts", "utf8");
   assert.match(route, /dynamic = "force-dynamic"/);
   assert.match(route, /private, no-store/);
@@ -255,8 +272,11 @@ test("route and server adapter keep Auth dynamic, private and fresh-user verifie
   assert.match(adapter, /captchaToken/);
   assert.match(adapter, /shouldCreateUser: true/);
   assert.match(adapter, /auth\.getUser\(\)/);
+  assert.match(adapter, /signOut\(\{ scope: "local" \}\)/);
+  assert.match(proxy, /auth\.getClaims\(\)/);
+  assert.match(proxy, /COMMERCE_CUSTOMER_AUTH_ENABLED/);
   assert.match(limiter, /consume_customer_auth_rate_limit/);
-  assert.doesNotMatch(`${route}\n${adapter}`, /SUPABASE_SECRET_KEY|service_role|user_metadata/);
+  assert.doesNotMatch(`${route}\n${adapter}\n${proxy}`, /SUPABASE_SECRET_KEY|service_role|user_metadata/);
 });
 
 test("customer Auth limiter migration is private, fixed-policy and cleanup-bounded", () => {

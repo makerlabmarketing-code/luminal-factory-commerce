@@ -1,5 +1,6 @@
 import "server-only";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import type { CustomerAuthService } from "@/features/auth/customer-auth-request";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -43,5 +44,29 @@ export function createServerCustomerAuthService(cookieStore: AuthCookieStore): C
       const { data: confirmed, error: confirmationError } = await client.auth.getUser();
       return confirmationError === null && confirmed.user?.id === data.user.id;
     },
+    async signOut() {
+      const { error } = await client.auth.signOut({ scope: "local" });
+      return error === null;
+    },
   };
+}
+
+export async function getServerCustomerAuthEmail(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const supabaseKey = (
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )?.trim();
+  if (!supabaseUrl || !supabaseKey) return null;
+
+  const client = createServerClient<Database>(supabaseUrl, supabaseKey, {
+    cookies: {
+      getAll: () => cookieStore.getAll(),
+      setAll: () => {
+        // The account Proxy owns refresh-cookie writes for Server Component reads.
+      },
+    },
+  });
+  const { data, error } = await client.auth.getUser();
+  return error === null ? data.user?.email ?? null : null;
 }

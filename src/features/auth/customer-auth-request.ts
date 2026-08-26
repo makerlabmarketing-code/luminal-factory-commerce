@@ -17,11 +17,13 @@ const customerAuthRequestSchema = z.discriminatedUnion("action", [
     email: z.email().max(254).transform((value) => value.trim().toLowerCase()),
     token: z.string().regex(/^\d{6}$/),
   }).strict(),
+  z.object({ action: z.literal("sign_out") }).strict(),
 ]);
 
 export interface CustomerAuthService {
   requestOtp(input: Readonly<{ email: string; captchaToken: string }>): Promise<boolean>;
   verifyOtp(input: Readonly<{ email: string; token: string }>): Promise<boolean>;
+  signOut(): Promise<boolean>;
 }
 
 export type CustomerAuthRateLimitBucket = "otp_email_15m" | "otp_source_hour" | "verify_source_15m";
@@ -44,7 +46,7 @@ export type CustomerAuthEnvironment =
 export type CustomerAuthHttpOutcome = Readonly<{
   status: number;
   body:
-    | Readonly<{ ok: true; state: "otp_sent" | "authenticated" }>
+    | Readonly<{ ok: true; state: "otp_sent" | "authenticated" | "signed_out" }>
     | Readonly<{
       ok: false;
       code: "auth_unavailable" | "invalid_request" | "invalid_or_expired_otp" | "rate_limited";
@@ -187,13 +189,23 @@ export async function handleCustomerAuthRequest(
     return failure(403, "invalid_request");
   }
 
-  if (!dependencies.service || !dependencies.rateLimiter || !dependencies.sourceIdentifier) {
+  if (!dependencies.service) {
     return failure(503, "auth_unavailable");
   }
   const body = await parseRequestBody(request);
   if (!body) return failure(400, "invalid_request");
 
   try {
+    if (body.action === "sign_out") {
+      const signedOut = await dependencies.service.signOut();
+      return signedOut
+        ? { status: 200, body: { ok: true, state: "signed_out" } }
+        : failure(503, "auth_unavailable");
+    }
+
+    if (!dependencies.rateLimiter || !dependencies.sourceIdentifier) {
+      return failure(503, "auth_unavailable");
+    }
     const sourceKey = createCustomerAuthRateLimitKey(
       dependencies.environment.rateLimitSecret,
       "source",

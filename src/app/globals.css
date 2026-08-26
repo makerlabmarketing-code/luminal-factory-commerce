@@ -188,3 +188,37 @@ button { font: inherit; }
 .shop-route-card .shop-media { border: 0; border-bottom: 1px solid var(--border); border-radius: 0; }
 .shop-route-card .shop-route-copy dl { grid-template-columns: 1fr; }
 @media (max-width: 900px) { .shop-preview-heading, .shop-route-heading, .shop-preview-card, .shop-route-list { grid-template-columns: 1fr; } .shop-preview-copy dl { grid-template-columns: 1fr; } .shop-preview-action { justify-content: flex-start; } .shop-media { min-height: 17rem; } }
+
+.account-route { min-height: calc(100svh - 4.75rem); padding-block: clamp(3rem, 8vw, 8rem); background: radial-gradient(circle at 78% 18%, rgba(185,233,255,.08), transparent 28%), radial-gradient(circle at 12% 82%, rgba(200,196,255,.06), transparent 30%), var(--background); }
+.account-route-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(20rem, .95fr); gap: clamp(2rem, 7vw, 8rem); align-items: start; }
+.account-intro { position: sticky; top: 8rem; padding-block: clamp(1rem, 4vw, 4rem); }
+.account-intro h1 { max-width: 11ch; margin: 1rem 0 1.5rem; font-size: clamp(3rem, 6.4vw, 6.8rem); font-weight: 430; line-height: .93; letter-spacing: -.06em; }
+.account-intro > p:last-child { max-width: 37rem; color: var(--muted-foreground); font-size: 1rem; line-height: 1.7; }
+.account-panel { display: grid; gap: 2rem; min-width: 0; padding: clamp(1.25rem, 4vw, 2.5rem); border: 1px solid var(--border); border-radius: var(--radius-large); background: rgba(10,10,10,.9); box-shadow: 0 2.5rem 8rem rgba(0,0,0,.28); }
+.account-panel-heading { display: grid; gap: 1rem; }
+.account-panel-heading h2, .account-unavailable h2 { margin: 0; max-width: 13ch; font-size: clamp(2rem, 4vw, 3.7rem); font-weight: 430; line-height: 1; letter-spacing: -.045em; }
+.account-panel-heading > p:last-child, .account-unavailable > p:last-child { margin: 0; color: var(--muted-foreground); line-height: 1.7; }
+.account-form { display: grid; gap: 1.35rem; }
+.account-field { display: grid; gap: .65rem; }
+.account-field label { color: #deded8; font-size: .78rem; font-weight: 600; }
+.account-field input { width: 100%; min-height: 3.4rem; border: 1px solid rgba(255,255,255,.17); border-radius: var(--radius-small); padding: .8rem .9rem; background: var(--surface-elevated); color: var(--foreground); font-size: max(1rem, 16px); transition: border-color var(--motion-fast), background var(--motion-fast); }
+.account-field input:hover { border-color: rgba(185,233,255,.34); }
+.account-field input:focus { border-color: var(--ice); background: #141414; }
+.account-field span { color: var(--muted-foreground); font-size: .75rem; line-height: 1.55; }
+.account-turnstile { min-height: 4.1rem; width: 100%; overflow: hidden; }
+.account-submit { width: 100%; cursor: pointer; }
+.account-submit:disabled, .account-text-button:disabled { cursor: not-allowed; opacity: .45; transform: none; }
+.account-form-actions { display: grid; gap: .75rem; }
+.account-text-button { min-height: 2.75rem; border: 0; background: transparent; color: var(--ice); cursor: pointer; text-decoration: underline; text-underline-offset: .25em; }
+.account-session { display: grid; gap: 1.5rem; }
+.account-session dl { display: grid; gap: .85rem; margin: 0; }
+.account-session dl div { display: grid; grid-template-columns: .45fr 1fr; gap: 1rem; padding-block: .9rem; border-bottom: 1px solid var(--border); }
+.account-session dt { color: var(--muted-foreground); font: .66rem var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+.account-session dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: #deded8; }
+.account-feedback { min-height: 1.5rem; }
+.account-message, .account-error { margin: 0; padding: .85rem 1rem; border-radius: var(--radius-small); font-size: .82rem; line-height: 1.55; }
+.account-message { border: 1px solid rgba(185,233,255,.24); background: rgba(185,233,255,.06); color: #dceff7; }
+.account-error { border: 1px solid rgba(255,160,160,.3); background: rgba(255,120,120,.07); color: #ffd2d2; }
+.account-unavailable { align-content: start; min-height: 24rem; }
+@media (max-width: 800px) { .account-route-grid { grid-template-columns: 1fr; } .account-intro { position: static; padding-block: 1rem; } .account-intro h1 { font-size: clamp(3rem, 15vw, 5rem); } .account-panel { padding: 1.25rem; } }
+@media (max-width: 360px) { .account-turnstile { overflow-x: auto; } }

@@ -1,11 +1,18 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-26 Phase 6 customer Account foundation prepared
+
+- **Local branch:** `/account` now has a runtime-gated email OTP + Turnstile flow, six-digit verification, fresh server user display, cookie-session refresh and local sign-out. The route is dynamic/noindex and uses the approved loading experience.
+- **Isolation:** Global navigation is unchanged. Customer RLS, cart attachment, addresses, orders, payments and raffle identity remain disconnected. Production guest cart/Auth remain false or absent.
+- **Configuration report:** The owner reported Supabase SMTP and Turnstile protection configured and the Turnstile public site key saved as Vercel Preview Config. No secret value was added to public runtime configuration.
+- **Current gate:** `specs/commerce/phase6-customer-auth-staging-runbook.md` is prepared but not authorized for enabled execution. The next delivery should create one exact-head Preview for the accumulated branch, prove disabled behavior first, and request separate approval before sending one OTP or creating one Auth user.
+
 ## 2026-08-26 Phase 6 customer-Auth limiter applied
 
 - **Production database:** The reviewed migration was applied once as `20260826105102_add_customer_auth_rate_limits` after a complete transactional rollback validation.
 - **Postflight:** RLS/no-policy, grants, invoker/empty-search-path RPC, 3/10/10 thresholds, invalid-input rejection and hourly cleanup all passed. `anon` and `authenticated` cannot access the table or RPC; the service role can. All test counters rolled back to zero, business/Auth tables remain zero-row, and the guest-cart limiter/job are intact.
-- **Runtime:** Guest cart remains disabled in Production and customer Auth remains disabled everywhere. No Supabase Auth, SMTP, Turnstile or Vercel configuration changed.
-- **Next gate:** Review and approve an isolated Auth staging configuration/runbook before adding Preview-only Turnstile/SMTP values or exercising OTP. Account UI, customer RLS, cart attachment, PII and addresses remain out of scope.
+- **Runtime at application time:** Guest cart remained disabled in Production and customer Auth remained disabled everywhere. Supabase SMTP/Turnstile and Vercel Preview public-site-key setup were completed later by the owner as recorded above.
+- **Superseded next gate:** The isolated Auth runbook and local Account UI now exist. Enabled OTP execution still requires the exact-head staging approval described above.
 
 ## 2026-08-26 Phase 6 guest-cart staging smoke passed
 
