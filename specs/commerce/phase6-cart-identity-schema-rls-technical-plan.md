@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `SLICE_A_SCHEMA_APPLIED_POSTFLIGHT_PASS`
+- **Status:** `SLICE_B_AUTH_FOUNDATION_IN_PROGRESS`
 - **Date:** 2026-08-14
 - **Live database status:** `SLICE_A_APPLIED_RUNTIME_DISABLED`
 - **Depends on:** `phase6-identity-architecture-decision.md` and owner approval of `phase6-privacy-security-review.md`
@@ -212,6 +212,10 @@ Auth provider, redirect, CAPTCHA and SMTP changes have independent dashboard rol
 ## Deployment gate
 
 The owner approved the privacy defaults on 2026-08-13 and explicitly approved the inert Slice A production migration on 2026-08-14. The exact reviewed migration passed rollback validation, was then applied once, and passed production postflight under ledger entry `20260814035441_create_guest_cart_foundation`. Generated types are refreshed. The internal server-side cart service is code-complete behind a default-false gate; no endpoint, cookie write, secret or UI is enabled. Request-boundary and staging controls remain separately gated.
+
+The isolated guest-cart enabled smoke subsequently passed and the Preview runtime returned to false. Slice B now includes a local `POST /api/account/auth` foundation for OTP request and verification, using `@supabase/ssr` cookie handling, a fresh `getUser()` confirmation, Turnstile-token input, exact-origin/CSRF checks, strict 4 KiB payloads and private/no-store generic responses. It remains behind `COMMERCE_CUSTOMER_AUTH_ENABLED=false` with no UI consumer.
+
+Migration `20260826091055_add_customer_auth_rate_limits.sql` passed transactional rollback validation and was applied once on 2026-08-26 as ledger entry `20260826105102_add_customer_auth_rate_limits`. Postflight proved its private RLS-enabled keyed-hash counters, fixed limits of three OTP requests per email key per 15 minutes, ten OTP requests per source key per hour and ten verification attempts per source key per 15 minutes, service-role-only invoker RPC and bounded Cron cleanup. Generated production types are refreshed and test counters remain zero. Auth runtime must remain false until the separate SMTP/Turnstile configuration runbook and isolated staging gate pass.
 
 ## References
 

@@ -4,7 +4,7 @@
 
 - **Status:** `APPROVED_FOR_TECHNICAL_PLANNING`
 - **Date:** 2026-08-13
-- **Implementation status:** `SLICE_A_RATE_LIMIT_CODE_COMPLETE_MIGRATION_APPROVAL_REQUIRED`
+- **Implementation status:** `SLICE_B_AUTH_UI_CODE_COMPLETE_STAGING_APPROVAL_REQUIRED`
 - **Approval boundary:** The owner separately approved and completed the inert Slice A schema/service boundary. Production runtime activation, Auth configuration, customer-data access and later migrations still require their applicable privacy/security gate.
 
 ## Context
@@ -171,7 +171,7 @@ Rejected because email can change, may be unverified, and must not become an aut
 
 ## Current approval gate
 
-The owner approved the Slice A persistence, server-service and disabled request-boundary implementation. The cart schema is applied; the internal service and POST-only endpoint remain behind a default-false flag with no UI consumer. On 2026-08-15 the durable-limiter migration passed rollback validation, was applied once as `20260815022728_add_guest_cart_rate_limits`, and passed production database postflight with zero retained counters. The isolated staging runbook and guarded smoke verifier are prepared, but no Preview secret, deployment or runtime activation has occurred. The next gate is explicit branch-scoped staging configuration and bounded smoke approval. Auth, Turnstile, PII, saved addresses and production runtime activation remain separately gated.
+The owner approved and completed the isolated Slice A guest-cart smoke: the guarded GitHub Actions run created and deleted exactly one cart, postflight returned to zero carts/items/Auth users, and the branch-scoped Preview runtime was restored to false. Slice B now contains a local default-off `/account` OTP/Turnstile UI, strict request boundary, cookie session refresh, verified-user presentation, local sign-out and durable keyed-hash limiter. The Auth limiter was applied once as `20260826105102_add_customer_auth_rate_limits` and passed zero-row postflight. The owner reported Supabase SMTP/Turnstile and Vercel Preview public-site-key configuration complete, but no exact-head end-to-end OTP smoke has run. Customer RLS, cart attachment, PII beyond the approved test email, addresses, global Account navigation and Production runtime remain disabled.
 
 ## Current official references
 

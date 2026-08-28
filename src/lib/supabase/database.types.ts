@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -678,6 +678,10 @@ export type Database = {
       }
     }
     Functions: {
+      consume_customer_auth_rate_limit: {
+        Args: { p_bucket: string; p_key_hash: string }
+        Returns: boolean
+      }
       consume_guest_cart_rate_limit: {
         Args: { p_bucket: string; p_key_hash: string }
         Returns: boolean
