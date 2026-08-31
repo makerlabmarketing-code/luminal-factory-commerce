@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `DOMAIN_CONTRACT_COMPLETE_RPC_MIGRATION_REVIEW_REQUIRED`
+- **Status:** `RPC_MIGRATION_DRAFT_COMPLETE_PRODUCTION_APPROVAL_REQUIRED`
 - **Date:** 2026-08-29
 - **Depends on:** completed guest-cart smoke, completed Customer Auth Production smoke, `phase6-cart-identity-schema-rls-technical-plan.md`
 - **Runtime default:** `COMMERCE_CUSTOMER_CART_MERGE_ENABLED=false`
@@ -75,7 +75,9 @@ default exposure.
 
 ## Proposed persistence support
 
-Add `private.customer_cart_merge_receipts`:
+The CLI-created migration
+`supabase/migrations/20260829151610_customer_cart_merge.sql` adds
+`private.customer_cart_merge_receipts`:
 
 | Column | Contract |
 | --- | --- |
@@ -111,15 +113,17 @@ The function receives verified `auth_user_id`, verified normalized email,
 5. Resolve the subject's active customer cart. If none exists, create one with
    no guest hash and the same currency as the guest cart.
 6. Lock the guest and customer cart rows in ascending UUID order before line
-   mutation. This ordering is mandatory for deadlock prevention.
+   mutation. A new invoker trigger makes every cart-line insert/update lock its
+   active parent cart first, closing the capture-versus-conversion race.
 7. Process guest lines in stable ID order. Re-check that the product is
    published and any variant belongs to it and is active.
 8. For each valid logical line, add guest and customer quantities and cap the
    result at 99. Count capped and unavailable lines explicitly.
 9. Delete the converted guest cart's line rows after their results are applied,
    mark the guest cart `converted`, clear its token hash and update timestamps.
-10. Insert the private receipt and return only customer-cart ID plus the two
-    aggregate counts. Do not return email, guest hash or raw line data.
+10. Insert the private receipt and return only the merge state plus the two
+    aggregate counts. Do not return customer/cart IDs, email, guest hash or raw
+    line data.
 
 All locks are held only inside this database function. Catalog validation and
 line mutation are database-local and bounded; no network work occurs while
@@ -129,6 +133,9 @@ locked.
 
 - The existing partial unique index permits one active customer cart.
 - Candidate carts are locked in ascending ID order before changes.
+- Every cart-line insert/update locks and revalidates its parent cart in the
+  same database transaction. A write that loses the conversion race fails
+  instead of leaving a line on a converted cart.
 - Concurrent customer creation is resolved by the existing unique
   `auth_user_id` and normalized-email indexes; a unique conflict is re-read once
   and accepted only when the Auth subject matches.
@@ -157,22 +164,28 @@ requires them.
 
 ## Migration and delivery gate
 
-The current environment has no Supabase CLI, so no migration filename is
-invented in this planning slice. At the SQL gate:
+The Supabase CLI created
+`supabase/migrations/20260829151610_customer_cart_merge.sql`; its forward SQL,
+static contract tests and
+`phase6-customer-cart-merge-production-runbook.md` are review-complete locally.
+The next gate is:
 
-1. create the migration with `supabase migration new customer_cart_merge`;
-2. add the private receipt table, explicit grants, cleanup change and invoker
-   RPC;
-3. write a rollback-validation transaction with concurrency assertions;
-4. run security/performance advisors;
-5. regenerate database types only after the reviewed schema is applied;
-6. obtain separate approval before Production rollback validation or DDL;
-7. keep merge, guest cart and Customer Auth runtime false after postflight.
+1. obtain explicit approval for Production transactional rollback validation,
+   exact migration application and bounded post-apply concurrency fixtures;
+2. run security/performance advisors;
+3. regenerate database types only after the reviewed schema is applied;
+4. add the Supabase adapter only from that generated RPC signature;
+5. keep merge, guest cart and Customer Auth runtime false after postflight.
 
-The repository now contains the default-off domain service and focused contract
-tests only. There is intentionally no Supabase adapter, RPC call, Auth-route
-consumer or cookie mutation until the migration exists and its generated type
-is verified.
+The pre-apply rollback transaction validates structure, grants and single-call
+behavior. True two-session concurrency cannot be honestly proven through one
+uncommitted DDL transaction; the runbook therefore performs that assertion only
+after schema application with exact-ID fixtures and mandatory cleanup.
+
+The repository now contains the default-off domain service, CLI-created
+migration, focused contract tests and Production runbook. There is intentionally
+no Supabase adapter, RPC call, Auth-route consumer or cookie mutation until the
+migration is applied and its generated type is verified.
 
 ## Required tests before any Production approval
 
