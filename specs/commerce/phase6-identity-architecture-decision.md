@@ -4,7 +4,7 @@
 
 - **Status:** `APPROVED_FOR_TECHNICAL_PLANNING`
 - **Date:** 2026-08-13
-- **Implementation status:** `SLICE_B_AUTH_UI_CODE_COMPLETE_STAGING_APPROVAL_REQUIRED`
+- **Implementation status:** `SLICE_B_AUTH_UI_DEPLOYED_PRODUCTION_SMOKE_APPROVAL_REQUIRED`
 - **Approval boundary:** The owner separately approved and completed the inert Slice A schema/service boundary. Production runtime activation, Auth configuration, customer-data access and later migrations still require their applicable privacy/security gate.
 
 ## Context
@@ -171,7 +171,7 @@ Rejected because email can change, may be unverified, and must not become an aut
 
 ## Current approval gate
 
-The owner approved and completed the isolated Slice A guest-cart smoke: the guarded GitHub Actions run created and deleted exactly one cart, postflight returned to zero carts/items/Auth users, and the branch-scoped Preview runtime was restored to false. Slice B now contains a local default-off `/account` OTP/Turnstile UI, strict request boundary, cookie session refresh, verified-user presentation, local sign-out and durable keyed-hash limiter. The Auth limiter was applied once as `20260826105102_add_customer_auth_rate_limits` and passed zero-row postflight. The owner reported Supabase SMTP/Turnstile and Vercel Preview public-site-key configuration complete, but no exact-head end-to-end OTP smoke has run. Customer RLS, cart attachment, PII beyond the approved test email, addresses, global Account navigation and Production runtime remain disabled.
+The owner approved and completed the isolated Slice A guest-cart smoke: the guarded GitHub Actions run created and deleted exactly one cart, postflight returned to zero carts/items/Auth users, and runtime was restored to false. PR #43 then delivered the default-off `/account` OTP/Turnstile UI, strict request boundary, cookie session refresh, verified-user presentation, local sign-out and durable keyed-hash limiter to Production as `a7da2b6f9602118342d84b481c8ba30ca7ef4880`. Production `/account` and disabled API probes passed with Auth false and all aggregate business/Auth rows still zero. On 2026-08-28 the owner selected `master` as the single Production delivery branch, superseding the Preview-only Auth runbook. The new production smoke runbook is prepared for `tungduy165@gmail.com`, but no OTP has been requested and Production activation still requires a separate explicit approval. Customer RLS, cart attachment, PII beyond that bounded test identity, addresses and global Account navigation remain disconnected.
 
 ## Current official references
 

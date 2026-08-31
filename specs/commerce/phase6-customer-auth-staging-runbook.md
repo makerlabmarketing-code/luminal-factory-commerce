@@ -2,10 +2,15 @@
 
 ## Document metadata
 
-- **Status:** `PREPARED_APPROVAL_REQUIRED`
+- **Status:** `SUPERSEDED_BY_PRODUCTION_SMOKE_RUNBOOK`
 - **Date:** 2026-08-26
 - **Target:** one exact-head, non-production Vercel Preview for Luminal Factory Commerce
 - **Runtime default:** `COMMERCE_CUSTOMER_AUTH_ENABLED=false`
+
+> Superseded on 2026-08-28 after the owner selected `master` as the single
+> Production delivery branch. Historical Preview evidence remains below. New
+> execution must use `phase6-customer-auth-production-smoke-runbook.md`; this
+> file no longer authorizes or governs an OTP run.
 
 ## Purpose and bounded scope
 

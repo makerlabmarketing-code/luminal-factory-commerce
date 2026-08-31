@@ -1,11 +1,20 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-28 Production-only delivery policy and Auth gate
+
+- **Repository policy:** `master` is now the only long-lived development and Production branch. Coherent changes are accumulated and fully validated locally, then pushed once. Routine feature/Preview branches are no longer required; GitHub automatic merged-head deletion is enabled for exceptional PRs.
+- **Delivered baseline:** PR #43 was squash-merged as `a7da2b6f9602118342d84b481c8ba30ca7ef4880`; Vercel Production reached `READY`. `/account` returned HTTP 200 with the disabled state and the Auth API returned HTTP 404 `auth_unavailable` without setting cookies.
+- **Data postflight:** Auth users, customers, carts, cart items and customer-Auth limiter rows remained zero.
+- **Current runtime:** Customer Auth and guest cart remain false. No OTP has been sent and no Auth user/session has been created.
+- **Next gate:** `specs/commerce/phase6-customer-auth-production-smoke-runbook.md` governs one bounded login for `tungduy165@gmail.com`. Production environment preflight comes first; enabling Auth and sending the email still require a separate explicit approval.
+- **Branch cleanup:** The five latest merged heads were deleted and automatic cleanup is enabled. Historical merged branches do not affect deployment; removal is repository housekeeping only.
+
 ## 2026-08-26 Phase 6 customer Account foundation prepared
 
 - **Local branch:** `/account` now has a runtime-gated email OTP + Turnstile flow, six-digit verification, fresh server user display, cookie-session refresh and local sign-out. The route is dynamic/noindex and uses the approved loading experience.
 - **Isolation:** Global navigation is unchanged. Customer RLS, cart attachment, addresses, orders, payments and raffle identity remain disconnected. Production guest cart/Auth remain false or absent.
 - **Configuration report:** The owner reported Supabase SMTP and Turnstile protection configured and the Turnstile public site key saved as Vercel Preview Config. No secret value was added to public runtime configuration.
-- **Current gate:** `specs/commerce/phase6-customer-auth-staging-runbook.md` is prepared but not authorized for enabled execution. The next delivery should create one exact-head Preview for the accumulated branch, prove disabled behavior first, and request separate approval before sending one OTP or creating one Auth user.
+- **Superseded gate:** The Preview-only runbook was superseded by the 2026-08-28 Production-only policy and production smoke runbook above.
 
 ## 2026-08-26 Phase 6 customer-Auth limiter applied
 

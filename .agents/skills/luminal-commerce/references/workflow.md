@@ -141,6 +141,25 @@ Prefer tasks such as:
 
 A task should have a clear completion boundary.
 
+## Repository and Deployment Policy
+
+The owner approved a single-branch delivery model on 2026-08-28 while the
+storefront is still in its early build phase:
+
+- `master` is the only long-lived development and Production branch;
+- accumulate a coherent, validated local batch on `master`, then push once;
+- do not create a feature branch or Pull Request solely to obtain a Preview;
+- incomplete live capabilities remain protected by default-false runtime flags
+  and explicit production activation gates;
+- every push to `master` must pass the repository quality gate before delivery
+  and receive a bounded post-deployment smoke after Vercel reaches `READY`;
+- GitHub automatic head-branch deletion stays enabled for any exceptional PR
+  that is still required for external review or recovery.
+
+This policy changes delivery topology, not security authority. A merge or push
+does not authorize production DDL, secret changes, email delivery, Auth
+activation, PII collection, payments or other separately gated live actions.
+
 ## Existing Code
 
 Before replacing existing code:

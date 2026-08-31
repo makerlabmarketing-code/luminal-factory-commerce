@@ -91,7 +91,8 @@ The owner approved the first Phase 6 privacy defaults on 2026-08-13:
 - guest carts expire after 30 days of inactivity and are deleted within 7 further days;
 - the first permanent account method is email OTP;
 - Cloudflare Turnstile is the production Auth bot-protection direction;
-- saved addresses wait until guest-cart and Auth isolation pass staging.
+- saved addresses wait until guest-cart and Auth isolation pass its reviewed
+  environment-specific smoke gate.
 
 This approval permits isolated migration/runtime planning. Applying production SQL, enabling Auth/Turnstile or collecting PII still requires its applicable reviewed delivery gate.
 
@@ -116,6 +117,23 @@ The Phase 6 guest-cart service uses:
 - `COMMERCE_GUEST_CART_RATE_LIMIT_SECRET`, a server-only HMAC secret for source limiter keys.
 
 The POST-only request boundary and Supabase rate-limit adapter are code-complete. The durable design uses a private RLS-enabled counter table, a fixed-policy service-role-only `SECURITY INVOKER` RPC and Supabase Cron cleanup inside the existing database. On 2026-08-15 the exact reviewed limiter migration passed transactional rollback validation, was applied once as `20260815022728_add_guest_cart_rate_limits`, and passed production database postflight. The counter table remains zero-row and default-deny. An isolated Preview-only staging runbook and guarded create/delete verifier are prepared, but no secret, deployment or runtime activation is configured. There is no Cart UI consumer; the runtime flag remains default-false and staging execution is separately gated.
+
+The Phase 6 customer-Auth boundary uses:
+
+- `COMMERCE_CUSTOMER_AUTH_ENABLED`, exact value `true` only during a reviewed
+  activation window;
+- `COMMERCE_CUSTOMER_AUTH_ALLOWED_ORIGINS`, containing only the exact live
+  origin used by the smoke;
+- `COMMERCE_CUSTOMER_AUTH_RATE_LIMIT_SECRET`, a distinct server-only HMAC
+  secret of at least 32 characters;
+- `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`, which is public by design while
+  the Turnstile secret remains only in Supabase Auth configuration.
+
+On 2026-08-28 the owner selected `master` as the single Production delivery
+branch. This removes the Preview requirement for future batches but does not
+weaken the runtime gate. Customer Auth remains false until the production OTP
+runbook receives separate approval; one approved email, one OTP request, one
+verification and local sign-out are the maximum initial smoke scope.
 
 ## Row-Level Security
 
