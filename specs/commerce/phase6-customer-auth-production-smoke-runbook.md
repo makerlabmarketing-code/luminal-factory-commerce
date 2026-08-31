@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `PREPARED_PRODUCTION_ACTIVATION_APPROVAL_REQUIRED`
+- **Status:** `COMPLETED_ROLLBACK_POSTFLIGHT_PASS`
 - **Date:** 2026-08-28
 - **Application target:** `https://luminalfactory.com` on the exact deployed
   `master` commit
@@ -100,3 +100,11 @@ Stop without retrying or broadening scope if:
 - any customer/cart/business row changes;
 - response caching, session isolation or sign-out behaves unexpectedly;
 - any credential, OTP, session token or raw PII appears in logs.
+
+## Execution evidence — 2026-08-28
+
+- The initial enabled attempt stopped without a session when Supabase still issued an eight-digit token from the incorrectly configured project; the six-digit request boundary rejected verification.
+- The owner corrected Email OTP length on Commerce project `bkmbhcfokobmhfzgsfzh`. A fresh six-digit OTP then verified successfully, one refresh preserved the cookie session and local sign-out completed.
+- Production Auth was restored to false and the same source was redeployed as `dpl_5ktST19uiu1wV8nxg9rePRrxkQ2x` in `READY` state.
+- Disabled `/account` behavior returned; active sessions, customers, carts and cart items are zero. One signed-out test Auth user remains intentionally because deletion was not authorized.
+- Supabase Auth logs contain the successful verify/logout evidence, and Vercel reported no runtime errors during the smoke window.

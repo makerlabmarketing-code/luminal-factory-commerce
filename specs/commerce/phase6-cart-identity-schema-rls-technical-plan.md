@@ -2,8 +2,8 @@
 
 ## Document metadata
 
-- **Status:** `SLICE_B_AUTH_FOUNDATION_IN_PROGRESS`
-- **Date:** 2026-08-14
+- **Status:** `SLICE_B_CUSTOMER_CART_MERGE_PLAN_IN_PROGRESS`
+- **Date:** 2026-08-29
 - **Live database status:** `SLICE_A_APPLIED_RUNTIME_DISABLED`
 - **Depends on:** `phase6-identity-architecture-decision.md` and owner approval of `phase6-privacy-security-review.md`
 
@@ -216,6 +216,8 @@ The owner approved the privacy defaults on 2026-08-13 and explicitly approved th
 The isolated guest-cart enabled smoke subsequently passed and the Preview runtime returned to false. Slice B now includes a local `POST /api/account/auth` foundation for OTP request and verification, using `@supabase/ssr` cookie handling, a fresh `getUser()` confirmation, Turnstile-token input, exact-origin/CSRF checks, strict 4 KiB payloads and private/no-store generic responses. It remains behind `COMMERCE_CUSTOMER_AUTH_ENABLED=false` with no UI consumer.
 
 Migration `20260826091055_add_customer_auth_rate_limits.sql` passed transactional rollback validation and was applied once on 2026-08-26 as ledger entry `20260826105102_add_customer_auth_rate_limits`. Postflight proved its private RLS-enabled keyed-hash counters, fixed limits of three OTP requests per email key per 15 minutes, ten OTP requests per source key per hour and ten verification attempts per source key per 15 minutes, service-role-only invoker RPC and bounded Cron cleanup. Generated production types are refreshed and test counters remain zero. Auth runtime must remain false until the separate SMTP/Turnstile configuration runbook and isolated staging gate pass.
+
+The bounded Production Auth smoke passed on 2026-08-28 and returned Auth to false with zero sessions and zero customer/cart rows. `phase6-customer-cart-merge-technical-plan.md` now owns the next default-off verified-subject link and atomic merge design. No migration filename or Production SQL is created in this planning checkpoint because Supabase CLI is unavailable; the SQL gate remains separately approved.
 
 ## References
 

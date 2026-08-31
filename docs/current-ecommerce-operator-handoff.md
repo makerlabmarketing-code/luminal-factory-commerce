@@ -1,12 +1,19 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-28 Customer Auth Production smoke passed and rolled back
+
+- **Source/deployment:** The bounded smoke ran on Production source `a7da2b6f9602118342d84b481c8ba30ca7ef4880`. The final disabled redeploy is `dpl_5ktST19uiu1wV8nxg9rePRrxkQ2x` in `READY` state.
+- **Configuration correction:** An initial attempt stopped because an eight-digit OTP was still being generated from the incorrectly configured Supabase project. The six-digit application boundary rejected it and no session was created. The owner then set Email OTP length to six on Commerce project `bkmbhcfokobmhfzgsfzh` before the successful attempt.
+- **Successful flow:** A six-digit OTP verified successfully, the Account route showed the confirmed identity, one refresh preserved the cookie-backed session, and local sign-out completed successfully.
+- **Postflight:** `COMMERCE_CUSTOMER_AUTH_ENABLED=false` is redeployed; `/account` is disabled again. The Commerce project contains one signed-out Auth user, zero active sessions, zero customers, zero carts and zero cart items. No runtime error was found in the smoke window.
+- **Local continuation:** The default-off verified-subject/customer-cart merge domain contract and seven focused tests are complete. It validates the fresh identity shape, normalizes email only as contact data, hashes guest credentials before persistence, keeps replay non-enumerating and exposes only aggregate merge counts. It has no RPC adapter, route consumer or live write path.
+- **Next gate:** Review and author the atomic invoker-RPC migration from `specs/commerce/phase6-customer-cart-merge-technical-plan.md`. Do not enable customer RLS, merge runtime, saved addresses, order history or global Account navigation without their separate reviews.
+
 ## 2026-08-28 Production-only delivery policy and Auth gate
 
 - **Repository policy:** `master` is now the only long-lived development and Production branch. Coherent changes are accumulated and fully validated locally, then pushed once. Routine feature/Preview branches are no longer required; GitHub automatic merged-head deletion is enabled for exceptional PRs.
 - **Delivered baseline:** PR #43 was squash-merged as `a7da2b6f9602118342d84b481c8ba30ca7ef4880`; Vercel Production reached `READY`. `/account` returned HTTP 200 with the disabled state and the Auth API returned HTTP 404 `auth_unavailable` without setting cookies.
-- **Data postflight:** Auth users, customers, carts, cart items and customer-Auth limiter rows remained zero.
-- **Current runtime:** Customer Auth and guest cart remain false. No OTP has been sent and no Auth user/session has been created.
-- **Next gate:** `specs/commerce/phase6-customer-auth-production-smoke-runbook.md` governs one bounded login for `tungduy165@gmail.com`. Production environment preflight comes first; enabling Auth and sending the email still require a separate explicit approval.
+- **Historical baseline:** Before the smoke, Auth users, customers, carts, cart items and customer-Auth limiter rows were zero. The completed smoke evidence and current runtime state are recorded in the newer checkpoint above.
 - **Branch cleanup:** The five latest merged heads were deleted and automatic cleanup is enabled. Historical merged branches do not affect deployment; removal is repository housekeeping only.
 
 ## 2026-08-26 Phase 6 customer Account foundation prepared

@@ -131,9 +131,12 @@ The Phase 6 customer-Auth boundary uses:
 
 On 2026-08-28 the owner selected `master` as the single Production delivery
 branch. This removes the Preview requirement for future batches but does not
-weaken the runtime gate. Customer Auth remains false until the production OTP
-runbook receives separate approval; one approved email, one OTP request, one
-verification and local sign-out are the maximum initial smoke scope.
+weaken the runtime gate. The bounded Production OTP smoke subsequently passed:
+the corrected Commerce project issued a six-digit token, verification and one
+refresh succeeded, local sign-out revoked the session, and Auth returned to
+false. One signed-out Auth user remains while sessions and all customer/cart
+rows are zero. Customer linking and guest-cart attachment remain a separate
+default-off slice with their own SQL and runtime approval gates.
 
 ## Row-Level Security
 
