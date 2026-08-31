@@ -185,9 +185,11 @@ after schema application with exact-ID fixtures and mandatory cleanup.
 On 2026-08-30 the reviewed migration passed rollback validation, was applied as
 `20260830070209_customer_cart_merge`, passed real two-session merge/late-write
 concurrency tests and returned to zero fixture rows after exact cleanup.
-Production-generated types now contain the bounded RPC signature. There is
-still intentionally no Supabase adapter, RPC caller, Auth-route consumer or
-cookie mutation; all related runtime flags remain false.
+Production-generated types now contain the bounded RPC signature. A local
+server-only adapter maps exactly that signature, validates the single returned
+row and requires all three runtime flags before privileged client construction.
+There is still intentionally no RPC caller, Auth-route consumer or cookie
+mutation; all related runtime flags remain false.
 
 ## Required tests before any Production approval
 

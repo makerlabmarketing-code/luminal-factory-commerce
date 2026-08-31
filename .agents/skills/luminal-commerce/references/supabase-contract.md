@@ -146,7 +146,11 @@ active parent cart so conversion cannot strand a late line. Browser roles keep
 zero receipt/RPC access. On 2026-08-30 rollback validation, exact application as
 `20260830070209_customer_cart_merge`, real concurrency validation and exact
 fixture cleanup all passed. Generated types include the bounded RPC; the
-application adapter and every merge caller remain absent and separately gated.
+server-only adapter now maps only that generated signature and fails closed on
+database, shape or configuration errors. Privileged client construction requires
+Customer Auth, guest cart and merge flags all to be exact `true`. No route or Auth
+consumer imports the adapter, so every merge caller and runtime activation remain
+separately gated.
 
 ## Row-Level Security
 
