@@ -1,14 +1,20 @@
 # Current Ecommerce operator handoff
 
+## 2026-08-30 Customer/cart merge database rollout passed
+
+- **Ledger:** Exact migration `20260829151610_customer_cart_merge.sql` was applied once as `20260830070209_customer_cart_merge` after transactional rollback validation passed.
+- **Concurrency:** Two simultaneous merges converged on one customer/cart/line/receipt; replay and cross-subject behavior passed. A late line write that lost conversion failed safely with SQLSTATE `23514`.
+- **Cleanup/postflight:** Exact fixtures were deleted and products, customers, carts, cart items, receipts and Auth sessions are zero. The one signed-out OTP-smoke Auth user was not changed. Browser roles remain denied, one hourly cleanup job is active, generated types include the RPC, and advisors added no warning/error.
+- **Runtime/delivery:** No Vercel env was edited and no deployment occurred. Customer Auth, guest cart and customer-cart merge remain false. There is still no adapter or live merge caller.
+- **Next gate:** `SLICE_B_CUSTOMER_CART_MERGE_ADAPTER_REVIEW_REQUIRED`; implement and locally verify the server-only adapter while it remains disconnected/default-off.
+
 ## 2026-08-28 Customer Auth Production smoke passed and rolled back
 
 - **Source/deployment:** The bounded smoke ran on Production source `a7da2b6f9602118342d84b481c8ba30ca7ef4880`. The final disabled redeploy is `dpl_5ktST19uiu1wV8nxg9rePRrxkQ2x` in `READY` state.
 - **Configuration correction:** An initial attempt stopped because an eight-digit OTP was still being generated from the incorrectly configured Supabase project. The six-digit application boundary rejected it and no session was created. The owner then set Email OTP length to six on Commerce project `bkmbhcfokobmhfzgsfzh` before the successful attempt.
 - **Successful flow:** A six-digit OTP verified successfully, the Account route showed the confirmed identity, one refresh preserved the cookie-backed session, and local sign-out completed successfully.
 - **Postflight:** `COMMERCE_CUSTOMER_AUTH_ENABLED=false` is redeployed; `/account` is disabled again. The Commerce project contains one signed-out Auth user, zero active sessions, zero customers, zero carts and zero cart items. No runtime error was found in the smoke window.
-- **Local continuation:** The default-off verified-subject/customer-cart merge domain contract is joined by CLI-created migration `20260829151610_customer_cart_merge`, eight schema/security tests and a Production runbook. The draft adds a private receipt, active-parent line-write lock, service-role-only invoker RPC and receipt cleanup without adding an adapter, route consumer, generated type or live write path.
-- **Read-only preflight:** Commerce is `ACTIVE_HEALTHY`; ledger and RLS match, all proposed merge objects are absent, customers/carts/cart-items/Auth sessions remain zero, and the retained signed-out OTP user was untouched. Existing advisor baseline includes unused-index/default-deny INFO and leaked-password-protection WARN; no Auth setting was changed.
-- **Next gate:** `SLICE_B_CUSTOMER_CART_MERGE_PRODUCTION_SQL_APPROVAL_REQUIRED`. Review `specs/commerce/phase6-customer-cart-merge-production-runbook.md`, then obtain explicit owner approval before Production rollback validation, migration application or bounded concurrency fixtures. Keep Customer Auth, guest cart and merge runtime false; do not enable customer RLS, saved addresses, order history or global Account navigation.
+- **Historical continuation:** The default-off merge domain contract, migration and runbook were prepared here; their completed Production rollout is recorded in the newer checkpoint above.
 
 ## 2026-08-28 Production-only delivery policy and Auth gate
 

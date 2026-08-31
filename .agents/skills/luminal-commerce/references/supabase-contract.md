@@ -138,14 +138,15 @@ false. One signed-out Auth user remains while sessions and all customer/cart
 rows are zero. Customer linking and guest-cart attachment remain a separate
 default-off slice with their own SQL and runtime approval gates.
 
-The default-off customer/cart merge draft now has a CLI-created migration,
-static security contracts and a Production runbook. Its server-only invoker RPC
+The default-off customer/cart merge now has an applied migration, static
+security contracts and a Production runbook. Its server-only invoker RPC
 uses the verified Auth subject, never email as ownership; a private 37-day
 receipt makes guest-token replay idempotent; and cart-line writes lock their
 active parent cart so conversion cannot strand a late line. Browser roles keep
-zero receipt/RPC access. The migration is not applied, generated types and the
-application adapter remain unchanged, and Production rollback validation plus
-DDL require explicit approval.
+zero receipt/RPC access. On 2026-08-30 rollback validation, exact application as
+`20260830070209_customer_cart_merge`, real concurrency validation and exact
+fixture cleanup all passed. Generated types include the bounded RPC; the
+application adapter and every merge caller remain absent and separately gated.
 
 ## Row-Level Security
 

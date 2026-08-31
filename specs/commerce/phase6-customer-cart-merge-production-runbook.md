@@ -2,7 +2,7 @@
 
 ## Status and authority
 
-- **Status:** `READ_ONLY_PREFLIGHT_PASS_LIVE_APPROVAL_REQUIRED`
+- **Status:** `APPLIED_POSTFLIGHT_PASS_RUNTIME_DISABLED`
 - **Forward draft:** `supabase/migrations/20260829151610_customer_cart_merge.sql`
 - **Runtime after every database step:** `COMMERCE_CUSTOMER_CART_MERGE_ENABLED=false`
 - **Project:** Luminal Factory Commerce only (`bkmbhcfokobmhfzgsfzh`)
@@ -10,6 +10,10 @@
 This runbook prepares the database validation and rollout boundary. It does not
 authorize Production SQL, test-row creation, Vercel environment changes, Auth
 activation, email delivery, customer browser access or deployment.
+
+The owner granted the bounded Production SQL and fixture authority on
+2026-08-30. That gate is now complete; any runtime activation, adapter delivery
+or rollback remains separately gated.
 
 ## Scope
 
@@ -161,3 +165,32 @@ activation are stop conditions.
   recorded baseline and cannot be attributed to the merge migration.
 - No SQL mutation, migration, fixture, Auth change, env change or deployment
   occurred during this preflight.
+
+## Production rollout record — 2026-08-30
+
+- The exact reviewed file hash matched, then the forward SQL passed transactional
+  rollback validation with mandatory rollback and independent absence proof.
+- Supabase applied it once as ledger entry
+  `20260830070209_customer_cart_merge`.
+- Actual `anon` and `authenticated` roles cannot read the receipt table or call
+  the RPC; `service_role` receives only the documented bounded result. The RPC
+  remains `SECURITY INVOKER` with empty `search_path`, 5-second statement timeout
+  and 2-second lock timeout.
+- Two truly concurrent calls converged on one customer, one active customer
+  cart, one logical line and one receipt. Same-subject replay was idempotent and
+  cross-subject replay returned the generic unavailable result.
+- A concurrent late cart-line write that lost the conversion race failed with
+  SQLSTATE `23514`; it was not stranded on the converted cart.
+- All exact-ID fixture receipts, lines, carts, customer and products were deleted
+  in dependency order. Final business and receipt aggregates returned to zero.
+  The retained signed-out OTP-smoke Auth user remains untouched and Auth sessions
+  remain zero.
+- RLS, policy count, grants, trigger and the single hourly `29 * * * *` cleanup
+  job passed postflight. Generated public-schema types now include only the new
+  RPC signature; the private receipt table is not exposed in application types.
+- Advisors added no warning or error. Expected INFO includes default-deny RLS,
+  unused indexes and three unindexed receipt foreign keys; index follow-up needs
+  a separate review and is not an emergency rollback condition. The pre-existing
+  leaked-password-protection WARN remains unchanged.
+- No Vercel environment value was edited and no deployment occurred. Source
+  defaults for Customer Auth, guest cart and customer-cart merge remain false.

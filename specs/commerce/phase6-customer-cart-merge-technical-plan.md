@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `RPC_MIGRATION_DRAFT_COMPLETE_PRODUCTION_APPROVAL_REQUIRED`
+- **Status:** `RPC_MIGRATION_APPLIED_POSTFLIGHT_PASS_RUNTIME_DISABLED`
 - **Date:** 2026-08-29
 - **Depends on:** completed guest-cart smoke, completed Customer Auth Production smoke, `phase6-cart-identity-schema-rls-technical-plan.md`
 - **Runtime default:** `COMMERCE_CUSTOMER_CART_MERGE_ENABLED=false`
@@ -182,10 +182,12 @@ behavior. True two-session concurrency cannot be honestly proven through one
 uncommitted DDL transaction; the runbook therefore performs that assertion only
 after schema application with exact-ID fixtures and mandatory cleanup.
 
-The repository now contains the default-off domain service, CLI-created
-migration, focused contract tests and Production runbook. There is intentionally
-no Supabase adapter, RPC call, Auth-route consumer or cookie mutation until the
-migration is applied and its generated type is verified.
+On 2026-08-30 the reviewed migration passed rollback validation, was applied as
+`20260830070209_customer_cart_merge`, passed real two-session merge/late-write
+concurrency tests and returned to zero fixture rows after exact cleanup.
+Production-generated types now contain the bounded RPC signature. There is
+still intentionally no Supabase adapter, RPC caller, Auth-route consumer or
+cookie mutation; all related runtime flags remain false.
 
 ## Required tests before any Production approval
 

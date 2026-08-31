@@ -686,6 +686,18 @@ export type Database = {
         Args: { p_bucket: string; p_key_hash: string }
         Returns: boolean
       }
+      merge_verified_customer_guest_cart: {
+        Args: {
+          p_auth_user_id: string
+          p_guest_token_hash: string
+          p_verified_email: string
+        }
+        Returns: {
+          capped_line_count: number
+          merge_state: string
+          unavailable_line_count: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
