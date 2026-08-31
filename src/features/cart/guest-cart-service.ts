@@ -106,6 +106,18 @@ export type GuestCartCookie = Readonly<{
   }>;
 }>;
 
+export type GuestCartCookieRemoval = Readonly<{
+  name: typeof GUEST_CART_COOKIE_NAME;
+  value: "";
+  options: Readonly<{
+    httpOnly: true;
+    sameSite: "lax";
+    secure: boolean;
+    path: "/";
+    maxAge: 0;
+  }>;
+}>;
+
 type GuestCartServiceOptions = Readonly<{
   enabled: boolean;
   repository?: GuestCartRepository;
@@ -153,6 +165,22 @@ export function createGuestCartCookie(
       secure: environment === "production",
       path: "/",
       maxAge: GUEST_CART_MAX_AGE_SECONDS,
+    },
+  };
+}
+
+export function createGuestCartCookieRemoval(
+  environment: string | undefined = process.env.NODE_ENV,
+): GuestCartCookieRemoval {
+  return {
+    name: GUEST_CART_COOKIE_NAME,
+    value: "",
+    options: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: environment === "production",
+      path: "/",
+      maxAge: 0,
     },
   };
 }

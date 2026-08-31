@@ -5,9 +5,9 @@
 - **Ledger:** Exact migration `20260829151610_customer_cart_merge.sql` was applied once as `20260830070209_customer_cart_merge` after transactional rollback validation passed.
 - **Concurrency:** Two simultaneous merges converged on one customer/cart/line/receipt; replay and cross-subject behavior passed. A late line write that lost conversion failed safely with SQLSTATE `23514`.
 - **Cleanup/postflight:** Exact fixtures were deleted and products, customers, carts, cart items, receipts and Auth sessions are zero. The one signed-out OTP-smoke Auth user was not changed. Browser roles remain denied, one hourly cleanup job is active, generated types include the RPC, and advisors added no warning/error.
-- **Local adapter:** The generated RPC now has a server-only Supabase adapter with strict one-row/result validation, generic failure mapping and exact argument forwarding. Privileged client construction requires all three runtime flags and no route/Auth module imports it.
-- **Runtime/delivery:** No Vercel env was edited and no deployment occurred. Customer Auth, guest cart and customer-cart merge remain false; there is still no live merge caller.
-- **Next gate:** `SLICE_B_CUSTOMER_CART_MERGE_RUNTIME_INTEGRATION_REVIEW_REQUIRED`; review the verified-login caller and guest-cookie lifecycle before any default-off connection. Runtime activation/smoke remains separately gated.
+- **Local integration:** The Auth route now invokes the generated-RPC adapter lazily only after OTP success, fresh `getUser()` identity confirmation and a guest cookie. A successful merge clears the cookie; any merge failure keeps the authenticated session and cookie for retry without changing the public Auth response.
+- **Runtime/delivery:** No Vercel env was edited and no deployment occurred. Customer Auth, guest cart and customer-cart merge remain false, so the connected source path is still inert in Production.
+- **Next gate:** `SLICE_B_DISABLED_PRODUCTION_DELIVERY_APPROVAL_REQUIRED`; push the coherent checked batch once to `master` and verify the disabled deployment. The enabled end-to-end smoke remains separately gated.
 
 ## 2026-08-28 Customer Auth Production smoke passed and rolled back
 

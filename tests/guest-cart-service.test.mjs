@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   createGuestCartCookie,
+  createGuestCartCookieRemoval,
   createGuestCartService,
   createGuestCartToken,
   GUEST_CART_MAX_AGE_SECONDS,
@@ -120,6 +121,17 @@ test("guest token has 256-bit entropy shape, deterministic hash and secure cooki
       secure: true,
       path: "/",
       maxAge: GUEST_CART_MAX_AGE_SECONDS,
+    },
+  });
+  assert.deepEqual(createGuestCartCookieRemoval("production"), {
+    name: "lf_guest_cart",
+    value: "",
+    options: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+      path: "/",
+      maxAge: 0,
     },
   });
 });

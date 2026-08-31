@@ -148,9 +148,11 @@ zero receipt/RPC access. On 2026-08-30 rollback validation, exact application as
 fixture cleanup all passed. Generated types include the bounded RPC; the
 server-only adapter now maps only that generated signature and fails closed on
 database, shape or configuration errors. Privileged client construction requires
-Customer Auth, guest cart and merge flags all to be exact `true`. No route or Auth
-consumer imports the adapter, so every merge caller and runtime activation remain
-separately gated.
+Customer Auth, guest cart and merge flags all to be exact `true`. The Auth route
+now invokes it lazily only after successful OTP verification, a fresh `getUser()`
+identity check and presence of a guest cookie. Only a completed merge clears that
+cookie; login remains valid and the cookie is preserved for every merge failure.
+All runtime activation remains separately gated.
 
 ## Row-Level Security
 

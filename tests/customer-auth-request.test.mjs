@@ -12,6 +12,7 @@ import {
 
 const ORIGIN = "https://luminalfactory.com";
 const RATE_SECRET = "0123456789abcdef0123456789abcdef";
+const AUTH_USER_ID = "11111111-1111-4111-8111-111111111111";
 
 function readyEnvironment() {
   return getCustomerAuthEnvironment({
@@ -74,7 +75,7 @@ function createService(overrides = {}) {
       },
       async verifyOtp(input) {
         calls.verifyOtp.push(input);
-        return true;
+        return { authUserId: AUTH_USER_ID, email: input.email };
       },
       async signOut() {
         calls.signOut += 1;
@@ -208,7 +209,7 @@ test("OTP verification accepts only six digits and maps provider failures generi
     assert.deepEqual(invalid, { status: 400, body: { ok: false, code: "invalid_request" } });
   }
 
-  const rejected = createService({ async verifyOtp() { return false; } });
+  const rejected = createService({ async verifyOtp() { return null; } });
   assert.deepEqual(await handleCustomerAuthRequest(createRequest({
     action: "verify_otp",
     email: "maker@example.com",
@@ -217,6 +218,76 @@ test("OTP verification accepts only six digits and maps provider failures generi
     status: 400,
     body: { ok: false, code: "invalid_or_expired_otp" },
   });
+});
+
+test("verified Auth merges an existing guest cookie and clears it only after database success", async () => {
+  const { service } = createService();
+  const mergeCalls = [];
+  const outcome = await handleCustomerAuthRequest(createRequest({
+    action: "verify_otp",
+    email: "Maker@Example.COM",
+    token: "123456",
+  }), dependencies({
+    service,
+    guestToken: "guest-cookie-token",
+    async mergeGuestCart(identity, guestToken) {
+      mergeCalls.push({ identity, guestToken });
+      return { ok: true, state: "merged", unavailableLineCount: 0, cappedLineCount: 0 };
+    },
+  }));
+
+  assert.deepEqual(outcome, {
+    status: 200,
+    body: { ok: true, state: "authenticated" },
+    clearGuestToken: true,
+    cartMergeState: "merged",
+  });
+  assert.deepEqual(mergeCalls, [{
+    identity: { authUserId: AUTH_USER_ID, email: "maker@example.com" },
+    guestToken: "guest-cookie-token",
+  }]);
+  assert.doesNotMatch(JSON.stringify(outcome.body), /guest|cart|maker@example|user/i);
+});
+
+test("merge failures preserve the valid Auth login and guest cookie for retry", async () => {
+  const { service } = createService();
+  const mergeFailures = [
+    async () => ({ ok: false, code: "identity_conflict" }),
+    async () => ({ ok: false, code: "runtime_disabled" }),
+    async () => { throw new Error("private merge detail"); },
+  ];
+
+  for (const mergeGuestCart of mergeFailures) {
+    const outcome = await handleCustomerAuthRequest(createRequest({
+      action: "verify_otp",
+      email: "maker@example.com",
+      token: "123456",
+    }), dependencies({ service, guestToken: "guest-cookie-token", mergeGuestCart }));
+    assert.deepEqual(outcome, {
+      status: 200,
+      body: { ok: true, state: "authenticated" },
+      cartMergeState: "merge_pending",
+    });
+    assert.equal(outcome.clearGuestToken, undefined);
+  }
+});
+
+test("verification without a guest cookie never invokes customer cart merge", async () => {
+  const { service } = createService();
+  let mergeCalled = false;
+  const outcome = await handleCustomerAuthRequest(createRequest({
+    action: "verify_otp",
+    email: "maker@example.com",
+    token: "123456",
+  }), dependencies({
+    service,
+    async mergeGuestCart() {
+      mergeCalled = true;
+      return { ok: true, state: "merged", unavailableLineCount: 0, cappedLineCount: 0 };
+    },
+  }));
+  assert.deepEqual(outcome, { status: 200, body: { ok: true, state: "authenticated" } });
+  assert.equal(mergeCalled, false);
 });
 
 test("sign out clears only the current Auth session without consuming an abuse bucket", async () => {
@@ -272,6 +343,10 @@ test("route and server adapter keep Auth dynamic, private and fresh-user verifie
   assert.match(adapter, /captchaToken/);
   assert.match(adapter, /shouldCreateUser: true/);
   assert.match(adapter, /auth\.getUser\(\)/);
+  assert.match(adapter, /authUserId: confirmed\.user\.id/);
+  assert.match(route, /getServerCustomerCartMergeService/);
+  assert.match(route, /GUEST_CART_COOKIE_NAME/);
+  assert.match(route, /createGuestCartCookieRemoval/);
   assert.match(adapter, /signOut\(\{ scope: "local" \}\)/);
   assert.match(proxy, /auth\.getClaims\(\)/);
   assert.match(proxy, /COMMERCE_CUSTOMER_AUTH_ENABLED/);

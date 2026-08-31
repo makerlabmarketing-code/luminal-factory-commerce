@@ -6,8 +6,13 @@ import {
   handleCustomerAuthRequest,
   type CustomerAuthHttpOutcome,
 } from "@/features/auth/customer-auth-request";
+import {
+  createGuestCartCookieRemoval,
+  GUEST_CART_COOKIE_NAME,
+} from "@/features/cart/guest-cart-service";
 import { createServerCustomerAuthService } from "@/lib/supabase/customer-auth-server";
 import { getServerCustomerAuthRateLimiter } from "@/lib/supabase/customer-auth-rate-limit-server";
+import { getServerCustomerCartMergeService } from "@/lib/supabase/customer-cart-merge-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,7 +25,12 @@ const responseHeaders = {
 } as const;
 
 function createResponse(outcome: CustomerAuthHttpOutcome): NextResponse {
-  return NextResponse.json(outcome.body, { status: outcome.status, headers: responseHeaders });
+  const response = NextResponse.json(outcome.body, { status: outcome.status, headers: responseHeaders });
+  if (outcome.clearGuestToken) {
+    const cookie = createGuestCartCookieRemoval();
+    response.cookies.set(cookie.name, cookie.value, cookie.options);
+  }
+  return response;
 }
 
 export async function POST(request: Request) {
@@ -35,5 +45,7 @@ export async function POST(request: Request) {
     service: createServerCustomerAuthService(cookieStore),
     rateLimiter: getServerCustomerAuthRateLimiter(),
     sourceIdentifier: getCustomerAuthSourceIdentifier(request.headers),
+    guestToken: cookieStore.get(GUEST_CART_COOKIE_NAME)?.value,
+    mergeGuestCart: (identity, guestToken) => getServerCustomerCartMergeService().merge(identity, guestToken),
   }));
 }

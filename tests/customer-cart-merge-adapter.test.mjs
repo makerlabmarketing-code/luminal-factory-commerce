@@ -88,12 +88,10 @@ test("customer cart merge adapter fails closed on errors and malformed results",
   }
 });
 
-test("privileged client construction is server-only, triple-gated and disconnected", () => {
+test("privileged client construction is server-only, triple-gated and scoped to the Auth route", () => {
   const server = readFileSync("src/lib/supabase/customer-cart-merge-server.ts", "utf8");
-  const routeSources = [
-    "src/app/api/account/auth/route.ts",
-    "src/lib/supabase/customer-auth-server.ts",
-  ].map((path) => readFileSync(path, "utf8")).join("\n");
+  const route = readFileSync("src/app/api/account/auth/route.ts", "utf8");
+  const authProvider = readFileSync("src/lib/supabase/customer-auth-server.ts", "utf8");
 
   assert.match(server, /import "server-only"/);
   assert.match(server, /COMMERCE_CUSTOMER_AUTH_ENABLED/);
@@ -101,5 +99,7 @@ test("privileged client construction is server-only, triple-gated and disconnect
   assert.match(server, /COMMERCE_CUSTOMER_CART_MERGE_ENABLED/);
   assert.match(server, /SUPABASE_SECRET_KEY/);
   assert.doesNotMatch(server, /NEXT_PUBLIC_SUPABASE_(?:SECRET|SERVICE)/);
-  assert.doesNotMatch(routeSources, /getServerCustomerCartMergeService|mergeGuestCart/);
+  assert.match(route, /getServerCustomerCartMergeService/);
+  assert.match(route, /mergeGuestCart/);
+  assert.doesNotMatch(authProvider, /getServerCustomerCartMergeService|mergeGuestCart/);
 });

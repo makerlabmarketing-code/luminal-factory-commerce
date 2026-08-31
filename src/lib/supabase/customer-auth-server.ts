@@ -39,10 +39,19 @@ export function createServerCustomerAuthService(cookieStore: AuthCookieStore): C
         token: input.token,
         type: "email",
       });
-      if (error || !data.user) return false;
+      if (error || !data.user) return null;
 
       const { data: confirmed, error: confirmationError } = await client.auth.getUser();
-      return confirmationError === null && confirmed.user?.id === data.user.id;
+      const confirmedEmail = confirmed.user?.email?.trim().toLowerCase();
+      if (
+        confirmationError ||
+        !confirmed.user ||
+        confirmed.user.id !== data.user.id ||
+        confirmedEmail !== input.email
+      ) {
+        return null;
+      }
+      return { authUserId: confirmed.user.id, email: confirmedEmail };
     },
     async signOut() {
       const { error } = await client.auth.signOut({ scope: "local" });

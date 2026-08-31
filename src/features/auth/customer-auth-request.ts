@@ -1,6 +1,7 @@
 import { createHmac } from "node:crypto";
 import { isIP } from "node:net";
 import { z } from "zod";
+import type { CustomerCartMergeResult } from "@/features/cart/customer-cart-merge";
 
 export const CUSTOMER_AUTH_REQUEST_HEADER = "x-luminal-auth-request";
 export const CUSTOMER_AUTH_REQUEST_HEADER_VALUE = "1";
@@ -20,9 +21,14 @@ const customerAuthRequestSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("sign_out") }).strict(),
 ]);
 
+export type VerifiedCustomerAuthIdentity = Readonly<{
+  authUserId: string;
+  email: string;
+}>;
+
 export interface CustomerAuthService {
   requestOtp(input: Readonly<{ email: string; captchaToken: string }>): Promise<boolean>;
-  verifyOtp(input: Readonly<{ email: string; token: string }>): Promise<boolean>;
+  verifyOtp(input: Readonly<{ email: string; token: string }>): Promise<VerifiedCustomerAuthIdentity | null>;
   signOut(): Promise<boolean>;
 }
 
@@ -45,6 +51,8 @@ export type CustomerAuthEnvironment =
 
 export type CustomerAuthHttpOutcome = Readonly<{
   status: number;
+  clearGuestToken?: true;
+  cartMergeState?: "merged" | "merge_pending";
   body:
     | Readonly<{ ok: true; state: "otp_sent" | "authenticated" | "signed_out" }>
     | Readonly<{
@@ -58,6 +66,11 @@ type CustomerAuthRequestDependencies = Readonly<{
   service?: CustomerAuthService;
   rateLimiter?: CustomerAuthRateLimiter;
   sourceIdentifier?: string;
+  guestToken?: string;
+  mergeGuestCart?: (
+    identity: VerifiedCustomerAuthIdentity,
+    guestToken: string,
+  ) => Promise<CustomerCartMergeResult>;
 }>;
 
 function normalizeAllowedOrigin(value: string): string | null {
@@ -236,10 +249,23 @@ export async function handleCustomerAuthRequest(
       "verify_source_15m",
     );
     if (verificationLimit) return verificationLimit;
-    const verified = await dependencies.service.verifyOtp({ email: body.email, token: body.token });
-    return verified
-      ? { status: 200, body: { ok: true, state: "authenticated" } }
-      : failure(400, "invalid_or_expired_otp");
+    const verifiedIdentity = await dependencies.service.verifyOtp({ email: body.email, token: body.token });
+    if (!verifiedIdentity) return failure(400, "invalid_or_expired_otp");
+
+    const authenticated = { status: 200, body: { ok: true, state: "authenticated" } } as const;
+    if (!dependencies.guestToken) return authenticated;
+    if (!dependencies.mergeGuestCart) {
+      return { ...authenticated, cartMergeState: "merge_pending" };
+    }
+
+    try {
+      const mergeResult = await dependencies.mergeGuestCart(verifiedIdentity, dependencies.guestToken);
+      return mergeResult.ok && mergeResult.state === "merged"
+        ? { ...authenticated, clearGuestToken: true, cartMergeState: "merged" }
+        : { ...authenticated, cartMergeState: "merge_pending" };
+    } catch {
+      return { ...authenticated, cartMergeState: "merge_pending" };
+    }
   } catch {
     return failure(503, "auth_unavailable");
   }

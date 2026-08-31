@@ -7,6 +7,7 @@ import {
 } from "@/features/cart/guest-cart-request";
 import {
   createGuestCartCookie,
+  createGuestCartCookieRemoval,
   GUEST_CART_COOKIE_NAME,
 } from "@/features/cart/guest-cart-service";
 import { getServerGuestCartService } from "@/lib/supabase/guest-cart-server";
@@ -32,13 +33,8 @@ function createResponse(outcome: GuestCartHttpOutcome): NextResponse {
     const cookie = createGuestCartCookie(outcome.guestTokenToSet);
     response.cookies.set(cookie.name, cookie.value, cookie.options);
   } else if (outcome.clearGuestToken) {
-    response.cookies.set(GUEST_CART_COOKIE_NAME, "", {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 0,
-    });
+    const cookie = createGuestCartCookieRemoval();
+    response.cookies.set(cookie.name, cookie.value, cookie.options);
   }
 
   return response;

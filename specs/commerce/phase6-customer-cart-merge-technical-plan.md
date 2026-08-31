@@ -188,8 +188,10 @@ concurrency tests and returned to zero fixture rows after exact cleanup.
 Production-generated types now contain the bounded RPC signature. A local
 server-only adapter maps exactly that signature, validates the single returned
 row and requires all three runtime flags before privileged client construction.
-There is still intentionally no RPC caller, Auth-route consumer or cookie
-mutation; all related runtime flags remain false.
+The Auth route now calls it lazily only after OTP success, fresh-user confirmation
+and presence of the guest cookie. It clears that cookie only after `merged`; every
+failure preserves the valid Auth session and cookie as internal `merge_pending`.
+All related runtime flags remain false and no live smoke has been authorized.
 
 ## Required tests before any Production approval
 
