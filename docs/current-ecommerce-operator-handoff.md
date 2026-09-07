@@ -174,8 +174,8 @@
 ## 2026-09-07 Homepage Wave 1 implementation
 
 - **Status:** `CODE_COMPLETE_WITH_ASSET_SYNC_LIMITATION`; owner-approved six-part Luminal Revival composition is implemented as a server-rendered Home feature with responsive CSS and reduced-motion behavior.
-- **Repository baseline:** clean `work` branch at `3e2b447`; this environment exposes no local/remote `master` and has no configured remote, so fetch/rebase/push/CI/PR/deployment verification cannot be performed.
+- **Repository baseline:** implementation began from clean `work` at `3e2b447`, matching `origin/master`; GitHub access was later available for the requested PR handoff.
 - **Assets:** approved local Luminal logo is used. The connected-resource inventory returned no Drive resources/templates and no product photography exists in the repository, so honest media frames remain pending rather than fabricating or hotlinking product media. See `specs/home/homepage-wave-1-technical-plan.md`.
 - **Boundaries:** no Auth, cart, merge, order, payment, inventory, raffle, Supabase schema/RLS, runtime flag, OTP, Production data, or gated feature behavior changed. No production master is published.
 - **Validation:** lint, typecheck, all 152 tests, static security gate, production dependency audit, and Next production build passed. Desktop and mobile screenshots were reviewed locally and then excluded from Git because PR creation rejects review-only binaries; final crop review remains gated on real media.
-- **Delivery:** no push or deployment was attempted, matching the requested single-delivery policy. Next action is approved Drive media sync, asset-only replacement, complete visual matrix, then one full gate and authorized delivery.
+- **Delivery:** branch `work` was pushed only to create PR #44 after validation and removal of review-only PNG binaries. It was not merged and no deployment was triggered. Next action is review, approved Drive media sync, asset-only replacement, and final visual validation.
