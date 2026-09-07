@@ -35,6 +35,25 @@ test("Wave 1 preserves product-media and commerce trust boundaries", () => {
   assert.match(plan, /No Auth, cart, merge, order, payment, inventory, raffle, Supabase schema, RLS, runtime flag/);
 });
 
+test("Homepage media pass uses real archive names and a non-requesting pending asset contract", () => {
+  const home = read("src/features/home/home-page.tsx");
+  const content = read("src/content/homepage.ts");
+  const media = read("src/content/homepage-media.ts");
+  assert.match(content, /Mono Meowhe/);
+  assert.match(content, /Meowhe/);
+  assert.match(content, /Mictlán/);
+  assert.match(content, /Historical Lazy Factory archive · 2023/);
+  assert.doesNotMatch(content, /Nocturne Study|Soft Signal|Afterglow|Quiet Form/);
+  for (const path of ["hero.webp", "featured.webp", "archive-meowhe.webp", "archive-mono-meowhe.webp", "archive-mictlan.webp"]) {
+    assert.match(media, new RegExp(`/images/home/${path}`));
+  }
+  assert.match(media, /availability: "pending"/);
+  assert.match(home, /media\.availability === "available"/);
+  assert.match(home, /<Image/);
+  assert.match(home, /sizes=/);
+  assert.match(home, /objectPosition/);
+});
+
 test("Wave 1 CSS carries responsive and reduced-motion safeguards", () => {
   const css = read("src/app/globals.css");
   assert.match(css, /@keyframes wave-object-reveal/);
