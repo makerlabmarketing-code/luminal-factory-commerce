@@ -8,26 +8,30 @@ const read = (path) => readFileSync(path, "utf8");
 const walk = (directory) => readdirSync(directory).flatMap((name) => { const path = join(directory, name); return statSync(path).isDirectory() ? walk(path) : [path]; });
 const src = () => walk("src").filter((path) => /\.(ts|tsx|css)$/.test(path)).map(read).join("\n");
 
-test("homepage has semantic raffle discovery hero and valid CTA anchor", () => {
+test("homepage has the semantic Wave 1 hero and Archive-first CTA", () => {
   const page = read("src/app/page.tsx");
+  const home = read("src/features/home/home-page.tsx");
   const content = read("src/content/homepage.ts");
-  assert.equal((page.match(/<main/g) ?? []).length, 1);
-  assert.match(page, /<section id="raffle"[^>]+aria-labelledby="hero-title"/);
-  assert.match(page, /<h1 id="hero-title"/);
-  assert.match(content, /Khám phá bản phát hành/);
-  assert.match(content, /href: "#release-information"/);
-  assert.match(page, /<section id="release-information"/);
+  assert.equal((home.match(/<main/g) ?? []).length, 1);
+  assert.match(page, /<HomePage \/>/);
+  assert.match(home, /<section className="revival-hero"[^>]+aria-labelledby="hero-title"/);
+  assert.match(home, /<h1 id="hero-title"/);
+  assert.match(content, /Explore the Archive/);
+  assert.match(content, /href: "\/archive"/);
 });
 
-test("home archive and shop previews follow raffle-first hierarchy", () => {
-  const page = read("src/app/page.tsx");
-  assert.ok(page.indexOf('<section id="release-information"') < page.indexOf("<ArchivePreviewSection"));
-  assert.ok(page.indexOf("<ArchivePreviewSection") < page.indexOf("<ShopPreviewSection"));
-  assert.ok(page.indexOf("<ShopPreviewSection") < page.indexOf('<section id="about"'));
-  assert.match(read("src/features/archive/archive-preview-section.tsx"), /href="\/archive"/);
-  assert.match(read("src/features/archive/archive-preview-section.tsx"), /Curated archive placeholder entries/);
-  assert.match(read("src/features/shop/shop-preview-section.tsx"), /href="\/shop"/);
-  assert.match(read("src/features/shop/shop-preview-section.tsx"), /Curated shop presentation entries/);
+test("home follows the owner-approved Wave 1 editorial hierarchy", () => {
+  const home = read("src/features/home/home-page.tsx");
+  const sections = ["revival-hero", "featured-object", "brand-revival", "selected-archive", "made-at-luminal", "commerce-split"];
+  let previous = -1;
+  for (const section of sections) {
+    const current = home.indexOf(section);
+    assert.ok(current > previous);
+    previous = current;
+  }
+  assert.match(home, /href="\/archive"/);
+  assert.match(home, /href="\/shop"/);
+  assert.match(home, /href="\/commission"/);
 });
 
 test("archive and shop routes keep one h1 while Shop advances to the Phase 5 catalog adapter", () => {

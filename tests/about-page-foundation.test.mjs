@@ -15,14 +15,13 @@ test("About route uses typed presentation content and one page h1", () => {
   assert.match(content, /Shaped by light\. Crafted to last\./);
 });
 
-test("About navigation is a real route and Home keeps a teaser link", () => {
+test("About navigation remains a real route while Wave 1 keeps its approved sequence", () => {
   const navigation = read("src/components/layout/navigation.ts");
-  const home = read("src/app/page.tsx");
+  const home = read("src/features/home/home-page.tsx");
 
   assert.match(navigation, /href: "\/about"/);
   assert.doesNotMatch(navigation, /href: "#about"/);
-  assert.match(home, /href="\/about"/);
-  assert.match(home, /Tìm hiểu về Luminal/);
+  assert.match(home, /featured-object[\s\S]*brand-revival[\s\S]*selected-archive[\s\S]*made-at-luminal[\s\S]*commerce-split/);
 });
 
 test("Footer uses the approved Luminal brand line and retires the legacy slogan", () => {
