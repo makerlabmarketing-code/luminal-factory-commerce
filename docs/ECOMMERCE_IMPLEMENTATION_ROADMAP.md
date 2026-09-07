@@ -183,6 +183,6 @@ Escalate only when a decision has material system-wide consequences, introduces 
 ### Homepage Wave 1 — Luminal Revival (`CODE_COMPLETE_WITH_ASSET_SYNC_LIMITATION`)
 
 - **Objective:** Implement the approved Hero, Featured Object, Revival, Selected Archive, Made at Luminal, Shop/Commission split, and minimal footer sequence.
-- **Completed:** Formal specification addendum, technical plan, task ledger, thin Home route, server-rendered feature composition, typed content, responsive gallery styling, motion budget, reduced-motion fallback, focused tests, and desktop/mobile captures.
+- **Completed:** Formal specification addendum, technical plan, task ledger, thin Home route, server-rendered feature composition, typed content, responsive gallery styling, motion budget, reduced-motion fallback, focused tests, and local desktop/mobile visual review; review-only PNG captures are intentionally excluded from Git.
 - **Blocked completion item:** This Codex session exposes no connected Google Drive resource or product image binary. Real product media replacement and crop/alt review are therefore pending; no unapproved image, hotlink, or production master was substituted.
 - **Non-goals preserved:** Auth, cart, merge, order, payment, inventory, raffle, Supabase schema/RLS, runtime flags, OTP, Production data, gated features, push, and deployment.
