@@ -170,3 +170,12 @@
 - **Asset classifications:** Future records must explicitly distinguish `lazyfactory-historical-archive`, `luminal-current-brand`, and `internal-placeholder` sources, and must keep `productionApproved` false until rights, brand, crop, alt text, optimization, and production usage review are complete.
 - **Future migration slice:** When assets arrive, run a separate approved slice for inventory, usage-rights and branding review, Home/Archive/Shop/Process/social metadata classification, production image/video selection, size/format optimization, video poster creation, alt-text completion, placeholder replacement, and performance/responsive crop validation.
 - **Still forbidden without approval:** External downloads, Google Drive URLs in source, Google Drive as production CDN, production-media claims, LazyFactory rebranding of current Luminal content, live data mutation, payments, orders, inventory, raffles, commissions, or ERP workflows.
+
+## 2026-09-07 Homepage Wave 1 implementation
+
+- **Status:** `CODE_COMPLETE_WITH_ASSET_SYNC_LIMITATION`; owner-approved six-part Luminal Revival composition is implemented as a server-rendered Home feature with responsive CSS and reduced-motion behavior.
+- **Repository baseline:** implementation began from clean `work` at `3e2b447`, matching `origin/master`; GitHub access was later available for the requested PR handoff.
+- **Assets:** approved local Luminal logo is used. The connected-resource inventory returned no Drive resources/templates and no product photography exists in the repository, so honest media frames remain pending rather than fabricating or hotlinking product media. See `specs/home/homepage-wave-1-technical-plan.md`.
+- **Boundaries:** no Auth, cart, merge, order, payment, inventory, raffle, Supabase schema/RLS, runtime flag, OTP, Production data, or gated feature behavior changed. No production master is published.
+- **Validation:** lint, typecheck, all 152 tests, static security gate, production dependency audit, and Next production build passed. Desktop and mobile screenshots were reviewed locally and then excluded from Git because PR creation rejects review-only binaries; final crop review remains gated on real media.
+- **Delivery:** branch `work` was pushed only to create PR #44 after validation and removal of review-only PNG binaries. It was not merged and no deployment was triggered. Next action is review, approved Drive media sync, asset-only replacement, and final visual validation.

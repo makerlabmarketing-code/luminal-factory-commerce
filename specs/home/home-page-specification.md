@@ -365,3 +365,29 @@ Data contract approval:
 10. Shop and Commission remain secondary and show “Sắp mở” when routes are unavailable.
 11. Should the header be sticky, non-sticky, or minimally sticky after scroll?
 12. Should unavailable secondary paths be hidden, disabled, or labeled forthcoming?
+
+
+## 4.22 Homepage Wave 1 Approval Addendum
+
+Status: `OWNER_APPROVED` / `IMPLEMENTATION_AUTHORIZED`
+Approval date recorded: 2026-09-07
+
+This addendum supersedes the first-slice placeholder composition where it conflicts, while preserving all raffle, commerce, data, security, and production-asset gates. Homepage Wave 1 is a brand/editorial implementation; it does not introduce an active raffle or transaction.
+
+### Approved sequence
+
+1. **Hero — Luminal Revival:** a restrained crystal-slice brand mark, one real approved product as the focus, primary `Explore the Archive` CTA, and secondary `Shop objects` CTA.
+2. **Featured Object:** large real product image, name, year/collection, editorial story, and light scroll depth only when it remains inside the motion budget.
+3. **Revival:** concise `Lazy Factory → Luminal Factory` transition with `Formerly Lazy Factory` context. Lazy Factory remains historical, never the global current brand.
+4. **Selected Archive:** three to six real approved products in an editorial grid.
+5. **Made at Luminal:** customer-facing `concept → sculpt → making → finish`; no ERP process or production-master exposure.
+6. **Shop / Commission:** two clear secondary discovery doors followed by the existing minimal footer.
+
+### Wave 1 acceptance
+
+- The route is thin and Server Components remain the default.
+- Visual language is a dark contemporary artisan gallery: object-led, restrained, physical, and editorial rather than generic ecommerce, SaaS, gaming RGB, or cyberpunk.
+- Motion remains one primary and at most two secondary motions per viewport; mobile and `prefers-reduced-motion` retain complete content and actions.
+- Only approved browser derivatives of real photography may ship. Google Drive is an ingest source, never a runtime CDN. STL, ZBrush files, sculpt masters, high-density meshes, and manufacturing assets are forbidden.
+- Auth, cart, customer cart merge, order, payment, inventory, raffle lifecycle/entry, Supabase schema, RLS, runtime flags, OTP, Production data, and gated feature state are unchanged.
+- If approved photography is unavailable in the execution environment, implementation must state the limitation and keep honest reserved media frames; it must not fabricate provenance or publish unapproved legacy/research media. Production-media completion remains blocked until those frames are replaced and visually reviewed.
