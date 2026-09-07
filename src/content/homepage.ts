@@ -8,6 +8,7 @@ export type PresentationCreation = Readonly<{
 }>;
 
 export type HomeArchiveObject = Readonly<{
+  mediaKey: "meowhe" | "monoMeowhe" | "mictlan";
   title: string;
   collection: string;
   year: string;
@@ -17,7 +18,7 @@ export type HomeArchiveObject = Readonly<{
 export const homePageContent = {
   hero: {
     eyebrow: "Luminal Revival · 2026",
-    title: "Objects, shaped by light.",
+    title: "Mono Meowhe, shaped by light.",
     description:
       "A new chapter for our small-batch artisan objects—formed slowly, finished by hand, and released with intention.",
     primaryAction: { label: "Explore the Archive", href: "/archive" },
@@ -25,16 +26,15 @@ export const homePageContent = {
   },
   featured: {
     index: "01 / Featured object",
-    title: "A study in character and light",
-    collection: "Luminal Collection · 2026",
+    title: "Mono Meowhe",
+    collection: "Historical Lazy Factory archive · 2023",
     story:
-      "Every Luminal object begins as a personality rather than a product. Gesture, silhouette, and surface are refined until the piece feels alive from every angle.",
+      "A monochrome Meowhe character from the studio's 2023 chapter—sculpted with a mischievous expression and preserved as part of the bridge from Lazy Factory to Luminal Factory.",
   },
   archive: [
-    { title: "Nocturne Study", collection: "Character archive", year: "2023", tone: "ice" },
-    { title: "Soft Signal", collection: "Material archive", year: "2024", tone: "lavender" },
-    { title: "Afterglow", collection: "Finish archive", year: "2025", tone: "rose" },
-    { title: "Quiet Form", collection: "Studio archive", year: "2025", tone: "smoke" },
+    { mediaKey: "meowhe", title: "Meowhe", collection: "Lazy Factory archive", year: "2023", tone: "lavender" },
+    { mediaKey: "monoMeowhe", title: "Mono Meowhe", collection: "Lazy Factory archive", year: "2023", tone: "ice" },
+    { mediaKey: "mictlan", title: "Mictlán", collection: "Lazy Factory archive", year: "2023", tone: "rose" },
   ] satisfies readonly HomeArchiveObject[],
   process: [
     { number: "01", title: "Concept", copy: "A personality, a gesture, and a story establish the object before its form." },

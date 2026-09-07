@@ -3,6 +3,38 @@ import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
+import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
+
+type HomeMediaFrameProps = Readonly<{
+  media: HomeMediaContract;
+  className: string;
+  imageClassName: string;
+  placeholderClassName: string;
+  priority?: boolean;
+}>;
+
+function HomeMediaFrame({ media, className, imageClassName, placeholderClassName, priority = false }: HomeMediaFrameProps) {
+  return (
+    <div className={className}>
+      {media.availability === "available" ? (
+        <Image
+          className={imageClassName}
+          src={media.src}
+          alt={media.alt}
+          fill
+          priority={priority}
+          sizes={media.sizes}
+          style={{ objectPosition: media.objectPosition }}
+        />
+      ) : (
+        <>
+          <span className={placeholderClassName} aria-hidden="true" />
+          <p className="home-media-pending">{media.alt}<br /><span>Approved product media pending sync</span></p>
+        </>
+      )}
+    </div>
+  );
+}
 
 export function HomePage() {
   const content = homePageContent;
@@ -30,20 +62,14 @@ export function HomePage() {
               <ButtonLink href={content.hero.secondaryAction.href} variant="secondary">{content.hero.secondaryAction.label}</ButtonLink>
             </div>
           </div>
-          <div className="hero-object-stage" aria-label="Featured Luminal object image awaiting approved Drive asset sync">
-            <span className="hero-object-silhouette" aria-hidden="true" />
-            <p>Featured object<br /><span>Approved product media pending sync</span></p>
-          </div>
+          <HomeMediaFrame media={homePageMedia.hero} className="hero-object-stage" imageClassName="home-product-image hero-product-image" placeholderClassName="hero-object-silhouette" priority />
           <p className="hero-scroll-note" aria-hidden="true">Scroll to enter the archive <span>↓</span></p>
         </Container>
       </section>
 
       <section className="featured-object" aria-labelledby="featured-title">
         <Container className="featured-object-grid">
-          <div className="featured-object-media" role="img" aria-label="Featured object media placeholder pending approved product photography">
-            <span className="featured-object-form" aria-hidden="true" />
-            <span className="asset-sync-note">Product photography pending Drive sync</span>
-          </div>
+          <HomeMediaFrame media={homePageMedia.featured} className="featured-object-media" imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" />
           <div className="featured-object-copy">
             <p className="eyebrow">{content.featured.index}</p>
             <h2 id="featured-title">{content.featured.title}</h2>
@@ -71,7 +97,19 @@ export function HomePage() {
           <div className="archive-editorial-grid">
             {content.archive.map((object, index) => (
               <Link href="/archive" className={`archive-object archive-object-${object.tone}`} key={object.title}>
-                <div className="archive-object-visual"><span aria-hidden="true" /><em>{String(index + 1).padStart(2, "0")}</em></div>
+                <div className="archive-object-visual">
+                  {homePageMedia.archive[object.mediaKey].availability === "available" ? (
+                    <Image
+                      className="home-product-image archive-product-image"
+                      src={homePageMedia.archive[object.mediaKey].src}
+                      alt={homePageMedia.archive[object.mediaKey].alt}
+                      fill
+                      sizes={homePageMedia.archive[object.mediaKey].sizes}
+                      style={{ objectPosition: homePageMedia.archive[object.mediaKey].objectPosition }}
+                    />
+                  ) : <span aria-hidden="true" />}
+                  <em>{String(index + 1).padStart(2, "0")}</em>
+                </div>
                 <div><h3>{object.title}</h3><p>{object.collection} · {object.year}</p></div>
               </Link>
             ))}
