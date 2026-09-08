@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
 import { HeroObjectStage } from "./hero-object-stage";
-import "./home-wave-2.css";
+import styles from "./home-wave-2.module.css";
 
 type HomeMediaFrameProps = Readonly<{
   media: HomeMediaContract;
@@ -69,8 +69,8 @@ export function HomePage() {
 
       <section className="featured-object" aria-labelledby="featured-title">
         <Container className="featured-object-grid">
-          <HomeMediaFrame media={homePageMedia.featured} className="featured-object-media" imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" />
-          <div className="featured-object-copy">
+          <HomeMediaFrame media={homePageMedia.featured} className={`featured-object-media ${styles.featuredMedia}`} imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" />
+          <div className={`featured-object-copy ${styles.featuredCopy}`}>
             <p className="eyebrow">{content.featured.index}</p>
             <h2 id="featured-title">{content.featured.title}</h2>
             <p className="object-provenance">{content.featured.collection}</p>
@@ -94,10 +94,10 @@ export function HomePage() {
             <div><p className="eyebrow">Selected archive</p><h2 id="archive-title">Objects with a past.</h2></div>
             <p>A small index of forms, characters, and finishes that shaped the studio.</p>
           </header>
-          <div className="archive-editorial-grid">
+          <div className={`archive-editorial-grid ${styles.archiveGrid}`}>
             {content.archive.map((object, index) => (
-              <Link href="/archive" className={`archive-object archive-object-${object.tone}`} key={object.title}>
-                <div className="archive-object-visual">
+              <Link href="/archive" className={`archive-object archive-object-${object.tone} ${styles.archiveCard}`} key={object.title}>
+                <div className={`archive-object-visual ${styles.archiveVisual}`}>
                   {homePageMedia.archive[object.mediaKey].availability === "available" ? (
                     <Image
                       className="home-product-image archive-product-image"
@@ -110,7 +110,7 @@ export function HomePage() {
                   ) : <span aria-hidden="true" />}
                   <em>{String(index + 1).padStart(2, "0")}</em>
                 </div>
-                <div className="archive-object-meta"><h3>{object.title}</h3><p>{object.collection} · {object.year}</p><span aria-hidden="true">↗</span></div>
+                <div className={styles.archiveMeta}><h3>{object.title}</h3><p>{object.collection} · {object.year}</p><span aria-hidden="true">↗</span></div>
               </Link>
             ))}
           </div>
@@ -125,14 +125,14 @@ export function HomePage() {
             <p>Four measured movements. Digital tools support the process; the final character still comes from the hand.</p>
           </header>
           <ol className="making-steps">
-            {content.process.map((step) => <li key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></li>)}
+            {content.process.map((step) => <li className={styles.processStep} key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></li>)}
           </ol>
         </Container>
       </section>
 
       <section className="commerce-split" aria-label="Shop and commission">
-        <Link href="/shop" className="commerce-door commerce-door-shop"><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
-        <Link href="/commission" className="commerce-door commerce-door-commission"><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
+        <Link href="/shop" className={`commerce-door commerce-door-shop ${styles.commerceDoor}`}><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
+        <Link href="/commission" className={`commerce-door commerce-door-commission ${styles.commerceDoor}`}><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
       </section>
     </main>
   );
