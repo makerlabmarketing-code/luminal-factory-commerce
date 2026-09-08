@@ -5,7 +5,6 @@ import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
 import { HeroObjectStage } from "./hero-object-stage";
-import styles from "./home-wave-2.module.css";
 
 type HomeMediaFrameProps = Readonly<{
   media: HomeMediaContract;
@@ -69,8 +68,8 @@ export function HomePage() {
 
       <section className="featured-object" aria-labelledby="featured-title">
         <Container className="featured-object-grid">
-          <HomeMediaFrame media={homePageMedia.featured} className={`featured-object-media ${styles.featuredMedia}`} imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" />
-          <div className={`featured-object-copy ${styles.featuredCopy}`}>
+          <HomeMediaFrame media={homePageMedia.featured} className="featured-object-media border border-white/10 shadow-[0_3rem_9rem_rgba(0,0,0,0.28)]" imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" />
+          <div className="featured-object-copy self-start lg:sticky lg:top-28">
             <p className="eyebrow">{content.featured.index}</p>
             <h2 id="featured-title">{content.featured.title}</h2>
             <p className="object-provenance">{content.featured.collection}</p>
@@ -94,10 +93,10 @@ export function HomePage() {
             <div><p className="eyebrow">Selected archive</p><h2 id="archive-title">Objects with a past.</h2></div>
             <p>A small index of forms, characters, and finishes that shaped the studio.</p>
           </header>
-          <div className={`archive-editorial-grid ${styles.archiveGrid}`}>
+          <div className="archive-editorial-grid">
             {content.archive.map((object, index) => (
-              <Link href="/archive" className={`archive-object archive-object-${object.tone} ${styles.archiveCard}`} key={object.title}>
-                <div className={`archive-object-visual ${styles.archiveVisual}`}>
+              <Link href="/archive" className={`archive-object archive-object-${object.tone} group relative outline-none`} key={object.title}>
+                <div className="archive-object-visual">
                   {homePageMedia.archive[object.mediaKey].availability === "available" ? (
                     <Image
                       className="home-product-image archive-product-image"
@@ -110,7 +109,11 @@ export function HomePage() {
                   ) : <span aria-hidden="true" />}
                   <em>{String(index + 1).padStart(2, "0")}</em>
                 </div>
-                <div className={styles.archiveMeta}><h3>{object.title}</h3><p>{object.collection} · {object.year}</p><span aria-hidden="true">↗</span></div>
+                <div className="grid grid-cols-[1fr_auto] items-end gap-x-4 gap-y-1 pt-4">
+                  <h3 className="col-start-1">{object.title}</h3>
+                  <p className="col-start-1">{object.collection} · {object.year}</p>
+                  <span className="col-start-2 row-start-1 row-span-2 self-center text-sm text-[var(--muted-foreground)] transition duration-200 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-[var(--ice)] motion-reduce:transition-none" aria-hidden="true">↗</span>
+                </div>
               </Link>
             ))}
           </div>
@@ -125,14 +128,14 @@ export function HomePage() {
             <p>Four measured movements. Digital tools support the process; the final character still comes from the hand.</p>
           </header>
           <ol className="making-steps">
-            {content.process.map((step) => <li className={styles.processStep} key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></li>)}
+            {content.process.map((step) => <li className="relative overflow-hidden transition-colors duration-300 hover:bg-white/[0.02] motion-reduce:transition-none" key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></li>)}
           </ol>
         </Container>
       </section>
 
       <section className="commerce-split" aria-label="Shop and commission">
-        <Link href="/shop" className={`commerce-door commerce-door-shop ${styles.commerceDoor}`}><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
-        <Link href="/commission" className={`commerce-door commerce-door-commission ${styles.commerceDoor}`}><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
+        <Link href="/shop" className="commerce-door commerce-door-shop overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none"><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
+        <Link href="/commission" className="commerce-door commerce-door-commission overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none"><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
       </section>
     </main>
   );
