@@ -30,14 +30,14 @@ export const homePageMedia: HomePageMediaConfig = {
     alt: "Mono Meowhe artisan keycap in black and white",
     sizes: "(max-width: 800px) calc(100vw - 2rem), (max-width: 1200px) 48vw, 640px",
     objectPosition: "50% 68%",
-    availability: "pending",
+    availability: "available",
   },
   featured: {
     src: "/images/home/featured.webp",
     alt: "Mono Meowhe artisan keycap from the 2023 Lazy Factory archive",
     sizes: "(max-width: 800px) calc(100vw - 2rem), (max-width: 1200px) 58vw, 820px",
     objectPosition: "50% 64%",
-    availability: "pending",
+    availability: "available",
   },
   archive: {
     meowhe: {
@@ -45,21 +45,21 @@ export const homePageMedia: HomePageMediaConfig = {
       alt: "Meowhe artisan keycap from the Lazy Factory archive",
       sizes: "(max-width: 500px) calc(100vw - 2rem), (max-width: 800px) 48vw, 30vw",
       objectPosition: "50% 48%",
-      availability: "pending",
+      availability: "available",
     },
     monoMeowhe: {
       src: "/images/home/archive-mono-meowhe.webp",
       alt: "Mono Meowhe artisan keycap in black and white",
       sizes: "(max-width: 500px) calc(100vw - 2rem), (max-width: 800px) 48vw, 30vw",
       objectPosition: "50% 64%",
-      availability: "pending",
+      availability: "available",
     },
     mictlan: {
       src: "/images/home/archive-mictlan.webp",
       alt: "Mictlán artisan keycap from the Lazy Factory archive",
       sizes: "(max-width: 500px) calc(100vw - 2rem), (max-width: 800px) 48vw, 30vw",
       objectPosition: "50% 50%",
-      availability: "pending",
+      availability: "available",
     },
   },
 };
