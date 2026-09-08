@@ -1,0 +1,1 @@
+Homepage product media assets for the Luminal Revival experience. Browser-safe WebP files are activated through src/content/homepage-media.ts.
