@@ -1,0 +1,170 @@
+.featuredMedia {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 3rem 9rem rgba(0, 0, 0, 0.28);
+}
+
+.featuredCopy {
+  align-self: start;
+}
+
+.archiveGrid {
+  perspective: 1200px;
+}
+
+.archiveCard {
+  position: relative;
+  outline: none;
+}
+
+.archiveVisual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 58%, rgba(0, 0, 0, 0.38));
+  opacity: 0.7;
+  transition: opacity 300ms ease;
+}
+
+.archiveMeta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 0.35rem 1rem;
+  padding-top: 0.9rem;
+}
+
+.archiveMeta h3,
+.archiveMeta p {
+  grid-column: 1;
+}
+
+.archiveMeta > span {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  transition: color var(--motion-fast), transform var(--motion-fast);
+}
+
+.archiveCard:hover .archiveVisual::after,
+.archiveCard:focus-visible .archiveVisual::after {
+  opacity: 0.28;
+}
+
+.archiveCard:hover .archiveMeta > span,
+.archiveCard:focus-visible .archiveMeta > span {
+  color: var(--ice);
+  transform: translate(0.2rem, -0.2rem);
+}
+
+.processStep {
+  position: relative;
+  overflow: hidden;
+  transition: background-color 260ms ease;
+}
+
+.processStep::before {
+  content: "";
+  position: absolute;
+  inset: auto 1.5rem 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(185, 233, 255, 0.48), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 420ms cubic-bezier(.2, .7, .2, 1);
+}
+
+.processStep:hover {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.processStep:hover::before {
+  transform: scaleX(1);
+}
+
+.commerceDoor {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.commerceDoor::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(34rem, 70vw);
+  aspect-ratio: 1;
+  top: -42%;
+  right: -16%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(185, 233, 255, 0.1), transparent 64%);
+  transform: scale(0.82);
+  transition: transform 700ms cubic-bezier(.2, .7, .2, 1), opacity 700ms ease;
+  opacity: 0.7;
+}
+
+.commerceDoor:hover::before,
+.commerceDoor:focus-visible::before {
+  transform: scale(1.08);
+  opacity: 1;
+}
+
+@media (min-width: 1000px) {
+  .featuredCopy {
+    position: sticky;
+    top: 7rem;
+  }
+
+  .archiveCard:nth-child(1) {
+    transform: translateY(1.5rem);
+  }
+
+  .archiveCard:nth-child(3) {
+    transform: translateY(3rem);
+  }
+}
+
+@media (max-width: 800px) {
+  .featuredMedia {
+    box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.24);
+  }
+
+  .archiveMeta {
+    padding-top: 0.75rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .archiveMeta > span {
+    font-size: 0.72rem;
+  }
+
+  .processStep::before {
+    inset-inline: 0;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .archiveCard:hover .archiveVisual::after {
+    opacity: 0.7;
+  }
+
+  .processStep:hover {
+    background: transparent;
+  }
+
+  .processStep:hover::before {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .archiveVisual::after,
+  .archiveMeta > span,
+  .processStep,
+  .processStep::before,
+  .commerceDoor::before {
+    transition: none;
+  }
+}
