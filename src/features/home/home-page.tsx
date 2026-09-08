@@ -4,16 +4,17 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
+import { HeroObjectStage } from "./hero-object-stage";
+import "./home-wave-2.css";
 
 type HomeMediaFrameProps = Readonly<{
   media: HomeMediaContract;
   className: string;
   imageClassName: string;
   placeholderClassName: string;
-  priority?: boolean;
 }>;
 
-function HomeMediaFrame({ media, className, imageClassName, placeholderClassName, priority = false }: HomeMediaFrameProps) {
+function HomeMediaFrame({ media, className, imageClassName, placeholderClassName }: HomeMediaFrameProps) {
   return (
     <div className={className}>
       {media.availability === "available" ? (
@@ -22,7 +23,6 @@ function HomeMediaFrame({ media, className, imageClassName, placeholderClassName
           src={media.src}
           alt={media.alt}
           fill
-          priority={priority}
           sizes={media.sizes}
           style={{ objectPosition: media.objectPosition }}
         />
@@ -62,7 +62,7 @@ export function HomePage() {
               <ButtonLink href={content.hero.secondaryAction.href} variant="secondary">{content.hero.secondaryAction.label}</ButtonLink>
             </div>
           </div>
-          <HomeMediaFrame media={homePageMedia.hero} className="hero-object-stage" imageClassName="home-product-image hero-product-image" placeholderClassName="hero-object-silhouette" priority />
+          <HeroObjectStage media={homePageMedia.hero} />
           <p className="hero-scroll-note" aria-hidden="true">Scroll to enter the archive <span>↓</span></p>
         </Container>
       </section>
@@ -110,7 +110,7 @@ export function HomePage() {
                   ) : <span aria-hidden="true" />}
                   <em>{String(index + 1).padStart(2, "0")}</em>
                 </div>
-                <div><h3>{object.title}</h3><p>{object.collection} · {object.year}</p></div>
+                <div className="archive-object-meta"><h3>{object.title}</h3><p>{object.collection} · {object.year}</p><span aria-hidden="true">↗</span></div>
               </Link>
             ))}
           </div>
