@@ -4,16 +4,16 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
+import { HeroObjectStage } from "./hero-object-stage";
 
 type HomeMediaFrameProps = Readonly<{
   media: HomeMediaContract;
   className: string;
   imageClassName: string;
   placeholderClassName: string;
-  priority?: boolean;
 }>;
 
-function HomeMediaFrame({ media, className, imageClassName, placeholderClassName, priority = false }: HomeMediaFrameProps) {
+function HomeMediaFrame({ media, className, imageClassName, placeholderClassName }: HomeMediaFrameProps) {
   return (
     <div className={className}>
       {media.availability === "available" ? (
@@ -22,7 +22,6 @@ function HomeMediaFrame({ media, className, imageClassName, placeholderClassName
           src={media.src}
           alt={media.alt}
           fill
-          priority={priority}
           sizes={media.sizes}
           style={{ objectPosition: media.objectPosition }}
         />
@@ -62,15 +61,15 @@ export function HomePage() {
               <ButtonLink href={content.hero.secondaryAction.href} variant="secondary">{content.hero.secondaryAction.label}</ButtonLink>
             </div>
           </div>
-          <HomeMediaFrame media={homePageMedia.hero} className="hero-object-stage" imageClassName="home-product-image hero-product-image" placeholderClassName="hero-object-silhouette" priority />
+          <HeroObjectStage media={homePageMedia.hero} />
           <p className="hero-scroll-note" aria-hidden="true">Scroll to enter the archive <span>↓</span></p>
         </Container>
       </section>
 
       <section className="featured-object" aria-labelledby="featured-title">
         <Container className="featured-object-grid">
-          <HomeMediaFrame media={homePageMedia.featured} className="featured-object-media" imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" />
-          <div className="featured-object-copy">
+          <HomeMediaFrame media={homePageMedia.featured} className="featured-object-media border border-white/10 shadow-[0_3rem_9rem_rgba(0,0,0,0.28)]" imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" />
+          <div className="featured-object-copy self-start lg:sticky lg:top-28">
             <p className="eyebrow">{content.featured.index}</p>
             <h2 id="featured-title">{content.featured.title}</h2>
             <p className="object-provenance">{content.featured.collection}</p>
@@ -96,7 +95,7 @@ export function HomePage() {
           </header>
           <div className="archive-editorial-grid">
             {content.archive.map((object, index) => (
-              <Link href="/archive" className={`archive-object archive-object-${object.tone}`} key={object.title}>
+              <Link href="/archive" className={`archive-object archive-object-${object.tone} group relative outline-none`} key={object.title}>
                 <div className="archive-object-visual">
                   {homePageMedia.archive[object.mediaKey].availability === "available" ? (
                     <Image
@@ -110,7 +109,11 @@ export function HomePage() {
                   ) : <span aria-hidden="true" />}
                   <em>{String(index + 1).padStart(2, "0")}</em>
                 </div>
-                <div><h3>{object.title}</h3><p>{object.collection} · {object.year}</p></div>
+                <div className="grid grid-cols-[1fr_auto] items-end gap-x-4 gap-y-1 pt-4">
+                  <h3 className="col-start-1">{object.title}</h3>
+                  <p className="col-start-1">{object.collection} · {object.year}</p>
+                  <span className="col-start-2 row-start-1 row-span-2 self-center text-sm text-[var(--muted-foreground)] transition duration-200 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-[var(--ice)] motion-reduce:transition-none" aria-hidden="true">↗</span>
+                </div>
               </Link>
             ))}
           </div>
@@ -118,21 +121,39 @@ export function HomePage() {
         </Container>
       </section>
 
-      <section className="made-at-luminal section" aria-labelledby="making-title">
+      <section className="made-at-luminal section overflow-visible" aria-labelledby="making-title">
         <Container>
-          <header className="editorial-heading">
+          <header className="editorial-heading md:sticky md:top-20 md:z-0 md:pb-8">
             <div><p className="eyebrow">Made at Luminal</p><h2 id="making-title">From thought<br />to artifact.</h2></div>
             <p>Four measured movements. Digital tools support the process; the final character still comes from the hand.</p>
           </header>
-          <ol className="making-steps">
-            {content.process.map((step) => <li key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></li>)}
+          <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh]">
+            {content.process.map((step, index) => (
+              <li
+                className="relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0d0d0e]/95 p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:sticky md:min-h-[60svh] md:p-10 motion-reduce:static"
+                style={{ top: `calc(6.5rem + ${index * 1.1}rem)`, zIndex: index + 1 }}
+                key={step.number}
+              >
+                <div className="grid h-full min-h-[inherit] content-between gap-12 md:grid-cols-[0.7fr_1.3fr] md:items-end">
+                  <div>
+                    <span className="font-mono text-xs tracking-[0.2em] text-white/45">{step.number} / 04</span>
+                    <h3 className="mt-5 max-w-[8ch] text-[clamp(2.6rem,7vw,7rem)] font-normal leading-[0.88] tracking-[-0.065em]">{step.title}</h3>
+                  </div>
+                  <div className="md:justify-self-end md:pb-4">
+                    <p className="max-w-[30rem] text-base leading-7 text-white/55 md:text-lg">{step.copy}</p>
+                    <div className="mt-8 h-px w-full bg-gradient-to-r from-[var(--ice)]/50 via-white/10 to-transparent" aria-hidden="true" />
+                  </div>
+                </div>
+                <span className="pointer-events-none absolute -right-4 -top-10 select-none text-[clamp(8rem,22vw,18rem)] font-semibold leading-none tracking-[-0.1em] text-white/[0.025]" aria-hidden="true">{step.number}</span>
+              </li>
+            ))}
           </ol>
         </Container>
       </section>
 
       <section className="commerce-split" aria-label="Shop and commission">
-        <Link href="/shop" className="commerce-door commerce-door-shop"><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
-        <Link href="/commission" className="commerce-door commerce-door-commission"><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
+        <Link href="/shop" className="commerce-door commerce-door-shop overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none"><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
+        <Link href="/commission" className="commerce-door commerce-door-commission overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none"><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
       </section>
     </main>
   );
