@@ -2,7 +2,7 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getCustomerAuthEnvironment } from "@/features/auth/customer-auth-request";
-import type { AddressDatabase, CustomerAddress, CustomerAddressInput } from "@/features/account/customer-address-contract";
+import type { AddressDatabase, CustomerAddress } from "@/features/account/customer-address-contract";
 import { customerAddressSchema } from "@/features/account/customer-address-contract";
 
 function createClient(cookieStore: Awaited<ReturnType<typeof cookies>>) {
@@ -33,7 +33,7 @@ export async function listCustomerAddresses(): Promise<CustomerAddress[]> {
   return data ?? [];
 }
 
-export async function saveCustomerAddress(input: CustomerAddressInput, id?: string): Promise<void> {
+export async function saveCustomerAddress(input: CustomerAddress, id?: string): Promise<void> {
   const context = await getAddressContext();
   if (!context?.customerId) throw new Error("Address service unavailable.");
   const address = customerAddressSchema.parse(input);
