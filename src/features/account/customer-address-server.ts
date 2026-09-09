@@ -4,6 +4,9 @@ import { cookies } from "next/headers";
 import { getCustomerAuthEnvironment } from "@/features/auth/customer-auth-request";
 import type { AddressDatabase, CustomerAddress } from "@/features/account/customer-address-contract";
 import { customerAddressSchema } from "@/features/account/customer-address-contract";
+import type { z } from "zod";
+
+type ValidatedAddressInput = z.output<typeof customerAddressSchema>;
 
 function createClient(cookieStore: Awaited<ReturnType<typeof cookies>>) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
@@ -33,7 +36,7 @@ export async function listCustomerAddresses(): Promise<CustomerAddress[]> {
   return data ?? [];
 }
 
-export async function saveCustomerAddress(input: CustomerAddress, id?: string): Promise<void> {
+export async function saveCustomerAddress(input: ValidatedAddressInput, id?: string): Promise<void> {
   const context = await getAddressContext();
   if (!context?.customerId) throw new Error("Address service unavailable.");
   const address = customerAddressSchema.parse(input);
