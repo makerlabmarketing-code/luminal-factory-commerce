@@ -10,7 +10,8 @@ const globalStyles = fs.readFileSync("src/app/globals.css", "utf8");
 test("homepage hero uses a replaceable presentation contract with the current optimized GLB default", () => {
   assert.match(heroConfig, /modelSrc: "\/models\/meowhe-hero\.glb"/);
   assert.match(heroConfig, /tint: null/);
-  assert.match(homePageSource, /presentation=\{defaultHeroModelPresentation\}/);
+  assert.match(homePageSource, /await getHeroModelPresentation\(\)/);
+  assert.match(homePageSource, /presentation=\{heroPresentation\}/);
   assert.match(heroSource, /presentation\.modelSrc/);
   assert.equal(fs.existsSync("public/models/meowhe-hero.glb"), true);
   assert.equal(fs.existsSync("public/meowhe-hero.glb"), false);
