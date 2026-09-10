@@ -52,17 +52,17 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
   const radiusRef = useRef(presentation.camera.radiusPercent);
   const introFrameRef = useRef<number | null>(null);
 
-  const applyCamera = () => {
-    viewerRef.current?.setAttribute(
-      "camera-orbit",
-      `${presentation.camera.thetaDeg}deg ${presentation.camera.phiDeg}deg ${radiusRef.current}%`,
-    );
-  };
-
   useEffect(() => {
     const stage = stageRef.current;
     const mount = modelMountRef.current;
     if (!stage || !mount || media.availability !== "available") return;
+
+    const applyCamera = () => {
+      viewerRef.current?.setAttribute(
+        "camera-orbit",
+        `${presentation.camera.thetaDeg}deg ${presentation.camera.phiDeg}deg ${radiusRef.current}%`,
+      );
+    };
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let cancelled = false;
