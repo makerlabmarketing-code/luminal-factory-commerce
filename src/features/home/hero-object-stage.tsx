@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import type { PointerEvent } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
+import styles from "./hero-object-stage.module.css";
 
 type HeroObjectStageProps = Readonly<{
   media: HomeMediaContract;
@@ -77,7 +78,7 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
         if (cancelled || viewerRef.current) return;
 
         const viewer = document.createElement("model-viewer");
-        viewer.className = "hero-model-viewer";
+        viewer.className = styles.modelViewer;
         viewer.setAttribute("src", HERO_MODEL_SRC);
         viewer.setAttribute("alt", "");
         viewer.setAttribute("aria-hidden", "true");
@@ -93,7 +94,7 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
         viewer.setAttribute("camera-orbit", `${DEFAULT_THETA}deg ${DEFAULT_PHI}deg ${radiusRef.current}%`);
 
         viewer.addEventListener("load", () => {
-          stage.classList.add("is-model-loaded");
+          stage.classList.add(styles.modelLoaded);
           const startedAt = performance.now();
           const duration = 1450;
 
@@ -110,13 +111,13 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
         }, { once: true });
 
         viewer.addEventListener("error", () => {
-          stage.classList.add("is-model-error");
+          stage.classList.add(styles.modelError);
         }, { once: true });
 
         mount.replaceChildren(viewer);
         viewerRef.current = viewer;
       } catch {
-        stage.classList.add("is-model-error");
+        stage.classList.add(styles.modelError);
       }
     };
 
@@ -154,7 +155,7 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
   return (
     <div
       ref={stageRef}
-      className="hero-object-stage group"
+      className={`hero-object-stage group ${styles.stage}`}
       data-hero-renderer="model-viewer"
       onPointerMove={moveCamera}
       onPointerLeave={settleCamera}
@@ -162,7 +163,7 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
       {media.availability === "available" ? (
         <>
           <Image
-            className="home-product-image hero-product-image hero-product-fallback"
+            className={`home-product-image hero-product-image ${styles.fallback}`}
             src={media.src}
             alt={media.alt}
             fill
@@ -170,8 +171,8 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
             sizes={media.sizes}
             style={{ objectPosition: media.objectPosition }}
           />
-          <div ref={modelMountRef} className="hero-model-mount" aria-hidden="true" />
-          <span className="hero-model-note" aria-hidden="true">Move to shift perspective</span>
+          <div ref={modelMountRef} className={styles.modelMount} aria-hidden="true" />
+          <span className={styles.modelNote} aria-hidden="true">Move to shift perspective</span>
         </>
       ) : (
         <>
@@ -182,7 +183,7 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
           </p>
         </>
       )}
-      <div className="hero-object-vignette" aria-hidden="true" />
+      <div className={`hero-object-vignette ${styles.vignette}`} aria-hidden="true" />
     </div>
   );
 }
