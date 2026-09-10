@@ -18,8 +18,13 @@ test("homepage hero preserves an image fallback and reduced-motion strategy", ()
   assert.equal(fs.existsSync("src/features/home/hero-object-stage.module.css"), false);
 });
 
-test("homepage hero uses a bounded depth interaction instead of the old magnifying lens", () => {
-  assert.match(heroSource, /camera-orbit/);
+test("homepage hero supports direct 360 rotation and bounded zoom", () => {
+  assert.match(heroSource, /camera-controls/);
+  assert.match(heroSource, /disable-pan/);
+  assert.match(heroSource, /min-camera-orbit/);
+  assert.match(heroSource, /max-camera-orbit/);
+  assert.match(heroSource, /pointerEvents = "auto"/);
+  assert.match(heroSource, /Drag to rotate · Scroll to zoom/);
   assert.match(heroSource, /requestAnimationFrame\(zoomIn\)/);
-  assert.doesNotMatch(heroSource, /LENS_SIZE|moveLens|backgroundSize: "240% auto"/);
+  assert.doesNotMatch(heroSource, /onPointerMove|moveCamera|settleCamera|LENS_SIZE|moveLens|backgroundSize: "240% auto"/);
 });
