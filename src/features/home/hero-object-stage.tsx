@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import type { PointerEvent } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
-import styles from "./hero-object-stage.module.css";
 
 type HeroObjectStageProps = Readonly<{
   media: HomeMediaContract;
@@ -51,6 +50,8 @@ function clamp(value: number, min: number, max: number) {
 export function HeroObjectStage({ media }: HeroObjectStageProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
+  const fallbackRef = useRef<HTMLImageElement>(null);
+  const noteRef = useRef<HTMLSpanElement>(null);
   const viewerRef = useRef<HTMLElement | null>(null);
   const radiusRef = useRef(DEFAULT_RADIUS);
   const introFrameRef = useRef<number | null>(null);
@@ -78,7 +79,11 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
         if (cancelled || viewerRef.current) return;
 
         const viewer = document.createElement("model-viewer");
-        viewer.className = styles.modelViewer;
+        viewer.style.display = "block";
+        viewer.style.width = "100%";
+        viewer.style.height = "100%";
+        viewer.style.background = "transparent";
+        viewer.style.pointerEvents = "none";
         viewer.setAttribute("src", HERO_MODEL_SRC);
         viewer.setAttribute("alt", "");
         viewer.setAttribute("aria-hidden", "true");
@@ -94,10 +99,15 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
         viewer.setAttribute("camera-orbit", `${DEFAULT_THETA}deg ${DEFAULT_PHI}deg ${radiusRef.current}%`);
 
         viewer.addEventListener("load", () => {
-          stage.classList.add(styles.modelLoaded);
+          mount.style.opacity = "1";
+          if (fallbackRef.current) {
+            fallbackRef.current.style.opacity = "0";
+            fallbackRef.current.style.transform = "scale(1.035)";
+          }
+          if (noteRef.current) noteRef.current.style.opacity = "1";
+
           const startedAt = performance.now();
           const duration = 1450;
-
           const zoomIn = (now: number) => {
             if (cancelled) return;
             const progress = clamp((now - startedAt) / duration, 0, 1);
@@ -111,13 +121,13 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
         }, { once: true });
 
         viewer.addEventListener("error", () => {
-          stage.classList.add(styles.modelError);
+          mount.style.display = "none";
         }, { once: true });
 
         mount.replaceChildren(viewer);
         viewerRef.current = viewer;
       } catch {
-        stage.classList.add(styles.modelError);
+        mount.style.display = "none";
       }
     };
 
@@ -155,7 +165,7 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
   return (
     <div
       ref={stageRef}
-      className={`hero-object-stage group ${styles.stage}`}
+      className="hero-object-stage group overflow-hidden [touch-action:pan-y]"
       data-hero-renderer="model-viewer"
       onPointerMove={moveCamera}
       onPointerLeave={settleCamera}
@@ -163,7 +173,8 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
       {media.availability === "available" ? (
         <>
           <Image
-            className={`home-product-image hero-product-image ${styles.fallback}`}
+            ref={fallbackRef}
+            className="home-product-image hero-product-image transition-[opacity,transform] duration-[420ms,900ms] ease-out motion-reduce:transition-none"
             src={media.src}
             alt={media.alt}
             fill
@@ -171,19 +182,16 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
             sizes={media.sizes}
             style={{ objectPosition: media.objectPosition }}
           />
-          <div ref={modelMountRef} className={styles.modelMount} aria-hidden="true" />
-          <span className={styles.modelNote} aria-hidden="true">Move to shift perspective</span>
+          <div ref={modelMountRef} className="absolute inset-0 z-[2] opacity-0 transition-opacity duration-[420ms] motion-reduce:hidden" aria-hidden="true" />
+          <span ref={noteRef} className="absolute bottom-4 right-4 z-[4] hidden rounded-full border border-white/10 bg-black/50 px-3 py-2 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-white/50 opacity-0 backdrop-blur-sm transition-opacity duration-300 md:block motion-reduce:hidden" aria-hidden="true">Move to shift perspective</span>
         </>
       ) : (
         <>
           <span className="hero-object-silhouette" aria-hidden="true" />
-          <p className="home-media-pending">
-            {media.alt}<br />
-            <span>Approved product media pending sync</span>
-          </p>
+          <p className="home-media-pending">{media.alt}<br /><span>Approved product media pending sync</span></p>
         </>
       )}
-      <div className={`hero-object-vignette ${styles.vignette}`} aria-hidden="true" />
+      <div className="hero-object-vignette pointer-events-none z-[3]" aria-hidden="true" />
     </div>
   );
 }
