@@ -4,8 +4,8 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
+import { getHeroModelPresentation } from "./hero-model-data";
 import { HeroObjectStage } from "./hero-object-stage";
-import { defaultHeroModelPresentation } from "./hero-model-config";
 
 type HomeMediaFrameProps = Readonly<{
   media: HomeMediaContract;
@@ -29,8 +29,9 @@ function HomeMediaFrame({ media, className, imageClassName, placeholderClassName
   );
 }
 
-export function HomePage() {
+export async function HomePage() {
   const content = homePageContent;
+  const heroPresentation = await getHeroModelPresentation();
 
   return (
     <main id="main-content" className="wave-home">
@@ -47,7 +48,7 @@ export function HomePage() {
               <ButtonLink href={content.hero.secondaryAction.href} variant="secondary">{content.hero.secondaryAction.label}</ButtonLink>
             </div>
           </div>
-          <HeroObjectStage media={homePageMedia.hero} presentation={defaultHeroModelPresentation} />
+          <HeroObjectStage media={homePageMedia.hero} presentation={heroPresentation} />
           <p className="hero-scroll-note" aria-hidden="true">Scroll to enter the archive <span>↓</span></p>
         </Container>
       </section>
