@@ -2,24 +2,21 @@
 
 import { useEffect, useRef } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
+import type { HeroModelPresentation } from "./hero-model-config";
 
 type HeroObjectStageProps = Readonly<{
   media: HomeMediaContract;
+  presentation: HeroModelPresentation;
 }>;
 
-const HERO_MODEL_SRC = "/models/meowhe-hero.glb";
 const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
-const DEFAULT_THETA = 0;
-const DEFAULT_PHI = 76;
-const DEFAULT_RADIUS = 104;
 
 function ensureModelViewer() {
   if (window.customElements.get("model-viewer")) return Promise.resolve();
 
   return new Promise<void>((resolve, reject) => {
     const existingScript = document.getElementById(MODEL_VIEWER_SCRIPT_ID);
-
     const resolveWhenReady = () => {
       window.customElements.whenDefined("model-viewer").then(() => resolve()).catch(reject);
     };
@@ -45,24 +42,27 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
-export function HeroObjectStage({ media }: HeroObjectStageProps) {
+export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
   const noteRef = useRef<HTMLSpanElement>(null);
   const viewerRef = useRef<HTMLElement | null>(null);
-  const radiusRef = useRef(DEFAULT_RADIUS);
+  const radiusRef = useRef(presentation.camera.radiusPercent);
   const introFrameRef = useRef<number | null>(null);
-
-  const applyCamera = () => {
-    viewerRef.current?.setAttribute("camera-orbit", `${DEFAULT_THETA}deg ${DEFAULT_PHI}deg ${radiusRef.current}%`);
-  };
 
   useEffect(() => {
     const stage = stageRef.current;
     const mount = modelMountRef.current;
     if (!stage || !mount || media.availability !== "available") return;
+
+    const applyCamera = () => {
+      viewerRef.current?.setAttribute(
+        "camera-orbit",
+        `${presentation.camera.thetaDeg}deg ${presentation.camera.phiDeg}deg ${radiusRef.current}%`,
+      );
+    };
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let cancelled = false;
@@ -85,30 +85,31 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
         viewer.style.height = "100%";
         viewer.style.background = "transparent";
         viewer.style.pointerEvents = "auto";
-        viewer.setAttribute("src", HERO_MODEL_SRC);
+        viewer.setAttribute("src", presentation.modelSrc);
         viewer.setAttribute("alt", media.alt);
         viewer.setAttribute("loading", "eager");
         viewer.setAttribute("camera-controls", "");
         viewer.setAttribute("disable-pan", "");
         viewer.setAttribute("interaction-prompt", "none");
         viewer.setAttribute("environment-image", "neutral");
-        viewer.setAttribute("shadow-intensity", "1");
-        viewer.setAttribute("shadow-softness", "0.72");
-        viewer.setAttribute("exposure", "1.08");
-        viewer.setAttribute("field-of-view", "29deg");
-        viewer.setAttribute("min-camera-orbit", "auto auto 78%");
-        viewer.setAttribute("max-camera-orbit", "auto auto 155%");
-        viewer.setAttribute("min-field-of-view", "22deg");
-        viewer.setAttribute("max-field-of-view", "42deg");
+        viewer.setAttribute("shadow-intensity", String(presentation.shadowIntensity));
+        viewer.setAttribute("shadow-softness", String(presentation.shadowSoftness));
+        viewer.setAttribute("exposure", String(presentation.exposure));
+        viewer.setAttribute("field-of-view", `${presentation.camera.fieldOfViewDeg}deg`);
+        viewer.setAttribute("min-camera-orbit", `auto auto ${presentation.camera.minRadiusPercent}%`);
+        viewer.setAttribute("max-camera-orbit", `auto auto ${presentation.camera.maxRadiusPercent}%`);
+        viewer.setAttribute("min-field-of-view", `${presentation.camera.minFieldOfViewDeg}deg`);
+        viewer.setAttribute("max-field-of-view", `${presentation.camera.maxFieldOfViewDeg}deg`);
         viewer.setAttribute("camera-target", "auto auto auto");
-        if (!reducedMotion) {
+
+        if (!reducedMotion && presentation.autoRotate) {
           viewer.setAttribute("auto-rotate", "");
-          viewer.setAttribute("auto-rotate-delay", "3200");
-          viewer.setAttribute("rotation-per-second", "5deg");
+          viewer.setAttribute("auto-rotate-delay", String(presentation.autoRotateDelayMs));
+          viewer.setAttribute("rotation-per-second", `${presentation.rotationPerSecondDeg}deg`);
         }
 
-        radiusRef.current = reducedMotion ? DEFAULT_RADIUS : 122;
-        viewer.setAttribute("camera-orbit", `${DEFAULT_THETA}deg ${DEFAULT_PHI}deg ${radiusRef.current}%`);
+        radiusRef.current = reducedMotion ? presentation.camera.radiusPercent : presentation.camera.introRadiusPercent;
+        applyCamera();
 
         viewer.addEventListener("load", () => {
           if (loaderRef.current) {
@@ -121,7 +122,7 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
           if (noteRef.current) noteRef.current.style.opacity = "1";
 
           if (reducedMotion) {
-            radiusRef.current = DEFAULT_RADIUS;
+            radiusRef.current = presentation.camera.radiusPercent;
             applyCamera();
             return;
           }
@@ -132,7 +133,7 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
             if (cancelled) return;
             const progress = clamp((now - startedAt) / duration, 0, 1);
             const eased = 1 - Math.pow(1 - progress, 3);
-            radiusRef.current = 122 + (DEFAULT_RADIUS - 122) * eased;
+            radiusRef.current = presentation.camera.introRadiusPercent + (presentation.camera.radiusPercent - presentation.camera.introRadiusPercent) * eased;
             applyCamera();
             if (progress < 1) introFrameRef.current = window.requestAnimationFrame(zoomIn);
           };
@@ -163,17 +164,13 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
       viewerRef.current = null;
       mount.replaceChildren();
     };
-  }, [media.alt, media.availability]);
+  }, [media.alt, media.availability, presentation]);
 
   return (
-    <div ref={stageRef} className="hero-object-stage group overflow-hidden" data-hero-renderer="model-viewer">
+    <div ref={stageRef} className="hero-object-stage group overflow-hidden" data-hero-renderer="model-viewer" data-hero-tint={presentation.tint ?? "default"}>
       {media.availability === "available" ? (
         <>
-          <div
-            className="pointer-events-none absolute inset-[8%] z-[1] rounded-full opacity-45 blur-3xl motion-safe:animate-pulse"
-            style={{ background: "radial-gradient(circle, rgba(214,229,255,0.28) 0%, rgba(120,166,220,0.10) 38%, rgba(0,0,0,0) 72%)" }}
-            aria-hidden="true"
-          />
+          <div className="pointer-events-none absolute inset-[8%] z-[1] rounded-full opacity-45 blur-3xl motion-safe:animate-pulse" style={{ background: "radial-gradient(circle, rgba(214,229,255,0.28) 0%, rgba(120,166,220,0.10) 38%, rgba(0,0,0,0) 72%)" }} aria-hidden="true" />
           <div ref={loaderRef} className="absolute inset-0 z-[5] flex items-center justify-center transition-opacity duration-300" role="status" aria-live="polite">
             <div className="flex flex-col items-center gap-4">
               <div className="relative size-14" aria-hidden="true">
