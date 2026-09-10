@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
-import type { PointerEvent } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
 
 type HeroObjectStageProps = Readonly<{
@@ -55,10 +54,9 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
   const viewerRef = useRef<HTMLElement | null>(null);
   const radiusRef = useRef(DEFAULT_RADIUS);
   const introFrameRef = useRef<number | null>(null);
-  const reducedMotionRef = useRef(false);
 
-  const applyCamera = (theta = DEFAULT_THETA, phi = DEFAULT_PHI) => {
-    viewerRef.current?.setAttribute("camera-orbit", `${theta}deg ${phi}deg ${radiusRef.current}%`);
+  const applyCamera = () => {
+    viewerRef.current?.setAttribute("camera-orbit", `${DEFAULT_THETA}deg ${DEFAULT_PHI}deg ${radiusRef.current}%`);
   };
 
   useEffect(() => {
@@ -67,7 +65,6 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
     if (!stage || !mount || media.availability !== "available") return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    reducedMotionRef.current = reducedMotion;
     if (reducedMotion) return;
 
     let cancelled = false;
@@ -83,17 +80,23 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
         viewer.style.width = "100%";
         viewer.style.height = "100%";
         viewer.style.background = "transparent";
-        viewer.style.pointerEvents = "none";
+        viewer.style.pointerEvents = "auto";
         viewer.setAttribute("src", HERO_MODEL_SRC);
         viewer.setAttribute("alt", "");
         viewer.setAttribute("aria-hidden", "true");
         viewer.setAttribute("loading", "eager");
+        viewer.setAttribute("camera-controls", "");
+        viewer.setAttribute("disable-pan", "");
         viewer.setAttribute("interaction-prompt", "none");
         viewer.setAttribute("environment-image", "neutral");
         viewer.setAttribute("shadow-intensity", "0.75");
         viewer.setAttribute("shadow-softness", "0.85");
         viewer.setAttribute("exposure", "0.92");
         viewer.setAttribute("field-of-view", "29deg");
+        viewer.setAttribute("min-camera-orbit", "auto auto 78%");
+        viewer.setAttribute("max-camera-orbit", "auto auto 155%");
+        viewer.setAttribute("min-field-of-view", "22deg");
+        viewer.setAttribute("max-field-of-view", "42deg");
         viewer.setAttribute("camera-target", "auto auto auto");
         radiusRef.current = 122;
         viewer.setAttribute("camera-orbit", `${DEFAULT_THETA}deg ${DEFAULT_PHI}deg ${radiusRef.current}%`);
@@ -148,28 +151,8 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
     };
   }, [media.availability]);
 
-  const moveCamera = (event: PointerEvent<HTMLDivElement>) => {
-    if (!viewerRef.current || reducedMotionRef.current || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const normalizedX = clamp((event.clientX - bounds.left) / Math.max(bounds.width, 1), 0, 1) - 0.5;
-    const normalizedY = clamp((event.clientY - bounds.top) / Math.max(bounds.height, 1), 0, 1) - 0.5;
-    applyCamera(normalizedX * 9, DEFAULT_PHI + normalizedY * 5);
-  };
-
-  const settleCamera = () => {
-    if (!viewerRef.current || reducedMotionRef.current) return;
-    applyCamera();
-  };
-
   return (
-    <div
-      ref={stageRef}
-      className="hero-object-stage group overflow-hidden [touch-action:pan-y]"
-      data-hero-renderer="model-viewer"
-      onPointerMove={moveCamera}
-      onPointerLeave={settleCamera}
-    >
+    <div ref={stageRef} className="hero-object-stage group overflow-hidden" data-hero-renderer="model-viewer">
       {media.availability === "available" ? (
         <>
           <Image
@@ -183,7 +166,7 @@ export function HeroObjectStage({ media }: HeroObjectStageProps) {
             style={{ objectPosition: media.objectPosition }}
           />
           <div ref={modelMountRef} className="absolute inset-0 z-[2] opacity-0 transition-opacity duration-[420ms] motion-reduce:hidden" aria-hidden="true" />
-          <span ref={noteRef} className="absolute bottom-4 right-4 z-[4] hidden rounded-full border border-white/10 bg-black/50 px-3 py-2 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-white/50 opacity-0 backdrop-blur-sm transition-opacity duration-300 md:block motion-reduce:hidden" aria-hidden="true">Move to shift perspective</span>
+          <span ref={noteRef} className="pointer-events-none absolute bottom-4 right-4 z-[4] hidden rounded-full border border-white/10 bg-black/50 px-3 py-2 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-white/50 opacity-0 backdrop-blur-sm transition-opacity duration-300 md:block motion-reduce:hidden" aria-hidden="true">Drag to rotate · Scroll to zoom</span>
         </>
       ) : (
         <>
