@@ -11,19 +11,23 @@ test("homepage hero uses the optimized GLB distribution asset", () => {
   assert.equal(fs.existsSync("public/meowhe-hero.glb"), false);
 });
 
-test("homepage hero preserves an image fallback and reduced-motion strategy", () => {
-  assert.match(heroSource, /prefers-reduced-motion: reduce/);
-  assert.match(heroSource, /hero-product-image/);
+test("homepage hero shows a dedicated loader instead of the old image fallback", () => {
+  assert.match(heroSource, /Loading 3D object/);
+  assert.match(heroSource, /loaderRef/);
+  assert.match(heroSource, /3D preview unavailable/);
+  assert.doesNotMatch(heroSource, /next\/image|hero-product-image|fallbackRef/);
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.equal(fs.existsSync("src/features/home/hero-object-stage.module.css"), false);
 });
 
-test("homepage hero supports direct 360 rotation and bounded zoom", () => {
+test("homepage hero supports direct 360 rotation, bounded zoom and restrained idle motion", () => {
   assert.match(heroSource, /camera-controls/);
   assert.match(heroSource, /disable-pan/);
   assert.match(heroSource, /min-camera-orbit/);
   assert.match(heroSource, /max-camera-orbit/);
   assert.match(heroSource, /pointerEvents = "auto"/);
+  assert.match(heroSource, /auto-rotate/);
+  assert.match(heroSource, /rotation-per-second/);
   assert.match(heroSource, /Drag to rotate · Scroll to zoom/);
   assert.match(heroSource, /requestAnimationFrame\(zoomIn\)/);
   assert.doesNotMatch(heroSource, /onPointerMove|moveCamera|settleCamera|LENS_SIZE|moveLens|backgroundSize: "240% auto"/);
