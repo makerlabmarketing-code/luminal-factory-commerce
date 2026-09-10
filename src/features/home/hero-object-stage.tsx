@@ -24,7 +24,7 @@ function ensureModelViewer() {
     const existingScript = document.getElementById(MODEL_VIEWER_SCRIPT_ID);
 
     const resolveWhenReady = () => {
-      window.customElements.whenDefined("model-viewer").then(resolve).catch(reject);
+      window.customElements.whenDefined("model-viewer").then(() => resolve()).catch(reject);
     };
 
     if (existingScript instanceof HTMLScriptElement) {
