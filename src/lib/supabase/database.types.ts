@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -146,6 +146,65 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_addresses: {
+        Row: {
+          address_line1: string
+          address_line2: string | null
+          administrative_area: string
+          country_code: string
+          created_at: string
+          customer_id: string
+          id: string
+          is_default: boolean
+          label: string
+          locality: string
+          phone: string
+          postal_code: string | null
+          recipient_name: string
+          updated_at: string
+        }
+        Insert: {
+          address_line1: string
+          address_line2?: string | null
+          administrative_area: string
+          country_code?: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          is_default?: boolean
+          label: string
+          locality: string
+          phone: string
+          postal_code?: string | null
+          recipient_name: string
+          updated_at?: string
+        }
+        Update: {
+          address_line1?: string
+          address_line2?: string | null
+          administrative_area?: string
+          country_code?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          is_default?: boolean
+          label?: string
+          locality?: string
+          phone?: string
+          postal_code?: string | null
+          recipient_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_addresses_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           auth_user_id: string | null
@@ -175,6 +234,87 @@ export type Database = {
           id?: string
           metadata?: Json
           phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      homepage_hero_presentations: {
+        Row: {
+          auto_rotate: boolean
+          auto_rotate_delay_ms: number
+          camera_field_of_view_deg: number
+          camera_intro_radius_percent: number
+          camera_max_field_of_view_deg: number
+          camera_max_radius_percent: number
+          camera_min_field_of_view_deg: number
+          camera_min_radius_percent: number
+          camera_phi_deg: number
+          camera_radius_percent: number
+          camera_theta_deg: number
+          created_at: string
+          exposure: number
+          id: string
+          is_active: boolean
+          model_storage_path: string
+          name: string
+          poster_storage_path: string | null
+          published_at: string | null
+          rotation_per_second_deg: number
+          shadow_intensity: number
+          shadow_softness: number
+          tint: string | null
+          updated_at: string
+        }
+        Insert: {
+          auto_rotate?: boolean
+          auto_rotate_delay_ms?: number
+          camera_field_of_view_deg?: number
+          camera_intro_radius_percent?: number
+          camera_max_field_of_view_deg?: number
+          camera_max_radius_percent?: number
+          camera_min_field_of_view_deg?: number
+          camera_min_radius_percent?: number
+          camera_phi_deg?: number
+          camera_radius_percent?: number
+          camera_theta_deg?: number
+          created_at?: string
+          exposure?: number
+          id?: string
+          is_active?: boolean
+          model_storage_path: string
+          name: string
+          poster_storage_path?: string | null
+          published_at?: string | null
+          rotation_per_second_deg?: number
+          shadow_intensity?: number
+          shadow_softness?: number
+          tint?: string | null
+          updated_at?: string
+        }
+        Update: {
+          auto_rotate?: boolean
+          auto_rotate_delay_ms?: number
+          camera_field_of_view_deg?: number
+          camera_intro_radius_percent?: number
+          camera_max_field_of_view_deg?: number
+          camera_max_radius_percent?: number
+          camera_min_field_of_view_deg?: number
+          camera_min_radius_percent?: number
+          camera_phi_deg?: number
+          camera_radius_percent?: number
+          camera_theta_deg?: number
+          created_at?: string
+          exposure?: number
+          id?: string
+          is_active?: boolean
+          model_storage_path?: string
+          name?: string
+          poster_storage_path?: string | null
+          published_at?: string | null
+          rotation_per_second_deg?: number
+          shadow_intensity?: number
+          shadow_softness?: number
+          tint?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -686,6 +826,10 @@ export type Database = {
         Args: { p_bucket: string; p_key_hash: string }
         Returns: boolean
       }
+      homepage_hero_assets_ready: {
+        Args: { model_path: string; poster_path?: string }
+        Returns: boolean
+      }
       merge_verified_customer_guest_cart: {
         Args: {
           p_auth_user_id: string
@@ -698,6 +842,8 @@ export type Database = {
           unavailable_line_count: number
         }[]
       }
+      publish_homepage_hero: { Args: { target_id: string }; Returns: boolean }
+      unpublish_homepage_hero: { Args: { target_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
@@ -716,25 +862,21 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -745,23 +887,19 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends { Insert: infer I }
       ? I
       : never
     : never
@@ -770,23 +908,19 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends { Update: infer U }
       ? U
       : never
     : never
@@ -795,14 +929,10 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
@@ -812,14 +942,10 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
