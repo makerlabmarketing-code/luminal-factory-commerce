@@ -537,7 +537,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          amount_minor?: string | number
+          amount_minor?: number
           authorized_at?: string | null
           created_at?: string
           currency?: string
