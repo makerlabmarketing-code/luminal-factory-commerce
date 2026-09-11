@@ -59,7 +59,7 @@ test("management transport locks HMAC integrity fields and a short freshness win
 });
 
 test("management transport requires replay resistance, rotation and TLS hardening", () => {
-  assert.match(spec, /\(keyId, nonce\) pair has not already been accepted/i);
+  assert.match(spec, /\(`?keyId`?, `?nonce`?\) pair has not already been accepted/i);
   assert.match(spec, /Nonce acceptance must be atomic/i);
   assert.match(spec, /process-local in-memory set is not sufficient/i);
   assert.match(spec, /overlapping key rotation/i);
