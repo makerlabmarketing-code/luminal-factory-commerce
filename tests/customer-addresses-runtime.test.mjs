@@ -4,6 +4,7 @@ import test from "node:test";
 
 const read = (path) => readFileSync(path, "utf8");
 const contract = read("src/features/account/customer-address-contract.ts");
+const databaseTypes = read("src/lib/supabase/database.types.ts");
 const service = read("src/features/account/customer-address-server.ts");
 const request = read("src/features/account/customer-address-request.ts");
 const panel = read("src/features/account/customer-addresses-panel.tsx");
@@ -32,6 +33,14 @@ test("address request validates inputs and same-origin writes", () => {
   assert.match(request, /private, no-store/);
   assert.match(contract, /\.strict\(\)/);
   assert.match(contract, /toUpperCase\(\)/);
+});
+
+test("address contract uses the canonical generated Production snapshot", () => {
+  assert.match(databaseTypes, /customer_addresses:\s*\{/);
+  assert.match(databaseTypes, /homepage_hero_presentations:\s*\{/);
+  assert.match(databaseTypes, /publish_homepage_hero:/);
+  assert.match(contract, /Database\["public"\]\["Tables"\]\["customer_addresses"\]/);
+  assert.doesNotMatch(contract, /Kept as a narrow extension|Omit<Database/);
 });
 
 test("address form keeps browser address semantics instead of disabling autocomplete", () => {
