@@ -4,6 +4,7 @@ import test from "node:test";
 
 const migration = fs.readFileSync("supabase/migrations/20260910103000_create_homepage_hero_presentations.sql", "utf8");
 const publishGuardMigration = fs.readFileSync("supabase/migrations/20260911094500_guard_homepage_hero_publish_assets.sql", "utf8");
+const publishRpcMigration = fs.readFileSync("supabase/migrations/20260911101000_add_homepage_hero_publish_rpc.sql", "utf8");
 const adapter = fs.readFileSync("src/features/home/hero-model-data.ts", "utf8");
 const config = fs.readFileSync("src/features/home/hero-model-config.ts", "utf8");
 const home = fs.readFileSync("src/features/home/home-page.tsx", "utf8");
@@ -39,6 +40,17 @@ test("homepage Hero cannot publish a Storage path that does not exist", () => {
   assert.match(publishGuardMigration, /before insert or update of model_storage_path, poster_storage_path, is_active, published_at/);
   assert.match(publishGuardMigration, /grant execute on function public\.homepage_hero_assets_ready\(text, text\) to service_role/);
   assert.doesNotMatch(publishGuardMigration, /security definer/i);
+});
+
+test("homepage Hero publish switch is atomic and service-role only", () => {
+  assert.match(publishRpcMigration, /create or replace function public\.publish_homepage_hero\(target_id uuid\)/);
+  assert.match(publishRpcMigration, /lock table public\.homepage_hero_presentations in share row exclusive mode/);
+  assert.match(publishRpcMigration, /set is_active = false/);
+  assert.match(publishRpcMigration, /set is_active = true,[\s\S]*published_at = now\(\)/);
+  assert.match(publishRpcMigration, /grant execute on function public\.publish_homepage_hero\(uuid\) to service_role/);
+  assert.match(publishRpcMigration, /grant execute on function public\.unpublish_homepage_hero\(uuid\) to service_role/);
+  assert.doesNotMatch(publishRpcMigration, /security definer/i);
+  assert.doesNotMatch(publishRpcMigration, /grant execute[\s\S]*to (anon|authenticated)/i);
 });
 
 test("homepage reads one active Hero through a server-only validated adapter", () => {
