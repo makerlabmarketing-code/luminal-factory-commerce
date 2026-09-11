@@ -1,0 +1,24 @@
+{
+  "profile": "lfc-hmac-v1",
+  "note": "TEST FIXTURE ONLY. This secret is public test data and must never be used outside automated/local compatibility tests.",
+  "test_secret_utf8": "luminal-test-only-hmac-secret-32bytes!!",
+  "request": {
+    "version": "lfc-hmac-v1",
+    "clientId": "luminal-erp",
+    "keyId": "test-key-2026-09",
+    "audience": "luminal-commerce-production",
+    "requestId": "22222222-2222-4222-8222-222222222222",
+    "timestamp": 1789110000,
+    "nonce": "nonce_example_1234567890ABCD",
+    "actorId": "user_erp_123",
+    "workspaceId": "luminal_factory",
+    "scope": "commerce.hero.publish",
+    "method": "POST",
+    "path": "/api/admin/v1/homepage-hero/11111111-1111-4111-8111-111111111111/publish",
+    "contentType": "application/json",
+    "rawBodyUtf8": "{\"action\":\"publish\",\"id\":\"11111111-1111-4111-8111-111111111111\"}",
+    "bodySha256": "e3877fb4241d060842079fa6920c9b9826e6ff3e3fa6364ca23a17321916dbf2"
+  },
+  "canonicalRequest": "lfc-hmac-v1\nluminal-erp\ntest-key-2026-09\nluminal-commerce-production\n22222222-2222-4222-8222-222222222222\n1789110000\nnonce_example_1234567890ABCD\nuser_erp_123\nluminal_factory\ncommerce.hero.publish\nPOST\n/api/admin/v1/homepage-hero/11111111-1111-4111-8111-111111111111/publish\napplication/json\ne3877fb4241d060842079fa6920c9b9826e6ff3e3fa6364ca23a17321916dbf2",
+  "expectedHmacSha256Hex": "75c556f4b734a2bc9a85f16a6dbf50a1e1b41d6da3d412b941b3aa2b353a9886"
+}
