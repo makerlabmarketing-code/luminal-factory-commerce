@@ -6,6 +6,7 @@ const read = (path) => readFileSync(path, "utf8");
 const contract = read("src/features/account/customer-address-contract.ts");
 const service = read("src/features/account/customer-address-server.ts");
 const request = read("src/features/account/customer-address-request.ts");
+const panel = read("src/features/account/customer-addresses-panel.tsx");
 const route = read("src/app/api/account/addresses/route.ts");
 const page = read("src/app/account/page.tsx");
 
@@ -30,6 +31,14 @@ test("address request validates inputs and same-origin writes", () => {
   assert.match(route, /force-dynamic/);
   assert.match(request, /private, no-store/);
   assert.match(contract, /\.strict\(\)/);
+  assert.match(contract, /toUpperCase\(\)/);
+});
+
+test("address form keeps browser address semantics instead of disabling autocomplete", () => {
+  for (const token of ["name", "tel", "address-level1", "address-level2", "address-line1", "postal-code", "country"]) {
+    assert.match(panel, new RegExp(`"${token}"`));
+  }
+  assert.doesNotMatch(panel, /autoComplete="off"/);
 });
 
 test("address feature has no transactional commerce mutations", () => {
