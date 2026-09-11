@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const hardening = readFileSync("supabase/migrations/20260910023500_harden_customer_addresses.sql", "utf8");
+const hardening = readFileSync("supabase/migrations/20260911042616_harden_customer_addresses.sql", "utf8");
 const server = readFileSync("src/features/account/customer-address-server.ts", "utf8");
 const request = readFileSync("src/features/account/customer-address-request.ts", "utf8");
 const panel = readFileSync("src/features/account/customer-addresses-panel.tsx", "utf8");
