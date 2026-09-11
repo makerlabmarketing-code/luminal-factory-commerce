@@ -1,0 +1,43 @@
+name: Security lockfile remediation
+
+on:
+  push:
+    branches:
+      - chore/security-dependency-remediation
+    paths:
+      - .github/workflows/security-lockfile-remediation.yml
+      - package.json
+      - package-lock.json
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Refresh vulnerable dependency set
+        run: |
+          npm install next@16.3.4 eslint-config-next@16.3.4 --save-exact
+          npm audit fix
+      - name: Validate remediated tree
+        run: |
+          npm audit --omit=dev --audit-level=high
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run security:static
+          npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: remediated-package-lock
+          path: |
+            package.json
+            package-lock.json
+          if-no-files-found: error
