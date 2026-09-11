@@ -1,6 +1,7 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 import {
+  COMMERCE_ADMIN_MAX_CLOCK_SKEW_SECONDS,
   COMMERCE_ADMIN_MIN_SECRET_BYTES,
   COMMERCE_ADMIN_SECURITY_HEADERS,
   COMMERCE_ADMIN_SIGNATURE_VERSION,
@@ -166,7 +167,7 @@ export async function verifyCommerceAdminRequest(
     keyId: envelope.keyId,
     nonce: envelope.nonce,
     requestId: envelope.requestId,
-    expiresAtEpochSeconds: envelope.timestamp + 2 * 90,
+    expiresAtEpochSeconds: envelope.timestamp + 2 * COMMERCE_ADMIN_MAX_CLOCK_SKEW_SECONDS,
   });
   if (!replayAccepted) return { ok: false };
 
