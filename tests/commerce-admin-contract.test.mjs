@@ -1,16 +1,19 @@
 import assert from "node:assert/strict";
+import { createHash, createHmac } from "node:crypto";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const contract = readFileSync("src/features/management/commerce-admin-contract.ts", "utf8");
 const security = readFileSync("src/features/management/commerce-admin-security-contract.ts", "utf8");
+const verifier = readFileSync("src/features/management/commerce-admin-verifier.ts", "utf8");
 const spec = readFileSync("specs/integration/erp-commerce-management-boundary.md", "utf8");
+const vector = JSON.parse(readFileSync("specs/integration/lfc-hmac-v1-test-vector.json", "utf8"));
 
 test("ERP Commerce management contract keeps privileged ownership on Commerce server", () => {
   assert.match(spec, /separate Supabase projects/i);
   assert.match(spec, /Commerce service-role key or the ERP→Commerce HMAC secret in browser\/client code/i);
   assert.match(spec, /Commerce Admin API \/ management boundary/i);
-  assert.doesNotMatch(contract + security, /SUPABASE_SECRET_KEY|service_role|createClient|NEXT_PUBLIC_/);
+  assert.doesNotMatch(contract + security + verifier, /SUPABASE_SECRET_KEY|service_role|createClient|NEXT_PUBLIC_/);
 });
 
 test("Homepage Hero management contract exposes explicit least-privilege scopes", () => {
@@ -56,6 +59,36 @@ test("management transport locks HMAC integrity fields and a short freshness win
   }
   assert.match(spec, /exact raw request-body bytes before JSON parsing/i);
   assert.match(spec, /constant-time/i);
+});
+
+test("shared TEST-ONLY HMAC vector is internally reproducible", () => {
+  const bodyHash = createHash("sha256").update(vector.request.rawBodyUtf8, "utf8").digest("hex");
+  assert.equal(bodyHash, vector.request.bodySha256);
+
+  const hmac = createHmac("sha256", vector.test_secret_utf8).update(vector.canonicalRequest, "utf8").digest("hex");
+  assert.equal(hmac, vector.expectedHmacSha256Hex);
+
+  const tamperedBodyHash = createHash("sha256").update(`${vector.request.rawBodyUtf8} `, "utf8").digest("hex");
+  assert.notEqual(tamperedBodyHash, vector.request.bodySha256);
+});
+
+test("Commerce verifier fails closed and verifies integrity before replay consumption", () => {
+  assert.match(verifier, /createHash\("sha256"\)/);
+  assert.match(verifier, /createHmac\("sha256"/);
+  assert.match(verifier, /timingSafeEqual/);
+  assert.match(verifier, /credential\?\.secret \?\? DUMMY_SECRET/);
+  assert.match(verifier, /credential\.secret\.byteLength < COMMERCE_ADMIN_MIN_SECRET_BYTES/);
+  assert.match(verifier, /credential\.allowedScopes\.has\(scope\)/);
+  assert.match(verifier, /input\.requiredScopes\.includes\(scope\)/);
+  assert.match(verifier, /isCommerceAdminTimestampFresh/);
+  assert.match(verifier, /envelope\.audience !== input\.expectedAudience/);
+  assert.match(verifier, /calculateBodySha256\(input\.rawBody\)/);
+  assert.match(verifier, /replayStore\.consume/);
+
+  const signatureCheckPosition = verifier.indexOf("if (!credential || !signatureMatches)");
+  const replayConsumePosition = verifier.indexOf("replayStore.consume");
+  assert.ok(signatureCheckPosition >= 0 && replayConsumePosition > signatureCheckPosition);
+  assert.doesNotMatch(verifier, /console\.|process\.env|NEXT_PUBLIC_|service_role|SUPABASE_SECRET_KEY/);
 });
 
 test("management transport requires replay resistance, rotation and TLS hardening", () => {
