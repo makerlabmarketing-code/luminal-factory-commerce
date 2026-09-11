@@ -4,6 +4,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
+import { getHeroModelPresentation } from "./hero-model-data";
 import { HeroObjectStage } from "./hero-object-stage";
 
 type HomeMediaFrameProps = Readonly<{
@@ -17,14 +18,7 @@ function HomeMediaFrame({ media, className, imageClassName, placeholderClassName
   return (
     <div className={className}>
       {media.availability === "available" ? (
-        <Image
-          className={imageClassName}
-          src={media.src}
-          alt={media.alt}
-          fill
-          sizes={media.sizes}
-          style={{ objectPosition: media.objectPosition }}
-        />
+        <Image className={imageClassName} src={media.src} alt={media.alt} fill sizes={media.sizes} style={{ objectPosition: media.objectPosition }} />
       ) : (
         <>
           <span className={placeholderClassName} aria-hidden="true" />
@@ -35,22 +29,15 @@ function HomeMediaFrame({ media, className, imageClassName, placeholderClassName
   );
 }
 
-export function HomePage() {
+export async function HomePage() {
   const content = homePageContent;
+  const heroPresentation = await getHeroModelPresentation();
 
   return (
     <main id="main-content" className="wave-home">
       <section className="revival-hero" aria-labelledby="hero-title">
         <div className="hero-atmosphere" aria-hidden="true" />
-        <Image
-          className="hero-crystal-mark"
-          src="/brand/luminal-factory-logo-primary.png"
-          alt=""
-          width={4000}
-          height={4000}
-          priority
-          sizes="(max-width: 800px) 72vw, 42vw"
-        />
+        <Image className="hero-crystal-mark" src="/brand/luminal-factory-logo-primary.png" alt="" width={4000} height={4000} priority sizes="(max-width: 800px) 72vw, 42vw" />
         <Container className="revival-hero-inner">
           <div className="revival-hero-copy">
             <p className="eyebrow">{content.hero.eyebrow}</p>
@@ -61,7 +48,7 @@ export function HomePage() {
               <ButtonLink href={content.hero.secondaryAction.href} variant="secondary">{content.hero.secondaryAction.label}</ButtonLink>
             </div>
           </div>
-          <HeroObjectStage media={homePageMedia.hero} />
+          <HeroObjectStage media={homePageMedia.hero} presentation={heroPresentation} />
           <p className="hero-scroll-note" aria-hidden="true">Scroll to enter the archive <span>↓</span></p>
         </Container>
       </section>
@@ -98,14 +85,7 @@ export function HomePage() {
               <Link href="/archive" className={`archive-object archive-object-${object.tone} group relative outline-none`} key={object.title}>
                 <div className="archive-object-visual">
                   {homePageMedia.archive[object.mediaKey].availability === "available" ? (
-                    <Image
-                      className="home-product-image archive-product-image"
-                      src={homePageMedia.archive[object.mediaKey].src}
-                      alt={homePageMedia.archive[object.mediaKey].alt}
-                      fill
-                      sizes={homePageMedia.archive[object.mediaKey].sizes}
-                      style={{ objectPosition: homePageMedia.archive[object.mediaKey].objectPosition }}
-                    />
+                    <Image className="home-product-image archive-product-image" src={homePageMedia.archive[object.mediaKey].src} alt={homePageMedia.archive[object.mediaKey].alt} fill sizes={homePageMedia.archive[object.mediaKey].sizes} style={{ objectPosition: homePageMedia.archive[object.mediaKey].objectPosition }} />
                   ) : <span aria-hidden="true" />}
                   <em>{String(index + 1).padStart(2, "0")}</em>
                 </div>
@@ -129,11 +109,7 @@ export function HomePage() {
           </header>
           <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh]">
             {content.process.map((step, index) => (
-              <li
-                className="relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0d0d0e]/95 p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:sticky md:min-h-[60svh] md:p-10 motion-reduce:static"
-                style={{ top: `calc(6.5rem + ${index * 1.1}rem)`, zIndex: index + 1 }}
-                key={step.number}
-              >
+              <li className="relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0d0d0e]/95 p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:sticky md:min-h-[60svh] md:p-10 motion-reduce:static" style={{ top: `calc(6.5rem + ${index * 1.1}rem)`, zIndex: index + 1 }} key={step.number}>
                 <div className="grid h-full min-h-[inherit] content-between gap-12 md:grid-cols-[0.7fr_1.3fr] md:items-end">
                   <div>
                     <span className="font-mono text-xs tracking-[0.2em] text-white/45">{step.number} / 04</span>
