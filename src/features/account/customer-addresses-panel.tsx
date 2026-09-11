@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { CustomerAddress, CustomerAddressInput } from "@/features/account/customer-address-contract";
 
 type AddressForm = Required<CustomerAddressInput>;
+type AddressFieldName = Exclude<keyof AddressForm, "is_default">;
+
 const MAX_SAVED_ADDRESSES = 10;
 const emptyAddress: AddressForm = {
   label: "",
@@ -16,17 +18,17 @@ const emptyAddress: AddressForm = {
   postal_code: "",
   is_default: false,
 };
-const fields = [
-  ["label", "Tên gợi nhớ", 40],
-  ["recipient_name", "Người nhận", 120],
-  ["phone", "Số điện thoại", 32],
-  ["administrative_area", "Tỉnh / thành phố", 120],
-  ["locality", "Phường / xã / địa phương", 120],
-  ["address_line1", "Địa chỉ chi tiết", 200],
-  ["address_line2", "Thông tin bổ sung", 200],
-  ["postal_code", "Mã bưu chính", 32],
-  ["country_code", "Mã quốc gia (ISO)", 2],
-] as const;
+const fields: ReadonlyArray<readonly [AddressFieldName, string, number, string]> = [
+  ["label", "Tên gợi nhớ", 40, "off"],
+  ["recipient_name", "Người nhận", 120, "name"],
+  ["phone", "Số điện thoại", 32, "tel"],
+  ["administrative_area", "Tỉnh / thành phố", 120, "address-level1"],
+  ["locality", "Phường / xã / địa phương", 120, "address-level2"],
+  ["address_line1", "Địa chỉ chi tiết", 200, "address-line1"],
+  ["address_line2", "Thông tin bổ sung", 200, "address-line2"],
+  ["postal_code", "Mã bưu chính", 32, "postal-code"],
+  ["country_code", "Mã quốc gia (ISO)", 2, "country"],
+];
 
 export function CustomerAddressesPanel() {
   const [addresses, setAddresses] = useState<CustomerAddress[]>([]);
@@ -146,7 +148,7 @@ export function CustomerAddressesPanel() {
 
       {isEditing && (
         <form className="mt-6 grid gap-4 md:grid-cols-2" onSubmit={submit}>
-          {fields.map(([name, label, max]) => (
+          {fields.map(([name, label, max, autoComplete]) => (
             <label key={name} className="account-field">
               <span>{label}</span>
               <input
@@ -155,7 +157,8 @@ export function CustomerAddressesPanel() {
                 maxLength={max}
                 required={name !== "address_line2" && name !== "postal_code"}
                 onChange={(event) => setForm((current) => ({ ...current, [name]: event.target.value }))}
-                autoComplete="off"
+                autoComplete={autoComplete}
+                inputMode={name === "phone" ? "tel" : undefined}
               />
             </label>
           ))}
