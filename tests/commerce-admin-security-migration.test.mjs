@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const migration = readFileSync(
-  "supabase/migrations/20260911091500_add_commerce_admin_security_persistence.sql",
+  "supabase/migrations/20260911145411_add_commerce_admin_security_persistence.sql",
   "utf8",
 );
 
