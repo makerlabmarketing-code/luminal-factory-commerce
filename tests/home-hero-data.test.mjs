@@ -3,6 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 const migration = fs.readFileSync("supabase/migrations/20260910103000_create_homepage_hero_presentations.sql", "utf8");
+const publishGuardMigration = fs.readFileSync("supabase/migrations/20260911094500_guard_homepage_hero_publish_assets.sql", "utf8");
 const adapter = fs.readFileSync("src/features/home/hero-model-data.ts", "utf8");
 const config = fs.readFileSync("src/features/home/hero-model-config.ts", "utf8");
 const home = fs.readFileSync("src/features/home/home-page.tsx", "utf8");
@@ -26,6 +27,18 @@ test("homepage Hero Storage bucket is public for delivery but not public for wri
   assert.match(migration, /application\/octet-stream/);
   assert.doesNotMatch(migration, /create policy[\s\S]*storage\.objects/i);
   assert.doesNotMatch(migration, /grant (insert|update|delete)[\s\S]*storage/i);
+});
+
+test("homepage Hero cannot publish a Storage path that does not exist", () => {
+  assert.match(publishGuardMigration, /from storage\.objects/);
+  assert.match(publishGuardMigration, /bucket_id = 'homepage-hero'/);
+  assert.match(publishGuardMigration, /name = model_path/);
+  assert.match(publishGuardMigration, /poster_path is null/);
+  assert.match(publishGuardMigration, /new\.is_active or new\.published_at is not null/);
+  assert.match(publishGuardMigration, /errcode = '23514'/);
+  assert.match(publishGuardMigration, /before insert or update of model_storage_path, poster_storage_path, is_active, published_at/);
+  assert.match(publishGuardMigration, /grant execute on function public\.homepage_hero_assets_ready\(text, text\) to service_role/);
+  assert.doesNotMatch(publishGuardMigration, /security definer/i);
 });
 
 test("homepage reads one active Hero through a server-only validated adapter", () => {
