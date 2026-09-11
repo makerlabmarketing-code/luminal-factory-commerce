@@ -31,7 +31,7 @@ const optional = (max: number) => z.string().trim().max(max).transform((value) =
 
 export const customerAddressSchema = z.object({
   label: required(40), recipient_name: required(120), phone: required(32).min(3),
-  country_code: z.string().regex(/^[A-Z]{2}$/).default("VN"),
+  country_code: z.string().trim().transform((value) => value.toUpperCase()).pipe(z.string().regex(/^[A-Z]{2}$/)).default("VN"),
   administrative_area: required(120), locality: required(120), address_line1: required(200),
   address_line2: optional(200), postal_code: optional(32), is_default: z.boolean().default(false),
 }).strict();
