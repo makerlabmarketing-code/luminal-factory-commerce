@@ -14,6 +14,9 @@ const MAX_REQUEST_BYTES = 256_000;
 const requestIdSchema = z.uuid();
 
 type PrivilegedClient = ReturnType<typeof createClient>;
+type RpcClient = Readonly<{
+  rpc(name: string, args: Readonly<Record<string, unknown>>): PromiseLike<{ data: unknown; error: unknown }>;
+}>;
 
 export type CommerceAdminRouteContext = Readonly<{
   identity: CommerceAdminVerifiedIdentity;
@@ -63,6 +66,10 @@ function createPrivilegedClient(): PrivilegedClient {
 
 function asHomepageHeroClient(client: PrivilegedClient): CommerceAdminSupabaseClient {
   return client as unknown as CommerceAdminSupabaseClient;
+}
+
+function asRpcClient(client: PrivilegedClient | CommerceAdminSupabaseClient): RpcClient {
+  return client as unknown as RpcClient;
 }
 
 function buildCredentials(environment: ReturnType<typeof readCommerceAdminEnvironment>) {
@@ -121,6 +128,7 @@ export async function authorizeCommerceAdminRoute(
     return commerceAdminFailure(requestId, 503, "CONFIGURATION_INVALID", "Commerce Admin API chưa được cấu hình hợp lệ.");
   }
 
+  const replayClient = asRpcClient(privilegedClient);
   const verification = await verifyCommerceAdminRequest(
     {
       headers: request.headers,
@@ -134,7 +142,7 @@ export async function authorizeCommerceAdminRoute(
       credentials: buildCredentials(environment),
       replayStore: {
         async consume(input) {
-          const { data, error } = await privilegedClient.rpc("consume_commerce_admin_nonce", {
+          const { data, error } = await replayClient.rpc("consume_commerce_admin_nonce", {
             p_key_id: input.keyId,
             p_nonce: input.nonce,
             p_request_id: input.requestId,
@@ -169,8 +177,7 @@ export async function recordCommerceAdminAudit(
     failureCode?: string | null;
   }>,
 ): Promise<void> {
-  const client = context.client as unknown as { rpc(name: string, args: Readonly<Record<string, unknown>>): PromiseLike<{ error: unknown }> };
-  const { error } = await client.rpc("record_commerce_admin_audit_event", {
+  const { error } = await asRpcClient(context.client).rpc("record_commerce_admin_audit_event", {
     p_request_id: context.identity.requestId,
     p_client_id: context.identity.clientId,
     p_key_id: context.identity.keyId,
