@@ -5,7 +5,8 @@ import { z } from "zod";
 import { defaultHeroModelPresentation, type HeroModelPresentation } from "./hero-model-config";
 
 const HERO_BUCKET = "homepage-hero";
-const HERO_CONFIG_TIMEOUT_MS = 900;
+const HERO_CONFIG_TIMEOUT_MS = 350;
+const HERO_CONFIG_REVALIDATE_SECONDS = 60;
 
 const heroRowSchema = z.object({
   model_storage_path: z.string().trim().min(1).max(512),
@@ -125,7 +126,6 @@ async function requestActiveHero(): Promise<HeroModelPresentation | null> {
   const endpoint = new URL(`${config.url}/rest/v1/homepage_hero_presentations`);
   endpoint.searchParams.set("select", HERO_SELECT);
   endpoint.searchParams.set("is_active", "eq.true");
-  endpoint.searchParams.set("published_at", `lte.${new Date().toISOString()}`);
   endpoint.searchParams.set("order", "updated_at.desc");
   endpoint.searchParams.set("limit", "1");
 
@@ -135,7 +135,7 @@ async function requestActiveHero(): Promise<HeroModelPresentation | null> {
         Accept: "application/json",
         apikey: config.publishableKey,
       },
-      cache: "no-store",
+      next: { revalidate: HERO_CONFIG_REVALIDATE_SECONDS },
       signal: AbortSignal.timeout(HERO_CONFIG_TIMEOUT_MS),
     });
 
