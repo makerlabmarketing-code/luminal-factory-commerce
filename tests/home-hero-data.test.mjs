@@ -57,7 +57,9 @@ test("homepage reads one active Hero through a server-only validated adapter", (
   assert.match(adapter, /import "server-only"/);
   assert.match(adapter, /heroRowsSchema\.safeParse/);
   assert.match(adapter, /is_active", "eq\.true/);
-  assert.match(adapter, /published_at/);
+  assert.match(migration, /is_active and published_at is not null and published_at <= now\(\)/);
+  assert.doesNotMatch(adapter, /endpoint\.searchParams\.set\("published_at"/);
+  assert.match(adapter, /next: \{ revalidate: HERO_CONFIG_REVALIDATE_SECONDS \}/);
   assert.match(adapter, /AbortSignal\.timeout\(HERO_CONFIG_TIMEOUT_MS\)/);
   assert.match(adapter, /storage\/v1\/object\/public\/\$\{HERO_BUCKET\}/);
   assert.match(adapter, /defaultHeroModelPresentation/);
