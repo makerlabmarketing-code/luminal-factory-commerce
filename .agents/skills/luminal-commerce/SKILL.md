@@ -28,6 +28,16 @@ Luminal Factory's approved product direction, commerce contracts, architecture b
 
 External websites are references only. Use `.codex/skills/reference-analysis/SKILL.md` for structured reference analysis.
 
+## Companion Quality Skills
+
+These repository-local skills may be used after the Luminal authority files have been read:
+
+- `.agents/skills/frontend-design/SKILL.md` for distinctive composition and typography critique;
+- `.agents/skills/design-taste-frontend/SKILL.md` for density, motion, material, and restraint review;
+- `.agents/skills/vercel-react-best-practices/SKILL.md` for React/Next.js performance review.
+
+They are advisory. They never override approved Luminal page scripts, `ui-rules.md`, architecture, commerce behavior, Supabase boundaries, accessibility, or Production gates.
+
 ## Branches
 
 ### Project identity and boundaries
