@@ -37,9 +37,18 @@ export async function HomePage() {
     <main id="main-content" className="wave-home">
       <section className="revival-hero" aria-labelledby="hero-title">
         <div className="hero-atmosphere" aria-hidden="true" />
-        <Image className="hero-crystal-mark" src="/brand/luminal-factory-logo-primary.png" alt="" width={4000} height={4000} priority sizes="(max-width: 800px) 72vw, 42vw" />
-        <Container className="revival-hero-inner">
-          <div className="revival-hero-copy">
+        <Image
+          className="hero-crystal-mark"
+          src="/brand/luminal-factory-logo-primary.png"
+          alt=""
+          width={4000}
+          height={4000}
+          loading="lazy"
+          quality={62}
+          sizes="(max-width: 800px) 72vw, 42vw"
+        />
+        <Container className="revival-hero-inner lg:!grid-cols-[minmax(0,.72fr)_minmax(28rem,1.28fr)] lg:!gap-[clamp(2rem,5vw,6rem)]">
+          <div className="revival-hero-copy lg:max-w-[34rem] lg:-translate-y-[4vh]">
             <p className="eyebrow">{content.hero.eyebrow}</p>
             <h1 id="hero-title">{content.hero.title}</h1>
             <p className="lede">{content.hero.description}</p>
@@ -48,7 +57,9 @@ export async function HomePage() {
               <ButtonLink href={content.hero.secondaryAction.href} variant="secondary">{content.hero.secondaryAction.label}</ButtonLink>
             </div>
           </div>
-          <HeroObjectStage media={homePageMedia.hero} presentation={heroPresentation} />
+          <div className="relative min-w-0 lg:-mr-[min(7vw,7rem)] lg:pt-6">
+            <HeroObjectStage media={homePageMedia.hero} presentation={heroPresentation} />
+          </div>
           <p className="hero-scroll-note" aria-hidden="true">Scroll to enter the archive <span>↓</span></p>
         </Container>
       </section>
@@ -66,7 +77,7 @@ export async function HomePage() {
         </Container>
       </section>
 
-      <section className="brand-revival" aria-labelledby="revival-title">
+      <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title">
         <Container>
           <p className="eyebrow">A studio in transition</p>
           <h2 id="revival-title"><span>Lazy Factory</span><i aria-hidden="true">→</i>Luminal Factory</h2>
@@ -74,7 +85,7 @@ export async function HomePage() {
         </Container>
       </section>
 
-      <section className="selected-archive section" aria-labelledby="archive-title">
+      <section className="selected-archive section [content-visibility:auto] [contain-intrinsic-size:auto_1500px]" aria-labelledby="archive-title">
         <Container>
           <header className="editorial-heading">
             <div><p className="eyebrow">Selected archive</p><h2 id="archive-title">Objects with a past.</h2></div>
@@ -127,7 +138,7 @@ export async function HomePage() {
         </Container>
       </section>
 
-      <section className="commerce-split" aria-label="Shop and commission">
+      <section className="commerce-split [content-visibility:auto] [contain-intrinsic-size:auto_700px]" aria-label="Shop and commission">
         <Link href="/shop" className="commerce-door commerce-door-shop overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none"><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
         <Link href="/commission" className="commerce-door commerce-door-commission overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none"><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
       </section>

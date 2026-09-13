@@ -67,6 +67,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let cancelled = false;
     let observer: IntersectionObserver | null = null;
+    let visibilityObserver: IntersectionObserver | null = null;
 
     const showError = () => {
       if (loaderRef.current) loaderRef.current.style.display = "none";
@@ -144,6 +145,15 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         viewer.addEventListener("error", showError, { once: true });
         mount.replaceChildren(viewer);
         viewerRef.current = viewer;
+
+        if (!reducedMotion && presentation.autoRotate) {
+          visibilityObserver = new IntersectionObserver((entries) => {
+            const visible = entries.some((entry) => entry.isIntersecting && entry.intersectionRatio > 0.05);
+            if (visible) viewer.setAttribute("auto-rotate", "");
+            else viewer.removeAttribute("auto-rotate");
+          }, { threshold: [0, 0.05] });
+          visibilityObserver.observe(stage);
+        }
       } catch {
         showError();
       }
@@ -160,6 +170,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     return () => {
       cancelled = true;
       observer?.disconnect();
+      visibilityObserver?.disconnect();
       if (introFrameRef.current !== null) window.cancelAnimationFrame(introFrameRef.current);
       viewerRef.current = null;
       mount.replaceChildren();
@@ -170,7 +181,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     <div ref={stageRef} className="hero-object-stage group overflow-hidden" data-hero-renderer="model-viewer" data-hero-tint={presentation.tint ?? "default"}>
       {media.availability === "available" ? (
         <>
-          <div className="pointer-events-none absolute inset-[8%] z-[1] rounded-full opacity-45 blur-3xl motion-safe:animate-pulse" style={{ background: "radial-gradient(circle, rgba(214,229,255,0.28) 0%, rgba(120,166,220,0.10) 38%, rgba(0,0,0,0) 72%)" }} aria-hidden="true" />
+          <div className="pointer-events-none absolute inset-[8%] z-[1] rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(circle, rgba(214,229,255,0.28) 0%, rgba(120,166,220,0.10) 38%, rgba(0,0,0,0) 72%)" }} aria-hidden="true" />
           <div ref={loaderRef} className="absolute inset-0 z-[5] flex items-center justify-center transition-opacity duration-300" role="status" aria-live="polite">
             <div className="flex flex-col items-center gap-4">
               <div className="relative size-14" aria-hidden="true">
