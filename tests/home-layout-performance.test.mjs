@@ -24,12 +24,11 @@ test("decorative hero branding does not compete as a priority resource", () => {
   assert.doesNotMatch(home, /luminal-factory-logo-primary\.png[\s\S]{0,220}\bpriority\b/);
 });
 
-test("small header branding keeps source geometry but requests only its rendered size", () => {
+test("small header branding keeps source geometry without competing with the product Hero preload", () => {
   assert.match(header, /width=\{4000\}/);
   assert.match(header, /height=\{4000\}/);
   assert.match(header, /sizes="60px"/);
-  assert.match(header, /loading="eager"/);
-  assert.doesNotMatch(header, /\bpriority\b|\bpreload\b/);
+  assert.doesNotMatch(header, /loading="eager"|\bpriority\b|\bpreload\b/);
 });
 
 test("safe below-fold Homepage sections opt into rendering deferral", () => {
