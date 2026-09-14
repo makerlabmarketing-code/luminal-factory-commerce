@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { LuminalMotionLayer } from "@/components/motion/luminal-motion-layer";
 import "./globals.css";
-import "./motion.css";
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL;
 
