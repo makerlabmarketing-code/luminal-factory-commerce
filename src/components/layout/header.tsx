@@ -13,9 +13,9 @@ export function Header() {
             className="brand-logo"
             src="/brand/luminal-factory-logo-primary.png"
             alt=""
-            width={4000}
-            height={4000}
-            priority
+            width={60}
+            height={60}
+            loading="eager"
           />
         </Link>
         <nav className="desktop-nav" aria-label="Điều hướng chính">
