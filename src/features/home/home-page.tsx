@@ -12,11 +12,13 @@ type HomeMediaFrameProps = Readonly<{
   className: string;
   imageClassName: string;
   placeholderClassName: string;
+  motionReveal?: "media";
+  motionSpotlight?: boolean;
 }>;
 
-function HomeMediaFrame({ media, className, imageClassName, placeholderClassName }: HomeMediaFrameProps) {
+function HomeMediaFrame({ media, className, imageClassName, placeholderClassName, motionReveal, motionSpotlight = false }: HomeMediaFrameProps) {
   return (
-    <div className={className}>
+    <div className={className} data-luminal-reveal={motionReveal} data-luminal-spotlight={motionSpotlight ? "true" : undefined}>
       {media.availability === "available" ? (
         <Image className={imageClassName} src={media.src} alt={media.alt} fill sizes={media.sizes} style={{ objectPosition: media.objectPosition }} />
       ) : (
@@ -66,8 +68,8 @@ export async function HomePage() {
 
       <section className="featured-object" aria-labelledby="featured-title">
         <Container className="featured-object-grid">
-          <HomeMediaFrame media={homePageMedia.featured} className="featured-object-media border border-white/10 shadow-[0_3rem_9rem_rgba(0,0,0,0.28)]" imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" />
-          <div className="featured-object-copy self-start lg:sticky lg:top-28">
+          <HomeMediaFrame media={homePageMedia.featured} className="featured-object-media border border-white/10 shadow-[0_3rem_9rem_rgba(0,0,0,0.28)]" imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" motionReveal="media" motionSpotlight />
+          <div className="featured-object-copy self-start lg:sticky lg:top-28" data-luminal-reveal="copy">
             <p className="eyebrow">{content.featured.index}</p>
             <h2 id="featured-title">{content.featured.title}</h2>
             <p className="object-provenance">{content.featured.collection}</p>
@@ -79,22 +81,22 @@ export async function HomePage() {
 
       <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title">
         <Container>
-          <p className="eyebrow">A studio in transition</p>
-          <h2 id="revival-title"><span>Lazy Factory</span><i aria-hidden="true">→</i>Luminal Factory</h2>
-          <p>Formerly Lazy Factory. The same independent hands, now with a clearer focus on light, material, and collectible character.</p>
+          <p className="eyebrow" data-luminal-reveal="copy">A studio in transition</p>
+          <h2 id="revival-title" data-luminal-reveal="copy"><span>Lazy Factory</span><i aria-hidden="true">→</i>Luminal Factory</h2>
+          <p data-luminal-reveal="copy">Formerly Lazy Factory. The same independent hands, now with a clearer focus on light, material, and collectible character.</p>
         </Container>
       </section>
 
       <section className="selected-archive section [content-visibility:auto] [contain-intrinsic-size:auto_1500px]" aria-labelledby="archive-title">
         <Container>
-          <header className="editorial-heading">
+          <header className="editorial-heading" data-luminal-reveal="copy">
             <div><p className="eyebrow">Selected archive</p><h2 id="archive-title">Objects with a past.</h2></div>
             <p>A small index of forms, characters, and finishes that shaped the studio.</p>
           </header>
           <div className="archive-editorial-grid">
             {content.archive.map((object, index) => (
-              <Link href="/archive" className={`archive-object archive-object-${object.tone} group relative outline-none`} key={object.title}>
-                <div className="archive-object-visual">
+              <Link href="/archive" className={`archive-object archive-object-${object.tone} group relative outline-none`} key={object.title} data-luminal-reveal="card" data-luminal-delay={index}>
+                <div className="archive-object-visual" data-luminal-spotlight="true">
                   {homePageMedia.archive[object.mediaKey].availability === "available" ? (
                     <Image className="home-product-image archive-product-image" src={homePageMedia.archive[object.mediaKey].src} alt={homePageMedia.archive[object.mediaKey].alt} fill sizes={homePageMedia.archive[object.mediaKey].sizes} style={{ objectPosition: homePageMedia.archive[object.mediaKey].objectPosition }} />
                   ) : <span aria-hidden="true" />}
@@ -114,14 +116,14 @@ export async function HomePage() {
 
       <section className="made-at-luminal section overflow-visible" aria-labelledby="making-title">
         <Container>
-          <header className="editorial-heading md:sticky md:top-20 md:z-0 md:pb-8">
+          <header className="editorial-heading md:sticky md:top-20 md:z-0 md:pb-8" data-luminal-reveal="copy">
             <div><p className="eyebrow">Made at Luminal</p><h2 id="making-title">From thought<br />to artifact.</h2></div>
             <p>Four measured movements. Digital tools support the process; the final character still comes from the hand.</p>
           </header>
           <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh]">
             {content.process.map((step, index) => (
               <li className="relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0d0d0e]/95 p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:sticky md:min-h-[60svh] md:p-10 motion-reduce:static" style={{ top: `calc(6.5rem + ${index * 1.1}rem)`, zIndex: index + 1 }} key={step.number}>
-                <div className="grid h-full min-h-[inherit] content-between gap-12 md:grid-cols-[0.7fr_1.3fr] md:items-end">
+                <div className="grid h-full min-h-[inherit] content-between gap-12 md:grid-cols-[0.7fr_1.3fr] md:items-end" data-luminal-reveal="card" data-luminal-delay={index}>
                   <div>
                     <span className="font-mono text-xs tracking-[0.2em] text-white/45">{step.number} / 04</span>
                     <h3 className="mt-5 max-w-[8ch] text-[clamp(2.6rem,7vw,7rem)] font-normal leading-[0.88] tracking-[-0.065em]">{step.title}</h3>
@@ -139,8 +141,8 @@ export async function HomePage() {
       </section>
 
       <section className="commerce-split [content-visibility:auto] [contain-intrinsic-size:auto_700px]" aria-label="Shop and commission">
-        <Link href="/shop" className="commerce-door commerce-door-shop overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none"><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
-        <Link href="/commission" className="commerce-door commerce-door-commission overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none"><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
+        <Link href="/shop" className="commerce-door commerce-door-shop overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-spotlight="true"><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
+        <Link href="/commission" className="commerce-door commerce-door-commission overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-delay="1" data-luminal-spotlight="true"><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
       </section>
     </main>
   );
