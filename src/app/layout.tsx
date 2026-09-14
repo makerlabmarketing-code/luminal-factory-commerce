@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { LuminalMotionLayer } from "@/components/motion/luminal-motion-layer";
 import "./globals.css";
+import "./motion.css";
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL;
 
@@ -12,5 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="vi"><body>{children}</body></html>;
+  return <html lang="vi"><body><LuminalMotionLayer />{children}</body></html>;
 }
