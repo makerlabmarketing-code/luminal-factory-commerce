@@ -81,11 +81,9 @@ export async function HomePage() {
 
       <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title">
         <Container>
-          <div data-luminal-reveal="copy">
-            <p className="eyebrow">A studio in transition</p>
-            <h2 id="revival-title"><span>Lazy Factory</span><i aria-hidden="true">→</i>Luminal Factory</h2>
-            <p>Formerly Lazy Factory. The same independent hands, now with a clearer focus on light, material, and collectible character.</p>
-          </div>
+          <p className="eyebrow" data-luminal-reveal="copy">A studio in transition</p>
+          <h2 id="revival-title" data-luminal-reveal="copy"><span>Lazy Factory</span><i aria-hidden="true">→</i>Luminal Factory</h2>
+          <p data-luminal-reveal="copy">Formerly Lazy Factory. The same independent hands, now with a clearer focus on light, material, and collectible character.</p>
         </Container>
       </section>
 
