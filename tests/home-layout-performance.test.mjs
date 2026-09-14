@@ -4,6 +4,7 @@ import test from "node:test";
 
 const home = fs.readFileSync("src/features/home/home-page.tsx", "utf8");
 const heroStage = fs.readFileSync("src/features/home/hero-object-stage.tsx", "utf8");
+const header = fs.readFileSync("src/components/layout/header.tsx", "utf8");
 const layoutPlan = fs.readFileSync("specs/homepage-layout-performance-pass.md", "utf8");
 
 const companionSkills = [
@@ -21,6 +22,13 @@ test("Homepage visual pass keeps the object dominant without adding a runtime de
 test("decorative hero branding does not compete as a priority resource", () => {
   assert.match(home, /luminal-factory-logo-primary\.png[\s\S]*loading="lazy"[\s\S]*quality=\{62\}/);
   assert.doesNotMatch(home, /luminal-factory-logo-primary\.png[\s\S]{0,220}\bpriority\b/);
+});
+
+test("small header branding keeps source geometry without competing with the product Hero preload", () => {
+  assert.match(header, /width=\{4000\}/);
+  assert.match(header, /height=\{4000\}/);
+  assert.match(header, /sizes="60px"/);
+  assert.doesNotMatch(header, /loading="eager"|\bpriority\b|\bpreload\b/);
 });
 
 test("safe below-fold Homepage sections opt into rendering deferral", () => {

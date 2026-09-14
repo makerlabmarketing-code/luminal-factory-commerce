@@ -15,7 +15,7 @@ export function Header() {
             alt=""
             width={4000}
             height={4000}
-            priority
+            sizes="60px"
           />
         </Link>
         <nav className="desktop-nav" aria-label="Điều hướng chính">

@@ -17,11 +17,16 @@ test("homepage hero uses a replaceable presentation contract with the current op
   assert.equal(fs.existsSync("public/meowhe-hero.glb"), false);
 });
 
-test("homepage hero shows a dedicated loader instead of the old image fallback", () => {
+test("homepage hero shows the real product image first and hands off to 3D when ready", () => {
+  assert.match(heroSource, /import Image from "next\/image"/);
+  assert.match(heroSource, /data-hero-product-image="true"/);
+  assert.match(heroSource, /src=\{media\.src\}/);
+  assert.match(heroSource, /preload/);
+  assert.match(heroSource, /sizes=\{media\.sizes\}/);
+  assert.match(heroSource, /previewRef/);
+  assert.match(heroSource, /preview\.style\.opacity = "0"/);
+  assert.match(heroSource, /3D preview unavailable · Product image active/);
   assert.match(heroSource, /Loading 3D object/);
-  assert.match(heroSource, /loaderRef/);
-  assert.match(heroSource, /3D preview unavailable/);
-  assert.doesNotMatch(heroSource, /next\/image|hero-product-image|fallbackRef/);
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.equal(fs.existsSync("src/features/home/hero-object-stage.module.css"), false);
 });

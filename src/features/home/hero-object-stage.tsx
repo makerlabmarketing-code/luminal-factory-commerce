@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
 import type { HeroModelPresentation } from "./hero-model-config";
@@ -44,6 +45,7 @@ function clamp(value: number, min: number, max: number) {
 
 export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
   const stageRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -54,8 +56,16 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
 
   useEffect(() => {
     const stage = stageRef.current;
+    const preview = previewRef.current;
     const mount = modelMountRef.current;
     if (!stage || !mount || media.availability !== "available") return;
+
+    mount.style.display = "";
+    mount.style.opacity = "0";
+    if (preview) {
+      preview.style.opacity = "1";
+      preview.style.visibility = "visible";
+    }
 
     const applyCamera = () => {
       viewerRef.current?.setAttribute(
@@ -73,6 +83,10 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       if (loaderRef.current) loaderRef.current.style.display = "none";
       if (errorRef.current) errorRef.current.style.opacity = "1";
       mount.style.display = "none";
+      if (preview) {
+        preview.style.opacity = "1";
+        preview.style.visibility = "visible";
+      }
     };
 
     const mountViewer = async () => {
@@ -120,6 +134,12 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
             }, 320);
           }
           mount.style.opacity = "1";
+          if (preview) {
+            preview.style.opacity = "0";
+            window.setTimeout(() => {
+              if (!cancelled && previewRef.current) previewRef.current.style.visibility = "hidden";
+            }, 560);
+          }
           if (noteRef.current) noteRef.current.style.opacity = "1";
 
           if (reducedMotion) {
@@ -181,6 +201,17 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     <div ref={stageRef} className="hero-object-stage group overflow-hidden" data-hero-renderer="model-viewer" data-hero-tint={presentation.tint ?? "default"}>
       {media.availability === "available" ? (
         <>
+          <div ref={previewRef} className="absolute inset-0 z-[1] overflow-hidden opacity-100 transition-[opacity,visibility] duration-500 motion-reduce:transition-none" data-hero-product-image="true">
+            <Image
+              className="home-product-image hero-product-image"
+              src={media.src}
+              alt={media.alt}
+              fill
+              preload
+              sizes={media.sizes}
+              style={{ objectPosition: media.objectPosition }}
+            />
+          </div>
           <div className="pointer-events-none absolute inset-[8%] z-[1] rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(circle, rgba(214,229,255,0.28) 0%, rgba(120,166,220,0.10) 38%, rgba(0,0,0,0) 72%)" }} aria-hidden="true" />
           <div ref={loaderRef} className="absolute inset-0 z-[5] flex items-center justify-center transition-opacity duration-300" role="status" aria-live="polite">
             <div className="flex flex-col items-center gap-4">
@@ -194,7 +225,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
             </div>
           </div>
           <div ref={errorRef} className="pointer-events-none absolute inset-0 z-[4] flex items-center justify-center opacity-0 transition-opacity duration-300" role="status">
-            <span className="font-mono text-[0.58rem] uppercase tracking-[0.16em] text-white/40">3D preview unavailable</span>
+            <span className="rounded-full border border-white/10 bg-black/55 px-3 py-2 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-white/55 backdrop-blur-sm">3D preview unavailable · Product image active</span>
           </div>
           <div ref={modelMountRef} className="absolute inset-0 z-[2] opacity-0 transition-opacity duration-[520ms]" />
           <span ref={noteRef} className="pointer-events-none absolute bottom-4 right-4 z-[4] hidden rounded-full border border-white/10 bg-black/50 px-3 py-2 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-white/50 opacity-0 backdrop-blur-sm transition-opacity duration-300 md:block motion-reduce:hidden" aria-hidden="true">Drag to rotate · Scroll to zoom</span>
