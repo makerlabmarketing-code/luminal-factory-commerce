@@ -8,7 +8,13 @@ export function Footer() {
       <div className="footer-grid">
         <div>
           <Link className="footer-mark" href="/" aria-label="Luminal Factory">
-            <Image src="/brand/luminal-factory-logo-primary.png" alt="" width={4000} height={4000} />
+            <Image
+              src="/brand/luminal-factory-logo-primary.png"
+              alt=""
+              width={4000}
+              height={4000}
+              sizes="72px"
+            />
           </Link>
           <h2>Shaped by light.<br />Crafted to last.</h2>
         </div>
