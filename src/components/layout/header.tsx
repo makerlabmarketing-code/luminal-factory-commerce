@@ -13,8 +13,9 @@ export function Header() {
             className="brand-logo"
             src="/brand/luminal-factory-logo-primary.png"
             alt=""
-            width={60}
-            height={60}
+            width={4000}
+            height={4000}
+            sizes="60px"
             loading="eager"
           />
         </Link>
