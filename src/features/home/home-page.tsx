@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
+import { HeroCopyMotion } from "./hero-copy-motion";
 import { getHeroModelPresentation } from "./hero-model-data";
 import { HeroObjectStage } from "./hero-object-stage";
 
@@ -50,15 +50,13 @@ export async function HomePage() {
           sizes="(max-width: 800px) 72vw, 42vw"
         />
         <Container className="revival-hero-inner lg:!grid-cols-[minmax(0,.72fr)_minmax(28rem,1.28fr)] lg:!gap-[clamp(2rem,5vw,6rem)]">
-          <div className="revival-hero-copy lg:max-w-[34rem] lg:-translate-y-[4vh]">
-            <p className="eyebrow">{content.hero.eyebrow}</p>
-            <h1 id="hero-title">{content.hero.title}</h1>
-            <p className="lede">{content.hero.description}</p>
-            <div className="actions">
-              <ButtonLink href={content.hero.primaryAction.href}>{content.hero.primaryAction.label}</ButtonLink>
-              <ButtonLink href={content.hero.secondaryAction.href} variant="secondary">{content.hero.secondaryAction.label}</ButtonLink>
-            </div>
-          </div>
+          <HeroCopyMotion
+            eyebrow={content.hero.eyebrow}
+            title={content.hero.title}
+            description={content.hero.description}
+            primaryAction={content.hero.primaryAction}
+            secondaryAction={content.hero.secondaryAction}
+          />
           <div className="relative min-w-0 lg:-mr-[min(7vw,7rem)] lg:pt-6">
             <HeroObjectStage media={homePageMedia.hero} presentation={heroPresentation} />
           </div>
