@@ -36,6 +36,12 @@ const POINTER_PHI_RANGE_DEG = 2.4;
 const POINTER_EASE = 0.1;
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
+const HERO_LENS_MIN_X_PERCENT = 14;
+const HERO_LENS_MAX_X_PERCENT = 86;
+const HERO_LENS_MIN_Y_PERCENT = 16;
+const HERO_LENS_MAX_Y_PERCENT = 84;
+const HERO_LIGHT_IDLE_OPACITY = "0.4";
+const HERO_LIGHT_ACTIVE_OPACITY = "0.88";
 
 function ensureModelViewer() {
   if (window.customElements.get("model-viewer")) return Promise.resolve();
@@ -81,6 +87,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
   const introFrameRef = useRef<number | null>(null);
   const interactionFrameRef = useRef<number | null>(null);
   const modelReadyRef = useRef(false);
+  const hasInteractedRef = useRef(false);
   const pointerTargetRef = useRef<PointerPosition>({ x: 0, y: 0 });
   const pointerCurrentRef = useRef<PointerPosition>({ x: 0, y: 0 });
 
@@ -93,6 +100,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     mount.style.display = "";
     mount.style.opacity = "0";
     modelReadyRef.current = false;
+    hasInteractedRef.current = false;
     pointerTargetRef.current = { x: 0, y: 0 };
     pointerCurrentRef.current = { x: 0, y: 0 };
 
@@ -123,6 +131,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     }
 
     stage.dataset.heroMode = "pending";
+    if (reactiveLightRef.current) reactiveLightRef.current.style.opacity = reducedMotion ? "0" : HERO_LIGHT_IDLE_OPACITY;
 
     let cancelled = false;
     let observer: IntersectionObserver | null = null;
@@ -141,14 +150,16 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     const updateOpticalLayers = (pointer: PointerPosition) => {
       const xPercent = clamp((pointer.x + 1) * 50, 0, 100);
       const yPercent = clamp((pointer.y + 1) * 50, 0, 100);
+      const lensXPercent = clamp(xPercent, HERO_LENS_MIN_X_PERCENT, HERO_LENS_MAX_X_PERCENT);
+      const lensYPercent = clamp(yPercent, HERO_LENS_MIN_Y_PERCENT, HERO_LENS_MAX_Y_PERCENT);
 
       if (reactiveLightRef.current) {
         reactiveLightRef.current.style.background = `radial-gradient(circle at ${xPercent}% ${yPercent}%, rgba(214,179,90,.18) 0%, rgba(114,89,184,.07) 25%, rgba(5,5,5,0) 58%)`;
       }
 
       if (lensRef.current) {
-        lensRef.current.style.left = `${xPercent}%`;
-        lensRef.current.style.top = `${yPercent}%`;
+        lensRef.current.style.left = `${lensXPercent}%`;
+        lensRef.current.style.top = `${lensYPercent}%`;
       }
     };
 
@@ -182,13 +193,21 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         y: clamp(((event.clientY - bounds.top) / bounds.height) * 2 - 1, -1, 1),
       };
 
-      if (modelReadyRef.current && lensRef.current) lensRef.current.style.opacity = "1";
+      if (modelReadyRef.current) {
+        if (lensRef.current) lensRef.current.style.opacity = "1";
+        if (reactiveLightRef.current) reactiveLightRef.current.style.opacity = HERO_LIGHT_ACTIVE_OPACITY;
+        if (!hasInteractedRef.current) {
+          hasInteractedRef.current = true;
+          if (noteRef.current) noteRef.current.style.opacity = "0";
+        }
+      }
       scheduleInteraction();
     };
 
     const onPointerLeave = () => {
       pointerTargetRef.current = { x: 0, y: 0 };
       if (lensRef.current) lensRef.current.style.opacity = "0";
+      if (reactiveLightRef.current) reactiveLightRef.current.style.opacity = HERO_LIGHT_IDLE_OPACITY;
       scheduleInteraction();
     };
 
@@ -203,6 +222,8 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       if (loaderRef.current) loaderRef.current.style.display = "none";
       if (errorRef.current) errorRef.current.style.opacity = "1";
       if (lensRef.current) lensRef.current.style.opacity = "0";
+      if (reactiveLightRef.current) reactiveLightRef.current.style.opacity = "0";
+      if (noteRef.current) noteRef.current.style.opacity = "0";
       mount.style.display = "none";
       if (preview) {
         preview.style.opacity = "1";
@@ -262,7 +283,8 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
               if (!cancelled && previewRef.current) previewRef.current.style.visibility = "hidden";
             }, 620);
           }
-          if (noteRef.current && !reducedMotion) noteRef.current.style.opacity = "1";
+          if (reactiveLightRef.current && !reducedMotion) reactiveLightRef.current.style.opacity = HERO_LIGHT_IDLE_OPACITY;
+          if (noteRef.current && !reducedMotion && !hasInteractedRef.current) noteRef.current.style.opacity = "1";
 
           if (reducedMotion) {
             radiusRef.current = presentation.camera.radiusPercent;
@@ -377,7 +399,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
 
           <div
             ref={reactiveLightRef}
-            className="pointer-events-none absolute -inset-[8%] z-[3] opacity-80 transition-opacity duration-300 motion-reduce:hidden"
+            className="pointer-events-none absolute -inset-[8%] z-[3] opacity-40 transition-opacity duration-300 motion-reduce:hidden"
             style={{ background: "radial-gradient(circle at 50% 50%, rgba(214,179,90,.18) 0%, rgba(114,89,184,.07) 25%, rgba(5,5,5,0) 58%)" }}
             aria-hidden="true"
           />
