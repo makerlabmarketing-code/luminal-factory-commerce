@@ -54,11 +54,14 @@ test("safe below-fold Homepage sections opt into rendering deferral", () => {
   assert.match(home, /\[contain-intrinsic-size:auto_1500px\]/);
 });
 
-test("Hero auto-rotation pauses offscreen and decorative glow stays static", () => {
+test("Hero idle motion pauses offscreen while ambient and reactive light stay separated", () => {
   assert.match(heroStage, /visibilityObserver = new IntersectionObserver/);
   assert.match(heroStage, /viewer\.removeAttribute\("auto-rotate"\)/);
   assert.match(heroStage, /intersectionRatio > 0\.05/);
-  assert.match(heroStage, /rounded-full opacity-40 blur-3xl/);
+  assert.match(heroStage, /rounded-full opacity-55 blur-3xl/);
+  assert.match(heroStage, /reactiveLightRef/);
+  assert.match(heroStage, /radial-gradient\(circle at \$\{xPercent\}% \$\{yPercent\}%/);
+  assert.doesNotMatch(heroStage, /@react-three|from "three"/);
 });
 
 test("design and performance companion skills are installed locally", () => {

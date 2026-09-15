@@ -31,15 +31,32 @@ test("homepage hero shows the real product image first and hands off to 3D when 
   assert.equal(fs.existsSync("src/features/home/hero-object-stage.module.css"), false);
 });
 
-test("homepage hero drives camera, lighting and idle motion from presentation configuration", () => {
-  assert.match(heroSource, /presentation\.exposure/);
-  assert.match(heroSource, /presentation\.shadowIntensity/);
-  assert.match(heroSource, /presentation\.camera\.minRadiusPercent/);
-  assert.match(heroSource, /presentation\.autoRotate/);
+test("M-004 integrates the Hero model into the background instead of exposing an inspection viewer", () => {
+  assert.match(heroSource, /data-hero-interaction="pointer-orbit-fluid-lens"/);
+  assert.match(heroSource, /!border-0 !bg-transparent/);
+  assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
+  assert.match(heroSource, /Move to explore/);
+  assert.doesNotMatch(heroSource, /Drag to rotate · Scroll to zoom/);
+  assert.doesNotMatch(heroSource, /viewer\.setAttribute\("camera-controls"/);
+});
+
+test("M-004 uses requestAnimationFrame pointer orbit, reactive light and one optical lens without React render churn", () => {
+  assert.match(heroSource, /\(hover: hover\) and \(pointer: fine\)/);
+  assert.match(heroSource, /pointermove/);
+  assert.match(heroSource, /requestAnimationFrame\(animateInteraction\)/);
+  assert.match(heroSource, /presentation\.camera\.thetaDeg/);
+  assert.match(heroSource, /POINTER_THETA_RANGE_DEG/);
+  assert.match(heroSource, /reactiveLightRef/);
+  assert.match(heroSource, /data-hero-lens="fluid-glass"/);
+  assert.match(heroSource, /backdropFilter: "blur\(2px\) brightness\(1\.16\)/);
+  assert.doesNotMatch(heroSource, /useState|setState/);
+});
+
+test("M-004 preserves reduced-motion, simplified coarse-pointer idle motion and offscreen suspension", () => {
+  assert.match(heroSource, /prefers-reduced-motion: reduce/);
+  assert.match(heroSource, /useSimplifiedIdleMotion = !reducedMotion && !finePointer && presentation\.autoRotate/);
   assert.match(heroSource, /presentation\.rotationPerSecondDeg/);
-  assert.match(heroSource, /camera-controls/);
-  assert.match(heroSource, /disable-pan/);
-  assert.match(heroSource, /Drag to rotate · Scroll to zoom/);
-  assert.match(heroSource, /requestAnimationFrame\(zoomIn\)/);
-  assert.doesNotMatch(heroSource, /HERO_MODEL_SRC|DEFAULT_THETA|DEFAULT_PHI|DEFAULT_RADIUS/);
+  assert.match(heroSource, /IntersectionObserver/);
+  assert.match(heroSource, /viewer\.removeAttribute\("auto-rotate"\)/);
+  assert.match(heroSource, /cancelAnimationFrame\(interactionFrameRef\.current\)/);
 });
