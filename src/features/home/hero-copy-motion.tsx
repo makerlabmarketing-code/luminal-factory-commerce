@@ -1,26 +1,16 @@
 "use client";
 
-import { Fragment, useEffect, useRef } from "react";
-import { ButtonLink } from "@/components/ui/button-link";
-
-type HeroCopyMotionProps = Readonly<{
-  eyebrow: string;
-  title: string;
-  description: string;
-  primaryAction: Readonly<{ href: string; label: string }>;
-  secondaryAction: Readonly<{ href: string; label: string }>;
-}>;
+import { useEffect, useRef } from "react";
 
 const WORD_DURATION_MS = 600;
 const WORD_STAGGER_MS = 52;
 const WORD_INITIAL_DELAY_MS = 120;
 
-export function HeroCopyMotion({ eyebrow, title, description, primaryAction, secondaryAction }: HeroCopyMotionProps) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const titleWords = title.trim().split(/\s+/);
+export function HeroTextMotionController() {
+  const markerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const root = rootRef.current;
+    const root = markerRef.current?.parentElement;
     if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const animations: Animation[] = [];
@@ -65,22 +55,5 @@ export function HeroCopyMotion({ eyebrow, title, description, primaryAction, sec
     return () => animations.forEach((animation) => animation.cancel());
   }, []);
 
-  return (
-    <div ref={rootRef} className="revival-hero-copy lg:max-w-[34rem] lg:-translate-y-[4vh]" data-hero-text-motion="word-reveal">
-      <p className="eyebrow" data-hero-copy-support>{eyebrow}</p>
-      <h1 id="hero-title">
-        {titleWords.map((word, index) => (
-          <Fragment key={`${word}-${index}`}>
-            <span className="inline-block will-change-transform" data-hero-word>{word}</span>
-            {index < titleWords.length - 1 ? " " : null}
-          </Fragment>
-        ))}
-      </h1>
-      <p className="lede" data-hero-copy-support>{description}</p>
-      <div className="actions" data-hero-copy-support>
-        <ButtonLink href={primaryAction.href}>{primaryAction.label}</ButtonLink>
-        <ButtonLink href={secondaryAction.href} variant="secondary">{secondaryAction.label}</ButtonLink>
-      </div>
-    </div>
-  );
+  return <span ref={markerRef} hidden data-hero-text-controller="native-waapi" />;
 }
