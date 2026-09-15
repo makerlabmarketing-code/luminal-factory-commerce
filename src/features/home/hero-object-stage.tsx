@@ -15,11 +15,27 @@ type PointerPosition = {
   y: number;
 };
 
+type NetworkInformationLike = {
+  saveData?: boolean;
+  effectiveType?: string;
+};
+
+type NavigatorWithConnection = Navigator & {
+  connection?: NetworkInformationLike;
+};
+
+type IdleCapableWindow = Window & {
+  requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
+  cancelIdleCallback?: (handle: number) => void;
+};
+
 const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
 const POINTER_THETA_RANGE_DEG = 4;
 const POINTER_PHI_RANGE_DEG = 2.4;
 const POINTER_EASE = 0.1;
+const HERO_IDLE_TIMEOUT_MS = 1200;
+const HERO_IDLE_FALLBACK_MS = 450;
 
 function ensureModelViewer() {
   if (window.customElements.get("model-viewer")) return Promise.resolve();
@@ -85,11 +101,33 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       preview.style.visibility = "visible";
     }
 
+    if (loaderRef.current) {
+      loaderRef.current.style.display = "none";
+      loaderRef.current.style.opacity = "0";
+    }
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const connection = (navigator as NavigatorWithConnection).connection;
+    const constrainedNetwork = connection?.saveData === true
+      || connection?.effectiveType === "slow-2g"
+      || connection?.effectiveType === "2g";
+    const posterOnly = !finePointer || constrainedNetwork;
+
+    if (posterOnly) {
+      stage.dataset.heroMode = !finePointer ? "poster-coarse-pointer" : "poster-constrained-network";
+      if (reactiveLightRef.current) reactiveLightRef.current.style.opacity = "0";
+      if (lensRef.current) lensRef.current.style.opacity = "0";
+      if (noteRef.current) noteRef.current.style.opacity = "0";
+      return;
+    }
+
+    stage.dataset.heroMode = "pending";
+
     let cancelled = false;
     let observer: IntersectionObserver | null = null;
-    let visibilityObserver: IntersectionObserver | null = null;
+    let idleHandle: number | null = null;
+    let fallbackTimeout: number | null = null;
 
     const applyCamera = (pointer = pointerCurrentRef.current) => {
       const theta = presentation.camera.thetaDeg + pointer.x * POINTER_THETA_RANGE_DEG;
@@ -116,7 +154,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
 
     const animateInteraction = () => {
       interactionFrameRef.current = null;
-      if (cancelled || reducedMotion || !finePointer) return;
+      if (cancelled || reducedMotion) return;
 
       const current = pointerCurrentRef.current;
       const target = pointerTargetRef.current;
@@ -131,7 +169,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     };
 
     const scheduleInteraction = () => {
-      if (interactionFrameRef.current !== null || reducedMotion || !finePointer) return;
+      if (interactionFrameRef.current !== null || reducedMotion) return;
       interactionFrameRef.current = window.requestAnimationFrame(animateInteraction);
     };
 
@@ -154,12 +192,13 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       scheduleInteraction();
     };
 
-    if (finePointer && !reducedMotion) {
+    if (!reducedMotion) {
       stage.addEventListener("pointermove", onPointerMove, { passive: true });
       stage.addEventListener("pointerleave", onPointerLeave, { passive: true });
     }
 
     const showError = () => {
+      stage.dataset.heroMode = "poster-error";
       modelReadyRef.current = false;
       if (loaderRef.current) loaderRef.current.style.display = "none";
       if (errorRef.current) errorRef.current.style.opacity = "1";
@@ -173,6 +212,13 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
 
     const mountViewer = async () => {
       try {
+        stage.dataset.heroMode = "loading";
+
+        if (loaderRef.current) {
+          loaderRef.current.style.display = "flex";
+          loaderRef.current.style.opacity = "1";
+        }
+
         await ensureModelViewer();
         if (cancelled || viewerRef.current) return;
 
@@ -197,17 +243,11 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         viewer.setAttribute("max-field-of-view", `${presentation.camera.maxFieldOfViewDeg}deg`);
         viewer.setAttribute("camera-target", "auto auto auto");
 
-        const useSimplifiedIdleMotion = !reducedMotion && !finePointer && presentation.autoRotate;
-        if (useSimplifiedIdleMotion) {
-          viewer.setAttribute("auto-rotate", "");
-          viewer.setAttribute("auto-rotate-delay", String(presentation.autoRotateDelayMs));
-          viewer.setAttribute("rotation-per-second", `${presentation.rotationPerSecondDeg}deg`);
-        }
-
         radiusRef.current = reducedMotion ? presentation.camera.radiusPercent : presentation.camera.introRadiusPercent;
         applyCamera();
 
         viewer.addEventListener("load", () => {
+          stage.dataset.heroMode = "enhanced";
           modelReadyRef.current = true;
           if (loaderRef.current) {
             loaderRef.current.style.opacity = "0";
@@ -222,7 +262,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
               if (!cancelled && previewRef.current) previewRef.current.style.visibility = "hidden";
             }, 620);
           }
-          if (noteRef.current && finePointer && !reducedMotion) noteRef.current.style.opacity = "1";
+          if (noteRef.current && !reducedMotion) noteRef.current.style.opacity = "1";
 
           if (reducedMotion) {
             radiusRef.current = presentation.camera.radiusPercent;
@@ -247,25 +287,34 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         viewer.addEventListener("error", showError, { once: true });
         mount.replaceChildren(viewer);
         viewerRef.current = viewer;
-
-        if (useSimplifiedIdleMotion) {
-          visibilityObserver = new IntersectionObserver((entries) => {
-            const visible = entries.some((entry) => entry.isIntersecting && entry.intersectionRatio > 0.05);
-            if (visible) viewer.setAttribute("auto-rotate", "");
-            else viewer.removeAttribute("auto-rotate");
-          }, { threshold: [0, 0.05] });
-          visibilityObserver.observe(stage);
-        }
       } catch {
         showError();
       }
     };
 
+    const scheduleMountViewer = () => {
+      if (cancelled || idleHandle !== null || fallbackTimeout !== null) return;
+
+      const idleWindow = window as IdleCapableWindow;
+      if (typeof idleWindow.requestIdleCallback === "function") {
+        idleHandle = idleWindow.requestIdleCallback(() => {
+          idleHandle = null;
+          void mountViewer();
+        }, { timeout: HERO_IDLE_TIMEOUT_MS });
+        return;
+      }
+
+      fallbackTimeout = window.setTimeout(() => {
+        fallbackTimeout = null;
+        void mountViewer();
+      }, HERO_IDLE_FALLBACK_MS);
+    };
+
     observer = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
       observer?.disconnect();
-      void mountViewer();
-    }, { rootMargin: "280px" });
+      scheduleMountViewer();
+    }, { rootMargin: "160px" });
 
     observer.observe(stage);
 
@@ -273,11 +322,17 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       cancelled = true;
       modelReadyRef.current = false;
       observer?.disconnect();
-      visibilityObserver?.disconnect();
       stage.removeEventListener("pointermove", onPointerMove);
       stage.removeEventListener("pointerleave", onPointerLeave);
+
+      const idleWindow = window as IdleCapableWindow;
+      if (idleHandle !== null && typeof idleWindow.cancelIdleCallback === "function") {
+        idleWindow.cancelIdleCallback(idleHandle);
+      }
+      if (fallbackTimeout !== null) window.clearTimeout(fallbackTimeout);
       if (introFrameRef.current !== null) window.cancelAnimationFrame(introFrameRef.current);
       if (interactionFrameRef.current !== null) window.cancelAnimationFrame(interactionFrameRef.current);
+
       viewerRef.current = null;
       mount.replaceChildren();
     };
@@ -289,6 +344,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       className="hero-object-stage group !min-h-[30rem] !overflow-visible !border-0 !bg-transparent lg:!min-h-[46rem]"
       data-hero-renderer="model-viewer"
       data-hero-interaction="pointer-orbit-fluid-lens"
+      data-hero-mode="poster-first"
       data-hero-tint={presentation.tint ?? "default"}
     >
       {media.availability === "available" ? (
@@ -326,7 +382,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
             aria-hidden="true"
           />
 
-          <div ref={loaderRef} className="absolute inset-0 z-[5] flex items-center justify-center transition-opacity duration-300" role="status" aria-live="polite">
+          <div ref={loaderRef} className="absolute inset-0 z-[5] flex items-center justify-center opacity-0 transition-opacity duration-300" role="status" aria-live="polite">
             <div className="flex flex-col items-center gap-4">
               <div className="relative size-14" aria-hidden="true">
                 <span className="absolute inset-0 rounded-full border border-white/10" />

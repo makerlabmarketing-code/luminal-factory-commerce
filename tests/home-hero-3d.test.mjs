@@ -20,6 +20,7 @@ test("homepage hero uses a replaceable presentation contract with the current op
 test("homepage hero shows the real product image first and hands off to 3D when ready", () => {
   assert.match(heroSource, /import Image from "next\/image"/);
   assert.match(heroSource, /data-hero-product-image="true"/);
+  assert.match(heroSource, /data-hero-mode="poster-first"/);
   assert.match(heroSource, /src=\{media\.src\}/);
   assert.match(heroSource, /preload/);
   assert.match(heroSource, /sizes=\{media\.sizes\}/);
@@ -52,11 +53,23 @@ test("M-004 uses requestAnimationFrame pointer orbit, reactive light and one opt
   assert.doesNotMatch(heroSource, /useState|setState/);
 });
 
-test("M-004 preserves reduced-motion, simplified coarse-pointer idle motion and offscreen suspension", () => {
+test("M-004 keeps the 5 MB enhancement off coarse pointers and constrained networks", () => {
+  assert.match(heroSource, /connection\?\.saveData === true/);
+  assert.match(heroSource, /connection\?\.effectiveType === "slow-2g"/);
+  assert.match(heroSource, /connection\?\.effectiveType === "2g"/);
+  assert.match(heroSource, /posterOnly = !finePointer \|\| constrainedNetwork/);
+  assert.match(heroSource, /poster-coarse-pointer/);
+  assert.match(heroSource, /poster-constrained-network/);
+  assert.doesNotMatch(heroSource, /useSimplifiedIdleMotion|auto-rotate/);
+});
+
+test("M-004 defers desktop 3D until browser idle while preserving reduced-motion and cleanup", () => {
   assert.match(heroSource, /prefers-reduced-motion: reduce/);
-  assert.match(heroSource, /useSimplifiedIdleMotion = !reducedMotion && !finePointer && presentation\.autoRotate/);
-  assert.match(heroSource, /presentation\.rotationPerSecondDeg/);
-  assert.match(heroSource, /IntersectionObserver/);
-  assert.match(heroSource, /viewer\.removeAttribute\("auto-rotate"\)/);
+  assert.match(heroSource, /requestIdleCallback/);
+  assert.match(heroSource, /HERO_IDLE_TIMEOUT_MS/);
+  assert.match(heroSource, /HERO_IDLE_FALLBACK_MS/);
+  assert.match(heroSource, /cancelIdleCallback/);
+  assert.match(heroSource, /clearTimeout\(fallbackTimeout\)/);
   assert.match(heroSource, /cancelAnimationFrame\(interactionFrameRef\.current\)/);
+  assert.match(heroSource, /stage\.dataset\.heroMode = "enhanced"/);
 });
