@@ -41,16 +41,6 @@ export async function HomePage() {
     <main id="main-content" className="wave-home">
       <section className="revival-hero" aria-labelledby="hero-title">
         <div className="hero-atmosphere" aria-hidden="true" />
-        <Image
-          className="hero-crystal-mark"
-          src="/brand/luminal-factory-logo-primary.png"
-          alt=""
-          width={4000}
-          height={4000}
-          loading="lazy"
-          quality={62}
-          sizes="(max-width: 800px) 72vw, 42vw"
-        />
         <Container className="revival-hero-inner lg:!grid-cols-[minmax(0,.72fr)_minmax(28rem,1.28fr)] lg:!gap-[clamp(2rem,5vw,6rem)]">
           <div className="revival-hero-copy lg:max-w-[34rem] lg:-translate-y-[4vh]" data-hero-text-motion="word-reveal">
             <p className="eyebrow" data-hero-copy-support>{content.hero.eyebrow}</p>

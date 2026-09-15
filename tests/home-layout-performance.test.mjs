@@ -21,9 +21,9 @@ test("Homepage visual pass keeps the object dominant without adding a runtime de
   assert.match(layoutPlan, /Do not add Three\.js \/ R3F yet/);
 });
 
-test("decorative hero branding does not compete as a priority resource", () => {
-  assert.match(home, /luminal-factory-logo-primary\.png[\s\S]*loading="lazy"[\s\S]*quality=\{62\}/);
-  assert.doesNotMatch(home, /luminal-factory-logo-primary\.png[\s\S]{0,220}\bpriority\b/);
+test("legacy decorative Hero watermark stays out of the Homepage", () => {
+  assert.doesNotMatch(home, /hero-crystal-mark/);
+  assert.doesNotMatch(home, /\/brand\/luminal-factory-logo-primary\.png/);
 });
 
 test("small header branding keeps source geometry without competing with the product Hero preload", () => {
