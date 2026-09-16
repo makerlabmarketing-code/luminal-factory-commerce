@@ -4,6 +4,7 @@ import test from "node:test";
 
 const heroSource = fs.readFileSync("src/features/home/hero-object-stage.tsx", "utf8");
 const heroConfig = fs.readFileSync("src/features/home/hero-model-config.ts", "utf8");
+const heroData = fs.readFileSync("src/features/home/hero-model-data.ts", "utf8");
 const homePageSource = fs.readFileSync("src/features/home/home-page.tsx", "utf8");
 const globalStyles = fs.readFileSync("src/app/globals.css", "utf8");
 const heroModelPath = "public/models/meowhe-hero.glb";
@@ -17,6 +18,11 @@ test("homepage hero uses a replaceable presentation contract with the current op
   assert.equal(fs.existsSync(heroModelPath), true);
   assert.equal(fs.existsSync("public/meowhe-hero.glb"), false);
   assert.ok(fs.statSync(heroModelPath).size < 2 * 1024 * 1024, "Hero GLB should remain below 2 MiB");
+});
+
+test("remote Hero configuration inherits the local orientation without requiring a Production DB migration", () => {
+  assert.match(heroData, /orientation: defaultHeroModelPresentation\.orientation/);
+  assert.doesNotMatch(heroData, /orientation_roll_deg|orientation_pitch_deg|orientation_yaw_deg/);
 });
 
 test("desktop Hero keeps the product poster out of the 3D loading and error path", () => {

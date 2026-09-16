@@ -105,6 +105,7 @@ function mapHeroRow(row: HeroRow, projectOrigin: string): HeroModelPresentation 
     autoRotate: row.auto_rotate,
     autoRotateDelayMs: row.auto_rotate_delay_ms,
     rotationPerSecondDeg: row.rotation_per_second_deg,
+    orientation: defaultHeroModelPresentation.orientation,
     camera: {
       thetaDeg: row.camera_theta_deg,
       phiDeg: row.camera_phi_deg,
