@@ -23,6 +23,17 @@ test("motion honors reduced-motion and coarse pointers", () => {
   assert.match(globals, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
+test("global cursor uses dual smoothed followers instead of a single flashlight lock", () => {
+  assert.match(motionLayer, /data-flow="dual-follower"/);
+  assert.match(motionLayer, /LEAD_EASE/);
+  assert.match(motionLayer, /TRAIL_EASE/);
+  assert.match(motionLayer, /goldRef/);
+  assert.match(motionLayer, /violetRef/);
+  assert.match(motionLayer, /Math\.sin\(now \* 0\.00145\)/);
+  assert.match(motionLayer, /Math\.cos\(now \* 0\.00105\)/);
+  assert.doesNotMatch(motionLayer, /light\.style\.transform = `translate3d\(\$\{currentX\}/);
+});
+
 test("Luminal palette and local spotlight stay restrained and CSS-driven", () => {
   assert.match(globals, /--luminal-motion-gold: #d6b35a/);
   assert.match(globals, /--luminal-motion-violet: #7259b8/);

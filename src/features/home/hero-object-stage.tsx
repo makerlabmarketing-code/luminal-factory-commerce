@@ -31,17 +31,13 @@ type IdleCapableWindow = Window & {
 
 const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
-const POINTER_THETA_RANGE_DEG = 4;
-const POINTER_PHI_RANGE_DEG = 2.4;
-const POINTER_EASE = 0.1;
+const POINTER_THETA_RANGE_DEG = 3.5;
+const POINTER_PHI_RANGE_DEG = 1.8;
+const POINTER_EASE = 0.085;
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
-const HERO_LENS_MIN_X_PERCENT = 14;
-const HERO_LENS_MAX_X_PERCENT = 86;
-const HERO_LENS_MIN_Y_PERCENT = 16;
-const HERO_LENS_MAX_Y_PERCENT = 84;
-const HERO_LIGHT_IDLE_OPACITY = "0.4";
-const HERO_LIGHT_ACTIVE_OPACITY = "0.88";
+const HERO_LIGHT_IDLE_OPACITY = "0.28";
+const HERO_LIGHT_ACTIVE_OPACITY = "0.7";
 
 function ensureModelViewer() {
   if (window.customElements.get("model-viewer")) return Promise.resolve();
@@ -80,11 +76,9 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
   const loaderRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
   const noteRef = useRef<HTMLSpanElement>(null);
-  const lensRef = useRef<HTMLDivElement>(null);
   const reactiveLightRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLElement | null>(null);
   const radiusRef = useRef(presentation.camera.radiusPercent);
-  const introFrameRef = useRef<number | null>(null);
   const interactionFrameRef = useRef<number | null>(null);
   const modelReadyRef = useRef(false);
   const hasInteractedRef = useRef(false);
@@ -101,6 +95,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     mount.style.opacity = "0";
     modelReadyRef.current = false;
     hasInteractedRef.current = false;
+    radiusRef.current = presentation.camera.radiusPercent;
     pointerTargetRef.current = { x: 0, y: 0 };
     pointerCurrentRef.current = { x: 0, y: 0 };
 
@@ -125,7 +120,6 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     if (posterOnly) {
       stage.dataset.heroMode = !finePointer ? "poster-coarse-pointer" : "poster-constrained-network";
       if (reactiveLightRef.current) reactiveLightRef.current.style.opacity = "0";
-      if (lensRef.current) lensRef.current.style.opacity = "0";
       if (noteRef.current) noteRef.current.style.opacity = "0";
       return;
     }
@@ -147,19 +141,12 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       );
     };
 
-    const updateOpticalLayers = (pointer: PointerPosition) => {
+    const updateReactiveLight = (pointer: PointerPosition) => {
       const xPercent = clamp((pointer.x + 1) * 50, 0, 100);
       const yPercent = clamp((pointer.y + 1) * 50, 0, 100);
-      const lensXPercent = clamp(xPercent, HERO_LENS_MIN_X_PERCENT, HERO_LENS_MAX_X_PERCENT);
-      const lensYPercent = clamp(yPercent, HERO_LENS_MIN_Y_PERCENT, HERO_LENS_MAX_Y_PERCENT);
 
       if (reactiveLightRef.current) {
-        reactiveLightRef.current.style.background = `radial-gradient(circle at ${xPercent}% ${yPercent}%, rgba(214,179,90,.18) 0%, rgba(114,89,184,.07) 25%, rgba(5,5,5,0) 58%)`;
-      }
-
-      if (lensRef.current) {
-        lensRef.current.style.left = `${lensXPercent}%`;
-        lensRef.current.style.top = `${lensYPercent}%`;
+        reactiveLightRef.current.style.background = `radial-gradient(ellipse at ${xPercent}% ${yPercent}%, rgba(255,255,255,.105) 0%, rgba(114,89,184,.05) 31%, rgba(5,5,5,0) 68%)`;
       }
     };
 
@@ -173,7 +160,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       current.y += (target.y - current.y) * POINTER_EASE;
 
       applyCamera(current);
-      updateOpticalLayers(current);
+      updateReactiveLight(current);
 
       const unsettled = Math.abs(target.x - current.x) > 0.002 || Math.abs(target.y - current.y) > 0.002;
       if (unsettled) interactionFrameRef.current = window.requestAnimationFrame(animateInteraction);
@@ -194,7 +181,6 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       };
 
       if (modelReadyRef.current) {
-        if (lensRef.current) lensRef.current.style.opacity = "1";
         if (reactiveLightRef.current) reactiveLightRef.current.style.opacity = HERO_LIGHT_ACTIVE_OPACITY;
         if (!hasInteractedRef.current) {
           hasInteractedRef.current = true;
@@ -206,7 +192,6 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
 
     const onPointerLeave = () => {
       pointerTargetRef.current = { x: 0, y: 0 };
-      if (lensRef.current) lensRef.current.style.opacity = "0";
       if (reactiveLightRef.current) reactiveLightRef.current.style.opacity = HERO_LIGHT_IDLE_OPACITY;
       scheduleInteraction();
     };
@@ -221,7 +206,6 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       modelReadyRef.current = false;
       if (loaderRef.current) loaderRef.current.style.display = "none";
       if (errorRef.current) errorRef.current.style.opacity = "1";
-      if (lensRef.current) lensRef.current.style.opacity = "0";
       if (reactiveLightRef.current) reactiveLightRef.current.style.opacity = "0";
       if (noteRef.current) noteRef.current.style.opacity = "0";
       mount.style.display = "none";
@@ -264,12 +248,15 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         viewer.setAttribute("max-field-of-view", `${presentation.camera.maxFieldOfViewDeg}deg`);
         viewer.setAttribute("camera-target", "auto auto auto");
 
-        radiusRef.current = reducedMotion ? presentation.camera.radiusPercent : presentation.camera.introRadiusPercent;
-        applyCamera();
+        radiusRef.current = presentation.camera.radiusPercent;
+        applyCamera({ x: 0, y: 0 });
 
         viewer.addEventListener("load", () => {
           stage.dataset.heroMode = "enhanced";
           modelReadyRef.current = true;
+          radiusRef.current = presentation.camera.radiusPercent;
+          applyCamera({ x: 0, y: 0 });
+
           if (loaderRef.current) {
             loaderRef.current.style.opacity = "0";
             window.setTimeout(() => {
@@ -285,25 +272,6 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
           }
           if (reactiveLightRef.current && !reducedMotion) reactiveLightRef.current.style.opacity = HERO_LIGHT_IDLE_OPACITY;
           if (noteRef.current && !reducedMotion && !hasInteractedRef.current) noteRef.current.style.opacity = "1";
-
-          if (reducedMotion) {
-            radiusRef.current = presentation.camera.radiusPercent;
-            applyCamera({ x: 0, y: 0 });
-            return;
-          }
-
-          const startedAt = performance.now();
-          const duration = 1450;
-          const zoomIn = (now: number) => {
-            if (cancelled) return;
-            const progress = clamp((now - startedAt) / duration, 0, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            radiusRef.current = presentation.camera.introRadiusPercent + (presentation.camera.radiusPercent - presentation.camera.introRadiusPercent) * eased;
-            applyCamera();
-            if (progress < 1) introFrameRef.current = window.requestAnimationFrame(zoomIn);
-          };
-
-          introFrameRef.current = window.requestAnimationFrame(zoomIn);
         }, { once: true });
 
         viewer.addEventListener("error", showError, { once: true });
@@ -352,7 +320,6 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         idleWindow.cancelIdleCallback(idleHandle);
       }
       if (fallbackTimeout !== null) window.clearTimeout(fallbackTimeout);
-      if (introFrameRef.current !== null) window.cancelAnimationFrame(introFrameRef.current);
       if (interactionFrameRef.current !== null) window.cancelAnimationFrame(interactionFrameRef.current);
 
       viewerRef.current = null;
@@ -365,7 +332,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       ref={stageRef}
       className="hero-object-stage group !min-h-[30rem] !overflow-visible !border-0 !bg-transparent lg:!min-h-[46rem]"
       data-hero-renderer="model-viewer"
-      data-hero-interaction="pointer-orbit-fluid-lens"
+      data-hero-interaction="pointer-orbit-flow-light"
       data-hero-mode="poster-first"
       data-hero-tint={presentation.tint ?? "default"}
     >
@@ -393,14 +360,14 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
 
           <div
             className="pointer-events-none absolute inset-[1%] z-[1] rounded-full opacity-55 blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(214,179,90,.14) 0%, rgba(114,89,184,.055) 38%, rgba(0,0,0,0) 72%)" }}
+            style={{ background: "radial-gradient(circle, rgba(214,179,90,.09) 0%, rgba(114,89,184,.05) 38%, rgba(0,0,0,0) 72%)" }}
             aria-hidden="true"
           />
 
           <div
             ref={reactiveLightRef}
-            className="pointer-events-none absolute -inset-[8%] z-[3] opacity-40 transition-opacity duration-300 motion-reduce:hidden"
-            style={{ background: "radial-gradient(circle at 50% 50%, rgba(214,179,90,.18) 0%, rgba(114,89,184,.07) 25%, rgba(5,5,5,0) 58%)" }}
+            className="pointer-events-none absolute -inset-[8%] z-[3] opacity-30 transition-opacity duration-500 motion-reduce:hidden"
+            style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.105) 0%, rgba(114,89,184,.05) 31%, rgba(5,5,5,0) 68%)" }}
             aria-hidden="true"
           />
 
@@ -421,23 +388,6 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
           </div>
 
           <div ref={modelMountRef} className="absolute -inset-x-[9%] -inset-y-[4%] z-[2] opacity-0 transition-opacity duration-[620ms]" />
-
-          <div
-            ref={lensRef}
-            data-hero-lens="fluid-glass"
-            className="pointer-events-none absolute z-[4] hidden aspect-square w-[clamp(7.5rem,11vw,10rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/20 opacity-0 shadow-[0_1.5rem_5rem_rgba(0,0,0,.35),inset_0_0_2rem_rgba(255,255,255,.08)] transition-opacity duration-200 md:block motion-reduce:hidden"
-            style={{
-              left: "50%",
-              top: "50%",
-              background: "radial-gradient(circle at 32% 24%, rgba(255,255,255,.16), rgba(214,179,90,.055) 28%, rgba(114,89,184,.05) 56%, rgba(5,5,5,.08) 100%)",
-              backdropFilter: "blur(2px) brightness(1.16) contrast(1.1) saturate(1.08)",
-              WebkitBackdropFilter: "blur(2px) brightness(1.16) contrast(1.1) saturate(1.08)",
-            }}
-            aria-hidden="true"
-          >
-            <span className="absolute inset-[9%] rounded-full border border-white/10" />
-            <span className="absolute left-[20%] top-[15%] h-[22%] w-[35%] rotate-[-28deg] rounded-full bg-white/15 blur-md" />
-          </div>
 
           <span ref={noteRef} className="pointer-events-none absolute bottom-4 right-4 z-[5] hidden font-mono text-[0.58rem] uppercase tracking-[0.14em] text-white/42 opacity-0 transition-opacity duration-300 md:block motion-reduce:hidden" aria-hidden="true">Move to explore</span>
         </>
