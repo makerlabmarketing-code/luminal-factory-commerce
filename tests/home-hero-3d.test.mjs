@@ -19,61 +19,56 @@ test("homepage hero uses a replaceable presentation contract with the current op
   assert.ok(fs.statSync(heroModelPath).size < 2 * 1024 * 1024, "Hero GLB should remain below 2 MiB");
 });
 
-test("homepage hero shows the real product image first and hands off to 3D when ready", () => {
+test("desktop Hero keeps the product poster out of the 3D loading and error path", () => {
   assert.match(heroSource, /import Image from "next\/image"/);
   assert.match(heroSource, /data-hero-product-image="true"/);
-  assert.match(heroSource, /data-hero-mode="poster-first"/);
-  assert.match(heroSource, /src=\{media\.src\}/);
-  assert.match(heroSource, /preload/);
-  assert.match(heroSource, /sizes=\{media\.sizes\}/);
-  assert.match(heroSource, /previewRef/);
-  assert.match(heroSource, /preview\.style\.opacity = "0"/);
-  assert.match(heroSource, /3D preview unavailable · Product image active/);
+  assert.match(heroSource, /data-hero-poster-role="constrained-fallback"/);
+  assert.match(heroSource, /data-hero-mode="capability-gated"/);
+  assert.match(heroSource, /className="absolute inset-0 z-\[1\] overflow-hidden opacity-100 md:hidden"/);
+  assert.match(heroSource, /preview\.style\.display = "none"/);
+  assert.match(heroSource, /preview\.style\.visibility = "hidden"/);
+  assert.match(heroSource, /stage\.dataset\.heroMode = "3d-error"/);
+  assert.match(heroSource, /3D preview unavailable/);
+  assert.doesNotMatch(heroSource, /Product image active/);
   assert.match(heroSource, /Loading 3D object/);
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.equal(fs.existsSync("src/features/home/hero-object-stage.module.css"), false);
 });
 
-test("Hero Visual Pass 2 keeps a curated angled product pose without exposing an inspection viewer", () => {
-  assert.match(heroConfig, /thetaDeg: 24/);
-  assert.match(heroConfig, /phiDeg: 73/);
-  assert.match(heroConfig, /autoRotate: false/);
-  assert.match(heroSource, /data-hero-interaction="pointer-orbit-flow-light"/);
-  assert.match(heroSource, /!border-0 !bg-transparent/);
+test("Hero Visual Pass 3 starts near the requested face angle and rotates continuously without cursor control", () => {
+  assert.match(heroConfig, /thetaDeg: 14/);
+  assert.match(heroConfig, /phiDeg: 82/);
+  assert.match(heroConfig, /radiusPercent: 102/);
+  assert.match(heroConfig, /autoRotate: true/);
+  assert.match(heroConfig, /autoRotateDelayMs: 700/);
+  assert.match(heroConfig, /rotationPerSecondDeg: 6/);
+  assert.match(heroSource, /data-hero-interaction="auto-rotate-360"/);
+  assert.match(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
+  assert.match(heroSource, /viewer\.setAttribute\("auto-rotate-delay", String\(presentation\.autoRotateDelayMs\)\)/);
+  assert.match(heroSource, /viewer\.setAttribute\("rotation-per-second", `\$\{presentation\.rotationPerSecondDeg\}deg`\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
-  assert.match(heroSource, /Move to explore/);
+  assert.doesNotMatch(heroSource, /pointermove|pointerleave|POINTER_THETA_RANGE_DEG|POINTER_PHI_RANGE_DEG|reactiveLightRef|Move to explore/);
   assert.doesNotMatch(heroSource, /data-hero-lens|fluid-glass|backdropFilter/);
-  assert.doesNotMatch(heroSource, /Drag to rotate · Scroll to zoom/);
   assert.doesNotMatch(heroSource, /viewer\.setAttribute\("camera-controls"/);
 });
 
-test("Hero Visual Pass 2 uses requestAnimationFrame pointer orbit and soft reactive light without React render churn", () => {
-  assert.match(heroSource, /\(hover: hover\) and \(pointer: fine\)/);
-  assert.match(heroSource, /pointermove/);
-  assert.match(heroSource, /requestAnimationFrame\(animateInteraction\)/);
-  assert.match(heroSource, /presentation\.camera\.thetaDeg/);
-  assert.match(heroSource, /POINTER_THETA_RANGE_DEG/);
-  assert.match(heroSource, /reactiveLightRef/);
-  assert.match(heroSource, /radial-gradient\(ellipse at \$\{xPercent\}% \$\{yPercent\}%/);
-  assert.doesNotMatch(heroSource, /useState|setState/);
-});
-
-test("Hero Visual Pass 2 removes the load-time zoom and keeps the optimized enhancement off constrained clients", () => {
+test("constrained clients keep the image fallback while eligible desktop defers 3D until browser idle", () => {
   assert.match(heroSource, /connection\?\.saveData === true/);
   assert.match(heroSource, /connection\?\.effectiveType === "slow-2g"/);
   assert.match(heroSource, /connection\?\.effectiveType === "2g"/);
   assert.match(heroSource, /posterOnly = !finePointer \|\| constrainedNetwork/);
-  assert.match(heroSource, /radiusRef\.current = presentation\.camera\.radiusPercent/);
-  assert.doesNotMatch(heroSource, /const zoomIn|introFrameRef|requestAnimationFrame\(zoomIn\)/);
-});
-
-test("Hero 3D defers desktop enhancement until browser idle while preserving reduced-motion and cleanup", () => {
-  assert.match(heroSource, /prefers-reduced-motion: reduce/);
+  assert.match(heroSource, /poster-coarse-pointer/);
+  assert.match(heroSource, /poster-constrained-network/);
+  assert.match(heroSource, /preview\.style\.display = "block"/);
   assert.match(heroSource, /requestIdleCallback/);
   assert.match(heroSource, /HERO_IDLE_TIMEOUT_MS/);
   assert.match(heroSource, /HERO_IDLE_FALLBACK_MS/);
   assert.match(heroSource, /cancelIdleCallback/);
   assert.match(heroSource, /clearTimeout\(fallbackTimeout\)/);
-  assert.match(heroSource, /cancelAnimationFrame\(interactionFrameRef\.current\)/);
-  assert.match(heroSource, /stage\.dataset\.heroMode = "enhanced"/);
+});
+
+test("reduced motion keeps an eligible desktop model static instead of removing the 3D object", () => {
+  assert.match(heroSource, /prefers-reduced-motion: reduce/);
+  assert.match(heroSource, /presentation\.autoRotate && !reducedMotion/);
+  assert.match(heroSource, /enhanced-static/);
+  assert.match(heroSource, /enhanced-auto-rotate/);
 });
