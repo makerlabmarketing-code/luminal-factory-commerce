@@ -40,11 +40,12 @@ test("desktop Hero keeps the product poster out of the 3D loading and error path
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("Hero Visual Pass 5 rotates the object onto a horizontal axis and keeps autonomous rotation", () => {
-  assert.match(heroConfig, /rollDeg: -90/);
-  assert.match(heroConfig, /pitchDeg: 8/);
-  assert.match(heroConfig, /thetaDeg: 8/);
-  assert.match(heroConfig, /phiDeg: 74/);
+test("Hero Visual Pass 6 respects the uploaded GLB native axes and uses camera framing instead of rotation hacks", () => {
+  assert.match(heroConfig, /rollDeg: 0/);
+  assert.match(heroConfig, /pitchDeg: 0/);
+  assert.match(heroConfig, /yawDeg: 0/);
+  assert.match(heroConfig, /thetaDeg: 12/);
+  assert.match(heroConfig, /phiDeg: 70/);
   assert.match(heroConfig, /radiusPercent: 103/);
   assert.match(heroConfig, /autoRotate: true/);
   assert.match(heroConfig, /autoRotateDelayMs: 700/);
@@ -52,6 +53,7 @@ test("Hero Visual Pass 5 rotates the object onto a horizontal axis and keeps aut
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
   assert.match(heroSource, /presentation\.orientation\.rollDeg/);
   assert.match(heroSource, /presentation\.orientation\.pitchDeg/);
+  assert.match(heroSource, /presentation\.orientation\.yawDeg/);
   assert.match(heroSource, /data-hero-interaction="auto-rotate-360"/);
   assert.match(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
   assert.match(heroSource, /viewer\.setAttribute\("auto-rotate-delay", String\(presentation\.autoRotateDelayMs\)\)/);
