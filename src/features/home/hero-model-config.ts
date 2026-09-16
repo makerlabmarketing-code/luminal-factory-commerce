@@ -36,12 +36,12 @@ export const defaultHeroModelPresentation: HeroModelPresentation = {
   rotationPerSecondDeg: 8,
   orientation: {
     rollDeg: 0,
-    pitchDeg: 0,
+    pitchDeg: 52,
     yawDeg: 0,
   },
   camera: {
     thetaDeg: 12,
-    phiDeg: 70,
+    phiDeg: 82,
     radiusPercent: 103,
     introRadiusPercent: 103,
     minRadiusPercent: 78,

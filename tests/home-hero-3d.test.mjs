@@ -40,12 +40,12 @@ test("desktop Hero keeps the product poster out of the 3D loading and error path
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("Hero Visual Pass 6 respects the uploaded GLB native axes and uses camera framing instead of rotation hacks", () => {
+test("Hero Visual Pass 7 pitches the upright keycap forward while preserving autonomous rotation", () => {
   assert.match(heroConfig, /rollDeg: 0/);
-  assert.match(heroConfig, /pitchDeg: 0/);
+  assert.match(heroConfig, /pitchDeg: 52/);
   assert.match(heroConfig, /yawDeg: 0/);
   assert.match(heroConfig, /thetaDeg: 12/);
-  assert.match(heroConfig, /phiDeg: 70/);
+  assert.match(heroConfig, /phiDeg: 82/);
   assert.match(heroConfig, /radiusPercent: 103/);
   assert.match(heroConfig, /autoRotate: true/);
   assert.match(heroConfig, /autoRotateDelayMs: 700/);
