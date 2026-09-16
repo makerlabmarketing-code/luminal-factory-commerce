@@ -36,7 +36,7 @@ export const defaultHeroModelPresentation: HeroModelPresentation = {
   rotationPerSecondDeg: 8,
   orientation: {
     rollDeg: 0,
-    pitchDeg: 52,
+    pitchDeg: -52,
     yawDeg: 0,
   },
   camera: {

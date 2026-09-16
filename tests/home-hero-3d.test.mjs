@@ -40,9 +40,9 @@ test("desktop Hero keeps the product poster out of the 3D loading and error path
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("Hero Visual Pass 7 pitches the upright keycap forward while preserving autonomous rotation", () => {
+test("Hero Visual Pass 8 flips the forward pitch direction while preserving autonomous rotation", () => {
   assert.match(heroConfig, /rollDeg: 0/);
-  assert.match(heroConfig, /pitchDeg: 52/);
+  assert.match(heroConfig, /pitchDeg: -52/);
   assert.match(heroConfig, /yawDeg: 0/);
   assert.match(heroConfig, /thetaDeg: 12/);
   assert.match(heroConfig, /phiDeg: 82/);
