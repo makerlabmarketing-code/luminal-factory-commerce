@@ -34,13 +34,16 @@ test("desktop Hero keeps the product poster out of the 3D loading and error path
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("Hero Visual Pass 3 starts near the requested face angle and rotates continuously without cursor control", () => {
-  assert.match(heroConfig, /thetaDeg: 14/);
-  assert.match(heroConfig, /phiDeg: 82/);
-  assert.match(heroConfig, /radiusPercent: 102/);
+test("Hero Visual Pass 4 pitches the object forward and rotates continuously without cursor control", () => {
+  assert.match(heroConfig, /pitchDeg: 18/);
+  assert.match(heroConfig, /thetaDeg: 8/);
+  assert.match(heroConfig, /phiDeg: 74/);
+  assert.match(heroConfig, /radiusPercent: 103/);
   assert.match(heroConfig, /autoRotate: true/);
   assert.match(heroConfig, /autoRotateDelayMs: 700/);
-  assert.match(heroConfig, /rotationPerSecondDeg: 6/);
+  assert.match(heroConfig, /rotationPerSecondDeg: 8/);
+  assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
+  assert.match(heroSource, /presentation\.orientation\.pitchDeg/);
   assert.match(heroSource, /data-hero-interaction="auto-rotate-360"/);
   assert.match(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
   assert.match(heroSource, /viewer\.setAttribute\("auto-rotate-delay", String\(presentation\.autoRotateDelayMs\)\)/);

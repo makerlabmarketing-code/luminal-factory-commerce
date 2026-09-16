@@ -7,6 +7,11 @@ export type HeroModelPresentation = Readonly<{
   autoRotate: boolean;
   autoRotateDelayMs: number;
   rotationPerSecondDeg: number;
+  orientation: Readonly<{
+    rollDeg: number;
+    pitchDeg: number;
+    yawDeg: number;
+  }>;
   camera: Readonly<{
     thetaDeg: number;
     phiDeg: number;
@@ -28,12 +33,17 @@ export const defaultHeroModelPresentation: HeroModelPresentation = {
   shadowSoftness: 0.72,
   autoRotate: true,
   autoRotateDelayMs: 700,
-  rotationPerSecondDeg: 6,
+  rotationPerSecondDeg: 8,
+  orientation: {
+    rollDeg: 0,
+    pitchDeg: 18,
+    yawDeg: 0,
+  },
   camera: {
-    thetaDeg: 14,
-    phiDeg: 82,
-    radiusPercent: 102,
-    introRadiusPercent: 102,
+    thetaDeg: 8,
+    phiDeg: 74,
+    radiusPercent: 103,
+    introRadiusPercent: 103,
     minRadiusPercent: 78,
     maxRadiusPercent: 155,
     fieldOfViewDeg: 29,

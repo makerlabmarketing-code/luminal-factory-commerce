@@ -6,6 +6,7 @@ const layout = fs.readFileSync("src/app/layout.tsx", "utf8");
 const motionLayer = fs.readFileSync("src/components/motion/luminal-motion-layer.tsx", "utf8");
 const globals = fs.readFileSync("src/app/globals.css", "utf8");
 const home = fs.readFileSync("src/features/home/home-page.tsx", "utf8");
+const components = fs.readFileSync("components.json", "utf8");
 
 test("global Luminal motion foundation mounts once without a new runtime package", () => {
   assert.match(layout, /LuminalMotionLayer/);
@@ -19,19 +20,21 @@ test("global Luminal motion foundation mounts once without a new runtime package
 test("motion honors reduced-motion and coarse pointers", () => {
   assert.match(motionLayer, /prefers-reduced-motion: reduce/);
   assert.match(motionLayer, /pointer: fine/);
-  assert.match(globals, /@media \(hover: none\), \(pointer: coarse\)/);
+  assert.match(motionLayer, /if \(!finePointer\.matches\) cursor\.style\.display = "none"/);
   assert.match(globals, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("global cursor uses dual smoothed followers instead of a single flashlight lock", () => {
-  assert.match(motionLayer, /data-flow="dual-follower"/);
-  assert.match(motionLayer, /LEAD_EASE/);
-  assert.match(motionLayer, /TRAIL_EASE/);
-  assert.match(motionLayer, /goldRef/);
-  assert.match(motionLayer, /violetRef/);
-  assert.match(motionLayer, /Math\.sin\(now \* 0\.00145\)/);
-  assert.match(motionLayer, /Math\.cos\(now \* 0\.00105\)/);
-  assert.doesNotMatch(motionLayer, /light\.style\.transform = `translate3d\(\$\{currentX\}/);
+test("global cursor uses a lightweight custom glass trail without licensed React Bits code", () => {
+  assert.match(motionLayer, /data-cursor="glass-trail"/);
+  assert.match(motionLayer, /GLASS_TRAIL_LENGTH = 14/);
+  assert.match(motionLayer, /CURSOR_IDLE_TIMEOUT_MS = 700/);
+  assert.match(motionLayer, /backdropFilter: "blur\(5px\) saturate\(1\.35\)"/);
+  assert.match(motionLayer, /WebkitBackdropFilter: "blur\(5px\) saturate\(1\.35\)"/);
+  assert.match(motionLayer, /mixBlendMode: "screen"/);
+  assert.match(motionLayer, /Math\.hypot\(dx, dy\)/);
+  assert.match(motionLayer, /scale\(\$\{localStretch\}, \$\{crossScale\}\)/);
+  assert.doesNotMatch(motionLayer, /@reactbits|glass-cursor-tw|dual-follower|goldRef|violetRef/);
+  assert.match(components, /"registries": \{\}/);
 });
 
 test("Luminal palette and local spotlight stay restrained and CSS-driven", () => {

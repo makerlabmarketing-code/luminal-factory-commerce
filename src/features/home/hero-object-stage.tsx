@@ -136,6 +136,10 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         viewer.style.height = "100%";
         viewer.style.background = "transparent";
         viewer.style.pointerEvents = "none";
+        viewer.setAttribute(
+          "orientation",
+          `${presentation.orientation.rollDeg}deg ${presentation.orientation.pitchDeg}deg ${presentation.orientation.yawDeg}deg`,
+        );
         viewer.setAttribute("src", presentation.modelSrc);
         viewer.setAttribute("alt", media.alt);
         viewer.setAttribute("loading", "eager");
