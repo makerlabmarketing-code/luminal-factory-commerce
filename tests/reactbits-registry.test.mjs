@@ -3,16 +3,14 @@ import fs from "node:fs";
 import test from "node:test";
 
 const components = JSON.parse(fs.readFileSync("components.json", "utf8"));
+const motionLayer = fs.readFileSync("src/components/motion/luminal-motion-layer.tsx", "utf8");
 
-test("React Bits Pro registries use the license environment variable without committing a credential", () => {
-  const starter = components.registries?.["@reactbits-starter"];
-  const pro = components.registries?.["@reactbits-pro"];
-
-  assert.equal(starter?.url, "https://pro.reactbits.dev/api/r/starter/{name}.json");
-  assert.equal(pro?.url, "https://pro.reactbits.dev/api/r/pro/{name}.json");
-  assert.equal(starter?.headers?.Authorization, "Bearer ${REACTBITS_LICENSE_KEY}");
-  assert.equal(pro?.headers?.Authorization, "Bearer ${REACTBITS_LICENSE_KEY}");
+test("custom Luminal Glass Cursor stays independent from React Bits Pro licensing", () => {
+  assert.deepEqual(components.registries ?? {}, {});
+  assert.match(motionLayer, /data-cursor="glass-trail"/);
+  assert.match(motionLayer, /backdropFilter: "blur\(5px\) saturate\(1\.35\)"/);
+  assert.doesNotMatch(motionLayer, /@reactbits|glass-cursor-tw|REACTBITS_LICENSE_KEY/);
 
   const serialized = JSON.stringify(components);
-  assert.doesNotMatch(serialized, /Bearer rb_[A-Za-z0-9_-]+/);
+  assert.doesNotMatch(serialized, /reactbits|REACTBITS_LICENSE_KEY|Bearer rb_[A-Za-z0-9_-]+/i);
 });
