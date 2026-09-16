@@ -33,8 +33,11 @@ External websites are references only. Use `.codex/skills/reference-analysis/SKI
 These repository-local skills may be used after the Luminal authority files have been read:
 
 - `.agents/skills/frontend-design/SKILL.md` for distinctive composition and typography critique;
-- `.agents/skills/design-taste-frontend/SKILL.md` for density, motion, material, and restraint review;
+- `.agents/skills/design-taste-frontend/SKILL.md` for design read, anti-template direction, density, motion, material, and restraint review;
+- `.agents/skills/luminal-frontend-structure/SKILL.md` for spatial thesis, reading order, grouping, rhythm, responsive extremes, and bounded visual QA;
 - `.agents/skills/vercel-react-best-practices/SKILL.md` for React/Next.js performance review.
+
+Use the quality layers in that order when a frontend task needs all of them: Luminal authority first, then art direction, then structural review, then implementation/performance checks.
 
 They are advisory. They never override approved Luminal page scripts, `ui-rules.md`, architecture, commerce behavior, Supabase boundaries, accessibility, or Production gates.
 

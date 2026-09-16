@@ -80,8 +80,10 @@ test("Archive stays static while Phase 5 Shop catalog reads remain non-transacti
 
 test("design tokens have one source and reduced motion is supported", () => {
   const cssFiles = walk("src").filter((path) => path.endsWith(".css"));
-  assert.deepEqual(cssFiles, ["src/app/globals.css"]);
-  assert.match(read(cssFiles[0]), /prefers-reduced-motion/);
+  assert.ok(cssFiles.includes("src/app/globals.css"));
+  const rootTokenSources = cssFiles.filter((path) => /:root\s*\{/.test(read(path)));
+  assert.deepEqual(rootTokenSources, ["src/app/globals.css"]);
+  assert.match(read("src/app/globals.css"), /prefers-reduced-motion/);
 });
 
 test("documentation reflects bounded brand recovery slice without completing media migration", () => {
