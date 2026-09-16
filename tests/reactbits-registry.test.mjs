@@ -4,12 +4,18 @@ import test from "node:test";
 
 const components = JSON.parse(fs.readFileSync("components.json", "utf8"));
 const motionLayer = fs.readFileSync("src/components/motion/luminal-motion-layer.tsx", "utf8");
+const bentoCss = fs.readFileSync("src/components/motion/luminal-bento.module.css", "utf8");
+const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
-test("custom Luminal Glass Cursor stays independent from React Bits Pro licensing", () => {
+test("Luminal Magic Bento adaptation stays registry-free and retires GlowCursor", () => {
   assert.deepEqual(components.registries ?? {}, {});
-  assert.match(motionLayer, /data-cursor="glass-trail"/);
-  assert.match(motionLayer, /backdropFilter: "blur\(5px\) saturate\(1\.35\)"/);
-  assert.doesNotMatch(motionLayer, /@reactbits|glass-cursor-tw|REACTBITS_LICENSE_KEY/);
+  assert.equal(fs.existsSync("src/components/motion/glow-cursor.tsx"), false);
+  assert.equal(fs.existsSync("src/components/motion/glow-cursor.module.css"), false);
+  assert.match(motionLayer, /BENTO_SELECTOR/);
+  assert.match(bentoCss, /--luminal-bento-intensity/);
+  assert.doesNotMatch(motionLayer + bentoCss, /REACTBITS_LICENSE_KEY|@reactbits|GlowCursor|glow-trail/i);
+  assert.doesNotMatch(motionLayer, /from ["']gsap["']|gsap\./);
+  assert.equal(packageJson.dependencies?.ogl, undefined);
 
   const serialized = JSON.stringify(components);
   assert.doesNotMatch(serialized, /reactbits|REACTBITS_LICENSE_KEY|Bearer rb_[A-Za-z0-9_-]+/i);

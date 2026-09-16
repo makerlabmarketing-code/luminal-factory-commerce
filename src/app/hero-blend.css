@@ -1,0 +1,44 @@
+/* Hero 3D is part of the page atmosphere, not a separate card surface. */
+.hero-object-stage {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  isolation: auto !important;
+}
+
+/* Retire the legacy Wave 1 glow that was bounded by the stage rectangle. */
+.hero-object-stage::before {
+  content: none !important;
+}
+
+/* Feather only the outer canvas edge so the transparent WebGL stage dissolves into Hero atmosphere. */
+.hero-object-stage model-viewer {
+  background: transparent !important;
+  -webkit-mask-image: radial-gradient(
+    ellipse 92% 90% at 50% 50%,
+    #000 0%,
+    #000 68%,
+    rgba(0, 0, 0, 0.88) 80%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 92% 90% at 50% 50%,
+    #000 0%,
+    #000 68%,
+    rgba(0, 0, 0, 0.88) 80%,
+    transparent 100%
+  );
+}
+
+/* A stage-local vignette recreates a visible panel edge, so keep atmosphere section-level. */
+.hero-object-vignette {
+  display: none !important;
+}
+
+@media (max-width: 800px) {
+  .hero-object-stage model-viewer {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
