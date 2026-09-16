@@ -6,6 +6,7 @@ const layout = fs.readFileSync("src/app/layout.tsx", "utf8");
 const motionLayer = fs.readFileSync("src/components/motion/luminal-motion-layer.tsx", "utf8");
 const globals = fs.readFileSync("src/app/globals.css", "utf8");
 const home = fs.readFileSync("src/features/home/home-page.tsx", "utf8");
+const components = fs.readFileSync("components.json", "utf8");
 
 test("global Luminal motion foundation mounts once without a new runtime package", () => {
   assert.match(layout, /LuminalMotionLayer/);
@@ -19,8 +20,26 @@ test("global Luminal motion foundation mounts once without a new runtime package
 test("motion honors reduced-motion and coarse pointers", () => {
   assert.match(motionLayer, /prefers-reduced-motion: reduce/);
   assert.match(motionLayer, /pointer: fine/);
-  assert.match(globals, /@media \(hover: none\), \(pointer: coarse\)/);
+  assert.match(motionLayer, /if \(!finePointer\.matches\) cursor\.style\.display = "none"/);
   assert.match(globals, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test("global cursor uses one glass head and a continuous ribbon instead of bubble nodes", () => {
+  assert.match(motionLayer, /data-cursor="glass-trail"/);
+  assert.match(motionLayer, /glassHeadRef/);
+  assert.match(motionLayer, /glassRibbonRef/);
+  assert.match(motionLayer, /glassHaloRef/);
+  assert.match(motionLayer, /CURSOR_TAIL_EASE = 0\.14/);
+  assert.match(motionLayer, /data-cursor-part="ribbon"/);
+  assert.match(motionLayer, /data-cursor-part="head"/);
+  assert.match(motionLayer, /linear-gradient\(90deg/);
+  assert.match(motionLayer, /backdropFilter: "blur\(5px\) saturate\(1\.35\)"/);
+  assert.match(motionLayer, /Math\.hypot\(dx, dy\)/);
+  assert.match(motionLayer, /glassRibbon\.style\.width/);
+  assert.match(motionLayer, /glassHead\.style\.transform/);
+  assert.doesNotMatch(motionLayer, /GLASS_TRAIL_LENGTH|trailRefs/);
+  assert.doesNotMatch(motionLayer, /@reactbits|glass-cursor-tw|dual-follower|goldRef|violetRef/);
+  assert.match(components, /"registries": \{\}/);
 });
 
 test("Luminal palette and local spotlight stay restrained and CSS-driven", () => {

@@ -4,8 +4,10 @@ import test from "node:test";
 
 const heroSource = fs.readFileSync("src/features/home/hero-object-stage.tsx", "utf8");
 const heroConfig = fs.readFileSync("src/features/home/hero-model-config.ts", "utf8");
+const heroData = fs.readFileSync("src/features/home/hero-model-data.ts", "utf8");
 const homePageSource = fs.readFileSync("src/features/home/home-page.tsx", "utf8");
 const globalStyles = fs.readFileSync("src/app/globals.css", "utf8");
+const heroModelPath = "public/models/meowhe-hero.glb";
 
 test("homepage hero uses a replaceable presentation contract with the current optimized GLB default", () => {
   assert.match(heroConfig, /modelSrc: "\/models\/meowhe-hero\.glb"/);
@@ -13,63 +15,73 @@ test("homepage hero uses a replaceable presentation contract with the current op
   assert.match(homePageSource, /await getHeroModelPresentation\(\)/);
   assert.match(homePageSource, /presentation=\{heroPresentation\}/);
   assert.match(heroSource, /presentation\.modelSrc/);
-  assert.equal(fs.existsSync("public/models/meowhe-hero.glb"), true);
+  assert.equal(fs.existsSync(heroModelPath), true);
   assert.equal(fs.existsSync("public/meowhe-hero.glb"), false);
+  assert.ok(fs.statSync(heroModelPath).size < 2 * 1024 * 1024, "Hero GLB should remain below 2 MiB");
 });
 
-test("homepage hero shows the real product image first and hands off to 3D when ready", () => {
+test("remote Hero configuration inherits the local orientation without requiring a Production DB migration", () => {
+  assert.match(heroData, /orientation: defaultHeroModelPresentation\.orientation/);
+  assert.doesNotMatch(heroData, /orientation_roll_deg|orientation_pitch_deg|orientation_yaw_deg/);
+});
+
+test("desktop Hero keeps the product poster out of the 3D loading and error path", () => {
   assert.match(heroSource, /import Image from "next\/image"/);
   assert.match(heroSource, /data-hero-product-image="true"/);
-  assert.match(heroSource, /data-hero-mode="poster-first"/);
-  assert.match(heroSource, /src=\{media\.src\}/);
-  assert.match(heroSource, /preload/);
-  assert.match(heroSource, /sizes=\{media\.sizes\}/);
-  assert.match(heroSource, /previewRef/);
-  assert.match(heroSource, /preview\.style\.opacity = "0"/);
-  assert.match(heroSource, /3D preview unavailable · Product image active/);
+  assert.match(heroSource, /data-hero-poster-role="constrained-fallback"/);
+  assert.match(heroSource, /data-hero-mode="capability-gated"/);
+  assert.match(heroSource, /className="absolute inset-0 z-\[1\] overflow-hidden opacity-100 md:hidden"/);
+  assert.match(heroSource, /preview\.style\.display = "none"/);
+  assert.match(heroSource, /preview\.style\.visibility = "hidden"/);
+  assert.match(heroSource, /stage\.dataset\.heroMode = "3d-error"/);
+  assert.match(heroSource, /3D preview unavailable/);
+  assert.doesNotMatch(heroSource, /Product image active/);
   assert.match(heroSource, /Loading 3D object/);
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.equal(fs.existsSync("src/features/home/hero-object-stage.module.css"), false);
 });
 
-test("M-004 integrates the Hero model into the background instead of exposing an inspection viewer", () => {
-  assert.match(heroSource, /data-hero-interaction="pointer-orbit-fluid-lens"/);
-  assert.match(heroSource, /!border-0 !bg-transparent/);
+test("Hero Visual Pass 8 flips the forward pitch direction while preserving autonomous rotation", () => {
+  assert.match(heroConfig, /rollDeg: 0/);
+  assert.match(heroConfig, /pitchDeg: -52/);
+  assert.match(heroConfig, /yawDeg: 0/);
+  assert.match(heroConfig, /thetaDeg: 12/);
+  assert.match(heroConfig, /phiDeg: 82/);
+  assert.match(heroConfig, /radiusPercent: 103/);
+  assert.match(heroConfig, /autoRotate: true/);
+  assert.match(heroConfig, /autoRotateDelayMs: 700/);
+  assert.match(heroConfig, /rotationPerSecondDeg: 8/);
+  assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
+  assert.match(heroSource, /presentation\.orientation\.rollDeg/);
+  assert.match(heroSource, /presentation\.orientation\.pitchDeg/);
+  assert.match(heroSource, /presentation\.orientation\.yawDeg/);
+  assert.match(heroSource, /data-hero-interaction="auto-rotate-360"/);
+  assert.match(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
+  assert.match(heroSource, /viewer\.setAttribute\("auto-rotate-delay", String\(presentation\.autoRotateDelayMs\)\)/);
+  assert.match(heroSource, /viewer\.setAttribute\("rotation-per-second", `\$\{presentation\.rotationPerSecondDeg\}deg`\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
-  assert.match(heroSource, /Move to explore/);
-  assert.doesNotMatch(heroSource, /Drag to rotate · Scroll to zoom/);
+  assert.doesNotMatch(heroSource, /pointermove|pointerleave|POINTER_THETA_RANGE_DEG|POINTER_PHI_RANGE_DEG|reactiveLightRef|Move to explore/);
+  assert.doesNotMatch(heroSource, /data-hero-lens|fluid-glass|backdropFilter/);
   assert.doesNotMatch(heroSource, /viewer\.setAttribute\("camera-controls"/);
 });
 
-test("M-004 uses requestAnimationFrame pointer orbit, reactive light and one optical lens without React render churn", () => {
-  assert.match(heroSource, /\(hover: hover\) and \(pointer: fine\)/);
-  assert.match(heroSource, /pointermove/);
-  assert.match(heroSource, /requestAnimationFrame\(animateInteraction\)/);
-  assert.match(heroSource, /presentation\.camera\.thetaDeg/);
-  assert.match(heroSource, /POINTER_THETA_RANGE_DEG/);
-  assert.match(heroSource, /reactiveLightRef/);
-  assert.match(heroSource, /data-hero-lens="fluid-glass"/);
-  assert.match(heroSource, /backdropFilter: "blur\(2px\) brightness\(1\.16\)/);
-  assert.doesNotMatch(heroSource, /useState|setState/);
-});
-
-test("M-004 keeps the 5 MB enhancement off coarse pointers and constrained networks", () => {
+test("constrained clients keep the image fallback while eligible desktop defers 3D until browser idle", () => {
   assert.match(heroSource, /connection\?\.saveData === true/);
   assert.match(heroSource, /connection\?\.effectiveType === "slow-2g"/);
   assert.match(heroSource, /connection\?\.effectiveType === "2g"/);
   assert.match(heroSource, /posterOnly = !finePointer \|\| constrainedNetwork/);
   assert.match(heroSource, /poster-coarse-pointer/);
   assert.match(heroSource, /poster-constrained-network/);
-  assert.doesNotMatch(heroSource, /useSimplifiedIdleMotion|auto-rotate/);
-});
-
-test("M-004 defers desktop 3D until browser idle while preserving reduced-motion and cleanup", () => {
-  assert.match(heroSource, /prefers-reduced-motion: reduce/);
+  assert.match(heroSource, /preview\.style\.display = "block"/);
   assert.match(heroSource, /requestIdleCallback/);
   assert.match(heroSource, /HERO_IDLE_TIMEOUT_MS/);
   assert.match(heroSource, /HERO_IDLE_FALLBACK_MS/);
   assert.match(heroSource, /cancelIdleCallback/);
   assert.match(heroSource, /clearTimeout\(fallbackTimeout\)/);
-  assert.match(heroSource, /cancelAnimationFrame\(interactionFrameRef\.current\)/);
-  assert.match(heroSource, /stage\.dataset\.heroMode = "enhanced"/);
+});
+
+test("reduced motion keeps an eligible desktop model static instead of removing the 3D object", () => {
+  assert.match(heroSource, /prefers-reduced-motion: reduce/);
+  assert.match(heroSource, /presentation\.autoRotate && !reducedMotion/);
+  assert.match(heroSource, /enhanced-static/);
+  assert.match(heroSource, /enhanced-auto-rotate/);
 });
