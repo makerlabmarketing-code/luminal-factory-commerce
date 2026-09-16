@@ -4,9 +4,9 @@ import { useEffect, useRef } from "react";
 
 const REVEAL_SELECTOR = "[data-luminal-reveal]";
 const SPOTLIGHT_SELECTOR = "[data-luminal-spotlight]";
-const GLASS_TRAIL_LENGTH = 14;
 const CURSOR_IDLE_TIMEOUT_MS = 700;
 const CURSOR_HEAD_EASE = 0.34;
+const CURSOR_TAIL_EASE = 0.14;
 const CURSOR_SETTLE_PX = 0.35;
 
 function clamp(value: number, min: number, max: number) {
@@ -15,11 +15,16 @@ function clamp(value: number, min: number, max: number) {
 
 export function LuminalMotionLayer() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const trailRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const glassHeadRef = useRef<HTMLSpanElement>(null);
+  const glassRibbonRef = useRef<HTMLSpanElement>(null);
+  const glassHaloRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const cursor = cursorRef.current;
-    if (!cursor) return;
+    const glassHead = glassHeadRef.current;
+    const glassRibbon = glassRibbonRef.current;
+    const glassHalo = glassHaloRef.current;
+    if (!cursor || !glassHead || !glassRibbon || !glassHalo) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) {
@@ -69,17 +74,15 @@ export function LuminalMotionLayer() {
     let frameId = 0;
     let idleTimer: number | null = null;
     let active = false;
+    let hasPointerSample = false;
     let targetX = window.innerWidth * 0.58;
     let targetY = window.innerHeight * 0.38;
     let lastPointerX = targetX;
     let lastPointerY = targetY;
-    let heading = 0;
-    let stretch = 1;
+    let velocityStretch = 1;
 
-    const points = Array.from({ length: GLASS_TRAIL_LENGTH }, () => ({
-      x: targetX,
-      y: targetY,
-    }));
+    const headPoint = { x: targetX, y: targetY };
+    const tailPoint = { x: targetX, y: targetY };
 
     const ensureCursorFrame = () => {
       if (frameId) return;
@@ -88,43 +91,41 @@ export function LuminalMotionLayer() {
 
     const renderGlassTrail = () => {
       frameId = 0;
-      let anchorX = targetX;
-      let anchorY = targetY;
-      let maxDistance = 0;
-      stretch += (1 - stretch) * 0.12;
 
-      for (let index = 0; index < points.length; index += 1) {
-        const point = points[index];
-        const ease = Math.max(0.11, CURSOR_HEAD_EASE - index * 0.014);
-        point.x += (anchorX - point.x) * ease;
-        point.y += (anchorY - point.y) * ease;
+      headPoint.x += (targetX - headPoint.x) * CURSOR_HEAD_EASE;
+      headPoint.y += (targetY - headPoint.y) * CURSOR_HEAD_EASE;
+      tailPoint.x += (headPoint.x - tailPoint.x) * CURSOR_TAIL_EASE;
+      tailPoint.y += (headPoint.y - tailPoint.y) * CURSOR_TAIL_EASE;
+      velocityStretch += (1 - velocityStretch) * 0.14;
 
-        const distance = Math.abs(anchorX - point.x) + Math.abs(anchorY - point.y);
-        maxDistance = Math.max(maxDistance, distance);
+      const ribbonDx = headPoint.x - tailPoint.x;
+      const ribbonDy = headPoint.y - tailPoint.y;
+      const ribbonDistance = Math.hypot(ribbonDx, ribbonDy);
+      const heading = ribbonDistance > 0.01 ? Math.atan2(ribbonDy, ribbonDx) : 0;
+      const midpointX = tailPoint.x + ribbonDx * 0.5;
+      const midpointY = tailPoint.y + ribbonDy * 0.5;
+      const ribbonLength = clamp(ribbonDistance * 1.12 + 12, 12, 104);
+      const ribbonThickness = clamp(8 + (velocityStretch - 1) * 14, 8, 12);
+      const ribbonOpacity = clamp(ribbonDistance / 110, 0.08, 0.34);
+      const headCrossScale = 1 / Math.sqrt(velocityStretch);
 
-        const node = trailRefs.current[index];
-        if (node) {
-          const progress = index / Math.max(points.length - 1, 1);
-          const size = 26 - progress * 16;
-          const opacity = 0.94 - progress * 0.72;
-          const localStretch = 1 + (stretch - 1) * (1 - progress * 0.76);
-          const crossScale = 1 / Math.sqrt(localStretch);
+      glassRibbon.style.width = `${ribbonLength}px`;
+      glassRibbon.style.height = `${ribbonThickness}px`;
+      glassRibbon.style.opacity = `${ribbonOpacity}`;
+      glassRibbon.style.transform = `translate3d(${midpointX}px, ${midpointY}px, 0) translate(-50%, -50%) rotate(${heading}rad)`;
 
-          node.style.width = `${size}px`;
-          node.style.height = `${size}px`;
-          node.style.opacity = `${opacity}`;
-          node.style.transform = `translate3d(${point.x}px, ${point.y}px, 0) translate(-50%, -50%) rotate(${heading}rad) scale(${localStretch}, ${crossScale})`;
-        }
+      glassHalo.style.opacity = `${clamp(0.12 + (velocityStretch - 1) * 0.28, 0.12, 0.22)}`;
+      glassHalo.style.transform = `translate3d(${headPoint.x}px, ${headPoint.y}px, 0) translate(-50%, -50%) scale(${1 + (velocityStretch - 1) * 0.32})`;
 
-        anchorX = point.x;
-        anchorY = point.y;
-      }
+      glassHead.style.transform = `translate3d(${headPoint.x}px, ${headPoint.y}px, 0) translate(-50%, -50%) rotate(${heading}rad) scale(${velocityStretch}, ${headCrossScale})`;
 
-      if (active || maxDistance > CURSOR_SETTLE_PX || stretch > 1.01) ensureCursorFrame();
+      const settleDistance = Math.hypot(targetX - headPoint.x, targetY - headPoint.y) + ribbonDistance;
+      if (active || settleDistance > CURSOR_SETTLE_PX || velocityStretch > 1.01) ensureCursorFrame();
     };
 
     const deactivateCursor = () => {
       active = false;
+      hasPointerSample = false;
       cursor.style.opacity = "0";
       ensureCursorFrame();
     };
@@ -135,12 +136,17 @@ export function LuminalMotionLayer() {
     };
 
     const handlePointerMove = (event: PointerEvent) => {
+      if (!hasPointerSample) {
+        lastPointerX = event.clientX;
+        lastPointerY = event.clientY;
+        hasPointerSample = true;
+      }
+
       const dx = event.clientX - lastPointerX;
       const dy = event.clientY - lastPointerY;
       const speed = Math.hypot(dx, dy);
 
-      if (speed > 0.5) heading = Math.atan2(dy, dx);
-      stretch = clamp(1 + speed * 0.018, 1, 1.55);
+      velocityStretch = clamp(1 + speed * 0.012, 1, 1.32);
       lastPointerX = event.clientX;
       lastPointerY = event.clientY;
       targetX = event.clientX;
@@ -192,37 +198,75 @@ export function LuminalMotionLayer() {
         height: 1,
         pointerEvents: "none",
         opacity: 0,
-        transition: "opacity 480ms ease",
+        transition: "opacity 420ms ease",
       }}
     >
-      {Array.from({ length: GLASS_TRAIL_LENGTH }, (_, index) => (
-        <span
-          key={index}
-          ref={(node) => {
-            trailRefs.current[index] = node;
-          }}
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            width: 26,
-            height: 26,
-            borderRadius: 999,
-            border: "1px solid rgba(255,255,255,.28)",
-            background: "radial-gradient(circle at 32% 24%, rgba(255,255,255,.42) 0%, rgba(243,230,195,.16) 24%, rgba(214,179,90,.08) 48%, rgba(114,89,184,.055) 72%, rgba(255,255,255,.02) 100%)",
-            backdropFilter: "blur(5px) saturate(1.35)",
-            WebkitBackdropFilter: "blur(5px) saturate(1.35)",
-            boxShadow: "inset 0 1px 1px rgba(255,255,255,.38), inset -4px -5px 10px rgba(114,89,184,.08), 0 5px 16px rgba(0,0,0,.18), 0 0 18px rgba(214,179,90,.08)",
-            mixBlendMode: "screen",
-            opacity: 0,
-            pointerEvents: "none",
-            transform: "translate3d(-100px,-100px,0)",
-            transformOrigin: "center",
-            willChange: "transform, opacity",
-            contain: "strict",
-          }}
-        />
-      ))}
+      <span
+        ref={glassRibbonRef}
+        data-cursor-part="ribbon"
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: 12,
+          height: 8,
+          borderRadius: 999,
+          border: "none",
+          background: "linear-gradient(90deg, rgba(114,89,184,0) 0%, rgba(114,89,184,.035) 24%, rgba(214,179,90,.075) 58%, rgba(255,255,255,.14) 100%)",
+          backdropFilter: "blur(2px) saturate(1.16)",
+          WebkitBackdropFilter: "blur(2px) saturate(1.16)",
+          boxShadow: "0 0 14px rgba(214,179,90,.045)",
+          opacity: 0,
+          pointerEvents: "none",
+          transform: "translate3d(-100px,-100px,0)",
+          transformOrigin: "center",
+          willChange: "width, height, transform, opacity",
+          contain: "strict",
+        }}
+      />
+      <span
+        ref={glassHaloRef}
+        data-cursor-part="halo"
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: 40,
+          height: 40,
+          borderRadius: 999,
+          background: "radial-gradient(circle, rgba(214,179,90,.12) 0%, rgba(114,89,184,.055) 42%, transparent 72%)",
+          filter: "blur(8px)",
+          mixBlendMode: "screen",
+          opacity: 0,
+          pointerEvents: "none",
+          transform: "translate3d(-100px,-100px,0)",
+          transformOrigin: "center",
+          willChange: "transform, opacity",
+        }}
+      />
+      <span
+        ref={glassHeadRef}
+        data-cursor-part="head"
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: 22,
+          height: 22,
+          borderRadius: "47% 53% 50% 50% / 52% 46% 54% 48%",
+          border: "1px solid rgba(255,255,255,.18)",
+          background: "radial-gradient(circle at 34% 27%, rgba(255,255,255,.34) 0%, rgba(255,255,255,.09) 28%, rgba(214,179,90,.065) 52%, rgba(114,89,184,.04) 72%, rgba(10,10,12,.035) 100%)",
+          backdropFilter: "blur(5px) saturate(1.35)",
+          WebkitBackdropFilter: "blur(5px) saturate(1.35)",
+          boxShadow: "inset 0 1px 1px rgba(255,255,255,.28), inset -3px -4px 8px rgba(114,89,184,.055), 0 3px 12px rgba(0,0,0,.16)",
+          opacity: 0.92,
+          pointerEvents: "none",
+          transform: "translate3d(-100px,-100px,0)",
+          transformOrigin: "center",
+          willChange: "transform",
+          contain: "strict",
+        }}
+      />
     </div>
   );
 }

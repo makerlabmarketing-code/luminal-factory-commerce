@@ -24,15 +24,20 @@ test("motion honors reduced-motion and coarse pointers", () => {
   assert.match(globals, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("global cursor uses a lightweight custom glass trail without licensed React Bits code", () => {
+test("global cursor uses one glass head and a continuous ribbon instead of bubble nodes", () => {
   assert.match(motionLayer, /data-cursor="glass-trail"/);
-  assert.match(motionLayer, /GLASS_TRAIL_LENGTH = 14/);
-  assert.match(motionLayer, /CURSOR_IDLE_TIMEOUT_MS = 700/);
+  assert.match(motionLayer, /glassHeadRef/);
+  assert.match(motionLayer, /glassRibbonRef/);
+  assert.match(motionLayer, /glassHaloRef/);
+  assert.match(motionLayer, /CURSOR_TAIL_EASE = 0\.14/);
+  assert.match(motionLayer, /data-cursor-part="ribbon"/);
+  assert.match(motionLayer, /data-cursor-part="head"/);
+  assert.match(motionLayer, /linear-gradient\(90deg/);
   assert.match(motionLayer, /backdropFilter: "blur\(5px\) saturate\(1\.35\)"/);
-  assert.match(motionLayer, /WebkitBackdropFilter: "blur\(5px\) saturate\(1\.35\)"/);
-  assert.match(motionLayer, /mixBlendMode: "screen"/);
   assert.match(motionLayer, /Math\.hypot\(dx, dy\)/);
-  assert.match(motionLayer, /scale\(\$\{localStretch\}, \$\{crossScale\}\)/);
+  assert.match(motionLayer, /glassRibbon\.style\.width/);
+  assert.match(motionLayer, /glassHead\.style\.transform/);
+  assert.doesNotMatch(motionLayer, /GLASS_TRAIL_LENGTH|trailRefs/);
   assert.doesNotMatch(motionLayer, /@reactbits|glass-cursor-tw|dual-follower|goldRef|violetRef/);
   assert.match(components, /"registries": \{\}/);
 });

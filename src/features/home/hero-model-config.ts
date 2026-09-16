@@ -35,8 +35,8 @@ export const defaultHeroModelPresentation: HeroModelPresentation = {
   autoRotateDelayMs: 700,
   rotationPerSecondDeg: 8,
   orientation: {
-    rollDeg: 0,
-    pitchDeg: 18,
+    rollDeg: -90,
+    pitchDeg: 8,
     yawDeg: 0,
   },
   camera: {
