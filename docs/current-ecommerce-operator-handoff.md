@@ -187,3 +187,11 @@
 - **Motion/performance:** a narrow client component uses the existing GSAP dependency for one intersection-triggered opacity/translate/blur reveal. It falls back to static content for reduced motion, uses lazy `next/image`, and adapts from three to two to one column.
 - **ERP follow-up:** `specs/integration/homepage-gallery-erp-management-task.md` queues upload, ordering, crop/focal point, alt text, preview and publication through the signed Commerce Admin API. No ERP, Supabase, Storage, secret, runtime flag or live data was changed in this slice.
 - **Validation:** `npm run check` passed with 223 tests, zero production dependency vulnerabilities and a successful production build. Local SSR returned HTTP 200 with gallery content. The environment did not provide the browser automation binary, so final 390/768/1440 visual and console review remains a post-push Preview gate.
+
+## 2026-09-17 Homepage Dome Gallery and Hero pointer pass
+
+- **Approval:** Owner approved `GALLERY-DOME-01 + HERO-POINTER-01`.
+- **Gallery direction:** the prior tall Masonry layout is replaced by a bounded three-row Dome for fine-pointer desktop clients. It uses the same nine local optimized images, a slow 120-second revolution, hover/drag/lightbox pause, delayed resume, and a horizontal snap-strip fallback for touch and narrow viewports.
+- **Hero direction:** the existing Google `<model-viewer>` delivery, capability gates, poster fallback, idle loading, and reduced-motion behavior remain intact. Fine-pointer movement adds a slowly interpolated `5° × 2.5°` model tilt that settles on leave; default autonomous rotation is reduced from `8°/s` to `3°/s`.
+- **Boundaries:** no new runtime dependency, Supabase migration, Production data mutation, ERP change, runtime flag, secret, push, or deployment is included in this local slice.
+- **Validation:** `npm run check` passed with 223 tests, zero production dependency vulnerabilities, static security gate success, and a successful Next.js Production build. Browser automation could not reach the workspace-local dev server, so desktop/mobile motion, drag, lightbox, pointer settle, and console inspection remain the required Preview gate before Production delivery.

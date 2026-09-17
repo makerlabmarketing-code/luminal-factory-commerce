@@ -33,7 +33,7 @@ export const defaultHeroModelPresentation: HeroModelPresentation = {
   shadowSoftness: 0.72,
   autoRotate: true,
   autoRotateDelayMs: 700,
-  rotationPerSecondDeg: 8,
+  rotationPerSecondDeg: 3,
   orientation: {
     rollDeg: 0,
     pitchDeg: -52,

@@ -54,13 +54,14 @@ test("safe below-fold Homepage sections opt into rendering deferral", () => {
   assert.match(home, /\[contain-intrinsic-size:auto_1500px\]/);
 });
 
-test("Hero 3D stays an idle desktop enhancement with a static ambient layer and no cursor-driven camera", () => {
+test("Hero 3D stays an idle desktop enhancement with bounded pointer interaction", () => {
   assert.match(heroStage, /requestIdleCallback/);
   assert.match(heroStage, /poster-coarse-pointer/);
   assert.match(heroStage, /poster-constrained-network/);
   assert.match(heroStage, /rounded-full opacity-55 blur-3xl/);
-  assert.match(heroStage, /data-hero-interaction="auto-rotate-360"/);
-  assert.doesNotMatch(heroStage, /reactiveLightRef|pointermove|pointerleave/);
+  assert.match(heroStage, /data-hero-interaction="auto-rotate-with-pointer-tilt"/);
+  assert.doesNotMatch(heroStage, /reactiveLightRef/);
+  assert.match(heroStage, /HERO_POINTER_FOLLOW_RATE/);
   assert.doesNotMatch(heroStage, /data-hero-lens|fluid-glass/);
   assert.doesNotMatch(heroStage, /@react-three|from "three"/);
 });

@@ -28,6 +28,11 @@ const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
+const HERO_POINTER_YAW_MAX_DEG = 5;
+const HERO_POINTER_PITCH_MAX_DEG = 2.5;
+const HERO_POINTER_FOLLOW_RATE = 3.2;
+const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
+const HERO_AUTO_ROTATE_MAX_DEG_PER_SECOND = 3;
 
 function ensureModelViewer() {
   if (window.customElements.get("model-viewer")) return Promise.resolve();
@@ -112,6 +117,65 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     let observer: IntersectionObserver | null = null;
     let idleHandle: number | null = null;
     let fallbackTimeout: number | null = null;
+    let pointerAnimationFrame: number | null = null;
+    let previousPointerFrameTime = performance.now();
+    const pointerTarget = { pitchDeg: 0, yawDeg: 0 };
+    const pointerCurrent = { pitchDeg: 0, yawDeg: 0 };
+
+    const applyPointerOrientation = () => {
+      const viewer = viewerRef.current;
+      if (!viewer) return;
+      viewer.setAttribute(
+        "orientation",
+        `${presentation.orientation.rollDeg}deg ${presentation.orientation.pitchDeg + pointerCurrent.pitchDeg}deg ${presentation.orientation.yawDeg + pointerCurrent.yawDeg}deg`,
+      );
+    };
+
+    const animatePointerTilt = (time: number) => {
+      const elapsedSeconds = Math.min((time - previousPointerFrameTime) / 1000, 0.05);
+      previousPointerFrameTime = time;
+      const easing = 1 - Math.exp(-HERO_POINTER_FOLLOW_RATE * elapsedSeconds);
+
+      pointerCurrent.pitchDeg += (pointerTarget.pitchDeg - pointerCurrent.pitchDeg) * easing;
+      pointerCurrent.yawDeg += (pointerTarget.yawDeg - pointerCurrent.yawDeg) * easing;
+      applyPointerOrientation();
+
+      const pitchRemaining = Math.abs(pointerTarget.pitchDeg - pointerCurrent.pitchDeg);
+      const yawRemaining = Math.abs(pointerTarget.yawDeg - pointerCurrent.yawDeg);
+      if (pitchRemaining <= HERO_POINTER_SETTLE_EPSILON_DEG && yawRemaining <= HERO_POINTER_SETTLE_EPSILON_DEG) {
+        pointerCurrent.pitchDeg = pointerTarget.pitchDeg;
+        pointerCurrent.yawDeg = pointerTarget.yawDeg;
+        applyPointerOrientation();
+        pointerAnimationFrame = null;
+        return;
+      }
+
+      pointerAnimationFrame = window.requestAnimationFrame(animatePointerTilt);
+    };
+
+    const startPointerTilt = () => {
+      if (pointerAnimationFrame !== null) return;
+      previousPointerFrameTime = performance.now();
+      pointerAnimationFrame = window.requestAnimationFrame(animatePointerTilt);
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+      const bounds = stage.getBoundingClientRect();
+      if (bounds.width <= 0 || bounds.height <= 0) return;
+
+      const normalizedX = Math.min(Math.max(((event.clientX - bounds.left) / bounds.width) * 2 - 1, -1), 1);
+      const normalizedY = Math.min(Math.max(((event.clientY - bounds.top) / bounds.height) * 2 - 1, -1), 1);
+      pointerTarget.yawDeg = normalizedX * HERO_POINTER_YAW_MAX_DEG;
+      pointerTarget.pitchDeg = normalizedY * HERO_POINTER_PITCH_MAX_DEG;
+      startPointerTilt();
+    };
+
+    const settlePointerTilt = () => {
+      pointerTarget.pitchDeg = 0;
+      pointerTarget.yawDeg = 0;
+      startPointerTilt();
+    };
 
     const showError = () => {
       stage.dataset.heroMode = "3d-error";
@@ -157,9 +221,18 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         viewer.setAttribute("camera-target", "auto auto auto");
 
         if (presentation.autoRotate && !reducedMotion) {
+          const rotationPerSecondDeg = Math.min(
+            presentation.rotationPerSecondDeg,
+            HERO_AUTO_ROTATE_MAX_DEG_PER_SECOND,
+          );
           viewer.setAttribute("auto-rotate", "");
           viewer.setAttribute("auto-rotate-delay", String(presentation.autoRotateDelayMs));
-          viewer.setAttribute("rotation-per-second", `${presentation.rotationPerSecondDeg}deg`);
+          viewer.setAttribute("rotation-per-second", `${rotationPerSecondDeg}deg`);
+        }
+
+        if (!reducedMotion) {
+          stage.addEventListener("pointermove", handlePointerMove);
+          stage.addEventListener("pointerleave", settlePointerTilt);
         }
 
         viewer.addEventListener("load", () => {
@@ -217,6 +290,9 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         idleWindow.cancelIdleCallback(idleHandle);
       }
       if (fallbackTimeout !== null) window.clearTimeout(fallbackTimeout);
+      if (pointerAnimationFrame !== null) window.cancelAnimationFrame(pointerAnimationFrame);
+      stage.removeEventListener("pointermove", handlePointerMove);
+      stage.removeEventListener("pointerleave", settlePointerTilt);
 
       viewerRef.current = null;
       mount.replaceChildren();
@@ -228,7 +304,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       ref={stageRef}
       className="hero-object-stage group !min-h-[30rem] !overflow-visible !border-0 !bg-transparent lg:!min-h-[46rem]"
       data-hero-renderer="model-viewer"
-      data-hero-interaction="auto-rotate-360"
+      data-hero-interaction="auto-rotate-with-pointer-tilt"
       data-hero-mode="capability-gated"
       data-hero-tint={presentation.tint ?? "default"}
     >

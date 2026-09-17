@@ -7,7 +7,7 @@ import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media"
 import { getHeroModelPresentation } from "./hero-model-data";
 import { HeroObjectStage } from "./hero-object-stage";
 import { HeroTextMotionController } from "./hero-copy-motion";
-import { HomeMasonryGallery } from "./home-masonry-gallery";
+import { HomeDomeGallery } from "./home-dome-gallery";
 
 type HomeMediaFrameProps = Readonly<{
   media: HomeMediaContract;
@@ -114,13 +114,13 @@ export async function HomePage() {
         </Container>
       </section>
 
-      <section className="home-gallery section border-t border-white/10 bg-[#070707] [content-visibility:auto] [contain-intrinsic-size:auto_2200px]" aria-labelledby="gallery-title">
+      <section className="home-gallery section border-t border-white/10 bg-[#070707] [content-visibility:auto] [contain-intrinsic-size:auto_1300px]" aria-labelledby="gallery-title">
         <Container>
           <header className="editorial-heading" data-luminal-reveal="copy">
             <div><p className="eyebrow">Colorway studies</p><h2 id="gallery-title">One character.<br />Three moods.</h2></div>
             <p>A closer look at the colorful Lolipop, death-inspired Mictlán, and monochrome finishes from the studio archive.</p>
           </header>
-          <HomeMasonryGallery items={homePageMedia.gallery} />
+          <HomeDomeGallery items={homePageMedia.gallery} />
         </Container>
       </section>
 

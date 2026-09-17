@@ -202,6 +202,12 @@ Motion must support material, depth, state, hierarchy, or visual guidance. Budge
 - Mobile fallback: static or simplified media with minimal opacity/transform transitions.
 - Performance guard: CSS first; Motion/GSAP only if needed; no WebGL if CSS, Motion, or GSAP communicates the material idea adequately.
 
+### 2026-09-17 approved interaction addendum
+
+- `HERO-POINTER-01`: eligible fine-pointer desktop clients may guide the existing Hero object by a restrained `5°` horizontal and `2.5°` vertical tilt. The response must interpolate slowly, settle to the authored orientation on pointer leave, preserve the existing poster/network capability gates, cap autonomous presentation speed at `3°/s` even for older faster records, and remain disabled for reduced motion and coarse pointers. The Hero remains an atmospheric presentation, not a free-orbit product inspector.
+- `GALLERY-DOME-01`: the approved nine-image Colorway Studies set may render as a compact three-row curved Dome on fine-pointer desktop clients. It rotates at approximately `3°` per second, pauses during hover, drag, or enlarged-image viewing, and resumes after a short settle delay. Touch and narrow viewports use a readable horizontal snap strip; reduced motion disables automatic rotation.
+- The implementation adapts the interaction principles of the supplied React Bits references without adding React Three Fiber, Three.js, Drei, or a second 3D runtime.
+
 ## 4.11 Optional 3D Decision Record
 
 Decision status: `OWNER_APPROVED_NOT_FOR_FIRST_SLICE`.

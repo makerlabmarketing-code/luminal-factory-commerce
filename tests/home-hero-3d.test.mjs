@@ -40,7 +40,7 @@ test("desktop Hero keeps the product poster out of the 3D loading and error path
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("Hero Visual Pass 8 flips the forward pitch direction while preserving autonomous rotation", () => {
+test("Hero keeps autonomous rotation and adds restrained pointer tilt", () => {
   assert.match(heroConfig, /rollDeg: 0/);
   assert.match(heroConfig, /pitchDeg: -52/);
   assert.match(heroConfig, /yawDeg: 0/);
@@ -49,17 +49,25 @@ test("Hero Visual Pass 8 flips the forward pitch direction while preserving auto
   assert.match(heroConfig, /radiusPercent: 103/);
   assert.match(heroConfig, /autoRotate: true/);
   assert.match(heroConfig, /autoRotateDelayMs: 700/);
-  assert.match(heroConfig, /rotationPerSecondDeg: 8/);
+  assert.match(heroConfig, /rotationPerSecondDeg: 3/);
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
   assert.match(heroSource, /presentation\.orientation\.rollDeg/);
   assert.match(heroSource, /presentation\.orientation\.pitchDeg/);
   assert.match(heroSource, /presentation\.orientation\.yawDeg/);
-  assert.match(heroSource, /data-hero-interaction="auto-rotate-360"/);
+  assert.match(heroSource, /data-hero-interaction="auto-rotate-with-pointer-tilt"/);
   assert.match(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
   assert.match(heroSource, /viewer\.setAttribute\("auto-rotate-delay", String\(presentation\.autoRotateDelayMs\)\)/);
-  assert.match(heroSource, /viewer\.setAttribute\("rotation-per-second", `\$\{presentation\.rotationPerSecondDeg\}deg`\)/);
+  assert.match(heroSource, /HERO_AUTO_ROTATE_MAX_DEG_PER_SECOND = 3/);
+  assert.match(heroSource, /Math\.min\([\s\S]*presentation\.rotationPerSecondDeg,[\s\S]*HERO_AUTO_ROTATE_MAX_DEG_PER_SECOND/);
+  assert.match(heroSource, /viewer\.setAttribute\("rotation-per-second", `\$\{rotationPerSecondDeg\}deg`\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
-  assert.doesNotMatch(heroSource, /pointermove|pointerleave|POINTER_THETA_RANGE_DEG|POINTER_PHI_RANGE_DEG|reactiveLightRef|Move to explore/);
+  assert.match(heroSource, /HERO_POINTER_YAW_MAX_DEG = 5/);
+  assert.match(heroSource, /HERO_POINTER_PITCH_MAX_DEG = 2\.5/);
+  assert.match(heroSource, /HERO_POINTER_FOLLOW_RATE = 3\.2/);
+  assert.match(heroSource, /stage\.addEventListener\("pointermove", handlePointerMove\)/);
+  assert.match(heroSource, /stage\.addEventListener\("pointerleave", settlePointerTilt\)/);
+  assert.match(heroSource, /window\.cancelAnimationFrame\(pointerAnimationFrame\)/);
+  assert.doesNotMatch(heroSource, /POINTER_THETA_RANGE_DEG|POINTER_PHI_RANGE_DEG|reactiveLightRef|Move to explore/);
   assert.doesNotMatch(heroSource, /data-hero-lens|fluid-glass|backdropFilter/);
   assert.doesNotMatch(heroSource, /viewer\.setAttribute\("camera-controls"/);
 });
@@ -84,4 +92,5 @@ test("reduced motion keeps an eligible desktop model static instead of removing 
   assert.match(heroSource, /presentation\.autoRotate && !reducedMotion/);
   assert.match(heroSource, /enhanced-static/);
   assert.match(heroSource, /enhanced-auto-rotate/);
+  assert.match(heroSource, /if \(!reducedMotion\) \{[\s\S]*pointermove/);
 });
