@@ -4,9 +4,9 @@ import test from "node:test";
 
 const read = (path) => readFileSync(path, "utf8");
 
-test("Homepage Wave 1 follows the approved six-part editorial sequence", () => {
+test("Homepage follows the approved editorial sequence with the colorway gallery", () => {
   const home = read("src/features/home/home-page.tsx");
-  const order = ["revival-hero", "featured-object", "brand-revival", "selected-archive", "made-at-luminal", "commerce-split"];
+  const order = ["revival-hero", "featured-object", "brand-revival", "selected-archive", "home-gallery", "made-at-luminal", "commerce-split"];
   order.reduce((previous, marker) => {
     const position = home.indexOf(marker);
     assert.ok(position > previous, `${marker} must follow the prior section`);
@@ -16,6 +16,26 @@ test("Homepage Wave 1 follows the approved six-part editorial sequence", () => {
   assert.equal((home.match(/<h1\b/g) ?? []).length, 1);
   assert.match(home, /content\.hero\.primaryAction/);
   assert.match(home, /content\.hero\.secondaryAction/);
+});
+
+test("Homepage gallery is local, responsive, accessible and motion-safe", () => {
+  const home = read("src/features/home/home-page.tsx");
+  const gallery = read("src/features/home/home-masonry-gallery.tsx");
+  const galleryCss = read("src/features/home/home-masonry-gallery.module.css");
+  const media = read("src/content/homepage-media.ts");
+  const galleryMedia = media.slice(media.indexOf("gallery: ["));
+
+  assert.match(home, /<HomeMasonryGallery items={homePageMedia\.gallery}/);
+  assert.equal((galleryMedia.match(/colorway: "Lolipop"/g) ?? []).length, 3);
+  assert.equal((galleryMedia.match(/colorway: "Mictlán"/g) ?? []).length, 3);
+  assert.equal((galleryMedia.match(/colorway: "Mono"/g) ?? []).length, 3);
+  assert.doesNotMatch(media + gallery, /drive\.google|googleusercontent/);
+  assert.match(gallery, /prefers-reduced-motion: reduce/);
+  assert.match(gallery, /IntersectionObserver/);
+  assert.match(gallery, /alt={item\.alt}/);
+  assert.match(galleryCss, /columns: 3/);
+  assert.match(galleryCss, /@media \(max-width: 640px\)/);
+  assert.match(galleryCss, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
 test("Wave 1 keeps the route thin and uses a server component feature boundary", () => {

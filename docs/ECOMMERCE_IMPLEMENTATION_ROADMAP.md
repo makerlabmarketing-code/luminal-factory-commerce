@@ -153,6 +153,7 @@ Every phase uses the same contract fields below.
 - **Production gate:** Both-system operator approval.
 - **Completion evidence:** Staging reconciliation and runbook.
 - **Next approved slice:** Read-only ERP boundary audit.
+- **Queued task:** Homepage gallery media management through the signed Commerce Admin API; see `specs/integration/homepage-gallery-erp-management-task.md`. This remains `NOT_STARTED` and must not introduce direct ERP database access or Drive runtime URLs.
 
 ## Phase 9 — Launch hardening — `NOT_STARTED`
 

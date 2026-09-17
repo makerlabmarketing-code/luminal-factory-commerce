@@ -6,6 +6,15 @@ export type HomeMediaContract = Readonly<{
   availability: "pending" | "available";
 }>;
 
+export type HomeGalleryMedia = Readonly<{
+  id: string;
+  src: `/images/home/gallery/${string}.webp`;
+  alt: string;
+  colorway: "Lolipop" | "Mictlán" | "Mono";
+  frame: "portrait" | "square" | "landscape";
+  objectPosition?: string;
+}>;
+
 type HomePageMediaConfig = Readonly<{
   hero: HomeMediaContract;
   featured: HomeMediaContract;
@@ -14,6 +23,7 @@ type HomePageMediaConfig = Readonly<{
     monoMeowhe: HomeMediaContract;
     mictlan: HomeMediaContract;
   }>;
+  gallery: readonly HomeGalleryMedia[];
 }>;
 
 /**
@@ -62,4 +72,72 @@ export const homePageMedia: HomePageMediaConfig = {
       availability: "available",
     },
   },
+  gallery: [
+    {
+      id: "lolipop-garden",
+      src: "/images/home/gallery/lolipop-garden.webp",
+      alt: "Lolipop Meowhe artisan keycap nestled in green succulent leaves",
+      colorway: "Lolipop",
+      frame: "portrait",
+      objectPosition: "50% 54%",
+    },
+    {
+      id: "mictlan-keyboard",
+      src: "/images/home/gallery/mictlan-keyboard.webp",
+      alt: "Mictlán artisan keycap placed among black keyboard keys",
+      colorway: "Mictlán",
+      frame: "square",
+    },
+    {
+      id: "mono-cookie-open",
+      src: "/images/home/gallery/mono-cookie-open.webp",
+      alt: "Mono Meowhe artisan keycap staged with black and white sandwich cookies",
+      colorway: "Mono",
+      frame: "landscape",
+      objectPosition: "50% 62%",
+    },
+    {
+      id: "lolipop-pastel-keys",
+      src: "/images/home/gallery/lolipop-pastel-keys.webp",
+      alt: "Lolipop Meowhe artisan keycap on a pastel mechanical keyboard",
+      colorway: "Lolipop",
+      frame: "square",
+    },
+    {
+      id: "mictlan-skull-pair",
+      src: "/images/home/gallery/mictlan-skull-pair.webp",
+      alt: "Two Mictlán artisan keycaps arranged beside a skull study",
+      colorway: "Mictlán",
+      frame: "portrait",
+      objectPosition: "50% 48%",
+    },
+    {
+      id: "mono-cookie-stack",
+      src: "/images/home/gallery/mono-cookie-stack.webp",
+      alt: "Mono Meowhe artisan keycap framed by stacked sandwich cookies",
+      colorway: "Mono",
+      frame: "portrait",
+    },
+    {
+      id: "lolipop-candy-stones",
+      src: "/images/home/gallery/lolipop-candy-stones.webp",
+      alt: "Lolipop Meowhe artisan keycap resting on colorful candy stones",
+      colorway: "Lolipop",
+      frame: "landscape",
+    },
+    {
+      id: "mictlan-skull-study",
+      src: "/images/home/gallery/mictlan-skull-study.webp",
+      alt: "Mictlán artisan keycap centered against a pale skull",
+      colorway: "Mictlán",
+      frame: "landscape",
+    },
+    {
+      id: "mono-cookie-portrait",
+      src: "/images/home/gallery/mono-cookie-portrait.webp",
+      alt: "Mono Meowhe artisan keycap presented on a single sandwich cookie",
+      colorway: "Mono",
+      frame: "square",
+    },
+  ],
 };

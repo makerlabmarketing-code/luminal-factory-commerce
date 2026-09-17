@@ -179,3 +179,11 @@
 - **Boundaries:** no Auth, cart, merge, order, payment, inventory, raffle, Supabase schema/RLS, runtime flag, OTP, Production data, or gated feature behavior changed. No production master is published.
 - **Validation:** lint, typecheck, all 152 tests, static security gate, production dependency audit, and Next production build passed. Desktop and mobile screenshots were reviewed locally and then excluded from Git because PR creation rejects review-only binaries; final crop review remains gated on real media.
 - **Delivery:** branch `work` was pushed only to create PR #44 after validation and removal of review-only PNG binaries. It was not merged and no deployment was triggered. Next action is review, approved Drive media sync, asset-only replacement, and final visual validation.
+
+## 2026-09-17 Homepage colorway gallery
+
+- **Status:** `CODE_COMPLETE_LOCAL`; the Homepage now includes a below-fold Masonry-style archive gallery between Selected Archive and Made at Luminal.
+- **Assets:** nine owner-provided photographs were selected as three studies each for Lolipop, Mictlán and Mono, normalized to browser-safe WebP, and stored under `public/images/home/gallery/`. Drive remains an import source only and is not present in storefront runtime paths.
+- **Motion/performance:** a narrow client component uses the existing GSAP dependency for one intersection-triggered opacity/translate/blur reveal. It falls back to static content for reduced motion, uses lazy `next/image`, and adapts from three to two to one column.
+- **ERP follow-up:** `specs/integration/homepage-gallery-erp-management-task.md` queues upload, ordering, crop/focal point, alt text, preview and publication through the signed Commerce Admin API. No ERP, Supabase, Storage, secret, runtime flag or live data was changed in this slice.
+- **Validation:** `npm run check` passed with 223 tests, zero production dependency vulnerabilities and a successful production build. Local SSR returned HTTP 200 with gallery content. The environment did not provide the browser automation binary, so final 390/768/1440 visual and console review remains a post-push Preview gate.
