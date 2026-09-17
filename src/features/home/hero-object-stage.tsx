@@ -28,11 +28,16 @@ const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
-const HERO_POINTER_YAW_MAX_DEG = 5;
-const HERO_POINTER_PITCH_MAX_DEG = 2.5;
-const HERO_POINTER_FOLLOW_RATE = 3.2;
+const HERO_DRAG_YAW_MAX_DEG = 22;
+const HERO_DRAG_PITCH_MAX_DEG = 8;
+const HERO_DRAG_YAW_DEG_PER_PIXEL = 0.12;
+const HERO_DRAG_PITCH_DEG_PER_PIXEL = 0.08;
+const HERO_POINTER_FOLLOW_RATE = 4;
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
-const HERO_AUTO_ROTATE_MAX_DEG_PER_SECOND = 3;
+
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.min(Math.max(value, minimum), maximum);
+}
 
 function ensureModelViewer() {
   if (window.customElements.get("model-viewer")) return Promise.resolve();
@@ -119,6 +124,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     let fallbackTimeout: number | null = null;
     let pointerAnimationFrame: number | null = null;
     let previousPointerFrameTime = performance.now();
+    let pointerDrag: { pointerId: number; x: number; y: number; pitchDeg: number; yawDeg: number } | null = null;
     const pointerTarget = { pitchDeg: 0, yawDeg: 0 };
     const pointerCurrent = { pitchDeg: 0, yawDeg: 0 };
 
@@ -159,19 +165,44 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       pointerAnimationFrame = window.requestAnimationFrame(animatePointerTilt);
     };
 
-    const handlePointerMove = (event: PointerEvent) => {
+    const handlePointerDown = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
-      const bounds = stage.getBoundingClientRect();
-      if (bounds.width <= 0 || bounds.height <= 0) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
 
-      const normalizedX = Math.min(Math.max(((event.clientX - bounds.left) / bounds.width) * 2 - 1, -1), 1);
-      const normalizedY = Math.min(Math.max(((event.clientY - bounds.top) / bounds.height) * 2 - 1, -1), 1);
-      pointerTarget.yawDeg = normalizedX * HERO_POINTER_YAW_MAX_DEG;
-      pointerTarget.pitchDeg = normalizedY * HERO_POINTER_PITCH_MAX_DEG;
+      pointerDrag = {
+        pointerId: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        pitchDeg: pointerTarget.pitchDeg,
+        yawDeg: pointerTarget.yawDeg,
+      };
+      stage.setPointerCapture(event.pointerId);
+      stage.style.cursor = "grabbing";
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
+
+      pointerTarget.yawDeg = clamp(
+        pointerDrag.yawDeg + (event.clientX - pointerDrag.x) * HERO_DRAG_YAW_DEG_PER_PIXEL,
+        -HERO_DRAG_YAW_MAX_DEG,
+        HERO_DRAG_YAW_MAX_DEG,
+      );
+      pointerTarget.pitchDeg = clamp(
+        pointerDrag.pitchDeg + (event.clientY - pointerDrag.y) * HERO_DRAG_PITCH_DEG_PER_PIXEL,
+        -HERO_DRAG_PITCH_MAX_DEG,
+        HERO_DRAG_PITCH_MAX_DEG,
+      );
       startPointerTilt();
     };
 
-    const settlePointerTilt = () => {
+    const settlePointerTilt = (event?: PointerEvent) => {
+      if (event && pointerDrag && event.pointerId !== pointerDrag.pointerId) return;
+      if (pointerDrag && stage.hasPointerCapture(pointerDrag.pointerId)) {
+        stage.releasePointerCapture(pointerDrag.pointerId);
+      }
+      pointerDrag = null;
+      stage.style.cursor = "grab";
       pointerTarget.pitchDeg = 0;
       pointerTarget.yawDeg = 0;
       startPointerTilt();
@@ -220,23 +251,17 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         viewer.setAttribute("max-field-of-view", `${presentation.camera.maxFieldOfViewDeg}deg`);
         viewer.setAttribute("camera-target", "auto auto auto");
 
-        if (presentation.autoRotate && !reducedMotion) {
-          const rotationPerSecondDeg = Math.min(
-            presentation.rotationPerSecondDeg,
-            HERO_AUTO_ROTATE_MAX_DEG_PER_SECOND,
-          );
-          viewer.setAttribute("auto-rotate", "");
-          viewer.setAttribute("auto-rotate-delay", String(presentation.autoRotateDelayMs));
-          viewer.setAttribute("rotation-per-second", `${rotationPerSecondDeg}deg`);
-        }
-
         if (!reducedMotion) {
+          stage.style.cursor = "grab";
+          stage.addEventListener("pointerdown", handlePointerDown);
           stage.addEventListener("pointermove", handlePointerMove);
           stage.addEventListener("pointerleave", settlePointerTilt);
+          stage.addEventListener("pointerup", settlePointerTilt);
+          stage.addEventListener("pointercancel", settlePointerTilt);
         }
 
         viewer.addEventListener("load", () => {
-          stage.dataset.heroMode = reducedMotion ? "enhanced-static" : "enhanced-auto-rotate";
+          stage.dataset.heroMode = reducedMotion ? "enhanced-static" : "enhanced-drag-to-rotate";
           if (loaderRef.current) {
             loaderRef.current.style.opacity = "0";
             window.setTimeout(() => {
@@ -291,8 +316,12 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       }
       if (fallbackTimeout !== null) window.clearTimeout(fallbackTimeout);
       if (pointerAnimationFrame !== null) window.cancelAnimationFrame(pointerAnimationFrame);
+      stage.removeEventListener("pointerdown", handlePointerDown);
       stage.removeEventListener("pointermove", handlePointerMove);
       stage.removeEventListener("pointerleave", settlePointerTilt);
+      stage.removeEventListener("pointerup", settlePointerTilt);
+      stage.removeEventListener("pointercancel", settlePointerTilt);
+      stage.style.cursor = "";
 
       viewerRef.current = null;
       mount.replaceChildren();
@@ -302,9 +331,9 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
   return (
     <div
       ref={stageRef}
-      className="hero-object-stage group !min-h-[30rem] !overflow-visible !border-0 !bg-transparent lg:!min-h-[46rem]"
+      className="hero-object-stage group select-none !min-h-[30rem] !overflow-visible !border-0 !bg-transparent lg:!min-h-[46rem]"
       data-hero-renderer="model-viewer"
-      data-hero-interaction="auto-rotate-with-pointer-tilt"
+      data-hero-interaction="drag-to-rotate-and-recenter"
       data-hero-mode="capability-gated"
       data-hero-tint={presentation.tint ?? "default"}
     >

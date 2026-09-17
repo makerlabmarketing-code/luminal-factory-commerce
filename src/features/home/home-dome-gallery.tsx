@@ -24,7 +24,7 @@ const DOME_ROW_PITCH_DEG = [-17, 0, 17] as const;
 const DOME_AUTO_ROTATE_DEG_PER_SECOND = 3;
 const DOME_DRAG_DEG_PER_PIXEL = 0.12;
 const DOME_MAX_PITCH_DEG = 7;
-const DOME_RESUME_DELAY_MS = 1500;
+const DOME_RESUME_DELAY_MS = 600;
 const DOME_DRAG_THRESHOLD_PX = 6;
 
 function clamp(value: number, minimum: number, maximum: number) {
@@ -53,10 +53,10 @@ export function HomeDomeGallery({ items }: HomeDomeGalleryProps) {
   const rotationRef = useRef({ pitchDeg: -1.5, yawDeg: 0 });
   const dragStartRef = useRef<{ x: number; y: number; pitchDeg: number; yawDeg: number } | null>(null);
   const dragDistanceRef = useRef(0);
+  const pressedItemRef = useRef<HomeGalleryMedia | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const resumeAtRef = useRef(0);
   const isVisibleRef = useRef(false);
-  const isHoveringRef = useRef(false);
   const isDraggingRef = useRef(false);
   const [supportsDome, setSupportsDome] = useState(false);
   const [selectedItem, setSelectedItem] = useState<HomeGalleryMedia | null>(null);
@@ -100,7 +100,6 @@ export function HomeDomeGallery({ items }: HomeDomeGalleryProps) {
 
       const canAutoRotate = !reducedMotion
         && isVisibleRef.current
-        && !isHoveringRef.current
         && !isDraggingRef.current
         && selectedItem === null
         && time >= resumeAtRef.current;
@@ -152,6 +151,13 @@ export function HomeDomeGallery({ items }: HomeDomeGalleryProps) {
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+
+    const tile = event.target instanceof Element
+      ? event.target.closest<HTMLElement>("[data-dome-item-id]")
+      : null;
+    const itemId = tile?.dataset.domeItemId;
+    pressedItemRef.current = itemId ? items.find((item) => item.id === itemId) ?? null : null;
     event.currentTarget.setPointerCapture(event.pointerId);
     isDraggingRef.current = true;
     dragDistanceRef.current = 0;
@@ -177,18 +183,23 @@ export function HomeDomeGallery({ items }: HomeDomeGalleryProps) {
     applyRotation();
   };
 
-  const finishDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+  const finishDrag = (event: React.PointerEvent<HTMLDivElement>, allowOpen: boolean) => {
+    const wasDragging = isDraggingRef.current;
+    const selectedTile = pressedItemRef.current;
+    const shouldOpen = wasDragging
+      && allowOpen
+      && selectedTile !== null
+      && dragDistanceRef.current < DOME_DRAG_THRESHOLD_PX;
+
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     isDraggingRef.current = false;
     dragStartRef.current = null;
+    pressedItemRef.current = null;
     resumeAtRef.current = performance.now() + DOME_RESUME_DELAY_MS;
-  };
 
-  const openTile = (item: HomeGalleryMedia) => {
-    if (dragDistanceRef.current >= DOME_DRAG_THRESHOLD_PX) return;
-    setSelectedItem(item);
+    if (shouldOpen) setSelectedItem(selectedTile);
   };
 
   return (
@@ -198,21 +209,19 @@ export function HomeDomeGallery({ items }: HomeDomeGalleryProps) {
           <div
             className={styles.viewport}
             onPointerDown={handlePointerDown}
-            onPointerEnter={() => { isHoveringRef.current = true; }}
             onPointerLeave={(event) => {
-              isHoveringRef.current = false;
-              if (isDraggingRef.current) finishDrag(event);
-              resumeAtRef.current = performance.now() + DOME_RESUME_DELAY_MS;
+              if (isDraggingRef.current) finishDrag(event, false);
             }}
             onPointerMove={handlePointerMove}
-            onPointerUp={finishDrag}
+            onPointerCancel={(event) => finishDrag(event, false)}
+            onPointerUp={(event) => finishDrag(event, true)}
           >
             <div className={styles.sphere} ref={sphereRef} aria-hidden="true">
               {tiles.map((tile) => (
                 <div
                   className={styles.tile}
+                  data-dome-item-id={tile.item.id}
                   key={tile.id}
-                  onClick={() => openTile(tile.item)}
                   style={{
                     "--tile-pitch": `${tile.pitchDeg}deg`,
                     "--tile-yaw": `${tile.yawDeg}deg`,

@@ -40,32 +40,31 @@ test("desktop Hero keeps the product poster out of the 3D loading and error path
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("Hero keeps autonomous rotation and adds restrained pointer tilt", () => {
+test("Hero stays front-facing until drag and recenters after release", () => {
   assert.match(heroConfig, /rollDeg: 0/);
   assert.match(heroConfig, /pitchDeg: -52/);
   assert.match(heroConfig, /yawDeg: 0/);
   assert.match(heroConfig, /thetaDeg: 12/);
   assert.match(heroConfig, /phiDeg: 82/);
   assert.match(heroConfig, /radiusPercent: 103/);
-  assert.match(heroConfig, /autoRotate: true/);
+  assert.match(heroConfig, /autoRotate: false/);
   assert.match(heroConfig, /autoRotateDelayMs: 700/);
   assert.match(heroConfig, /rotationPerSecondDeg: 3/);
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
   assert.match(heroSource, /presentation\.orientation\.rollDeg/);
   assert.match(heroSource, /presentation\.orientation\.pitchDeg/);
   assert.match(heroSource, /presentation\.orientation\.yawDeg/);
-  assert.match(heroSource, /data-hero-interaction="auto-rotate-with-pointer-tilt"/);
-  assert.match(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
-  assert.match(heroSource, /viewer\.setAttribute\("auto-rotate-delay", String\(presentation\.autoRotateDelayMs\)\)/);
-  assert.match(heroSource, /HERO_AUTO_ROTATE_MAX_DEG_PER_SECOND = 3/);
-  assert.match(heroSource, /Math\.min\([\s\S]*presentation\.rotationPerSecondDeg,[\s\S]*HERO_AUTO_ROTATE_MAX_DEG_PER_SECOND/);
-  assert.match(heroSource, /viewer\.setAttribute\("rotation-per-second", `\$\{rotationPerSecondDeg\}deg`\)/);
+  assert.match(heroSource, /data-hero-interaction="drag-to-rotate-and-recenter"/);
+  assert.doesNotMatch(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
-  assert.match(heroSource, /HERO_POINTER_YAW_MAX_DEG = 5/);
-  assert.match(heroSource, /HERO_POINTER_PITCH_MAX_DEG = 2\.5/);
-  assert.match(heroSource, /HERO_POINTER_FOLLOW_RATE = 3\.2/);
+  assert.match(heroSource, /HERO_DRAG_YAW_MAX_DEG = 22/);
+  assert.match(heroSource, /HERO_DRAG_PITCH_MAX_DEG = 8/);
+  assert.match(heroSource, /stage\.addEventListener\("pointerdown", handlePointerDown\)/);
   assert.match(heroSource, /stage\.addEventListener\("pointermove", handlePointerMove\)/);
   assert.match(heroSource, /stage\.addEventListener\("pointerleave", settlePointerTilt\)/);
+  assert.match(heroSource, /stage\.addEventListener\("pointerup", settlePointerTilt\)/);
+  assert.match(heroSource, /stage\.setPointerCapture\(event\.pointerId\)/);
+  assert.match(heroSource, /stage\.releasePointerCapture\(pointerDrag\.pointerId\)/);
   assert.match(heroSource, /window\.cancelAnimationFrame\(pointerAnimationFrame\)/);
   assert.doesNotMatch(heroSource, /POINTER_THETA_RANGE_DEG|POINTER_PHI_RANGE_DEG|reactiveLightRef|Move to explore/);
   assert.doesNotMatch(heroSource, /data-hero-lens|fluid-glass|backdropFilter/);
@@ -89,8 +88,7 @@ test("constrained clients keep the image fallback while eligible desktop defers 
 
 test("reduced motion keeps an eligible desktop model static instead of removing the 3D object", () => {
   assert.match(heroSource, /prefers-reduced-motion: reduce/);
-  assert.match(heroSource, /presentation\.autoRotate && !reducedMotion/);
   assert.match(heroSource, /enhanced-static/);
-  assert.match(heroSource, /enhanced-auto-rotate/);
+  assert.match(heroSource, /enhanced-drag-to-rotate/);
   assert.match(heroSource, /if \(!reducedMotion\) \{[\s\S]*pointermove/);
 });
