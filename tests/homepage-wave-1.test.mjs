@@ -54,6 +54,13 @@ test("Homepage media pass uses real archive names and a non-requesting pending a
   assert.match(home, /objectPosition/);
 });
 
+test("Homepage Hero copy represents the Luminal brand rather than one fallback object", () => {
+  const content = read("src/content/homepage.ts");
+  assert.match(content, /title: "Artisan objects, shaped by light\."/);
+  assert.match(content, /featured:[\s\S]*title: "Mono Meowhe"/);
+  assert.doesNotMatch(content, /title: "Mono Meowhe, shaped by light\."/);
+});
+
 test("Wave 1 CSS carries responsive and reduced-motion safeguards", () => {
   const css = read("src/app/globals.css");
   assert.match(css, /@keyframes wave-object-reveal/);

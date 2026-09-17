@@ -18,7 +18,7 @@ export type HomeArchiveObject = Readonly<{
 export const homePageContent = {
   hero: {
     eyebrow: "Luminal Revival · 2026",
-    title: "Mono Meowhe, shaped by light.",
+    title: "Artisan objects, shaped by light.",
     description:
       "A new chapter for our small-batch artisan objects—formed slowly, finished by hand, and released with intention.",
     primaryAction: { label: "Explore the Archive", href: "/archive" },
