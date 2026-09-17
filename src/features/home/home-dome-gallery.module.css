@@ -62,12 +62,21 @@
 .tile > span {
   position: absolute;
   z-index: 1;
-  right: 0.75rem;
-  bottom: 0.7rem;
-  color: rgba(255, 255, 255, 0.76);
+  right: 0.55rem;
+  bottom: 0.55rem;
+  max-width: calc(100% - 1.1rem);
+  overflow: hidden;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(5, 5, 5, 0.72);
+  backdrop-filter: blur(8px);
   font: 0.58rem var(--font-mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .edgeVeil {

@@ -128,12 +128,12 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     const pointerTarget = { pitchDeg: 0, yawDeg: 0 };
     const pointerCurrent = { pitchDeg: 0, yawDeg: 0 };
 
-    const applyPointerOrientation = () => {
+    const applyPointerOrbit = () => {
       const viewer = viewerRef.current;
       if (!viewer) return;
       viewer.setAttribute(
-        "orientation",
-        `${presentation.orientation.rollDeg}deg ${presentation.orientation.pitchDeg + pointerCurrent.pitchDeg}deg ${presentation.orientation.yawDeg + pointerCurrent.yawDeg}deg`,
+        "camera-orbit",
+        `${presentation.camera.thetaDeg + pointerCurrent.yawDeg}deg ${presentation.camera.phiDeg + pointerCurrent.pitchDeg}deg ${presentation.camera.radiusPercent}%`,
       );
     };
 
@@ -144,14 +144,14 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
 
       pointerCurrent.pitchDeg += (pointerTarget.pitchDeg - pointerCurrent.pitchDeg) * easing;
       pointerCurrent.yawDeg += (pointerTarget.yawDeg - pointerCurrent.yawDeg) * easing;
-      applyPointerOrientation();
+      applyPointerOrbit();
 
       const pitchRemaining = Math.abs(pointerTarget.pitchDeg - pointerCurrent.pitchDeg);
       const yawRemaining = Math.abs(pointerTarget.yawDeg - pointerCurrent.yawDeg);
       if (pitchRemaining <= HERO_POINTER_SETTLE_EPSILON_DEG && yawRemaining <= HERO_POINTER_SETTLE_EPSILON_DEG) {
         pointerCurrent.pitchDeg = pointerTarget.pitchDeg;
         pointerCurrent.yawDeg = pointerTarget.yawDeg;
-        applyPointerOrientation();
+        applyPointerOrbit();
         pointerAnimationFrame = null;
         return;
       }

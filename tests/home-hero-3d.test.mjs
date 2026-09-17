@@ -54,6 +54,11 @@ test("Hero stays front-facing until drag and recenters after release", () => {
   assert.match(heroSource, /presentation\.orientation\.rollDeg/);
   assert.match(heroSource, /presentation\.orientation\.pitchDeg/);
   assert.match(heroSource, /presentation\.orientation\.yawDeg/);
+  assert.match(heroSource, /const applyPointerOrbit/);
+  assert.match(heroSource, /presentation\.camera\.thetaDeg \+ pointerCurrent\.yawDeg/);
+  assert.match(heroSource, /presentation\.camera\.phiDeg \+ pointerCurrent\.pitchDeg/);
+  assert.doesNotMatch(heroSource, /presentation\.orientation\.pitchDeg \+ pointerCurrent/);
+  assert.doesNotMatch(heroSource, /presentation\.orientation\.yawDeg \+ pointerCurrent/);
   assert.match(heroSource, /data-hero-interaction="drag-to-rotate-and-recenter"/);
   assert.doesNotMatch(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);

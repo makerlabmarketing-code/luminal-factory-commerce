@@ -33,12 +33,14 @@ test("Homepage gallery uses a compact, motion-safe Dome with a touch fallback", 
   assert.match(gallery, /prefers-reduced-motion: reduce/);
   assert.match(gallery, /IntersectionObserver/);
   assert.match(gallery, /DOME_AUTO_ROTATE_DEG_PER_SECOND = 3/);
+  assert.match(gallery, /DOME_ROW_PITCH_DEG = \[-30, 0, 30\]/);
   assert.match(gallery, /DOME_RESUME_DELAY_MS = 600/);
   assert.match(gallery, /pressedItemRef/);
   assert.doesNotMatch(gallery, /isHoveringRef/);
   assert.match(gallery, /data-gallery-mode={supportsDome \? "dome" : "compact-strip"}/);
   assert.match(gallery, /alt={item\.alt}/);
   assert.match(galleryCss, /perspective: 950px/);
+  assert.match(galleryCss, /backdrop-filter: blur\(8px\)/);
   assert.match(galleryCss, /scroll-snap-type: x mandatory/);
   assert.match(galleryCss, /@media \(max-width: 768px\)/);
   assert.match(galleryCss, /@media \(prefers-reduced-motion: reduce\)/);

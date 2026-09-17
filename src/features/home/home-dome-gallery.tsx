@@ -20,7 +20,7 @@ type DomeTile = Readonly<{
 }>;
 
 const DOME_COLUMN_COUNT = 12;
-const DOME_ROW_PITCH_DEG = [-17, 0, 17] as const;
+const DOME_ROW_PITCH_DEG = [-30, 0, 30] as const;
 const DOME_AUTO_ROTATE_DEG_PER_SECOND = 3;
 const DOME_DRAG_DEG_PER_PIXEL = 0.12;
 const DOME_MAX_PITCH_DEG = 7;
