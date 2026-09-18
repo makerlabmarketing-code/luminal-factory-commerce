@@ -18,29 +18,29 @@ test("Homepage follows the approved editorial sequence with the colorway gallery
   assert.match(home, /content\.hero\.secondaryAction/);
 });
 
-test("Homepage gallery uses a compact, motion-safe Dome with a touch fallback", () => {
+test("Homepage gallery uses a compact, motion-safe Drift Wall with a touch fallback", () => {
   const home = read("src/features/home/home-page.tsx");
-  const gallery = read("src/features/home/home-dome-gallery.tsx");
-  const galleryCss = read("src/features/home/home-dome-gallery.module.css");
+  const gallery = read("src/features/home/home-drift-wall.tsx");
+  const galleryCss = read("src/features/home/home-drift-wall.module.css");
   const media = read("src/content/homepage-media.ts");
   const galleryMedia = media.slice(media.indexOf("gallery: ["));
 
-  assert.match(home, /<HomeDomeGallery items={homePageMedia\.gallery}/);
+  assert.match(home, /<HomeDriftWall items={homePageMedia\.gallery}/);
   assert.equal((galleryMedia.match(/colorway: "Lolipop"/g) ?? []).length, 3);
   assert.equal((galleryMedia.match(/colorway: "Mictlán"/g) ?? []).length, 3);
   assert.equal((galleryMedia.match(/colorway: "Mono"/g) ?? []).length, 3);
   assert.doesNotMatch(media + gallery, /drive\.google|googleusercontent/);
   assert.match(gallery, /prefers-reduced-motion: reduce/);
   assert.match(gallery, /IntersectionObserver/);
-  assert.match(gallery, /DOME_AUTO_ROTATE_DEG_PER_SECOND = 3/);
-  assert.match(gallery, /DOME_ROW_PITCH_DEG = \[-30, 0, 30\]/);
-  assert.match(gallery, /DOME_RESUME_DELAY_MS = 600/);
-  assert.match(gallery, /pressedItemRef/);
-  assert.doesNotMatch(gallery, /isHoveringRef/);
-  assert.match(gallery, /data-gallery-mode={supportsDome \? "dome" : "compact-strip"}/);
+  assert.match(gallery, /DRIFT_COLUMN_COUNT = 5/);
+  assert.match(gallery, /DRIFT_ITEMS_PER_COLUMN = 3/);
+  assert.match(gallery, /DRIFT_POINTER_RANGE_PX = 12/);
+  assert.match(gallery, /data-gallery-mode={supportsDrift \? "drift-wall" : "compact-strip"}/);
   assert.match(gallery, /alt={item\.alt}/);
-  assert.match(galleryCss, /perspective: 950px/);
-  assert.match(galleryCss, /backdrop-filter: blur\(8px\)/);
+  assert.match(galleryCss, /perspective: 1200px/);
+  assert.match(galleryCss, /height: clamp\(28rem, 43vw, 34rem\)/);
+  assert.match(galleryCss, /@keyframes drift-up/);
+  assert.match(galleryCss, /animation-play-state: paused/);
   assert.match(galleryCss, /scroll-snap-type: x mandatory/);
   assert.match(galleryCss, /@media \(max-width: 768px\)/);
   assert.match(galleryCss, /@media \(prefers-reduced-motion: reduce\)/);
