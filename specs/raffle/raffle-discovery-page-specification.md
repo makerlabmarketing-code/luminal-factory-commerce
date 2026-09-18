@@ -4,12 +4,12 @@
 
 | Field | Value |
 |---|---|
-| Status | `DRAFT` / `REVIEW_REQUIRED` |
+| Status | `APPROVED` / `IMPLEMENTED` |
 | Owner | Luminal Factory Commerce storefront |
 | Last updated | 2026-08-09 |
 | Source experience script | `docs/page-scripts/raffle-discovery-experience-script-draft.md` |
 | Related roadmap phase | Phase 3 — Static storefront routes |
-| Implementation status | `BLOCKED_PENDING_OWNER_APPROVAL` |
+| Implementation status | `DEPLOYED_STATIC_FOUNDATION` |
 
 This specification defines the first dedicated Raffle page foundation. It does not approve raffle entry persistence, eligibility enforcement, authentication, winner selection, payment, order creation, Supabase schema, or ERP changes.
 
@@ -40,7 +40,7 @@ Commerce boundary:
 
 ## First-slice route scope
 
-Approved implementation target, once owner review is complete:
+Implemented route scope:
 
 - `/raffle` only.
 
@@ -283,8 +283,13 @@ No database inspection or migration is required because the slice must not read 
 - ERP changes.
 - Final legal/rules copy.
 
-## Approval gate
+## Approval record
 
-Implementation remains blocked until the owner approves this experience script and specification for the bounded static `/raffle` discovery foundation.
+The owner approved the bounded static `/raffle` discovery foundation on
+2026-08-09. The route, typed presentation boundary, truthful preparing state,
+Archive bridge, navigation update, and non-transactional tests are implemented.
 
-After approval, create a separate technical plan and feature branch for `/raffle`. The transactional detail/entry flow remains a later independently approved slice.
+The transactional `/raffle/[slug]` and guest-email entry flow remain a separate
+default-off slice governed by
+`specs/raffle/raffle-detail-entry-data-specification.md` and its reviewed
+schema/RLS technical plan.

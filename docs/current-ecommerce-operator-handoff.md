@@ -195,3 +195,19 @@
 - **Hero direction:** the existing Google `<model-viewer>` delivery, capability gates, poster fallback, idle loading, and reduced-motion behavior remain intact. The object is static and front-facing by default; fine-pointer clients hold and drag within a bounded `22° × 8°` range, then the model slowly returns to the authored center on release, cancel, or pointer leave. Renderer-level autonomous rotation is disabled even for older remote records.
 - **Boundaries:** no new runtime dependency, Supabase migration, Production data mutation, ERP change, runtime flag, secret, push, or deployment is included in this local slice.
 - **Validation:** `npm run check` passed with 223 tests, zero production dependency vulnerabilities, static security gate success, and a successful Next.js Production build. Browser automation could not reach the workspace-local dev server, so desktop/mobile motion, drag, lightbox, pointer settle, and console inspection remain the required Preview gate before Production delivery.
+
+## 2026-09-18 Raffle detail + guest-entry planning
+
+- **Production inspection:** Read-only inspection confirmed the Commerce project
+  has no `raffles` or `raffle_entries` table. Existing public tables use RLS;
+  sensitive limiter/replay data uses the policy-free `private` schema.
+- **Plan:** `specs/raffle/raffle-detail-entry-schema-rls-technical-plan.md`
+  defines separate raffle and entry records, server/database-authoritative time,
+  transactional uniqueness/idempotency, private hashed rate limiting,
+  Turnstile, and a default-off server mutation boundary.
+- **Boundary:** No SQL was authored or applied, no Production row was written,
+  no runtime flag or secret was changed, and no order/payment/inventory/winner/
+  ERP behavior was introduced.
+- **Next gate:** `RAFFLE-SCHEMA-01` authorizes the exact migration plus disabled
+  application implementation only. Production migration and live entry remain
+  separately gated as `RAFFLE-PROD-MIGRATION-01` and `RAFFLE-LIVE-SMOKE-01`.

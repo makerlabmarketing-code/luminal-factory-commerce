@@ -5,10 +5,10 @@
 - Status: `APPROVED` / `IMPLEMENTATION_PLANNING_READY`
 - Date: 2026-08-09
 - Owner approval: `2026-08-09`
-- Implementation status: `READY_FOR_SCHEMA_INSPECTION_AND_TECHNICAL_PLAN`
+- Implementation status: `SCHEMA_INSPECTED_TECHNICAL_PLAN_PREPARED`
 - Data status: `APPROVED_CONTRACT_NOT_APPLIED`
 
-This specification defines the approved contract for `/raffle/[slug]` and the first raffle entry mutation. It authorizes technical planning and direct inspection of the current commerce Supabase project, but no migration may be applied until the actual schema/RLS plan has been reviewed on a dedicated implementation branch.
+This specification defines the approved contract for `/raffle/[slug]` and the first raffle entry mutation. Production schema inspection completed read-only on 2026-09-18 and confirmed that no raffle or raffle-entry table currently exists. No migration may be applied until the actual schema/RLS plan is reviewed and separately approved for Production execution.
 
 ## Public route contract
 
@@ -143,7 +143,10 @@ Before any Supabase write:
 6. verify Preview with the intended environment
 7. verify database contract before merge
 
-Until those steps are complete: `NO_DATABASE_CHANGE_APPLIED_YET`.
+The direct schema inspection and technical-plan steps are complete. Migration
+authoring, rollback validation, Production application, runtime enablement, and
+the live entry smoke remain separately gated:
+`NO_DATABASE_CHANGE_APPLIED_YET`.
 
 ## Owner approval record
 
