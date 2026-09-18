@@ -1,9 +1,10 @@
 # Raffle Detail + Guest Entry Schema/RLS Technical Plan
 
-Status: `REVIEW_READY_NO_DATABASE_CHANGE`
+Status: `CODE_COMPLETE_DEFAULT_OFF_NO_DATABASE_CHANGE`
 Inspection date: `2026-09-18`
 Target project: Commerce Supabase `bkmbhcfokobmhfzgsfzh`
-Runtime default: `COMMERCE_RAFFLE_ENTRY_ENABLED=false`
+Runtime defaults: `COMMERCE_RAFFLE_DETAIL_ENABLED=false` and
+`COMMERCE_RAFFLE_ENTRY_ENABLED=false`
 
 ## Outcome
 
@@ -113,13 +114,17 @@ idempotency.
 
 ## Application boundary
 
-- `src/services/raffle/`: public detail query and server-only entry adapter;
-- `src/features/raffle/`: Zod request/result contracts and detail/form UI;
+- `src/features/raffle/`: public detail query, strict request/result contracts,
+  and detail/form UI;
+- `src/lib/supabase/raffle-entry-server.ts`: server-only service-role RPC,
+  durable limiter, and Turnstile adapters;
 - `src/app/raffle/[slug]/page.tsx`: thin Server Component route;
 - `src/app/api/raffle-entry/route.ts`: POST-only, Node runtime, dynamic,
   same-origin, JSON-only, strict custom header, bounded body, private/no-store;
 - client form receives only normalized public raffle presentation data;
-- runtime remains unavailable unless all raffle-entry configuration is valid
+- public detail reads remain unavailable unless
+  `COMMERCE_RAFFLE_DETAIL_ENABLED` is exactly `true`;
+- runtime entry remains unavailable unless all raffle-entry configuration is valid
   and `COMMERCE_RAFFLE_ENTRY_ENABLED` is exactly `true`.
 
 ## Privacy and abuse controls

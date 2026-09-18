@@ -72,7 +72,10 @@ for (const file of textFiles.filter((file) => /^next\.config\.[cm]?[jt]s$/.test(
   }
 }
 
-const approvedOutboundHosts = new Set(["api.resend.com"]);
+const approvedOutboundHosts = new Set([
+  "api.resend.com",
+  "challenges.cloudflare.com",
+]);
 for (const file of runtimeFiles.filter((file) => file.startsWith("src/"))) {
   const source = readFileSync(file, "utf8");
   const hardcodedFetches = source.matchAll(/fetch\(\s*["'`](https:\/\/[^"'`/]+)/g);

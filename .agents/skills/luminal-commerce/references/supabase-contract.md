@@ -154,6 +154,25 @@ identity check and presence of a guest cookie. Only a completed merge clears tha
 cookie; login remains valid and the cookie is preserved for every merge failure.
 All runtime activation remains separately gated.
 
+The approved Raffle detail/guest-entry foundation uses two independent,
+default-off runtime gates:
+
+- `COMMERCE_RAFFLE_DETAIL_ENABLED` allows the server-rendered public detail
+  adapter to read published raffle rows;
+- `COMMERCE_RAFFLE_ENTRY_ENABLED` allows the POST-only guest-entry boundary;
+- `COMMERCE_RAFFLE_ENTRY_ALLOWED_ORIGINS` contains exact accepted origins;
+- `COMMERCE_RAFFLE_ENTRY_RATE_LIMIT_SECRET` is server-only HMAC material of at
+  least 32 characters;
+- `COMMERCE_RAFFLE_ENTRY_TURNSTILE_SECRET` is the server-only Cloudflare
+  verification secret; the existing public Turnstile site key remains the only
+  browser-exposed CAPTCHA value.
+
+Raffle entry remains guest-email based and must not auto-link to a customer by
+email. Entrant and limiter tables are browser-denied; database time,
+publication, status, rules version, uniqueness and request idempotency remain
+authoritative. Applying the migration and enabling either runtime are separate
+Production gates.
+
 ## Row-Level Security
 
 Assume RLS is required for customer-owned data.

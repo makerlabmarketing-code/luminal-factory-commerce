@@ -211,3 +211,32 @@
 - **Next gate:** `RAFFLE-SCHEMA-01` authorizes the exact migration plus disabled
   application implementation only. Production migration and live entry remain
   separately gated as `RAFFLE-PROD-MIGRATION-01` and `RAFFLE-LIVE-SMOKE-01`.
+
+## 2026-09-18 Raffle schema + disabled application foundation
+
+- **Approval:** Owner approved `RAFFLE-SCHEMA-01` for migration authoring and
+  the default-off application slice only.
+- **Schema package:** Migration
+  `20260918060647_create_raffle_entry_foundation.sql` defines separate public
+  raffle metadata, a browser-inaccessible entrant ledger, private keyed-hash
+  limiter state, server-role-only RPCs, RLS/grants, concurrency-safe duplicate
+  and retry handling, and bounded Cron cleanup. It does not create a raffle,
+  entrant, winner, order, payment, inventory reservation, or ERP mutation.
+- **Application package:** Dynamic `/raffle/[slug]` public detail reads and the
+  POST-only `/api/raffle-entry` mutation boundary are implemented behind
+  independent exact-true flags. Entry requires same-origin JSON, a custom
+  request header, bounded input, Turnstile, durable source/email limits, and
+  database-authoritative status/time/rules checks.
+- **Validation:** `npm run check` passed with 233/233 tests, static security
+  gate success, zero Production dependency vulnerabilities, and a successful
+  Next.js Production build. Standalone disabled-runtime smoke returned HTTP 404
+  for both an unknown raffle detail and entry POST; the API returned only
+  `entry_unavailable`.
+- **Boundary:** No Supabase migration or fixture was executed, no generated
+  Production type was changed, no runtime flag/secret was enabled, and nothing
+  was pushed or deployed. Generated types remain pending until the reviewed
+  migration exists in Production.
+- **Next gate:** `RAFFLE-PROD-MIGRATION-01` separately authorizes transactional
+  rollback validation, one exact Production migration application, postflight,
+  fixture cleanup, and generated-type refresh. Live public entry remains
+  blocked by `RAFFLE-LIVE-SMOKE-01`.
