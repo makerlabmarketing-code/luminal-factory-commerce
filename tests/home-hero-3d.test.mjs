@@ -66,6 +66,9 @@ test("Hero stays front-facing until drag and recenters after release", () => {
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
   assert.match(heroSource, /HERO_DRAG_YAW_MAX_DEG = 22/);
   assert.match(heroSource, /HERO_DRAG_PITCH_MAX_DEG = 8/);
+  assert.match(heroSource, /HERO_DRAG_YAW_DEG_PER_PIXEL = 0\.16/);
+  assert.match(heroSource, /HERO_DRAG_PITCH_DEG_PER_PIXEL = 0\.1/);
+  assert.match(heroSource, /HERO_POINTER_FOLLOW_RATE = 8/);
   assert.match(heroSource, /stage\.addEventListener\("pointerdown", handlePointerDown\)/);
   assert.match(heroSource, /stage\.addEventListener\("pointermove", handlePointerMove\)/);
   assert.match(heroSource, /stage\.addEventListener\("pointerleave", settlePointerTilt\)/);
