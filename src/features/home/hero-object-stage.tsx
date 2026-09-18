@@ -32,7 +32,7 @@ const HERO_DRAG_YAW_MAX_DEG = 22;
 const HERO_DRAG_PITCH_MAX_DEG = 8;
 const HERO_DRAG_YAW_DEG_PER_PIXEL = 0.16;
 const HERO_DRAG_PITCH_DEG_PER_PIXEL = 0.1;
-const HERO_POINTER_FOLLOW_RATE = 8;
+const HERO_POINTER_FOLLOW_RATE = 20;
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
 
 function clamp(value: number, minimum: number, maximum: number) {
