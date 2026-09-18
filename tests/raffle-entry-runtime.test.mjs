@@ -29,6 +29,19 @@ test("raffle runtime is independently default-off and server-only", () => {
   assert.doesNotMatch(read("src/features/raffle/raffle-entry-form.tsx"), /SUPABASE_SECRET_KEY|TURNSTILE_SECRET/);
 });
 
+test("raffle adapters use the canonical Production-generated contract", () => {
+  const types = read("src/lib/supabase/database.types.ts");
+  const server = read("src/lib/supabase/raffle-entry-server.ts");
+  const detail = read("src/features/raffle/raffle-detail-service.ts");
+  assert.match(types, /raffles:/);
+  assert.match(types, /raffle_entries:/);
+  assert.match(types, /submit_guest_raffle_entry:/);
+  assert.match(types, /consume_raffle_entry_rate_limit:/);
+  assert.match(server, /import type \{ Database \}/);
+  assert.match(detail, /import type \{ Database \}/);
+  assert.doesNotMatch(server, /type RaffleEntryDatabase =/);
+});
+
 test("raffle request boundary rejects cross-site and oversized input", () => {
   const request = read("src/features/raffle/raffle-entry-request.ts");
   const route = read("src/app/api/raffle-entry/route.ts");

@@ -1,6 +1,6 @@
 # Raffle Detail + Guest Entry Schema/RLS Technical Plan
 
-Status: `CODE_COMPLETE_DEFAULT_OFF_NO_DATABASE_CHANGE`
+Status: `PRODUCTION_SCHEMA_APPLIED_RUNTIME_OFF`
 Inspection date: `2026-09-18`
 Target project: Commerce Supabase `bkmbhcfokobmhfzgsfzh`
 Runtime defaults: `COMMERCE_RAFFLE_DETAIL_ENABLED=false` and

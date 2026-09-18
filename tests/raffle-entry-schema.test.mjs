@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const migration = readFileSync(
-  "supabase/migrations/20260918060647_create_raffle_entry_foundation.sql",
+  "supabase/migrations/20260918063545_create_raffle_entry_foundation.sql",
   "utf8",
 );
 

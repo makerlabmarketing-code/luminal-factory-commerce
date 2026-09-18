@@ -1,13 +1,14 @@
 # Raffle Entry Production Migration Runbook
 
-Status: `PREPARED_NOT_AUTHORIZED`
-Migration: `20260918060647_create_raffle_entry_foundation.sql`
+Status: `APPLIED_POSTFLIGHT_PASS_RUNTIME_OFF`
+Migration: `20260918063545_create_raffle_entry_foundation.sql`
 Required gate: `RAFFLE-PROD-MIGRATION-01`
 
 ## Safety boundary
 
-This runbook may not be executed from `RAFFLE-SCHEMA-01`. The current approval
-authorizes code and migration authoring only.
+This runbook was executed after the owner approved
+`RAFFLE-PROD-MIGRATION-01`. `RAFFLE-SCHEMA-01` alone did not authorize the
+Production operation.
 
 The migration creates the raffle event, private entrant ledger, hashed limiter,
 service-role RPCs, RLS/grants, indexes, and cleanup job. It does not insert a
@@ -17,7 +18,8 @@ raffle, entrant, winner, order, payment, inventory reservation, or ERP record.
 
 1. Confirm the target project is exactly Commerce
    `bkmbhcfokobmhfzgsfzh`, never the ERP project.
-2. Confirm the migration ledger does not contain version `20260918060647`.
+2. Confirm the migration ledger does not already contain
+   `create_raffle_entry_foundation`.
 3. Confirm `public.raffles`, `public.raffle_entries`, and
    `private.raffle_entry_rate_limits` do not exist.
 4. Confirm the repository commit containing the migration passed
@@ -68,6 +70,31 @@ Verify:
 7. generated TypeScript types are refreshed from Production;
 8. security/performance advisors add no unreviewed warning or error;
 9. runtime flags remain false and no public entry request is accepted.
+
+## Execution evidence — 2026-09-18
+
+- Target `bkmbhcfokobmhfzgsfzh` was `ACTIVE_HEALTHY`; the raffle tables and
+  migration were absent before execution.
+- Transactional rollback validation passed and confirmed the three tables, two
+  RPCs, and Cron job were absent again after `ROLLBACK`.
+- Production ledger recorded version `20260918063545` with name
+  `create_raffle_entry_foundation`.
+- All three tables have RLS. Only published raffle metadata has a browser
+  `SELECT` policy. Entrant and limiter tables have no browser policy or grant.
+- Both RPCs are `SECURITY INVOKER`, use fixed empty `search_path`, have bounded
+  timeouts, and are executable by `service_role` only.
+- Parallel same-email submissions produced one `submitted` and one
+  `already_entered`; replay, token conflict, rules mismatch, and limiter
+  exhaustion checks passed.
+- The published-row anon policy returned only the published fixture.
+- Fixture cleanup returned raffle, entry, and limiter counts to zero. Orders,
+  payments, inventory, customers, carts, and Auth user counts were unchanged.
+- Production-generated TypeScript types were refreshed. Both runtime flags
+  remain off; no application push or deployment occurred.
+- Postflight advisors introduced only the intentional `RLS enabled, no policy`
+  notices for the default-deny entrant/limiter tables and unused-index notices
+  expected while all raffle tables are empty. No raffle foreign-key or RLS
+  vulnerability was reported.
 
 ## Roll-forward recovery
 

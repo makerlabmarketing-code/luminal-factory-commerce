@@ -754,6 +754,112 @@ export type Database = {
         }
         Relationships: []
       }
+      raffle_entries: {
+        Row: {
+          accepted_at: string
+          contact_email: string
+          created_at: string
+          display_name: string
+          email_normalized: string
+          id: string
+          raffle_id: string
+          request_fingerprint_hash: string
+          request_token_hash: string
+          rules_version: string
+        }
+        Insert: {
+          accepted_at?: string
+          contact_email: string
+          created_at?: string
+          display_name: string
+          email_normalized: string
+          id?: string
+          raffle_id: string
+          request_fingerprint_hash: string
+          request_token_hash: string
+          rules_version: string
+        }
+        Update: {
+          accepted_at?: string
+          contact_email?: string
+          created_at?: string
+          display_name?: string
+          email_normalized?: string
+          id?: string
+          raffle_id?: string
+          request_fingerprint_hash?: string
+          request_token_hash?: string
+          rules_version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raffle_entries_raffle_id_fkey"
+            columns: ["raffle_id"]
+            isOneToOne: false
+            referencedRelation: "raffles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      raffles: {
+        Row: {
+          closes_at: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          opens_at: string | null
+          product_id: string | null
+          published_at: string | null
+          rules_summary: string | null
+          rules_version: string
+          slug: string
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          closes_at?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          opens_at?: string | null
+          product_id?: string | null
+          published_at?: string | null
+          rules_summary?: string | null
+          rules_version: string
+          slug: string
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          closes_at?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          opens_at?: string | null
+          product_id?: string | null
+          published_at?: string | null
+          rules_summary?: string | null
+          rules_version?: string
+          slug?: string
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raffles_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       refunds: {
         Row: {
           amount_minor: number
@@ -818,11 +924,19 @@ export type Database = {
       }
     }
     Functions: {
+      consume_commerce_admin_nonce: {
+        Args: { p_key_id: string; p_nonce: string; p_request_id: string }
+        Returns: boolean
+      }
       consume_customer_auth_rate_limit: {
         Args: { p_bucket: string; p_key_hash: string }
         Returns: boolean
       }
       consume_guest_cart_rate_limit: {
+        Args: { p_bucket: string; p_key_hash: string }
+        Returns: boolean
+      }
+      consume_raffle_entry_rate_limit: {
         Args: { p_bucket: string; p_key_hash: string }
         Returns: boolean
       }
@@ -843,6 +957,37 @@ export type Database = {
         }[]
       }
       publish_homepage_hero: { Args: { target_id: string }; Returns: boolean }
+      record_commerce_admin_audit_event: {
+        Args: {
+          p_actor_id: string
+          p_client_id: string
+          p_failure_code: string
+          p_http_status: number
+          p_key_id: string
+          p_operation: string
+          p_outcome: string
+          p_request_id: string
+          p_scope: string
+          p_target_id: string
+          p_target_type: string
+          p_workspace_id: string
+        }
+        Returns: string
+      }
+      submit_guest_raffle_entry: {
+        Args: {
+          p_display_name: string
+          p_email: string
+          p_raffle_id: string
+          p_request_fingerprint_hash: string
+          p_request_token_hash: string
+          p_rules_version: string
+        }
+        Returns: {
+          entry_reference: string
+          entry_state: string
+        }[]
+      }
       unpublish_homepage_hero: { Args: { target_id: string }; Returns: boolean }
     }
     Enums: {
@@ -868,15 +1013,19 @@ export type Tables<
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never) = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -892,14 +1041,18 @@ export type TablesInsert<
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends { Insert: infer I }
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
       ? I
       : never
     : never
@@ -913,14 +1066,18 @@ export type TablesUpdate<
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends { Update: infer U }
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
       ? U
       : never
     : never
@@ -929,10 +1086,14 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends (DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never) = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
@@ -942,10 +1103,14 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never) = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]

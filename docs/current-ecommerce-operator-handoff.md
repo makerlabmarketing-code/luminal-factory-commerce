@@ -217,7 +217,7 @@
 - **Approval:** Owner approved `RAFFLE-SCHEMA-01` for migration authoring and
   the default-off application slice only.
 - **Schema package:** Migration
-  `20260918060647_create_raffle_entry_foundation.sql` defines separate public
+  `20260918063545_create_raffle_entry_foundation.sql` defines separate public
   raffle metadata, a browser-inaccessible entrant ledger, private keyed-hash
   limiter state, server-role-only RPCs, RLS/grants, concurrency-safe duplicate
   and retry handling, and bounded Cron cleanup. It does not create a raffle,
@@ -240,3 +240,28 @@
   rollback validation, one exact Production migration application, postflight,
   fixture cleanup, and generated-type refresh. Live public entry remains
   blocked by `RAFFLE-LIVE-SMOKE-01`.
+
+## 2026-09-18 Raffle Production schema migration
+
+- **Approval:** Owner approved `RAFFLE-PROD-MIGRATION-01`.
+- **Result:** Transactional rollback validation passed, then migration
+  `20260918063545_create_raffle_entry_foundation` was applied once to Commerce
+  Supabase `bkmbhcfokobmhfzgsfzh`.
+- **Security:** All raffle tables have RLS; browser roles can only select
+  published raffle metadata. Entrant and limiter records remain inaccessible,
+  and both mutation RPCs are `SECURITY INVOKER` plus service-role-only.
+- **Functional postflight:** Concurrent same-email submission, idempotent
+  replay, token conflict, rules mismatch, published-row visibility, and limiter
+  exhaustion checks passed.
+- **Cleanup:** All temporary raffle, entrant, and limiter rows were deleted;
+  their final counts are zero. Orders, payments, inventory, customers, carts,
+  and Auth users were unchanged.
+- **Code sync:** Production-generated Supabase types were refreshed and the
+  raffle adapters now consume the canonical generated contract.
+- **Validation:** Full `npm run check` passed after the Production type refresh;
+  the added generated-contract assertion brought the suite to 234/234 passing
+  tests, with zero Production dependency vulnerabilities and a successful
+  Next.js build.
+- **Boundary:** Both raffle runtime flags remain off. No push, Vercel deployment,
+  public raffle, real entrant, winner, order, payment, inventory, or ERP change
+  was made.

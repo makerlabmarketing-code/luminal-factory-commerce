@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import type { Database } from "@/lib/supabase/database.types";
 
 const raffleRowSchema = z.object({
   id: z.string().uuid(),
@@ -28,23 +29,6 @@ const raffleRowSchema = z.object({
   published_at: z.string().datetime({ offset: true }),
   product_id: z.string().uuid().nullable(),
 });
-
-type RaffleDetailDatabase = {
-  public: {
-    Tables: {
-      raffles: {
-        Row: z.infer<typeof raffleRowSchema>;
-        Insert: never;
-        Update: never;
-        Relationships: [];
-      };
-    };
-    Views: Record<never, never>;
-    Functions: Record<never, never>;
-    Enums: Record<never, never>;
-    CompositeTypes: Record<never, never>;
-  };
-};
 
 export type PublicRaffleDetail = Readonly<{
   id: string;
@@ -89,7 +73,7 @@ export const getPublishedRaffleBySlug = cache(async (slug: string): Promise<Publ
   const config = getPublicRaffleConfig();
   if (!config) return null;
 
-  const client = createClient<RaffleDetailDatabase>(config.url, config.key, {
+  const client = createClient<Database>(config.url, config.key, {
     auth: { autoRefreshToken: false, detectSessionInUrl: false, persistSession: false },
     global: { fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }) },
   });
