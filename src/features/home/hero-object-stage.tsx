@@ -133,7 +133,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       if (!viewer) return;
       viewer.setAttribute(
         "camera-orbit",
-        `${presentation.camera.thetaDeg + pointerCurrent.yawDeg}deg ${presentation.camera.phiDeg + pointerCurrent.pitchDeg}deg ${presentation.camera.radiusPercent}%`,
+        `${presentation.camera.thetaDeg - pointerCurrent.yawDeg}deg ${presentation.camera.phiDeg - pointerCurrent.pitchDeg}deg ${presentation.camera.radiusPercent}%`,
       );
     };
 
