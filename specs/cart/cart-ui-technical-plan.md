@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `BLOCKED_PENDING_CART_UI_01`
+- **Status:** `CODE_COMPLETE_LOCAL_RUNTIME_OFF`
 - **Date:** 2026-09-19
 - **Page:** `/cart`
 - **Runtime:** `DEFAULT_OFF_FAIL_CLOSED`
@@ -123,3 +123,9 @@ runtime flags false. Push/deploy requires its normal explicit delivery approval.
 Enabling `COMMERCE_GUEST_CART_ENABLED`, exposing Cart in global navigation, or
 performing a real Production cart smoke requires a separate runbook and explicit
 live approval. Customer Auth, merge and address flags remain independently off.
+
+The first implementation reads and mutates the opaque guest cart only. A later
+authenticated-cart boundary must resolve the verified Auth subject to the
+customer-owned cart and extend the request path without weakening the existing
+guest-token isolation. It must be complete before enabling Cart and customer
+merge together.

@@ -4,7 +4,7 @@
 
 | Field | Value |
 |---|---|
-| Status | `DRAFT` / `REVIEW_REQUIRED` |
+| Status | `APPROVED` / `CODE_COMPLETE_LOCAL_PREVIEW_REVIEW_PENDING` |
 | Owner | Luminal Factory Commerce storefront |
 | Last updated | 2026-09-19 |
 | Source experience script | `docs/page-scripts/cart-experience-script-draft.md` |
@@ -203,3 +203,10 @@ Implementation is blocked until the owner approves:
 That approval authorizes only the default-off UI and server presentation
 adapter described here. It does not authorize runtime activation, Production
 cart creation, global navigation, checkout, payment, order or ERP behavior.
+
+## Implementation note
+
+`CART-UI-01` was approved on 2026-09-19. The implemented first slice resolves
+the opaque guest-cart cookie only. An authenticated customer-attached cart needs
+a separately reviewed read/mutation path before Customer Auth, merge and Cart
+can be enabled together; email is not used as a shortcut for ownership.

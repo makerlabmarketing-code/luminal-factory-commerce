@@ -283,3 +283,31 @@
 - **Next gate:** `CART-UI-01` authorizes local default-off implementation only.
   Production activation and smoke remain separately gated; all Commerce and
   raffle runtime flags stay false.
+
+## 2026-09-19 Cart UI implementation
+
+- **Approval:** Owner approved `CART-UI-01`.
+- **Status:** `CODE_COMPLETE_LOCAL_RUNTIME_OFF_PREVIEW_REVIEW_PENDING`.
+- **Implementation:** Private/no-store `/cart`, server-only guest-cart read,
+  four-way parallel public catalog enrichment, validated direct-product and
+  active-variant mapping, exact VND price selection, checked subtotal, approved
+  media/fallback handling, stale-line notice, and accessible quantity/remove
+  controls through the existing POST-only API.
+- **Safety:** Viewing Cart never creates a cart. Missing or ambiguous price
+  prevents a partial subtotal. The browser receives no cookie token, hash,
+  database cart ID or privileged key. No checkout, order, payment, inventory,
+  raffle, address, schema, ERP or global-navigation behavior was added.
+- **Known boundary:** This first slice resolves the opaque guest cookie only.
+  Verified customer-attached cart reads and mutations require a separate
+  service/request design before Cart, Auth and merge are enabled together.
+- **Runtime:** Guest cart, Customer Auth, merge, addresses, raffle detail and
+  raffle entry remain false; no Production data or environment value changed.
+- **Local validation:** `npm run check` passed with 242 tests, zero Production
+  dependency vulnerabilities and a successful build. The production build
+  returned dynamic `/cart` with HTTP 200, `private, no-store`, `noindex` and the
+  disabled-state content.
+- **Remaining delivery gate:** The cloud browser could not reach workspace
+  localhost and no local Chromium binary was installed. After an explicitly
+  approved push/deploy, review the Vercel page at 390/768/1440 px, exercise
+  quantity/remove controls only in an independently approved runtime smoke, and
+  inspect the console. Runtime flags remain false during read-only review.

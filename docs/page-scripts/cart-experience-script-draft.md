@@ -1,6 +1,6 @@
 # Cart Experience Script Draft
 
-Status: `DRAFT_FOR_OWNER_REVIEW`
+Status: `APPROVED` / `IMPLEMENTED_DEFAULT_OFF`
 Date: 2026-09-19
 Gate: Experience direction only. This document does not approve enabling a
 runtime flag, exposing Cart in global navigation, checkout, order creation,
@@ -180,3 +180,10 @@ checkout contract needs them.
    to global navigation and does not enable Production flags.
 6. Approve guest-first behavior with optional Account linkage deferred to its
    existing independent runtime gates.
+
+## Approval record
+
+The owner approved `CART-UI-01` on 2026-09-19. The first implementation remains
+guest-cookie-first and default-off. Reading or mutating a customer-attached cart
+after a successful Auth merge remains a separate boundary before those runtimes
+can be enabled together.

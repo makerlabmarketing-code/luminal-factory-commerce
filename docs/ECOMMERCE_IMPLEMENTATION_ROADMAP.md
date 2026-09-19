@@ -128,7 +128,16 @@ Every phase uses the same contract fields below.
 - **Merge postflight:** RLS/grants/trigger/RPC/Cron definitions match, the single receipt cleanup runs hourly at minute 29, generated Production types include the bounded RPC, and advisors added no warning/error. New INFO for unused/unindexed receipt indexes is recorded for separate review. No env value or deployment changed; Customer Auth, guest cart and merge runtime remain false.
 - **Later default-off foundations:** The repository now also contains the reviewed customer-address schema/runtime foundation behind its independent gate. This does not make addresses part of Cart, expose them globally, or authorize Production use.
 - **Cart UI planning:** `docs/page-scripts/cart-experience-script-draft.md` and `specs/cart/` define a guest-first `/cart` review surface, server-only batch catalog enrichment, current-price estimate, aggregate unavailable-line notice, and accessible quantity/remove controls. Checkout, orders, payments, inventory authority, addresses, global navigation and runtime activation remain excluded.
-- **Current gate:** `CART_UI_OWNER_REVIEW_REQUIRED`. Approve `CART-UI-01` before implementing the default-off Cart page and presentation adapter. Customer Auth, guest cart, merge, address and raffle runtime flags remain false; enabling any runtime or running a Production cart→OTP→merge smoke remains a separate live approval.
+- **Cart UI implementation:** The owner approved `CART-UI-01` on 2026-09-19. A private/no-store `/cart` route now resolves guest-cart state server-side, batch-enriches up to 50 lines from the public RLS catalog, rejects ambiguous/missing price totals, renders aggregate stale-line feedback, and reuses the existing POST-only quantity/remove boundary. It does not create a cart on view, expose navigation, reserve inventory, or introduce checkout/order/payment behavior.
+- **Cart UI local validation:** `npm run check` passed with 242 tests, zero
+  Production dependency vulnerabilities and a successful build. The production
+  build served dynamic `/cart` with HTTP 200, private/no-store, noindex and the
+  default-off state. All runtime flags remained false.
+- **Current gate:** `CART_UI_PREVIEW_REVIEW_PENDING`. Push/deploy is separately
+  approved; after delivery, review 390/768/1440 px layout, controls and console
+  on a reachable Vercel deployment. Before Customer Auth, merge and Cart can be
+  enabled together, add a verified customer-attached cart read/mutation
+  boundary; the current UI intentionally resolves only the opaque guest cookie.
 
 ## Phase 7 — Checkout and payment — `LIVE_APPROVAL_REQUIRED`
 

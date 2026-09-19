@@ -23,6 +23,18 @@ const nextConfig: NextConfig = {
       ? [{ protocol: "https", hostname: supabaseHostname, pathname: "/storage/v1/object/public/**" }]
       : [],
   },
+  async headers() {
+    return [
+      {
+        source: "/cart",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "Pragma", value: "no-cache" },
+          { key: "Vary", value: "Cookie" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
