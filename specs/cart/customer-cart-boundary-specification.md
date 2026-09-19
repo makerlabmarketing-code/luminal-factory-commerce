@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `CODE_COMPLETE_LOCAL_VALIDATED_MIGRATION_NOT_APPLIED`
+- **Status:** `PRODUCTION_MIGRATION_APPLIED_RUNTIME_OFF`
 - **Date:** 2026-09-19
 - **Roadmap phase:** Phase 6 — Cart and customer identity
 - **Depends on:** guest-cart service, Customer Auth, atomic guest-cart merge,
@@ -199,5 +199,11 @@ smoke, Vercel environment changes, checkout, payment, order or inventory work.
 ## Approval record
 
 The owner approved `CART-CUSTOMER-BOUNDARY-01` on 2026-09-19. The approval is
-being used only for local default-off implementation and migration preparation;
-all later live gates remain unchanged.
+used only for local default-off implementation and migration preparation.
+
+The owner approved `CART-CUSTOMER-PROD-MIGRATION-01` on 2026-09-19. The exact
+migration passed transactional rollback validation and was applied to Commerce
+Production as `20260919140429_verified_customer_cart_boundary`. Grants,
+service-role behavior, concurrency, cleanup and advisors passed. Generated
+types now include the three RPC signatures. All runtime flags remain false;
+push, deploy and integrated runtime smoke remain separate gates.

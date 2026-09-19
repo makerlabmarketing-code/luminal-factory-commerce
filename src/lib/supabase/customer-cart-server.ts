@@ -1,10 +1,7 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { createCustomerCartService } from "@/features/cart/customer-cart-service";
-import {
-  createSupabaseCustomerCartRepository,
-  type CustomerCartRpcClient,
-} from "@/lib/supabase/customer-cart-repository";
+import { createSupabaseCustomerCartRepository } from "@/lib/supabase/customer-cart-repository";
 import type { Database } from "@/lib/supabase/database.types";
 
 function isEnabled(value: string | undefined): boolean {
@@ -28,18 +25,8 @@ export function getServerCustomerCartService() {
       persistSession: false,
     },
   });
-  const rpcClient: CustomerCartRpcClient = {
-    rpc: (name, args) => {
-      const call = client.rpc as unknown as (
-        this: typeof client,
-        rpcName: string,
-        rpcArgs: Readonly<Record<string, unknown>>,
-      ) => ReturnType<CustomerCartRpcClient["rpc"]>;
-      return call.call(client, name, args);
-    },
-  };
   return createCustomerCartService({
     enabled: true,
-    repository: createSupabaseCustomerCartRepository(rpcClient),
+    repository: createSupabaseCustomerCartRepository(client),
   });
 }

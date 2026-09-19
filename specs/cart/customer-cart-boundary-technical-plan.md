@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `CODE_COMPLETE_LOCAL_VALIDATED_MIGRATION_NOT_APPLIED`
+- **Status:** `PRODUCTION_MIGRATION_APPLIED_RUNTIME_OFF`
 - **Date:** 2026-09-19
 - **Specification:** `customer-cart-boundary-specification.md`
 - **Approval gate:** `CART-CUSTOMER-BOUNDARY-01`
@@ -214,11 +214,17 @@ checkout, payment, order, inventory, raffle or ERP change is authorized.
 created `20260919123447_verified_customer_cart_boundary.sql`. The default-off
 application boundary, three public invoker RPCs, private bounded document
 helper, verified identity resolver, identity-aware POST routing and
-`sync_required` UI are implemented locally. The migration has not been applied
-to any database, generated Production types are intentionally unchanged, and
-all runtime flags remain false.
+`sync_required` UI were implemented locally. At that checkpoint the migration
+was unapplied and generated Production types were intentionally unchanged.
 
-The full repository gate passed with 258/258 tests, lint, TypeScript, static
+The full repository gate passed with 259/259 tests, lint, TypeScript, static
 security, zero Production dependency vulnerabilities and a successful Next.js
-Production build. This validates source behavior only; the unapplied SQL still
-requires the separately approved transactional rollback/database gate.
+Production build.
+
+`CART-CUSTOMER-PROD-MIGRATION-01` was approved on 2026-09-19. The exact SQL
+passed rollback validation and was applied as
+`20260919140429_verified_customer_cart_boundary`. Signature, invoker mode,
+fixed search path, timeout, service-role grants, browser-role denial, bounded
+behavior, concurrency, fixture cleanup and both advisor classes passed.
+Production-generated types now include the three RPCs. Runtime activation,
+push and deployment remain unapproved, and all runtime flags remain false.

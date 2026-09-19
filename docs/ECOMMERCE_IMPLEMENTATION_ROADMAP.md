@@ -149,11 +149,10 @@ Every phase uses the same contract fields below.
   identity routing, expired-cart rotation and explicit POST-only merge retry.
   They keep cart tables browser-denied and introduce only a proposed
   default-false `COMMERCE_CUSTOMER_CART_ENABLED` gate.
-- **Current gate:** `CART-CUSTOMER-BOUNDARY-01` authorizes local default-off
-  implementation and migration preparation only. Production SQL, push/deploy,
-  runtime activation and integrated Auth/cart/merge smoke remain separate
-  approvals. C011A mobile/tablet visual review and C013 activation runbook also
-  remain open.
+- **Current gate:** `CART-CUSTOMER-PROD-MIGRATION-01` completed the database
+  delivery only. Push/deploy, runtime activation and integrated
+  Auth/cart/merge smoke remain separate approvals. C011A mobile/tablet visual
+  review and C013 activation runbook also remain open.
 - **Customer-cart implementation checkpoint:** The owner approved
   `CART-CUSTOMER-BOUNDARY-01` on 2026-09-19. A fresh-user identity resolver now
   routes verified sessions exclusively to customer ownership and fails closed
@@ -161,15 +160,19 @@ Every phase uses the same contract fields below.
   customer read/set/remove plus explicit POST-only merge retry and
   `sync_required`. Supabase CLI created local migration
   `20260919123447_verified_customer_cart_boundary.sql`; it adds three
-  service-role-only invoker RPCs and no browser policy/grant. The migration is
-  not applied, generated Production types are unchanged and all runtime flags
-  remain false.
-- **Customer-cart local validation:** `npm run check` passed with 258/258 tests,
+  service-role-only invoker RPCs and no browser policy/grant. The migration
+  passed rollback validation and was applied to Production as
+  `20260919140429_verified_customer_cart_boundary`. Generated Production types
+  include the three RPCs and all runtime flags remain false.
+- **Customer-cart validation:** `npm run check` passed with 259/259 tests,
   lint, TypeScript, static security, zero Production dependency vulnerabilities
   and a successful Next.js Production build.
-- **Next gate:** `CART-CUSTOMER-PROD-MIGRATION-01` authorizes transactional
-  rollback validation, exact SQL review, Production application and database
-  postflight only. It does not authorize runtime activation, push or deploy.
+- **Database postflight:** Exact signatures, invoker mode, fixed search path,
+  timeouts, service-role-only grants, browser-role denial, read/set/remove,
+  concurrency and fixture cleanup passed. Advisors added no warning or error.
+- **Next gate:** Obtain separate push/deploy approval for the resulting local
+  commit and perform read-only Production verification with every Commerce and
+  raffle runtime flag false.
 
 ## Phase 7 — Checkout and payment — `LIVE_APPROVAL_REQUIRED`
 

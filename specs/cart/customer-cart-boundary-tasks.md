@@ -1,6 +1,6 @@
 # Verified Customer Cart Boundary Tasks
 
-Status: `CODE_COMPLETE_LOCAL_VALIDATED_MIGRATION_NOT_APPLIED`
+Status: `PRODUCTION_MIGRATION_APPLIED_RUNTIME_OFF`
 
 - [x] CC001 Trace guest Cart UI, POST boundary, Customer Auth and merge paths.
 - [x] CC002 Confirm the post-merge gap: customer cart exists but Cart can only
@@ -17,9 +17,9 @@ Status: `CODE_COMPLETE_LOCAL_VALIDATED_MIGRATION_NOT_APPLIED`
 - [x] CC008 Obtain owner approval `CART-CUSTOMER-BOUNDARY-01`.
 - [x] CC009 Implement the identity resolver and customer cart domain service.
 - [x] CC010 Create the CLI-named RPC migration and static security tests.
-- [ ] CC011 Obtain `CART-CUSTOMER-PROD-MIGRATION-01`, then run transactional
+- [x] CC011 Obtain `CART-CUSTOMER-PROD-MIGRATION-01`, then run transactional
   rollback validation before applying the exact reviewed SQL.
-- [ ] CC012 Apply the approved migration, run database behavior/concurrency/
+- [x] CC012 Apply the approved migration, run database behavior/concurrency/
   grants/advisor postflight and refresh generated types.
 - [x] CC013 Connect the provisional fixed RPC adapter to page and POST routing;
   refresh its generated signature only after approved Production application.

@@ -348,16 +348,23 @@
   through the customer service. A retained guest cookie produces
   `sync_required`; merge retry is explicit, same-origin POST-only, rate-limited
   and clears the cookie only after atomic success.
-- **Database draft:** Supabase CLI `2.117.0` created
+- **Database:** Supabase CLI `2.117.0` created
   `20260919123447_verified_customer_cart_boundary.sql`. It contains bounded
   read/set/remove RPCs, uses the merge subject advisory-lock namespace and
-  keeps cart tables browser-denied.
-- **Live impact:** The migration is local and unapplied. No Supabase, Vercel,
-  Production data, generated Production type, push, deploy or runtime value was
-  changed. All Commerce and raffle flags remain false.
-- **Validation:** Full `npm run check` passed with 258/258 tests, lint,
+  keeps cart tables browser-denied. After owner approval, exact rollback
+  validation passed and Supabase applied it as
+  `20260919140429_verified_customer_cart_boundary`.
+- **Production postflight:** Signature, invoker mode, fixed search path,
+  timeouts, service-role-only grants, browser-role denial, read/set/remove,
+  concurrency and exact fixture cleanup passed. Generated types include all
+  three RPCs. Advisors added no warning or error.
+- **Live impact:** Production schema changed only by the approved functions and
+  migration history entry. Production customer/cart/product tables returned to
+  zero rows after fixture cleanup. No Vercel value, push, deploy or runtime
+  value changed. All Commerce and raffle flags remain false.
+- **Validation:** Full `npm run check` passed with 259/259 tests, lint,
   TypeScript, static security, zero Production dependency vulnerabilities and a
   successful Next.js Production build.
-- **Next gate:** `CART-CUSTOMER-PROD-MIGRATION-01` authorizes transactional
-  rollback validation, exact SQL review, Production application and database
-  postflight only. Runtime activation, push and deploy remain separate gates.
+- **Next gate:** Obtain separate push/deploy approval for the resulting local
+  commit, then perform read-only Production verification with every Commerce
+  and raffle flag false. Runtime activation remains a later gate.

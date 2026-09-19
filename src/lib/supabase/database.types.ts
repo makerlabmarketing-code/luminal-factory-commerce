@@ -957,6 +957,10 @@ export type Database = {
         }[]
       }
       publish_homepage_hero: { Args: { target_id: string }; Returns: boolean }
+      read_verified_customer_cart: {
+        Args: { p_auth_user_id: string }
+        Returns: Json
+      }
       record_commerce_admin_audit_event: {
         Args: {
           p_actor_id: string
@@ -973,6 +977,24 @@ export type Database = {
           p_workspace_id: string
         }
         Returns: string
+      }
+      remove_verified_customer_cart_line: {
+        Args: {
+          p_auth_user_id: string
+          p_product_id: string
+          p_variant_id: string
+        }
+        Returns: Json
+      }
+      set_verified_customer_cart_line: {
+        Args: {
+          p_auth_user_id: string
+          p_product_id: string
+          p_requested_quantity: number
+          p_variant_id: string
+          p_verified_email: string
+        }
+        Returns: Json
       }
       submit_guest_raffle_entry: {
         Args: {

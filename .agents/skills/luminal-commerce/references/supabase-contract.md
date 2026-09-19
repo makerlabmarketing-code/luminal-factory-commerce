@@ -161,8 +161,11 @@ reads and mutations resolve ownership from a fresh Auth subject mapped to
 `customers.auth_user_id`; email remains contact data only. Three fixed
 service-role-only `SECURITY INVOKER` RPCs provide bounded read, absolute
 quantity set and idempotent remove behavior. They add no browser cart grants or
-policies. The CLI-created migration remains local/unapplied until separate
-Production migration approval; every Commerce and raffle runtime stays false.
+policies. On 2026-09-19 the owner approved
+`CART-CUSTOMER-PROD-MIGRATION-01`; rollback validation and Production
+application passed as `20260919140429_verified_customer_cart_boundary`, along
+with grants, behavior, concurrency, cleanup, generated-type and advisor
+postflight. Every Commerce and raffle runtime stays false.
 
 The approved Raffle detail/guest-entry foundation uses two independent,
 default-off runtime gates:

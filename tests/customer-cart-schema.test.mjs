@@ -4,6 +4,7 @@ import test from "node:test";
 
 const migrationPath = "supabase/migrations/20260919123447_verified_customer_cart_boundary.sql";
 const sql = readFileSync(migrationPath, "utf8");
+const generatedTypes = readFileSync("src/lib/supabase/database.types.ts", "utf8");
 
 test("customer cart RPCs are fixed, invoker-only and service-role-only", () => {
   for (const signature of [
@@ -44,4 +45,10 @@ test("reads are bounded and writes preserve cart/catalog lifecycle", () => {
 test("migration does not open cart tables to browser roles", () => {
   assert.doesNotMatch(sql, /create policy[\s\S]+on public\.(?:carts|cart_items)/i);
   assert.doesNotMatch(sql, /grant [^;]+ on (?:table )?public\.(?:carts|cart_items)[^;]+to (?:anon|authenticated)/i);
+});
+
+test("Production-generated types include the customer cart RPC contract", () => {
+  assert.match(generatedTypes, /read_verified_customer_cart:/);
+  assert.match(generatedTypes, /set_verified_customer_cart_line:/);
+  assert.match(generatedTypes, /remove_verified_customer_cart_line:/);
 });
