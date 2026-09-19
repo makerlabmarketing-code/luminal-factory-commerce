@@ -301,6 +301,112 @@ test("body is bounded to 4 KiB and rejects unknown fields", async () => {
   assert.deepEqual(unknownField, { status: 400, body: { ok: false, code: "invalid_request" } });
 });
 
+test("verified customer actions never fall back to the guest service", async () => {
+  const environment = getGuestCartRequestEnvironment({
+    COMMERCE_CUSTOMER_AUTH_ENABLED: "true",
+    COMMERCE_CUSTOMER_CART_ENABLED: "true",
+    COMMERCE_GUEST_CART_ALLOWED_ORIGINS: ORIGIN,
+    COMMERCE_GUEST_CART_RATE_LIMIT_SECRET: RATE_SECRET,
+  });
+  const guest = createService();
+  const customerCalls = [];
+  const customerService = {
+    async read(identity) {
+      customerCalls.push({ action: "read", identity });
+      return { ok: true, cart: CART };
+    },
+    async setLine(identity, input) {
+      customerCalls.push({ action: "set", identity, input });
+      return { ok: true, cart: CART };
+    },
+    async removeLine(identity, input) {
+      customerCalls.push({ action: "remove", identity, input });
+      return { ok: true, cart: null };
+    },
+  };
+  const { rateLimiter } = createRateLimiter();
+  const verified = {
+    state: "verified_customer",
+    identity: { authUserId: "44444444-4444-4444-8444-444444444444", email: "maker@example.com" },
+  };
+  const input = {
+    environment,
+    service: guest.service,
+    customerService,
+    identityResolver: { async resolve() { return verified; } },
+    rateLimiter,
+    sourceIdentifier: "203.0.113.10",
+  };
+
+  assert.equal((await handleGuestCartRequest(createRequest({ action: "read" }), input)).status, 200);
+  assert.equal((await handleGuestCartRequest(createRequest({
+    action: "set_line",
+    productId: PRODUCT_ID,
+    variantId: VARIANT_ID,
+    requestedQuantity: 2,
+  }), input)).status, 200);
+  assert.equal(customerCalls.length, 2);
+  assert.deepEqual(guest.calls, { create: 0, read: 0, setLine: 0, removeLine: 0 });
+});
+
+test("unverifiable customer identity fails closed without guest access", async () => {
+  const guest = createService();
+  const { rateLimiter } = createRateLimiter();
+  const outcome = await handleGuestCartRequest(createRequest({ action: "read" }), dependencies({
+    service: guest.service,
+    identityResolver: { async resolve() { return { state: "identity_unavailable" }; } },
+    rateLimiter,
+    guestToken: "preserved-token",
+  }));
+  assert.deepEqual(outcome, { status: 503, body: { ok: false, code: "service_unavailable" } });
+  assert.deepEqual(guest.calls, { create: 0, read: 0, setLine: 0, removeLine: 0 });
+});
+
+test("verified merge retry is POST-only and clears the guest cookie only after success", async () => {
+  const environment = getGuestCartRequestEnvironment({
+    COMMERCE_GUEST_CART_ENABLED: "true",
+    COMMERCE_CUSTOMER_AUTH_ENABLED: "true",
+    COMMERCE_CUSTOMER_CART_ENABLED: "true",
+    COMMERCE_CUSTOMER_CART_MERGE_ENABLED: "true",
+    COMMERCE_GUEST_CART_ALLOWED_ORIGINS: ORIGIN,
+    COMMERCE_GUEST_CART_RATE_LIMIT_SECRET: RATE_SECRET,
+  });
+  const { rateLimiter } = createRateLimiter();
+  const identity = { authUserId: "44444444-4444-4444-8444-444444444444", email: "maker@example.com" };
+  const base = {
+    environment,
+    customerService: {
+      async read() { return { ok: true, cart: null }; },
+      async setLine() { return { ok: true, cart: null }; },
+      async removeLine() { return { ok: true, cart: null }; },
+    },
+    identityResolver: { async resolve() { return { state: "verified_customer", identity }; } },
+    rateLimiter,
+    sourceIdentifier: "203.0.113.10",
+    guestToken: "preserved-token",
+  };
+  const success = await handleGuestCartRequest(createRequest({ action: "merge_guest" }), {
+    ...base,
+    async mergeGuestCart(receivedIdentity, token) {
+      assert.deepEqual(receivedIdentity, identity);
+      assert.equal(token, "preserved-token");
+      return { ok: true, state: "merged", unavailableLineCount: 0, cappedLineCount: 0 };
+    },
+  });
+  assert.deepEqual(success, {
+    status: 200,
+    body: { ok: true, state: "merged" },
+    clearGuestToken: true,
+  });
+
+  const failed = await handleGuestCartRequest(createRequest({ action: "merge_guest" }), {
+    ...base,
+    async mergeGuestCart() { return { ok: false, code: "cart_unavailable" }; },
+  });
+  assert.deepEqual(failed, { status: 503, body: { ok: false, code: "service_unavailable" } });
+  assert.equal(failed.clearGuestToken, undefined);
+});
+
 test("Next route is POST-only, private/no-store and durable-rate-limit fail-closed", () => {
   const route = readFileSync("src/app/api/cart/route.ts", "utf8");
   const limiter = readFileSync("src/lib/supabase/guest-cart-rate-limit-server.ts", "utf8");

@@ -186,6 +186,15 @@ Guest cart mutations are server-mediated and do not require a Supabase anonymous
 
 A cart represents purchase intent only. It is not an inventory reservation, order, payment, or authoritative price record. Account attachment and guest-cart merge must be transactional and idempotent.
 
+The approved verified customer-cart boundary keeps Cart server-mediated. When
+Customer Auth is enabled, the server resolves `anonymous`, `verified_customer`
+or fail-closed `identity_unavailable` before cart access. A verified session
+never falls back to guest ownership. Customer cart read/set/remove operations
+use fixed service-role-only invoker RPCs scoped by the fresh Auth subject;
+`carts` and `cart_items` remain unavailable to browser roles. A retained guest
+credential is merged only through an explicit POST retry, never as a GET-side
+effect.
+
 See `specs/commerce/phase6-identity-architecture-decision.md` for the approved planning contract and remaining privacy/security gate.
 
 ## Motion Architecture

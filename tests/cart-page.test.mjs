@@ -5,7 +5,10 @@ import {
   CART_PRESENTATION_MAX_LINES,
   normalizeCartCatalogPresentation,
 } from "../src/features/cart/cart-catalog-normalizer.ts";
-import { createCartPageView } from "../src/features/cart/cart-page-view.ts";
+import {
+  createCartPageView,
+  createCustomerCartPageView,
+} from "../src/features/cart/cart-page-view.ts";
 
 const PRODUCT_ID = "11111111-1111-4111-8111-111111111111";
 const VARIANT_ID = "22222222-2222-4222-8222-222222222222";
@@ -146,12 +149,40 @@ test("Cart page combines service and catalog stale counts without exposing priva
   assert.doesNotMatch(JSON.stringify(view), /opaque-cookie|guest_token|cart_id/i);
 });
 
+test("verified Cart requires explicit synchronization while the guest credential remains", async () => {
+  let reads = 0;
+  const view = await createCustomerCartPageView({
+    enabled: true,
+    hasGuestToken: true,
+    async readCart() {
+      reads += 1;
+      throw new Error("GET must not merge or read either cart");
+    },
+    async enrichCatalog() {
+      throw new Error("must not enrich before synchronization");
+    },
+  });
+  assert.deepEqual(view, { state: "sync_required", currency: "VND", unavailableLineCount: 0 });
+  assert.equal(reads, 0);
+});
+
+test("verified Cart reads customer state and creates nothing for an empty cart", async () => {
+  const view = await createCustomerCartPageView({
+    enabled: true,
+    hasGuestToken: false,
+    async readCart() { return { ok: true, cart: null }; },
+    async enrichCatalog() { throw new Error("empty cart must not enrich"); },
+  });
+  assert.deepEqual(view, { state: "empty", currency: "VND", unavailableLineCount: 0 });
+});
+
 test("Cart route is private, noindex, default-off and absent from global navigation", () => {
   const route = readFileSync("src/app/cart/page.tsx", "utf8");
   const proxy = readFileSync("src/proxy.ts", "utf8");
   const nextConfig = readFileSync("next.config.ts", "utf8");
   const service = readFileSync("src/features/cart/cart-page-service.ts", "utf8");
   const controls = readFileSync("src/features/cart/cart-line-controls.tsx", "utf8");
+  const syncControl = readFileSync("src/features/cart/cart-sync-control.tsx", "utf8");
   const header = readFileSync("src/components/layout/header.tsx", "utf8");
   const mobileNavigation = readFileSync("src/components/layout/mobile-navigation.tsx", "utf8");
 
@@ -164,6 +195,8 @@ test("Cart route is private, noindex, default-off and absent from global navigat
   assert.match(controls, /X-Luminal-Cart-Request|GUEST_CART_REQUEST_HEADER/);
   assert.match(controls, /action:\s*["']set_line["']/);
   assert.match(controls, /action:\s*["']remove_line["']/);
+  assert.match(syncControl, /action:\s*["']merge_guest["']/);
+  assert.match(syncControl, /aria-live=["']polite["']/);
   assert.doesNotMatch(header + mobileNavigation, /href=["']\/cart["']/);
   assert.equal(CART_PRESENTATION_MAX_LINES, 50);
 });

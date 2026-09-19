@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { CartPageView } from "./cart-page-contract";
 import { CartLineControls } from "./cart-line-controls";
 import { CartMedia } from "./cart-media";
+import { CartSyncControl } from "./cart-sync-control";
 
 function CartEmpty() {
   return (
@@ -28,6 +29,20 @@ function CartUnavailable() {
   );
 }
 
+function CartSyncRequired() {
+  return (
+    <section className="cart-feedback-panel" aria-labelledby="cart-sync-title">
+      <p className="eyebrow">Verified account · pending sync</p>
+      <h2 id="cart-sync-title">Hoàn tất đồng bộ giỏ hàng.</h2>
+      <p>
+        Tài khoản đã được xác minh nhưng lựa chọn trên thiết bị này chưa gắn xong.
+        Hệ thống sẽ giữ nguyên dữ liệu cũ nếu đồng bộ chưa thành công.
+      </p>
+      <CartSyncControl />
+    </section>
+  );
+}
+
 export function CartPage({ view }: Readonly<{ view: CartPageView }>) {
   return (
     <div className="cart-page-grid">
@@ -42,6 +57,7 @@ export function CartPage({ view }: Readonly<{ view: CartPageView }>) {
 
       {view.state === "empty" ? <CartEmpty /> : null}
       {view.state === "unavailable" ? <CartUnavailable /> : null}
+      {view.state === "sync_required" ? <CartSyncRequired /> : null}
       {view.state === "ready" ? (
         <>
           <section className="cart-lines" aria-labelledby="cart-lines-title">

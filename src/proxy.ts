@@ -2,7 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { refreshCustomerAuthSession } from "@/lib/supabase/customer-auth-proxy";
 
 export async function proxy(request: NextRequest) {
-  const response = request.nextUrl.pathname.startsWith("/account")
+  const usesCustomerSession =
+    request.nextUrl.pathname.startsWith("/account") ||
+    request.nextUrl.pathname === "/cart" ||
+    request.nextUrl.pathname === "/api/cart";
+  const response = usesCustomerSession
     ? await refreshCustomerAuthSession(request)
     : NextResponse.next({ request });
 
@@ -15,5 +19,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/account/:path*", "/api/account/:path*", "/cart"],
+  matcher: ["/account/:path*", "/api/account/:path*", "/cart", "/api/cart"],
 };

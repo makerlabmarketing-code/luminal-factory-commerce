@@ -31,6 +31,7 @@ export type CartReadyView = Readonly<{
 export type CartPageView =
   | Readonly<{ state: "empty"; currency: "VND"; unavailableLineCount: 0 }>
   | Readonly<{ state: "unavailable"; currency: "VND"; unavailableLineCount: 0 }>
+  | Readonly<{ state: "sync_required"; currency: "VND"; unavailableLineCount: 0 }>
   | CartReadyView;
 
 export type CartLineIdentity = Readonly<{

@@ -1,6 +1,6 @@
 # Cart UI Tasks
 
-Status: `CODE_COMPLETE_LOCAL_RUNTIME_OFF_PREVIEW_REVIEW_PENDING`
+Status: `PRODUCTION_DELIVERED_RUNTIME_OFF_RESPONSIVE_REVIEW_PARTIAL`
 
 - [x] C001 Inspect the existing guest-cart service and request contracts.
 - [x] C002 Confirm that the public cart view contains identities, quantity,
@@ -24,5 +24,7 @@ Status: `CODE_COMPLETE_LOCAL_RUNTIME_OFF_PREVIEW_REVIEW_PENDING`
 - [x] C012 Commit locally; push/deploy only after explicit delivery approval.
 - [ ] C013 Prepare a separate Production activation/smoke runbook. Do not enable
   guest-cart, Customer Auth, merge, address or raffle runtime in this slice.
-- [ ] C014 Design the verified customer-attached cart read/mutation boundary
-  before Cart, Customer Auth and merge can be enabled together.
+- [x] C014 Design the verified customer-attached cart read/mutation boundary
+  before Cart, Customer Auth and merge can be enabled together. The draft is in
+  `customer-cart-boundary-specification.md`, its technical plan and task list.
+- [x] C015 Obtain approval `CART-CUSTOMER-BOUNDARY-01` before implementation.

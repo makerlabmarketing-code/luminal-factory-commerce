@@ -154,6 +154,16 @@ identity check and presence of a guest cookie. Only a completed merge clears tha
 cookie; login remains valid and the cookie is preserved for every merge failure.
 All runtime activation remains separately gated.
 
+The owner approved `CART-CUSTOMER-BOUNDARY-01` on 2026-09-19. The prepared
+customer-cart boundary introduces `COMMERCE_CUSTOMER_CART_ENABLED`, exact
+`true` only after its own reviewed migration and smoke gates. Authenticated
+reads and mutations resolve ownership from a fresh Auth subject mapped to
+`customers.auth_user_id`; email remains contact data only. Three fixed
+service-role-only `SECURITY INVOKER` RPCs provide bounded read, absolute
+quantity set and idempotent remove behavior. They add no browser cart grants or
+policies. The CLI-created migration remains local/unapplied until separate
+Production migration approval; every Commerce and raffle runtime stays false.
+
 The approved Raffle detail/guest-entry foundation uses two independent,
 default-off runtime gates:
 

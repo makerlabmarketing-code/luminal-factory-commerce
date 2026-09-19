@@ -1,6 +1,12 @@
 import { createHmac } from "node:crypto";
 import { isIP } from "node:net";
 import { z } from "zod";
+import type { CustomerCartIdentityResolver } from "./customer-cart-identity";
+import type {
+  CustomerCartServiceResult,
+  VerifiedCustomerCartIdentity,
+} from "./customer-cart-service";
+import type { CustomerCartMergeResult } from "./customer-cart-merge";
 
 export const GUEST_CART_REQUEST_HEADER = "x-luminal-cart-request";
 export const GUEST_CART_REQUEST_HEADER_VALUE = "1";
@@ -20,6 +26,7 @@ const guestCartRequestSchema = z.discriminatedUnion("action", [
     productId: z.string().uuid(),
     variantId: z.string().uuid().nullable().optional().default(null),
   }).strict(),
+  z.object({ action: z.literal("merge_guest") }).strict(),
 ]);
 
 type GuestCartHttpView = Readonly<{
@@ -61,6 +68,18 @@ export interface GuestCartRequestService {
   ): Promise<GuestCartServiceResult>;
 }
 
+export interface CustomerCartRequestService {
+  read(identity: VerifiedCustomerCartIdentity): Promise<CustomerCartServiceResult>;
+  setLine(
+    identity: VerifiedCustomerCartIdentity,
+    input: Readonly<{ productId: string; variantId: string | null; requestedQuantity: number }>,
+  ): Promise<CustomerCartServiceResult>;
+  removeLine(
+    identity: VerifiedCustomerCartIdentity,
+    input: Readonly<{ productId: string; variantId: string | null }>,
+  ): Promise<CustomerCartServiceResult>;
+}
+
 export interface GuestCartRateLimiter {
   consume(input: Readonly<{
     key: string;
@@ -74,12 +93,16 @@ export type GuestCartRequestEnvironment =
     ready: true;
     allowedOrigins: ReadonlySet<string>;
     rateLimitSecret: string;
+    guestEnabled: boolean;
+    customerEnabled: boolean;
+    mergeEnabled: boolean;
   }>;
 
 export type GuestCartHttpOutcome = Readonly<{
   status: number;
   body:
     | Readonly<{ ok: true; cart: GuestCartHttpView }>
+    | Readonly<{ ok: true; state: "merged" }>
     | Readonly<{
       ok: false;
       code:
@@ -96,6 +119,12 @@ export type GuestCartHttpOutcome = Readonly<{
 type GuestCartRequestDependencies = Readonly<{
   environment: GuestCartRequestEnvironment;
   service?: GuestCartRequestService;
+  customerService?: CustomerCartRequestService;
+  identityResolver?: CustomerCartIdentityResolver;
+  mergeGuestCart?: (
+    identity: VerifiedCustomerCartIdentity,
+    guestToken: string,
+  ) => Promise<CustomerCartMergeResult>;
   rateLimiter?: GuestCartRateLimiter;
   guestToken?: string;
   sourceIdentifier?: string;
@@ -116,7 +145,15 @@ function normalizeAllowedOrigin(value: string): string | null {
 export function getGuestCartRequestEnvironment(
   environment: Readonly<Record<string, string | undefined>> = process.env,
 ): GuestCartRequestEnvironment {
-  if (environment.COMMERCE_GUEST_CART_ENABLED?.trim().toLowerCase() !== "true") {
+  const guestEnabled = environment.COMMERCE_GUEST_CART_ENABLED?.trim().toLowerCase() === "true";
+  const customerEnabled =
+    environment.COMMERCE_CUSTOMER_AUTH_ENABLED?.trim().toLowerCase() === "true" &&
+    environment.COMMERCE_CUSTOMER_CART_ENABLED?.trim().toLowerCase() === "true";
+  const mergeEnabled =
+    guestEnabled &&
+    customerEnabled &&
+    environment.COMMERCE_CUSTOMER_CART_MERGE_ENABLED?.trim().toLowerCase() === "true";
+  if (!guestEnabled && !customerEnabled) {
     return { ready: false, code: "runtime_disabled" };
   }
 
@@ -139,6 +176,9 @@ export function getGuestCartRequestEnvironment(
     ready: true,
     allowedOrigins: new Set(validOrigins),
     rateLimitSecret,
+    guestEnabled,
+    customerEnabled,
+    mergeEnabled,
   };
 }
 
@@ -166,6 +206,18 @@ function mapServiceResult(result: GuestCartServiceResult, hasGuestToken: boolean
   if (result.code === "invalid_input") return failure(400, "invalid_request");
   if (result.code === "catalog_selection_unavailable") return failure(409, "catalog_selection_unavailable");
   if (result.code === "runtime_disabled") return failure(404, "cart_unavailable");
+  return failure(503, "service_unavailable");
+}
+
+function mapCustomerServiceResult(result: CustomerCartServiceResult): GuestCartHttpOutcome {
+  if (result.ok) {
+    return result.cart
+      ? { status: 200, body: { ok: true, cart: result.cart } }
+      : failure(404, "cart_unavailable");
+  }
+  if (result.code === "catalog_selection_unavailable") {
+    return failure(409, "catalog_selection_unavailable");
+  }
   return failure(503, "service_unavailable");
 }
 
@@ -223,7 +275,7 @@ export async function handleGuestCartRequest(
     return failure(403, "invalid_request");
   }
 
-  if (!dependencies.service || !dependencies.rateLimiter || !dependencies.sourceIdentifier) {
+  if (!dependencies.rateLimiter || !dependencies.sourceIdentifier) {
     return failure(503, "service_unavailable");
   }
 
@@ -245,6 +297,47 @@ export async function handleGuestCartRequest(
 
   try {
     const guestToken = dependencies.guestToken;
+    const resolvedIdentity = dependencies.identityResolver
+      ? await dependencies.identityResolver.resolve()
+      : { state: "anonymous" } as const;
+    if (resolvedIdentity.state === "identity_unavailable") {
+      return failure(503, "service_unavailable");
+    }
+
+    if (resolvedIdentity.state === "verified_customer") {
+      if (!dependencies.environment.customerEnabled || !dependencies.customerService) {
+        return failure(503, "service_unavailable");
+      }
+      if (body.action === "create") return failure(409, "cart_unavailable");
+      if (body.action === "merge_guest") {
+        if (!guestToken || !dependencies.environment.mergeEnabled || !dependencies.mergeGuestCart) {
+          return failure(503, "service_unavailable");
+        }
+        const merged = await dependencies.mergeGuestCart(resolvedIdentity.identity, guestToken);
+        return merged.ok && merged.state === "merged"
+          ? { status: 200, body: { ok: true, state: "merged" }, clearGuestToken: true }
+          : failure(503, "service_unavailable");
+      }
+      if (body.action === "read") {
+        return mapCustomerServiceResult(await dependencies.customerService.read(resolvedIdentity.identity));
+      }
+      if (body.action === "set_line") {
+        return mapCustomerServiceResult(await dependencies.customerService.setLine(resolvedIdentity.identity, {
+          productId: body.productId,
+          variantId: body.variantId,
+          requestedQuantity: body.requestedQuantity,
+        }));
+      }
+      return mapCustomerServiceResult(await dependencies.customerService.removeLine(resolvedIdentity.identity, {
+        productId: body.productId,
+        variantId: body.variantId,
+      }));
+    }
+
+    if (!dependencies.environment.guestEnabled || !dependencies.service) {
+      return failure(503, "service_unavailable");
+    }
+    if (body.action === "merge_guest") return failure(403, "invalid_request");
     if (body.action === "create") {
       if (guestToken) {
         const existing = await dependencies.service.read(guestToken);

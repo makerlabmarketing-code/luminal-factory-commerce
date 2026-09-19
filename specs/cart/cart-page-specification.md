@@ -210,3 +210,8 @@ cart creation, global navigation, checkout, payment, order or ERP behavior.
 the opaque guest-cart cookie only. An authenticated customer-attached cart needs
 a separately reviewed read/mutation path before Customer Auth, merge and Cart
 can be enabled together; email is not used as a shortcut for ownership.
+
+That follow-up is now drafted in
+`customer-cart-boundary-specification.md` and remains blocked on
+`CART-CUSTOMER-BOUNDARY-01`. The draft adds no runtime, SQL or Production
+authority.

@@ -24,7 +24,11 @@ export function createSupabaseGuestCartRateLimiter(
 }
 
 export function getServerGuestCartRateLimiter(): GuestCartRateLimiter | undefined {
-  if (process.env.COMMERCE_GUEST_CART_ENABLED?.trim().toLowerCase() !== "true") return undefined;
+  const guestEnabled = process.env.COMMERCE_GUEST_CART_ENABLED?.trim().toLowerCase() === "true";
+  const customerEnabled =
+    process.env.COMMERCE_CUSTOMER_AUTH_ENABLED?.trim().toLowerCase() === "true" &&
+    process.env.COMMERCE_CUSTOMER_CART_ENABLED?.trim().toLowerCase() === "true";
+  if (!guestEnabled && !customerEnabled) return undefined;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const secretKey = process.env.SUPABASE_SECRET_KEY?.trim();

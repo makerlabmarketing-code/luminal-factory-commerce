@@ -273,6 +273,11 @@ button { font: inherit; }
 .cart-feedback-panel { grid-column: 1 / -1; display: grid; justify-items: start; gap: 1rem; max-width: 54rem; padding: clamp(1.5rem, 4vw, 3.5rem); border: 1px solid var(--border); border-radius: var(--radius-large); background: rgba(10,10,10,.86); }
 .cart-feedback-panel h2 { max-width: 15ch; margin: 0; font-size: clamp(2rem, 4vw, 4rem); font-weight: 430; line-height: 1; letter-spacing: -.045em; }
 .cart-feedback-panel > p:not(.eyebrow) { max-width: 42rem; margin: 0; color: var(--muted-foreground); line-height: 1.7; }
+.cart-sync-control { display: grid; justify-items: start; gap: .7rem; }
+.cart-sync-control button { min-height: 2.75rem; border: 1px solid rgba(185,233,255,.42); border-radius: var(--radius-small); padding: .7rem 1rem; background: rgba(185,233,255,.08); color: #e8f8ff; cursor: pointer; font-size: .78rem; font-weight: 650; transition: border-color var(--motion-fast), background var(--motion-fast); touch-action: manipulation; }
+.cart-sync-control button:hover:not(:disabled) { border-color: var(--ice); background: rgba(185,233,255,.14); }
+.cart-sync-control button:disabled { cursor: wait; opacity: .5; }
+.cart-sync-control p { min-height: 1.2rem; margin: 0; color: var(--muted-foreground); font-size: .75rem; line-height: 1.55; }
 .cart-lines { min-width: 0; }
 .cart-section-heading { display: flex; justify-content: space-between; gap: 2rem; align-items: end; margin-bottom: 1.25rem; }
 .cart-section-heading h2 { margin: .65rem 0 0; font-size: clamp(1.8rem, 3.2vw, 3.2rem); font-weight: 430; letter-spacing: -.045em; }

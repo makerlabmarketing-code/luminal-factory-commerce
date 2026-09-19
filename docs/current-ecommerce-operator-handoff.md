@@ -311,3 +311,53 @@
   approved push/deploy, review the Vercel page at 390/768/1440 px, exercise
   quantity/remove controls only in an independently approved runtime smoke, and
   inspect the console. Runtime flags remain false during read-only review.
+
+## 2026-09-19 Cart UI Production delivery and customer-cart boundary draft
+
+- **Production delivery:** Remote `master` commit `c00410f` (tree-equivalent to
+  approved local `5587f95`) deployed as
+  `dpl_37kBSAJbYXUikiHKvpNkomjoF9RT` and reached `READY`.
+- **Read-only smoke:** `/cart` returned HTTP 200 with private/no-store, noindex
+  and the disabled state. `/account` remained disabled, the address API remained
+  unavailable and raffle exposed no entry action. Vercel showed no application
+  runtime errors.
+- **Visual evidence:** At 1363×936 the Cart page had one `h1`, no horizontal
+  overflow, a visible disabled panel and no application console error. Exact
+  390px/768px checks remain pending because the available browser cannot change
+  viewport size.
+- **Runtime/data:** No Vercel environment, Supabase schema/data or Production
+  content changed. Customer Auth, guest cart, customer-cart merge, addresses,
+  raffle detail and raffle entry all remain false.
+- **Next design:** `specs/cart/customer-cart-boundary-specification.md` plus its
+  technical plan and task list define verified-subject customer cart reads and
+  mutations. A verified session never falls back to guest ownership; a retained
+  guest cookie requires explicit POST-only merge retry rather than GET-side
+  mutation.
+- **Next gate:** `CART-CUSTOMER-BOUNDARY-01` permits only local default-off
+  implementation and migration preparation. Production SQL, delivery and any
+  runtime smoke remain separately gated.
+
+## 2026-09-19 Verified customer-cart boundary implemented locally
+
+- **Approval:** Owner approved `CART-CUSTOMER-BOUNDARY-01` for default-off local
+  implementation and migration preparation only.
+- **Identity:** Cart resolves a fresh Supabase user into anonymous, verified or
+  fail-closed unavailable state. Verified sessions never fall back to guest
+  ownership when customer cart/configuration fails.
+- **Application:** `/cart` and `POST /api/cart` now route verified read/set/remove
+  through the customer service. A retained guest cookie produces
+  `sync_required`; merge retry is explicit, same-origin POST-only, rate-limited
+  and clears the cookie only after atomic success.
+- **Database draft:** Supabase CLI `2.117.0` created
+  `20260919123447_verified_customer_cart_boundary.sql`. It contains bounded
+  read/set/remove RPCs, uses the merge subject advisory-lock namespace and
+  keeps cart tables browser-denied.
+- **Live impact:** The migration is local and unapplied. No Supabase, Vercel,
+  Production data, generated Production type, push, deploy or runtime value was
+  changed. All Commerce and raffle flags remain false.
+- **Validation:** Full `npm run check` passed with 258/258 tests, lint,
+  TypeScript, static security, zero Production dependency vulnerabilities and a
+  successful Next.js Production build.
+- **Next gate:** `CART-CUSTOMER-PROD-MIGRATION-01` authorizes transactional
+  rollback validation, exact SQL review, Production application and database
+  postflight only. Runtime activation, push and deploy remain separate gates.

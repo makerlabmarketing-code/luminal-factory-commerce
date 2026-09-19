@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import {
   getGuestCartRequestEnvironment,
@@ -12,6 +13,9 @@ import {
 } from "@/features/cart/guest-cart-service";
 import { getServerGuestCartService } from "@/lib/supabase/guest-cart-server";
 import { getServerGuestCartRateLimiter } from "@/lib/supabase/guest-cart-rate-limit-server";
+import { createServerCustomerCartIdentityResolver } from "@/lib/supabase/customer-cart-identity-server";
+import { getServerCustomerCartMergeService } from "@/lib/supabase/customer-cart-merge-server";
+import { getServerCustomerCartService } from "@/lib/supabase/customer-cart-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -46,11 +50,16 @@ export async function POST(request: NextRequest) {
     return createResponse(await handleGuestCartRequest(request, { environment }));
   }
 
+  const cookieStore = await cookies();
   const outcome = await handleGuestCartRequest(request, {
     environment,
     service: getServerGuestCartService(),
+    customerService: getServerCustomerCartService(),
+    identityResolver: createServerCustomerCartIdentityResolver(cookieStore),
+    mergeGuestCart: (identity, guestToken) =>
+      getServerCustomerCartMergeService().merge(identity, guestToken),
     rateLimiter: getServerGuestCartRateLimiter(),
-    guestToken: request.cookies.get(GUEST_CART_COOKIE_NAME)?.value,
+    guestToken: cookieStore.get(GUEST_CART_COOKIE_NAME)?.value,
     sourceIdentifier: getGuestCartSourceIdentifier(request.headers),
   });
   return createResponse(outcome);
