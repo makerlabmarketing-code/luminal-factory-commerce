@@ -265,3 +265,21 @@
 - **Boundary:** Both raffle runtime flags remain off. No push, Vercel deployment,
   public raffle, real entrant, winner, order, payment, inventory, or ERP change
   was made.
+
+## 2026-09-19 Cart UI definition
+
+- **Status:** `DRAFT_FOR_OWNER_REVIEW`; no application code or runtime changed.
+- **Documents:** `docs/page-scripts/cart-experience-script-draft.md` and
+  `specs/cart/` define the first guest-first `/cart` review experience,
+  server-only batch catalog enrichment, current-price estimate, aggregate stale
+  line notice and quantity/remove interaction.
+- **Existing boundary:** The cart service returns only product/variant identity,
+  requested quantity, expiry and unavailable-line count. Product name, approved
+  media, variant label and current VND price must be re-read and validated from
+  the published catalog; the cart never locks price or reserves inventory.
+- **Non-goals:** No checkout button, order, payment, inventory read/reservation,
+  address use, raffle line, global navigation, Supabase schema, Production data,
+  ERP mutation, runtime activation, push or deployment.
+- **Next gate:** `CART-UI-01` authorizes local default-off implementation only.
+  Production activation and smoke remain separately gated; all Commerce and
+  raffle runtime flags stay false.
