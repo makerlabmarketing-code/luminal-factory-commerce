@@ -126,6 +126,9 @@ export function HomeDriftWall({ items }: HomeDriftWallProps) {
                           className={`${styles.tile} ${styles[item.frame]}`}
                           key={`${copyIndex}-${itemIndex}-${item.id}`}
                           onClick={() => setSelectedItem(item)}
+                          onPointerDown={(event) => {
+                            if (event.button === 0) setSelectedItem(item);
+                          }}
                           tabIndex={copyIndex === 0 ? 0 : -1}
                           type="button"
                         >

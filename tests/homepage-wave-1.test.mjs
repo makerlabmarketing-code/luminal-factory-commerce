@@ -38,6 +38,8 @@ test("Homepage gallery uses a compact, motion-safe Drift Wall with a touch fallb
   assert.match(gallery, /data-gallery-mode={supportsDrift \? "drift-wall" : "compact-strip"}/);
   assert.match(gallery, /alt={item\.alt}/);
   assert.match(gallery, /onClick={\(\) => setSelectedItem\(item\)}/);
+  assert.match(gallery, /onPointerDown={\(event\) =>/);
+  assert.match(gallery, /event\.button === 0/);
   assert.match(gallery, /role="dialog"/);
   assert.match(galleryCss, /perspective: 1200px/);
   assert.match(galleryCss, /height: clamp\(28rem, 43vw, 34rem\)/);
