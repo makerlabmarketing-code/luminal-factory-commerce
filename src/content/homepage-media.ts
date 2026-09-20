@@ -36,10 +36,10 @@ type HomePageMediaConfig = Readonly<{
  */
 export const homePageMedia: HomePageMediaConfig = {
   hero: {
-    src: "/images/home/hero.webp",
-    alt: "Mono Meowhe artisan keycap in black and white",
+    src: "/images/home/archive-meowhe.webp",
+    alt: "Lolipop Meowhe artisan keycap from the first colorway collection",
     sizes: "(max-width: 800px) calc(100vw - 2rem), (max-width: 1200px) 48vw, 640px",
-    objectPosition: "50% 68%",
+    objectPosition: "50% 48%",
     availability: "available",
   },
   featured: {
@@ -65,8 +65,8 @@ export const homePageMedia: HomePageMediaConfig = {
       availability: "available",
     },
     mictlan: {
-      src: "/images/home/archive-mictlan.webp",
-      alt: "Mictlán artisan keycap from the Lazy Factory archive",
+      src: "/images/home/gallery/mictlan-keyboard.webp",
+      alt: "Mictlán artisan keycap placed among black keyboard keys",
       sizes: "(max-width: 500px) calc(100vw - 2rem), (max-width: 800px) 48vw, (max-width: 1440px) 34vw, 500px",
       objectPosition: "50% 50%",
       availability: "available",

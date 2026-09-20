@@ -37,10 +37,12 @@ test("Homepage gallery uses a compact, motion-safe Drift Wall with a touch fallb
   assert.match(gallery, /DRIFT_POINTER_RANGE_PX = 12/);
   assert.match(gallery, /data-gallery-mode={supportsDrift \? "drift-wall" : "compact-strip"}/);
   assert.match(gallery, /alt={item\.alt}/);
+  assert.match(gallery, /onClick={\(\) => setSelectedItem\(item\)}/);
+  assert.match(gallery, /role="dialog"/);
   assert.match(galleryCss, /perspective: 1200px/);
   assert.match(galleryCss, /height: clamp\(28rem, 43vw, 34rem\)/);
   assert.match(galleryCss, /@keyframes drift-up/);
-  assert.match(galleryCss, /animation-play-state: paused/);
+  assert.match(galleryCss, /\.viewport:hover \.track,[\s\S]*animation-play-state: paused/);
   assert.match(galleryCss, /scroll-snap-type: x mandatory/);
   assert.match(galleryCss, /@media \(max-width: 768px\)/);
   assert.match(galleryCss, /@media \(prefers-reduced-motion: reduce\)/);
@@ -72,9 +74,11 @@ test("Homepage media pass uses real archive names and a non-requesting pending a
   assert.match(content, /Mictlán/);
   assert.match(content, /Historical Lazy Factory archive · 2023/);
   assert.doesNotMatch(content, /Nocturne Study|Soft Signal|Afterglow|Quiet Form/);
-  for (const path of ["hero.webp", "featured.webp", "archive-meowhe.webp", "archive-mono-meowhe.webp", "archive-mictlan.webp"]) {
+  for (const path of ["featured.webp", "archive-meowhe.webp", "archive-mono-meowhe.webp"]) {
     assert.match(media, new RegExp(`/images/home/${path}`));
   }
+  assert.match(media, /hero:[\s\S]*src: "\/images\/home\/archive-meowhe\.webp"[\s\S]*alt: "Lolipop/);
+  assert.match(media, /mictlan:[\s\S]*src: "\/images\/home\/gallery\/mictlan-keyboard\.webp"/);
   assert.match(media, /availability: "pending"/);
   assert.match(home, /media\.availability === "available"/);
   assert.match(home, /<Image/);

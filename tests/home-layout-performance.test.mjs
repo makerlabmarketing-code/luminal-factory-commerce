@@ -45,7 +45,7 @@ test("Homepage product media sizes follow the asymmetric editorial grids", () =>
   assert.equal((media.match(/\(max-width: 1440px\) 27vw, 390px/g) ?? []).length, 1);
   assert.match(media, /archive-meowhe\.webp[\s\S]*?objectPosition: "50% 48%"/);
   assert.match(media, /archive-mono-meowhe\.webp[\s\S]*?objectPosition: "50% 64%"/);
-  assert.match(media, /archive-mictlan\.webp[\s\S]*?objectPosition: "50% 50%"/);
+  assert.match(media, /gallery\/mictlan-keyboard\.webp[\s\S]*?objectPosition: "50% 50%"/);
 });
 
 test("safe below-fold Homepage sections opt into rendering deferral", () => {
