@@ -42,6 +42,8 @@ test("Homepage gallery uses a compact, motion-safe Drift Wall with a touch fallb
   assert.match(gallery, /event\.button === 0/);
   assert.match(gallery, /role="dialog"/);
   assert.match(galleryCss, /perspective: 1200px/);
+  assert.match(galleryCss, /\.wall \{[\s\S]*pointer-events: none/);
+  assert.match(galleryCss, /\.tile \{[\s\S]*pointer-events: auto/);
   assert.match(galleryCss, /height: clamp\(28rem, 43vw, 34rem\)/);
   assert.match(galleryCss, /@keyframes drift-up/);
   assert.match(galleryCss, /\.viewport:hover \.track,[\s\S]*animation-play-state: paused/);

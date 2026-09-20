@@ -27,6 +27,7 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: clamp(0.7rem, 1.4vw, 1.3rem);
   padding: 0 clamp(0.4rem, 1.4vw, 1.5rem);
+  pointer-events: none;
   transform: translate3d(var(--pointer-x), var(--pointer-y), -4rem) rotateX(8deg) rotateY(-6deg) rotateZ(-1deg) scale(1.04);
   transform-style: preserve-3d;
   transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -74,6 +75,7 @@
   background: #0a0a0a;
   box-shadow: 0 1.2rem 3rem rgba(0, 0, 0, 0.3);
   cursor: zoom-in;
+  pointer-events: auto;
   touch-action: manipulation;
   transform: translateZ(0);
   transition: border-color 220ms ease, filter 220ms ease, transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
