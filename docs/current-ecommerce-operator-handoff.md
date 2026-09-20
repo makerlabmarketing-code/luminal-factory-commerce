@@ -368,3 +368,28 @@
 - **Next gate:** Obtain separate push/deploy approval for the resulting local
   commit, then perform read-only Production verification with every Commerce
   and raffle flag false. Runtime activation remains a later gate.
+
+## 2026-09-20 Customer-cart delivered; integrated smoke prepared
+
+- **Delivery:** The connected GitHub path recreated local commits `42f2248` and
+  `87ef904` as tree-equivalent remote commits `b467984` and `a7facd1`, then
+  fast-forwarded `master` without force-push.
+- **Deployment:** Vercel Production deployment
+  `dpl_Cd492r7HdWWX8FNgLNkYQzuAamjJ` reached `READY` for `a7facd1`; the Vercel
+  GitHub status passed.
+- **Read-only evidence:** `/cart` and `/account` rendered their disabled,
+  noindex boundaries; raffle remained discovery-only without entry; GET on the
+  POST-only Cart API returned 405. Vercel reported no runtime error. The cloud
+  browser lacked WebGL, so Home used its 3D fallback; this did not produce a
+  corresponding application runtime error.
+- **Runtime/data:** No environment value, Supabase row/schema, Auth state or
+  Production content changed during delivery verification. Every Commerce and
+  raffle runtime flag remained false.
+- **Prepared next gate:**
+  `specs/cart/customer-cart-integrated-production-smoke-runbook.md` defines the
+  bounded Production transition and exact rollback/cleanup. It requires one
+  approved, already-published direct-shop catalog line; it does not authorize
+  creating a temporary public product.
+- **Next approval:** `CART-INTEGRATED-SMOKE-01`. Until separately approved and
+  until the catalog prerequisite exists, do not enable flags, send OTP, write
+  cart/customer data or execute cleanup.

@@ -149,10 +149,9 @@ Every phase uses the same contract fields below.
   identity routing, expired-cart rotation and explicit POST-only merge retry.
   They keep cart tables browser-denied and introduce only a proposed
   default-false `COMMERCE_CUSTOMER_CART_ENABLED` gate.
-- **Current gate:** `CART-CUSTOMER-PROD-MIGRATION-01` completed the database
-  delivery only. Push/deploy, runtime activation and integrated
-  Auth/cart/merge smoke remain separate approvals. C011A mobile/tablet visual
-  review and C013 activation runbook also remain open.
+- **Current gate:** Database migration and disabled Production delivery are
+  complete. Runtime activation and the integrated Auth/cart/merge smoke remain
+  separately gated. Exact 390px/768px visual review remains open.
 - **Customer-cart implementation checkpoint:** The owner approved
   `CART-CUSTOMER-BOUNDARY-01` on 2026-09-19. A fresh-user identity resolver now
   routes verified sessions exclusively to customer ownership and fails closed
@@ -170,9 +169,23 @@ Every phase uses the same contract fields below.
 - **Database postflight:** Exact signatures, invoker mode, fixed search path,
   timeouts, service-role-only grants, browser-role denial, read/set/remove,
   concurrency and fixture cleanup passed. Advisors added no warning or error.
-- **Next gate:** Obtain separate push/deploy approval for the resulting local
-  commit and perform read-only Production verification with every Commerce and
-  raffle runtime flag false.
+- **Customer-cart Production delivery:** The connected GitHub delivery path
+  recreated the approved local trees as remote commits `b467984` and
+  `a7facd1` without force-push. Vercel deployment
+  `dpl_Cd492r7HdWWX8FNgLNkYQzuAamjJ` reached Production `READY`; GitHub's Vercel
+  status passed. Read-only checks confirmed the disabled `/cart` and `/account`
+  states, raffle discovery without entry and POST-only Cart behavior. Vercel
+  reported no runtime error, and every Commerce/raffle flag remained false.
+- **Integrated smoke preparation:**
+  `specs/cart/customer-cart-integrated-production-smoke-runbook.md` defines one
+  bounded anonymous cart → OTP → atomic merge → verified cart mutation →
+  sign-out → rollback/cleanup flow. It deliberately refuses to manufacture a
+  temporary Production catalog row; one owner-approved, already-published
+  direct-shop product/variant is a prerequisite.
+- **Next gate:** `CART-INTEGRATED-SMOKE-01` separately authorizes the short
+  enabled Production window, one OTP, bounded cart/customer writes, immediate
+  restoration of all flags to false and exact cleanup. Do not execute it while
+  the catalog prerequisite is absent.
 
 ## Phase 7 — Checkout and payment — `LIVE_APPROVAL_REQUIRED`
 

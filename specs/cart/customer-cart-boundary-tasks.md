@@ -1,6 +1,6 @@
 # Verified Customer Cart Boundary Tasks
 
-Status: `PRODUCTION_MIGRATION_APPLIED_RUNTIME_OFF`
+Status: `DELIVERED_RUNTIME_OFF_SMOKE_RUNBOOK_PREPARED`
 
 - [x] CC001 Trace guest Cart UI, POST boundary, Customer Auth and merge paths.
 - [x] CC002 Confirm the post-merge gap: customer cart exists but Cart can only
@@ -27,6 +27,8 @@ Status: `PRODUCTION_MIGRATION_APPLIED_RUNTIME_OFF`
 - [x] CC015 Run unit/integration/security tests and full `npm run check`.
 - [ ] CC016 Review 390px, 768px and 1440px layout, keyboard behavior and browser
   console on a reachable deployment.
-- [ ] CC017 Obtain separate push/deploy approval; keep all Commerce and raffle
+- [x] CC017 Obtain separate push/deploy approval; keep all Commerce and raffle
   runtime flags false during read-only Production verification.
-- [ ] CC018 Prepare and approve a distinct integrated runtime smoke runbook.
+- [x] CC018 Prepare a distinct integrated runtime smoke runbook.
+- [ ] CC019 Obtain `CART-INTEGRATED-SMOKE-01`, then execute the bounded enabled
+  window, immediate flag rollback, exact cleanup and postflight.

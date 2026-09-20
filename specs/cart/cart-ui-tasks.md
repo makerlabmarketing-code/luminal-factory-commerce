@@ -22,7 +22,7 @@ Status: `PRODUCTION_DELIVERED_RUNTIME_OFF_RESPONSIVE_REVIEW_PARTIAL`
   console on a reachable Preview. The cloud browser cannot reach workspace
   localhost, and no local Chromium binary is installed.
 - [x] C012 Commit locally; push/deploy only after explicit delivery approval.
-- [ ] C013 Prepare a separate Production activation/smoke runbook. Do not enable
+- [x] C013 Prepare a separate Production activation/smoke runbook. Do not enable
   guest-cart, Customer Auth, merge, address or raffle runtime in this slice.
 - [x] C014 Design the verified customer-attached cart read/mutation boundary
   before Cart, Customer Auth and merge can be enabled together. The draft is in

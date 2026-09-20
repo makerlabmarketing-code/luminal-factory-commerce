@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `PRODUCTION_MIGRATION_APPLIED_RUNTIME_OFF`
+- **Status:** `DELIVERED_RUNTIME_OFF_SMOKE_RUNBOOK_PREPARED`
 - **Date:** 2026-09-19
 - **Specification:** `customer-cart-boundary-specification.md`
 - **Approval gate:** `CART-CUSTOMER-BOUNDARY-01`
@@ -227,4 +227,18 @@ passed rollback validation and was applied as
 fixed search path, timeout, service-role grants, browser-role denial, bounded
 behavior, concurrency, fixture cleanup and both advisor classes passed.
 Production-generated types now include the three RPCs. Runtime activation,
-push and deployment remain unapproved, and all runtime flags remain false.
+push and deployment remained separately gated, and all runtime flags remained
+false.
+
+The owner later approved the bounded disabled delivery. The exact local trees
+were recreated by the connected GitHub delivery path as remote commits
+`b467984` and `a7facd1`; remote `master` deployed successfully to Vercel
+Production with every Commerce and raffle runtime flag false. Read-only checks
+confirmed disabled `/cart` and `/account` boundaries, raffle discovery without
+entry, POST-only Cart behavior and no Vercel runtime error.
+
+`customer-cart-integrated-production-smoke-runbook.md` now defines the next
+live gate. It requires an owner-approved, already-published direct-shop catalog
+line and explicit `CART-INTEGRATED-SMOKE-01` approval. It does not authorize a
+temporary product fixture, runtime activation, OTP email or Production write by
+itself.
