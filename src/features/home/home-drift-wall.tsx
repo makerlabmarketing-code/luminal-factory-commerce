@@ -83,6 +83,8 @@ export function HomeDriftWall({ items }: HomeDriftWallProps) {
   const resetPointerOffset = () => {
     wallRef.current?.style.setProperty("--pointer-x", "0px");
     wallRef.current?.style.setProperty("--pointer-y", "0px");
+    wallRef.current?.style.setProperty("--pointer-nx", "0");
+    wallRef.current?.style.setProperty("--pointer-ny", "0");
   };
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -91,6 +93,8 @@ export function HomeDriftWall({ items }: HomeDriftWallProps) {
     const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * DRIFT_POINTER_RANGE_PX * 2;
     wallRef.current?.style.setProperty("--pointer-x", `${x.toFixed(2)}px`);
     wallRef.current?.style.setProperty("--pointer-y", `${y.toFixed(2)}px`);
+    wallRef.current?.style.setProperty("--pointer-nx", (x / DRIFT_POINTER_RANGE_PX).toFixed(3));
+    wallRef.current?.style.setProperty("--pointer-ny", (y / DRIFT_POINTER_RANGE_PX).toFixed(3));
   };
 
   return (
@@ -114,6 +118,7 @@ export function HomeDriftWall({ items }: HomeDriftWallProps) {
                 key={`column-${columnIndex}`}
                 style={{
                   "--column-depth": `${(2 - columnIndex) * 0.6}rem`,
+                  "--column-parallax": (columnIndex - 2) * 1.35,
                   "--drift-duration": `${30 + columnIndex * 2}s`,
                 } as React.CSSProperties}
               >
