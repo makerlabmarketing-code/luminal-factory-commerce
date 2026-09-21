@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `PREPARED_OWNER_INPUT_REQUIRED`
+- **Status:** `PARTIALLY_APPROVED_MEDIA_CONFIRMATION_REQUIRED`
 - **Date:** 2026-09-20
 - **Application:** Luminal Factory Commerce
 - **Database:** `bkmbhcfokobmhfzgsfzh`
@@ -21,7 +21,7 @@ The first slice creates exactly:
 
 - one published `products` row;
 - one active `product_variants` row;
-- one active variant-specific `product_prices` row in VND;
+- one active variant-specific `product_prices` row in USD;
 - one primary image `product_media` row.
 
 It does not create inventory, orders, payments, customers, carts, raffle data,
@@ -52,11 +52,11 @@ No Production data operation may start until all fields below are explicit.
 
 | Field | Required decision |
 | --- | --- |
-| Product | Public name and stable lowercase slug |
-| Product type | One of `artisan_keycap`, `collectible_object`, `custom_object`, `other` |
-| Description | Final truthful storefront copy |
-| Variant | Public variant name and unique SKU |
-| Price | Final VND amount; VND has zero decimal minor units |
+| Product | Approved: `Meowhe Lolipop`, slug `meowhe-lolipop` |
+| Product type | Approved: `artisan_keycap` |
+| Description | Proposed truthful copy requires final owner confirmation |
+| Variant | Approved: `Lolipop`, SKU `LF-MEOWHE-LOLIPOP-01` |
+| Price | Approved: `$70.00 USD` = `7000` minor units |
 | Media | Exact approved local WebP path, alt text and crop suitability |
 | Publication | Explicit approval to publish immediately |
 
@@ -85,8 +85,8 @@ select the exact image for this product operation.
 ### Price
 
 - belongs to both the new product and its one active variant;
-- `currency = 'VND'`;
-- `amount_minor` equals the approved whole-VND amount;
+- `currency = 'USD'`;
+- `amount_minor = 7000`, representing 70 dollars in cents;
 - `is_active = true`, with no end date;
 - is the only active price for this product/variant.
 
@@ -118,7 +118,7 @@ select the exact image for this product operation.
 1. The exact owner-approved values are recorded before mutation.
 2. One transaction inserts the four reviewed rows and returns their IDs.
 3. Anonymous read sees exactly one published direct product, its active
-   variant, one matching VND price and one primary image.
+   variant, one matching USD price and one primary image.
 4. `/shop` and the product detail route render the approved facts and image
    without falling back to fixture content.
 5. `/cart`, `/account` and all mutation routes remain disabled.
@@ -135,4 +135,3 @@ select the exact image for this product operation.
    already present on the deployed source.
 5. After read-only storefront validation, `CART-INTEGRATED-SMOKE-01` remains a
    distinct live approval for temporary flag activation, OTP and cart writes.
-

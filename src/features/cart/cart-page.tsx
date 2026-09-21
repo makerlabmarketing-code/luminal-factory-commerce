@@ -115,7 +115,7 @@ export function CartPage({ view }: Readonly<{ view: CartPageView }>) {
               <strong>{view.estimateStatus === "complete" ? view.subtotalLabel : "Chưa thể tính"}</strong>
             </div>
             {view.estimateStatus === "incomplete" ? (
-              <p role="status">Ít nhất một object chưa có giá VND rõ ràng, nên hệ thống không cộng tạm tính một phần.</p>
+              <p role="status">Ít nhất một object chưa có giá USD rõ ràng, nên hệ thống không cộng tạm tính một phần.</p>
             ) : null}
             <p>Checkout sau này sẽ xác nhận lại giá và khả dụng. Phí vận chuyển, thuế và giảm giá chưa được tính.</p>
             <div className="cart-checkout-boundary">

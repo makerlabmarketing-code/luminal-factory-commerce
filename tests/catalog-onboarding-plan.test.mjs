@@ -20,7 +20,7 @@ test("first product contract is one permanent direct variant with an exact price
   assert.match(specification, /one active variant-specific `product_prices` row/);
   assert.match(specification, /one primary image `product_media` row/);
   assert.match(runbook, /'published', 'direct'/);
-  assert.match(runbook, /select product_id, id, 'VND', :amount_minor, true/);
+  assert.match(runbook, /select product_id, id, 'USD', 7000, true/);
   assert.match(runbook, /select product_id, id, 'image', :media_path, :alt_text, 0, true/);
 });
 
@@ -37,4 +37,3 @@ test("rollback is exact and destructive broad cleanup is prohibited", () => {
   assert.match(runbook, /Never truncate, delete by time range/i);
   assert.doesNotMatch(runbook, /truncate\s+table/i);
 });
-

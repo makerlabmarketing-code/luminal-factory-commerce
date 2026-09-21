@@ -17,13 +17,13 @@ function toCartRecord(row: {
   expires_at: string;
   last_activity_at: string;
 }): GuestCartRecord {
-  if (row.currency !== "VND") throw new Error("Guest cart returned an unsupported currency.");
+  if (row.currency !== "USD") throw new Error("Guest cart returned an unsupported currency.");
   const expiresAt = new Date(row.expires_at);
   const lastActivityAt = new Date(row.last_activity_at);
   if (Number.isNaN(expiresAt.getTime()) || Number.isNaN(lastActivityAt.getTime())) {
     throw new Error("Guest cart returned invalid timestamps.");
   }
-  return { id: row.id, currency: "VND", expiresAt, lastActivityAt };
+  return { id: row.id, currency: "USD", expiresAt, lastActivityAt };
 }
 
 function throwPersistenceFailure(operation: string, error: { code?: string } | null): never {
@@ -54,7 +54,7 @@ export function createSupabaseGuestCartRepository(client: CommerceClient): Guest
           customer_id: null,
           guest_token_hash: input.guestTokenHash,
           status: "active",
-          currency: "VND",
+          currency: "USD",
           created_at: input.now.toISOString(),
           updated_at: input.now.toISOString(),
           last_activity_at: input.now.toISOString(),

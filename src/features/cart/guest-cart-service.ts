@@ -22,7 +22,7 @@ export type GuestCartLineIdentity = z.input<typeof guestCartLineIdentitySchema>;
 
 export type GuestCartRecord = Readonly<{
   id: string;
-  currency: "VND";
+  currency: "USD";
   expiresAt: Date;
   lastActivityAt: Date;
 }>;
@@ -35,7 +35,7 @@ export type GuestCartLineRecord = Readonly<{
 }>;
 
 export type GuestCartView = Readonly<{
-  currency: "VND";
+  currency: "USD";
   expiresAt: string;
   lines: readonly Readonly<{
     productId: string;

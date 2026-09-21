@@ -10,7 +10,7 @@ const PRODUCT_ID = "22222222-2222-4222-8222-222222222222";
 const VARIANT_ID = "33333333-3333-4333-8333-333333333333";
 const CART = {
   state: "cart",
-  currency: "VND",
+  currency: "USD",
   expiresAt: "2026-10-19T12:00:00.000Z",
   lines: [{ productId: PRODUCT_ID, variantId: VARIANT_ID, requestedQuantity: 2 }],
   unavailableLineCount: 1,
@@ -41,7 +41,7 @@ test("customer cart validates verified identity and maps bounded documents", asy
       },
       async removeLine(input) {
         received.push({ action: "remove", input });
-        return { state: "empty", currency: "VND", lines: [], unavailableLineCount: 0 };
+        return { state: "empty", currency: "USD", lines: [], unavailableLineCount: 0 };
       },
     },
   });
@@ -49,7 +49,7 @@ test("customer cart validates verified identity and maps bounded documents", asy
   assert.deepEqual(await service.read(IDENTITY), {
     ok: true,
     cart: {
-      currency: "VND",
+      currency: "USD",
       expiresAt: CART.expiresAt,
       lines: CART.lines,
       unavailableLineCount: 1,
@@ -72,8 +72,8 @@ test("customer cart preserves generic domain failures and rejects malformed outp
   for (const [document, expected] of [
     [{ state: "catalog_selection_unavailable" }, "catalog_selection_unavailable"],
     [{ state: "identity_conflict" }, "identity_conflict"],
-    [{ state: "cart", currency: "VND", expiresAt: "invalid", lines: [], unavailableLineCount: 0 }, "runtime_unavailable"],
-    [{ state: "cart", currency: "VND", expiresAt: CART.expiresAt, lines: Array(51).fill(CART.lines[0]), unavailableLineCount: 0 }, "runtime_unavailable"],
+    [{ state: "cart", currency: "USD", expiresAt: "invalid", lines: [], unavailableLineCount: 0 }, "runtime_unavailable"],
+    [{ state: "cart", currency: "USD", expiresAt: CART.expiresAt, lines: Array(51).fill(CART.lines[0]), unavailableLineCount: 0 }, "runtime_unavailable"],
   ]) {
     const service = createCustomerCartService({
       enabled: true,

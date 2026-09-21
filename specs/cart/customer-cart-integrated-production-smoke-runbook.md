@@ -102,7 +102,7 @@ enabled runtime.
 4. In a fresh browser profile, create exactly one guest cart through the
    same-origin POST boundary, then set exactly one approved line to quantity 1.
 5. Open `/cart`; require one enriched line, current catalog facts, a complete
-   VND estimate and no customer identifier, cart ID or guest credential in the
+   USD estimate and no customer identifier, cart ID or guest credential in the
    browser payload.
 6. Open `/account`, complete Turnstile and request exactly one OTP for the
    approved retained test identity. The owner enters the six-digit OTP only in

@@ -10,11 +10,11 @@ type CartPageViewDependencies = Readonly<{
   enrichCatalog: (lines: readonly CartLineIdentity[]) => Promise<CartCatalogPresentation | null>;
 }>;
 
-export const emptyCartPageView: CartPageView = { state: "empty", currency: "VND", unavailableLineCount: 0 };
-export const unavailableCartPageView: CartPageView = { state: "unavailable", currency: "VND", unavailableLineCount: 0 };
+export const emptyCartPageView: CartPageView = { state: "empty", currency: "USD", unavailableLineCount: 0 };
+export const unavailableCartPageView: CartPageView = { state: "unavailable", currency: "USD", unavailableLineCount: 0 };
 export const syncRequiredCartPageView: CartPageView = {
   state: "sync_required",
-  currency: "VND",
+  currency: "USD",
   unavailableLineCount: 0,
 };
 
@@ -28,7 +28,7 @@ async function presentCart(
   if (!presentation) return unavailableCartPageView;
   return {
     state: "ready",
-    currency: "VND",
+    currency: "USD",
     expiresAt: cart.expiresAt,
     lines: presentation.lines,
     unavailableLineCount: cart.unavailableLineCount + presentation.staleLineCount,

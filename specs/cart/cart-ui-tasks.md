@@ -10,7 +10,7 @@ Status: `PRODUCTION_DELIVERED_RUNTIME_OFF_RESPONSIVE_REVIEW_PARTIAL`
 - [x] C005 Obtain owner approval `CART-UI-01`.
 - [x] C006 Implement the private dynamic `/cart` route and page service.
 - [x] C007 Implement bounded batch catalog enrichment with validated media,
-  variant and VND price presentation.
+  variant and USD price presentation.
 - [x] C008 Implement accessible line update/removal interaction using the
   existing POST-only API.
 - [x] C009 Add empty, disabled, stale, incomplete-estimate and service-failure

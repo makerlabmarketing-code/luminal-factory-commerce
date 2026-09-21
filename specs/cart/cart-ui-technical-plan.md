@@ -25,7 +25,7 @@ After `CART-UI-01`, implement a default-off Cart review surface with:
 - `src/features/cart/cart-page-service.ts`: reads the opaque cookie through the
   trusted guest-cart service and maps public states.
 - `src/features/cart/cart-catalog-presentation.ts`: batch catalog lookup,
-  validation, media normalization and checked VND estimate.
+  validation, media normalization and checked USD estimate.
 - `src/features/cart/cart-page.tsx`: server-rendered semantic layout.
 - `src/features/cart/cart-lines-client.tsx`: smallest possible client island for
   existing POST actions, pending state and confirmed updates.
@@ -41,7 +41,7 @@ a smaller boundary clearer, but responsibilities must remain separate.
 3. Resolve the current cart through the existing service.
 4. Batch-read catalog presentation for all returned product/variant identities.
 5. Validate and normalize only published product, active selected variant,
-   current VND price and approved primary media fields.
+   current USD price and approved primary media fields.
 6. Produce the page view and a checked estimate, or an explicit incomplete
    estimate state.
 
@@ -61,7 +61,7 @@ The adapter must:
 - validate response rows with Zod;
 - retain input order in the normalized output;
 - reject a variant that is inactive or does not belong to its product;
-- accept only VND for the first Cart estimate;
+- accept only USD after the approved `CART-USD-01` amendment;
 - reuse the existing public-media allowlist/fallback rules;
 - return no inventory quantity.
 
@@ -105,7 +105,7 @@ No new write endpoint, schema, RPC, secret or rate limiter is introduced.
 
 1. Presentation adapter batch/deduplication/order tests.
 2. Product/variant mismatch, unpublished/inactive and malformed payload tests.
-3. Missing/mixed/non-VND/overflow price tests.
+3. Missing/mixed/non-USD/overflow price tests.
 4. Route disabled, missing-cookie, empty, ready and unavailable tests.
 5. Assert route view performs no cart creation.
 6. Mutation pending/success/conflict/failure tests.

@@ -30,7 +30,7 @@ const guestCartRequestSchema = z.discriminatedUnion("action", [
 ]);
 
 type GuestCartHttpView = Readonly<{
-  currency: "VND";
+  currency: "USD";
   expiresAt: string;
   lines: readonly Readonly<{
     productId: string;

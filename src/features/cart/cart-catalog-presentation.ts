@@ -3,7 +3,7 @@ import "server-only";
 import type { CartLineIdentity } from "./cart-page-contract";
 import {
   CART_PRESENTATION_MAX_LINES,
-  formatVnd,
+  formatUsd,
   normalizeCartCatalogPresentation,
 } from "./cart-catalog-normalizer";
 
@@ -45,7 +45,7 @@ export async function getCartCatalogPresentation(
   const config = getCatalogConfig();
   if (!config || cartLines.length > CART_PRESENTATION_MAX_LINES) return null;
   if (cartLines.length === 0) {
-    return { lines: [], staleLineCount: 0, estimateStatus: "complete", subtotalMinor: 0, subtotalLabel: formatVnd(0) };
+    return { lines: [], staleLineCount: 0, estimateStatus: "complete", subtotalMinor: 0, subtotalLabel: formatUsd(0) };
   }
 
   const productIds = [...new Set(cartLines.map((line) => line.productId))];

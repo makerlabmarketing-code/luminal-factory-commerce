@@ -191,11 +191,16 @@ Every phase uses the same contract fields below.
   the empty, purpose-specific `homepage-hero` bucket, which will not be
   repurposed for catalog media.
 - **Catalog onboarding preparation:** `specs/catalog/` defines one permanent,
-  owner-approved direct product with one active variant, one matching VND price
+  owner-approved direct product with one active variant, one matching USD price
   and one primary local WebP. `CATALOG-PROD-ONBOARDING-01` is required before
   any live row is inserted; all runtime flags remain false. The owner must first
   approve the exact name/slug, description, product type, variant/SKU, price and
   media/alt text.
+- **USD decision:** The owner approved `CART-USD-01`, Meowhe Lolipop at `$70.00`
+  and internal SKU `LF-MEOWHE-LOLIPOP-01`. The local Cart contract now uses USD
+  cents consistently across persistence, RPC validation and presentation.
+  Production migration `CART-USD-PROD-MIGRATION-01` remains separately gated;
+  no runtime or live catalog data is enabled by this decision.
 
 ## Phase 7 — Checkout and payment — `LIVE_APPROVAL_REQUIRED`
 

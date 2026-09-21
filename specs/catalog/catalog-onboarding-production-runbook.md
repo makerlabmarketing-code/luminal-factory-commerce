@@ -18,7 +18,7 @@ Before execution, record without secrets:
 - exact GitHub `master` and Vercel Production source SHA;
 - product name, slug, type, description and publication decision;
 - variant name and SKU;
-- VND `amount_minor`;
+- approved USD `amount_minor = 7000`;
 - media path and alt text;
 - generated product, variant, price and media IDs after commit.
 
@@ -67,7 +67,7 @@ with new_product as (
   insert into public.product_prices (
     product_id, variant_id, currency, amount_minor, is_active
   )
-  select product_id, id, 'VND', :amount_minor, true
+  select product_id, id, 'USD', 7000, true
   from new_variant
   returning id
 ), new_media as (
@@ -93,7 +93,8 @@ rows interactively or retry with broadened content.
 ## Read-only postflight
 
 1. Query the four recorded IDs and prove their foreign-key relationship.
-2. Require exactly one active matching variant price in VND.
+2. Require exactly one active matching variant price in USD at `7000` minor
+   units (`$70.00`).
 3. Read through the anonymous/public API and require exactly the approved
    published fields; sensitive tables remain unavailable.
 4. Check `/shop` and `/shop/:slug` for name, description, price, image, alt
@@ -130,4 +131,3 @@ or target an unrecorded product.
 Success means the permanent approved product is publicly readable and renders
 correctly, no unrelated data changed, and every runtime flag remains false.
 It does not authorize the later integrated Cart smoke or Phase 7 work.
-

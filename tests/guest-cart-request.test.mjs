@@ -15,7 +15,7 @@ const PRODUCT_ID = "11111111-1111-4111-8111-111111111111";
 const VARIANT_ID = "22222222-2222-4222-8222-222222222222";
 const RATE_SECRET = "0123456789abcdef0123456789abcdef";
 const CART = {
-  currency: "VND",
+  currency: "USD",
   expiresAt: "2026-09-13T04:00:00.000Z",
   lines: [],
   unavailableLineCount: 0,

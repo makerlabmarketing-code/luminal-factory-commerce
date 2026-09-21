@@ -14,14 +14,14 @@ const customerCartLineSchema = z.object({
 
 const emptyDocumentSchema = z.object({
   state: z.literal("empty"),
-  currency: z.literal("VND"),
+  currency: z.literal("USD"),
   lines: z.array(z.never()).max(0),
   unavailableLineCount: z.literal(0),
 }).strict();
 
 const cartDocumentSchema = z.object({
   state: z.literal("cart"),
-  currency: z.literal("VND"),
+  currency: z.literal("USD"),
   expiresAt: z.string().datetime({ offset: true }),
   lines: z.array(customerCartLineSchema).max(50),
   unavailableLineCount: z.number().int().nonnegative(),

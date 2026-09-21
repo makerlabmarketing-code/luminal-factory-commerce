@@ -56,7 +56,7 @@ The page consumes a server-normalized view. Proposed shape:
 ```ts
 type CartPageView = Readonly<{
   state: "ready" | "empty" | "unavailable";
-  currency: "VND";
+  currency: "USD";
   expiresAt?: string;
   lines: readonly CartPageLine[];
   unavailableLineCount: number;
@@ -94,7 +94,7 @@ The existing cart API owns only:
 A new server-only presentation adapter must batch-read the current published
 catalog for all returned identities and validate its payload. It may expose only
 the fields needed by the page: slug, name, selected active variant label,
-current VND price, and primary approved media.
+current USD price, and primary approved media.
 
 Requirements:
 - no browser-held Supabase secret;
@@ -131,10 +131,10 @@ Requirements:
 
 ## Estimate contract
 
-- Currency is VND only for the first slice.
+- Currency is USD only after the approved `CART-USD-01` amendment.
 - `subtotalMinor` is the checked sum of current unit minor values multiplied by
   confirmed requested quantities.
-- Show subtotal only if every visible line has a valid current VND price.
+- Show subtotal only if every visible line has a valid current USD price.
 - Do not calculate shipping, tax, discount, deposit or a final total.
 - Include copy that checkout will validate price and availability again.
 - Client formatting may mirror the server label but is not transactional

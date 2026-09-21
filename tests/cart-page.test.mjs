@@ -23,8 +23,8 @@ const CART_LINES = [
 function catalogPayload(priceRows = [{
   product_id: PRODUCT_ID,
   variant_id: VARIANT_ID,
-  currency: "VND",
-  amount_minor: 125000,
+  currency: "USD",
+  amount_minor: 7000,
 }]) {
   return {
     products: [{ id: PRODUCT_ID, slug: "mono-study", name: "Mono Study", release_type: "direct" }],
@@ -42,16 +42,19 @@ function catalogPayload(priceRows = [{
   };
 }
 
-test("catalog enrichment preserves cart order, validates variants and computes a complete VND estimate", () => {
+test("catalog enrichment preserves cart order, validates variants and computes a complete USD estimate", () => {
   const view = normalizeCartCatalogPresentation(CART_LINES, catalogPayload(), SUPABASE_URL);
   assert.ok(view);
   assert.equal(view.lines.length, 1);
   assert.equal(view.staleLineCount, 1);
   assert.equal(view.lines[0].title, "Mono Study");
   assert.equal(view.lines[0].variantLabel, "Mono");
-  assert.equal(view.lines[0].unitPriceMinor, 125000);
-  assert.equal(view.lines[0].lineEstimateMinor, 250000);
-  assert.equal(view.subtotalMinor, 250000);
+  assert.equal(view.lines[0].unitPriceMinor, 7000);
+  assert.equal(view.lines[0].unitPriceLabel, "$70.00");
+  assert.equal(view.lines[0].lineEstimateMinor, 14000);
+  assert.equal(view.lines[0].lineEstimateLabel, "$140.00");
+  assert.equal(view.subtotalMinor, 14000);
+  assert.equal(view.subtotalLabel, "$140.00");
   assert.equal(view.estimateStatus, "complete");
   assert.equal(view.lines[0].media.source, "commerce-catalog");
 });
@@ -60,12 +63,12 @@ test("ambiguous or missing prices never produce a partial subtotal", () => {
   const duplicatePrice = {
     product_id: PRODUCT_ID,
     variant_id: VARIANT_ID,
-    currency: "VND",
-    amount_minor: 125000,
+    currency: "USD",
+    amount_minor: 7000,
   };
   const view = normalizeCartCatalogPresentation(
     CART_LINES.slice(0, 1),
-    catalogPayload([duplicatePrice, { ...duplicatePrice, amount_minor: 130000 }]),
+    catalogPayload([duplicatePrice, { ...duplicatePrice, amount_minor: 7500 }]),
     SUPABASE_URL,
   );
   assert.ok(view);
@@ -86,6 +89,13 @@ test("catalog enrichment rejects malformed public payloads and unapproved media 
   assert.ok(view);
   assert.equal(view.lines[0].media.source, "internal-placeholder");
   assert.match(view.lines[0].media.src, /^\/placeholders\//);
+
+  const wrongCurrency = catalogPayload();
+  wrongCurrency.prices[0].currency = "VND";
+  assert.equal(
+    normalizeCartCatalogPresentation(CART_LINES.slice(0, 1), wrongCurrency, SUPABASE_URL),
+    null,
+  );
 });
 
 test("Cart page fails closed before cookie or persistence work while runtime is disabled", async () => {
@@ -103,7 +113,7 @@ test("Cart page fails closed before cookie or persistence work while runtime is 
       throw new Error("must not run");
     },
   });
-  assert.deepEqual(view, { state: "unavailable", currency: "VND", unavailableLineCount: 0 });
+  assert.deepEqual(view, { state: "unavailable", currency: "USD", unavailableLineCount: 0 });
   assert.equal(readCount, 0);
   assert.equal(enrichCount, 0);
 });
@@ -120,7 +130,7 @@ test("Cart page does not create a cart when the guest cookie is missing", async 
       throw new Error("must not run");
     },
   });
-  assert.deepEqual(view, { state: "empty", currency: "VND", unavailableLineCount: 0 });
+  assert.deepEqual(view, { state: "empty", currency: "USD", unavailableLineCount: 0 });
   assert.equal(readCount, 0);
 });
 
@@ -132,7 +142,7 @@ test("Cart page combines service and catalog stale counts without exposing priva
       return {
         ok: true,
         cart: {
-          currency: "VND",
+          currency: "USD",
           expiresAt: "2026-10-19T00:00:00.000Z",
           lines: CART_LINES,
           unavailableLineCount: 2,
@@ -162,7 +172,7 @@ test("verified Cart requires explicit synchronization while the guest credential
       throw new Error("must not enrich before synchronization");
     },
   });
-  assert.deepEqual(view, { state: "sync_required", currency: "VND", unavailableLineCount: 0 });
+  assert.deepEqual(view, { state: "sync_required", currency: "USD", unavailableLineCount: 0 });
   assert.equal(reads, 0);
 });
 
@@ -173,7 +183,7 @@ test("verified Cart reads customer state and creates nothing for an empty cart",
     async readCart() { return { ok: true, cart: null }; },
     async enrichCatalog() { throw new Error("empty cart must not enrich"); },
   });
-  assert.deepEqual(view, { state: "empty", currency: "VND", unavailableLineCount: 0 });
+  assert.deepEqual(view, { state: "empty", currency: "USD", unavailableLineCount: 0 });
 });
 
 test("Cart route is private, noindex, default-off and absent from global navigation", () => {

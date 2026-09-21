@@ -6,7 +6,7 @@ import { createSupabaseCustomerCartRepository } from "../src/lib/supabase/custom
 const AUTH_USER_ID = "11111111-1111-4111-8111-111111111111";
 const PRODUCT_ID = "22222222-2222-4222-8222-222222222222";
 
-function createClient(data = { state: "empty", currency: "VND", lines: [], unavailableLineCount: 0 }) {
+function createClient(data = { state: "empty", currency: "USD", lines: [], unavailableLineCount: 0 }) {
   const calls = [];
   return {
     calls,

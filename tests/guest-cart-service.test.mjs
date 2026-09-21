@@ -27,7 +27,7 @@ class MemoryGuestCartRepository {
   async createGuestCart(input) {
     const cart = {
       id: `cart-${this.nextCart++}`,
-      currency: "VND",
+      currency: "USD",
       expiresAt: input.expiresAt,
       lastActivityAt: input.now,
     };
@@ -147,7 +147,7 @@ test("creation returns only the internal cookie token and public cart view", asy
 
   assert.equal(result.ok, true);
   if (!result.ok) return;
-  assert.equal(result.cart.currency, "VND");
+  assert.equal(result.cart.currency, "USD");
   assert.deepEqual(result.cart.lines, []);
   assert.doesNotMatch(JSON.stringify(result.cart), /cart-|guestTokenHash|guest_token_hash/);
   assert.equal(hashGuestCartToken(result.guestToken)?.length, 66);

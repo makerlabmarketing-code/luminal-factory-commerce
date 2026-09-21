@@ -88,7 +88,7 @@ public view does not return those identifiers.
 Role: summarize current catalog presentation without implying a transaction.
 
 Content:
-- current subtotal only when every visible line has one valid VND price;
+- current subtotal only when every visible line has one valid USD price;
 - a truthful `Chưa thể tính tạm tính` state when any price is missing or
   malformed;
 - no shipping, tax, discount, deposit, raffle, or final-total calculation;

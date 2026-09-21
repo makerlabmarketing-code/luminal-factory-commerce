@@ -75,7 +75,7 @@ unavailable.
   price, create an order or authorize payment.
 - Published product and active variant membership are revalidated at mutation
   time. The Cart presentation continues to re-read current public catalog name,
-  media and VND price.
+  media and USD price after the approved `CART-USD-01` amendment.
 
 ## Guest-to-customer synchronization
 

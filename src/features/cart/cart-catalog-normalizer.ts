@@ -17,7 +17,7 @@ const variantRowsSchema = z.array(z.object({
 const priceRowsSchema = z.array(z.object({
   product_id: z.string().uuid(),
   variant_id: z.string().uuid().nullable(),
-  currency: z.literal("VND"),
+  currency: z.literal("USD"),
   amount_minor: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
 }));
 const mediaRowsSchema = z.array(z.object({
@@ -45,12 +45,13 @@ export type CartCatalogPresentation = Pick<
   "lines" | "subtotalMinor" | "subtotalLabel" | "estimateStatus"
 > & Readonly<{ staleLineCount: number }>;
 
-export function formatVnd(amountMinor: number): string {
-  return new Intl.NumberFormat("vi-VN", {
+export function formatUsd(amountMinor: number): string {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(amountMinor);
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amountMinor / 100);
 }
 
 function toneForSlug(slug: string): CartPageLine["media"]["tone"] {
@@ -153,10 +154,10 @@ export function normalizeCartCatalogPresentation(
       title: product.name,
       ...(variant ? { variantLabel: variant.name } : {}),
       requestedQuantity: cartLine.requestedQuantity,
-      ...(unitPrice === undefined ? {} : { unitPriceMinor: unitPrice, unitPriceLabel: formatVnd(unitPrice) }),
+      ...(unitPrice === undefined ? {} : { unitPriceMinor: unitPrice, unitPriceLabel: formatUsd(unitPrice) }),
       ...(lineEstimate === undefined || !Number.isSafeInteger(lineEstimate)
         ? {}
-        : { lineEstimateMinor: lineEstimate, lineEstimateLabel: formatVnd(lineEstimate) }),
+        : { lineEstimateMinor: lineEstimate, lineEstimateLabel: formatUsd(lineEstimate) }),
       media: createMedia(product, chooseMedia(mediaByProduct.get(product.id) ?? [], cartLine.variantId), supabaseUrl),
     });
   }
@@ -165,6 +166,6 @@ export function normalizeCartCatalogPresentation(
     lines: normalizedLines,
     staleLineCount,
     estimateStatus: hasCompleteEstimate ? "complete" : "incomplete",
-    ...(hasCompleteEstimate ? { subtotalMinor, subtotalLabel: formatVnd(subtotalMinor) } : {}),
+    ...(hasCompleteEstimate ? { subtotalMinor, subtotalLabel: formatUsd(subtotalMinor) } : {}),
   };
 }

@@ -415,3 +415,30 @@
 - **Next live gate:** `CATALOG-PROD-ONBOARDING-01`. The integrated cart smoke
   remains separately gated by `CART-INTEGRATED-SMOKE-01` after catalog
   postflight passes.
+
+## 2026-09-21 Cart USD decision and local implementation
+
+- **Owner approval:** `CART-USD-01`, Meowhe Lolipop at `$70.00 USD`, internal
+  SKU `LF-MEOWHE-LOLIPOP-01`.
+- **Reference review:** Artkey Universe publicly presents artisan releases in
+  USD, grouped by collection/colorway and sculpt, with availability and release
+  timing. SKU is treated as an internal Luminal operational identifier rather
+  than required customer-facing copy.
+- **Currency invariant:** Cart persistence, guest/customer service documents,
+  public price validation and subtotal formatting move together to USD. `$70`
+  is stored as `7000` cents; no exchange-rate conversion is introduced.
+- **Migration package:** `20260921001942_use_usd_for_cart.sql` changes only the
+  Cart currency constraint/default and the three verified-customer Cart RPC
+  literals. It preserves security-invoker, fixed-search-path and
+  service-role-only boundaries.
+- **Read-only Production baseline:** Products, prices, customers, carts, cart
+  items, orders, payments and raffles are all zero-row. Advisor output contains
+  only the existing intentional default-deny/no-policy INFO findings, existing
+  unused/unindexed INFO findings and the pre-existing leaked-password
+  protection warning; `CART-USD-01` has not changed any of them.
+- **Unaffected scope:** Orders/payments remain a Phase 7 decision. No catalog
+  row, Production schema, runtime flag, Vercel value, Auth state, raffle data or
+  ERP data has changed.
+- **Next gate:** `CART-USD-PROD-MIGRATION-01` is required before applying the
+  migration. Catalog publication and integrated Cart smoke remain distinct
+  later gates.
