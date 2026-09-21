@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- **Status:** `PREPARED_APPROVAL_REQUIRED`
+- **Status:** `APPLIED_VERIFIED`
 - **Target:** Luminal Factory Commerce project `bkmbhcfokobmhfzgsfzh`
 - **Migration:** `20260921001942_use_usd_for_cart.sql`
 - **Required gate:** `CART-USD-PROD-MIGRATION-01`
@@ -61,6 +61,28 @@ Only after `CART-USD-PROD-MIGRATION-01`:
 6. Confirm every runtime flag remains false and no Vercel environment or
    deployment changed.
 
+## Production evidence — 2026-09-21
+
+- Owner approved `CART-USD-PROD-MIGRATION-01`.
+- Reviewed source SHA-256:
+  `ff2302ab962341b179fc55c3d983506cf443b1d8f7315727a2bd7421f63ce707`.
+- Preflight found zero products, prices, customers, carts, cart items, orders,
+  payments and raffles; the Cart default/check and three RPC documents still
+  used VND.
+- The exact migration passed a transactional rollback validation. The database
+  returned to the VND default/check and zero USD RPC bodies before application.
+- Supabase applied the migration once as
+  `20260921022741_use_usd_for_cart`.
+- Postflight confirmed the validated USD default/check, three USD-only
+  security-invoker RPCs with fixed search paths/timeouts, service-role-only
+  execution, browser table denial and Cart RLS.
+- Read/remove returned empty USD documents. Set against a disposable missing
+  product returned `catalog_selection_unavailable`; final business counts
+  remained zero.
+- Security and performance advisors added no finding relative to the captured
+  baseline. No catalog row, runtime flag, Auth state, Vercel setting or
+  deployment changed.
+
 ## Rollback
 
 Rollback requires a separate incident decision. While runtime and catalog are
@@ -74,4 +96,3 @@ schema rollback.
 The migration is successful only when Cart persistence and RPC documents are
 consistently USD, browser authority is unchanged, advisors add no actionable
 finding, business tables remain at baseline and every runtime flag is false.
-

@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- **Status:** `IMPLEMENTED_LOCALLY_PRODUCTION_MIGRATION_REQUIRED`
+- **Status:** `IMPLEMENTED_LOCALLY_PRODUCTION_MIGRATION_APPLIED`
 - **Approval:** `CART-USD-01`
 - **Date:** 2026-09-21
 - **Production migration gate:** `CART-USD-PROD-MIGRATION-01`
@@ -64,6 +64,5 @@ authority or transactional payment behavior.
 - Unit tests cover `$70.00`, quantity-two `$140.00`, duplicate-price failure and
   malformed currency failure.
 - Full lint, TypeScript, test, security and Production build must pass.
-- Production SQL requires a separate migration approval and transactional
-  rollback validation.
-
+- Production SQL passed transactional rollback validation and was applied once
+  under owner approval as `20260921022741_use_usd_for_cart`.

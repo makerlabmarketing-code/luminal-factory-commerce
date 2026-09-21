@@ -404,14 +404,15 @@
   URL, Storage upload, schema change or browser write grant is part of this
   slice.
 - **Prepared package:** `specs/catalog/` maps one permanent published direct
-  product, one active variant, one variant-specific active VND price and one
+  product, one active variant, one variant-specific active USD price and one
   primary image to the deployed schema. It includes exact preflight,
   transaction, public-read validation and ID-scoped rollback.
 - **Runtime/data:** The preflight was read-only. No Supabase row, schema,
   Storage object, environment value, Auth state or Production source changed;
   every Commerce and raffle runtime flag remains false.
-- **Next owner input:** Approve the final product name/slug, product type,
-  description, variant/SKU, whole-VND price, exact WebP and alt text.
+- **Next owner input:** Approve the remaining final product content and exact
+  WebP/alt text; price is `$70.00 USD` and SKU is
+  `LF-MEOWHE-LOLIPOP-01`.
 - **Next live gate:** `CATALOG-PROD-ONBOARDING-01`. The integrated cart smoke
   remains separately gated by `CART-INTEGRATED-SMOKE-01` after catalog
   postflight passes.
@@ -436,9 +437,19 @@
   only the existing intentional default-deny/no-policy INFO findings, existing
   unused/unindexed INFO findings and the pre-existing leaked-password
   protection warning; `CART-USD-01` has not changed any of them.
+- **Production migration:** The owner approved
+  `CART-USD-PROD-MIGRATION-01`. Exact-SQL rollback validation passed, then
+  Supabase applied the migration once as
+  `20260921022741_use_usd_for_cart`. Postflight confirmed the validated USD
+  default/check, USD-only RPC documents, invoker/fixed-search-path/timeouts,
+  service-role-only execution, browser denial and RLS.
+- **Behavior/data evidence:** Disposable read/remove calls returned empty USD
+  documents; set against a missing product failed closed as
+  `catalog_selection_unavailable`. Products, prices, customers, carts, cart
+  items, orders, payments and raffles remained zero-row. Advisors added no new
+  finding relative to baseline.
 - **Unaffected scope:** Orders/payments remain a Phase 7 decision. No catalog
-  row, Production schema, runtime flag, Vercel value, Auth state, raffle data or
-  ERP data has changed.
-- **Next gate:** `CART-USD-PROD-MIGRATION-01` is required before applying the
-  migration. Catalog publication and integrated Cart smoke remain distinct
-  later gates.
+  row, runtime flag, Vercel value, Auth state, raffle data or ERP data changed.
+- **Next gate:** Source delivery and Vercel read-only verification require
+  separate push approval. Catalog publication and integrated Cart smoke remain
+  distinct later gates.

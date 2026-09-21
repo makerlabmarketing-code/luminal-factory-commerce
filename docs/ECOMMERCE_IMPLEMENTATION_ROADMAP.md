@@ -199,8 +199,11 @@ Every phase uses the same contract fields below.
 - **USD decision:** The owner approved `CART-USD-01`, Meowhe Lolipop at `$70.00`
   and internal SKU `LF-MEOWHE-LOLIPOP-01`. The local Cart contract now uses USD
   cents consistently across persistence, RPC validation and presentation.
-  Production migration `CART-USD-PROD-MIGRATION-01` remains separately gated;
-  no runtime or live catalog data is enabled by this decision.
+  Owner-approved `CART-USD-PROD-MIGRATION-01` passed exact-SQL rollback
+  validation and was applied once as
+  `20260921022741_use_usd_for_cart`. Postflight proved USD persistence/RPC
+  documents, unchanged browser denial and zero business rows. No runtime or
+  live catalog data was enabled by this migration.
 
 ## Phase 7 — Checkout and payment — `LIVE_APPROVAL_REQUIRED`
 
