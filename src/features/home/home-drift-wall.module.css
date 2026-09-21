@@ -52,8 +52,8 @@
 }
 
 .viewport[data-visible="false"] .track,
-.viewport:hover .track,
-.viewport:focus-within .track {
+.column:hover .track,
+.column:focus-within .track {
   animation-play-state: paused;
 }
 

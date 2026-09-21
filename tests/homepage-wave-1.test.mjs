@@ -46,7 +46,8 @@ test("Homepage gallery uses a compact, motion-safe Drift Wall with a touch fallb
   assert.match(galleryCss, /\.tile \{[\s\S]*pointer-events: auto/);
   assert.match(galleryCss, /height: clamp\(28rem, 43vw, 34rem\)/);
   assert.match(galleryCss, /@keyframes drift-up/);
-  assert.match(galleryCss, /\.viewport:hover \.track,[\s\S]*animation-play-state: paused/);
+  assert.match(galleryCss, /\.column:hover \.track,[\s\S]*\.column:focus-within \.track[\s\S]*animation-play-state: paused/);
+  assert.doesNotMatch(galleryCss, /\.viewport:hover \.track/);
   assert.match(galleryCss, /scroll-snap-type: x mandatory/);
   assert.match(galleryCss, /@media \(max-width: 768px\)/);
   assert.match(galleryCss, /@media \(prefers-reduced-motion: reduce\)/);
