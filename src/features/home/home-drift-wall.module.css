@@ -21,6 +21,8 @@
 .wall {
   --pointer-x: 0px;
   --pointer-y: 0px;
+  --pointer-nx: 0;
+  --pointer-ny: 0;
   position: absolute;
   inset: -13% -3%;
   display: grid;
@@ -37,7 +39,13 @@
 .column {
   min-width: 0;
   overflow: hidden;
-  transform: translateZ(var(--column-depth));
+  transform: translate3d(
+    calc(var(--pointer-nx) * var(--column-parallax) * 1px),
+    calc(var(--pointer-ny) * var(--column-parallax) * 0.65px),
+    var(--column-depth)
+  );
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 .track {
