@@ -393,3 +393,25 @@
 - **Next approval:** `CART-INTEGRATED-SMOKE-01`. Until separately approved and
   until the catalog prerequisite exists, do not enable flags, send OTP, write
   cart/customer data or execute cleanup.
+
+## 2026-09-20 Catalog prerequisite preflight and onboarding plan
+
+- **Read-only baseline:** Commerce Production contains zero products, published
+  products, variants, active variants, prices, active prices and product-media
+  rows. Storage contains one public `homepage-hero` bucket and zero objects.
+- **Boundary decision:** The Hero bucket remains purpose-specific. The first
+  catalog item will use one explicitly approved local storefront WebP; no Drive
+  URL, Storage upload, schema change or browser write grant is part of this
+  slice.
+- **Prepared package:** `specs/catalog/` maps one permanent published direct
+  product, one active variant, one variant-specific active VND price and one
+  primary image to the deployed schema. It includes exact preflight,
+  transaction, public-read validation and ID-scoped rollback.
+- **Runtime/data:** The preflight was read-only. No Supabase row, schema,
+  Storage object, environment value, Auth state or Production source changed;
+  every Commerce and raffle runtime flag remains false.
+- **Next owner input:** Approve the final product name/slug, product type,
+  description, variant/SKU, whole-VND price, exact WebP and alt text.
+- **Next live gate:** `CATALOG-PROD-ONBOARDING-01`. The integrated cart smoke
+  remains separately gated by `CART-INTEGRATED-SMOKE-01` after catalog
+  postflight passes.

@@ -186,6 +186,16 @@ Every phase uses the same contract fields below.
   enabled Production window, one OTP, bounded cart/customer writes, immediate
   restoration of all flags to false and exact cleanup. Do not execute it while
   the catalog prerequisite is absent.
+- **Catalog prerequisite baseline:** A read-only check on 2026-09-20 confirmed
+  zero products, variants, prices and product-media rows. Storage contains only
+  the empty, purpose-specific `homepage-hero` bucket, which will not be
+  repurposed for catalog media.
+- **Catalog onboarding preparation:** `specs/catalog/` defines one permanent,
+  owner-approved direct product with one active variant, one matching VND price
+  and one primary local WebP. `CATALOG-PROD-ONBOARDING-01` is required before
+  any live row is inserted; all runtime flags remain false. The owner must first
+  approve the exact name/slug, description, product type, variant/SKU, price and
+  media/alt text.
 
 ## Phase 7 — Checkout and payment — `LIVE_APPROVAL_REQUIRED`
 
