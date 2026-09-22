@@ -6,6 +6,17 @@ export const COMMERCE_ADMIN_SCOPES = [
   "commerce.hero.read",
   "commerce.hero.write",
   "commerce.hero.publish",
+  "commerce.product.read",
+  "commerce.product.write",
+  "commerce.product.publish",
+  "commerce.raffle.read",
+  "commerce.raffle.write",
+  "commerce.raffle.publish",
+  "commerce.raffle.entry.read",
+  "commerce.raffle.winner.manage",
+  "commerce.raffle.payment.manage",
+  "commerce.raffle.fulfillment.manage",
+  "commerce.raffle.result.publish",
 ] as const;
 
 export type CommerceAdminScope = (typeof COMMERCE_ADMIN_SCOPES)[number];
