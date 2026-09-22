@@ -23,6 +23,8 @@ const productRowSchema = z.object({
   updated_at: z.string(),
 });
 
+const NIL_UUID = "00000000-0000-0000-0000-000000000000";
+
 const raffleRowSchema = z.object({
   id: z.uuid(),
   slug: z.string(),
@@ -92,9 +94,9 @@ async function executeProductMutation(
     operationId: string;
     clientId: string;
     action: "create_draft" | "update_draft" | "publish" | "archive";
-    targetId: string | null;
+    targetId: string;
     requestFingerprint: string;
-    product: Json | null;
+    product: Json;
   }>,
 ): Promise<ProductAdminWire> {
   const { data, error } = await client.rpc("manage_catalog_product", {
@@ -115,9 +117,9 @@ async function executeRaffleMutation(
     operationId: string;
     clientId: string;
     action: "create_draft" | "update_draft" | "publish" | "unpublish";
-    targetId: string | null;
+    targetId: string;
     requestFingerprint: string;
-    raffle: Json | null;
+    raffle: Json;
   }>,
 ): Promise<RaffleAdminWire> {
   const { data, error } = await client.rpc("manage_raffle", {
@@ -167,7 +169,7 @@ export function createManagedProduct(
     operationId: mutation.operationId,
     clientId: context.clientId,
     action: "create_draft",
-    targetId: null,
+    targetId: NIL_UUID,
     requestFingerprint: context.requestFingerprint,
     product: productDraftPayload(mutation),
   });
@@ -201,7 +203,7 @@ export function publishManagedProduct(
     action: "publish",
     targetId: productId,
     requestFingerprint: context.requestFingerprint,
-    product: null,
+    product: {},
   });
 }
 
@@ -230,7 +232,7 @@ export function createManagedRaffle(
     operationId: mutation.operationId,
     clientId: context.clientId,
     action: "create_draft",
-    targetId: null,
+    targetId: NIL_UUID,
     requestFingerprint: context.requestFingerprint,
     raffle: raffleDraftPayload(mutation),
   });
@@ -264,7 +266,7 @@ export function publishManagedRaffle(
     action: "publish",
     targetId: raffleId,
     requestFingerprint: context.requestFingerprint,
-    raffle: null,
+    raffle: {},
   });
 }
 
@@ -280,6 +282,6 @@ export function unpublishManagedRaffle(
     action: "unpublish",
     targetId: raffleId,
     requestFingerprint: context.requestFingerprint,
-    raffle: null,
+    raffle: {},
   });
 }
