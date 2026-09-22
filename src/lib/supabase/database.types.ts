@@ -1103,6 +1103,39 @@ export type Database = {
         Args: { model_path: string; poster_path?: string }
         Returns: boolean
       }
+      manage_catalog_product: {
+        Args: {
+          p_action: string
+          p_client_id: string
+          p_operation_id: string
+          p_product: Json
+          p_request_fingerprint: string
+          p_target_id: string
+        }
+        Returns: Json
+      }
+      manage_homepage_hero: {
+        Args: {
+          p_action: string
+          p_client_id: string
+          p_hero: Json
+          p_operation_id: string
+          p_request_fingerprint: string
+          p_target_id: string
+        }
+        Returns: Json
+      }
+      manage_raffle: {
+        Args: {
+          p_action: string
+          p_client_id: string
+          p_operation_id: string
+          p_raffle: Json
+          p_request_fingerprint: string
+          p_target_id: string
+        }
+        Returns: Json
+      }
       merge_verified_customer_guest_cart: {
         Args: {
           p_auth_user_id: string
