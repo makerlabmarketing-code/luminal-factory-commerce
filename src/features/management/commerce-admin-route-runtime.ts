@@ -21,6 +21,7 @@ type RpcClient = Readonly<{
 export type CommerceAdminRouteContext = Readonly<{
   identity: CommerceAdminVerifiedIdentity;
   client: CommerceAdminSupabaseClient;
+  privilegedClient: PrivilegedClient;
   rawBodyText: string;
   requestFingerprint: string;
 }>;
@@ -164,13 +165,20 @@ export async function authorizeCommerceAdminRoute(
     .update(`${request.method.toUpperCase()}\n${new URL(request.url).pathname}\n${bodyHash}`, "utf8")
     .digest("hex");
 
-  return { identity: verification.identity, client: asHomepageHeroClient(privilegedClient), rawBodyText, requestFingerprint };
+  return {
+    identity: verification.identity,
+    client: asHomepageHeroClient(privilegedClient),
+    privilegedClient,
+    rawBodyText,
+    requestFingerprint,
+  };
 }
 
 export async function recordCommerceAdminAudit(
   context: CommerceAdminRouteContext,
   input: Readonly<{
     operation: string;
+    targetType?: "homepage_hero" | "product" | "raffle" | "raffle_entry" | "raffle_winner_allocation";
     targetId: string | null;
     outcome: "succeeded" | "failed";
     httpStatus: number;
@@ -185,7 +193,7 @@ export async function recordCommerceAdminAudit(
     p_workspace_id: context.identity.workspaceId,
     p_scope: context.identity.scope,
     p_operation: input.operation,
-    p_target_type: "homepage_hero",
+    p_target_type: input.targetType ?? "homepage_hero",
     p_target_id: input.targetId,
     p_outcome: input.outcome,
     p_http_status: input.httpStatus,
