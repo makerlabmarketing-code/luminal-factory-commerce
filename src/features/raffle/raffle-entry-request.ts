@@ -7,13 +7,21 @@ import {
   type RaffleEntryClientResponse,
 } from "./raffle-entry-contract";
 
-export const RAFFLE_ENTRY_REQUEST_MAX_BYTES = 8 * 1024;
+export const RAFFLE_ENTRY_REQUEST_MAX_BYTES = 12 * 1024;
 
 const raffleEntryRequestSchema = z.object({
   raffleId: z.string().uuid(),
   requestId: z.string().uuid(),
   email: z.email().max(254).transform((value) => value.trim().toLowerCase()),
   displayName: z.string().trim().min(2).max(120),
+  recipientName: z.string().trim().min(2).max(120),
+  addressLine1: z.string().trim().min(3).max(240),
+  addressLine2: z.string().trim().max(240),
+  city: z.string().trim().min(1).max(120),
+  stateProvince: z.string().trim().min(1).max(120),
+  postalCode: z.string().trim().max(32),
+  countryCode: z.string().trim().length(2).transform((value) => value.toUpperCase()),
+  phone: z.string().trim().max(32),
   rulesVersion: z.string().trim().min(1).max(64),
   rulesAccepted: z.literal(true),
   captchaToken: z.string().trim().min(16).max(4096),
@@ -28,6 +36,14 @@ export interface RaffleEntryService {
     raffleId: string;
     email: string;
     displayName: string;
+    recipientName: string;
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    stateProvince: string;
+    postalCode: string;
+    countryCode: string;
+    phone: string;
     rulesVersion: string;
     requestTokenHash: string;
     requestFingerprintHash: string;
@@ -141,6 +157,14 @@ function createRequestFingerprint(input: z.infer<typeof raffleEntryRequestSchema
       raffleId: input.raffleId,
       email: input.email,
       displayName: input.displayName,
+      recipientName: input.recipientName,
+      addressLine1: input.addressLine1,
+      addressLine2: input.addressLine2,
+      city: input.city,
+      stateProvince: input.stateProvince,
+      postalCode: input.postalCode,
+      countryCode: input.countryCode,
+      phone: input.phone,
       rulesVersion: input.rulesVersion,
       rulesAccepted: input.rulesAccepted,
     }))
@@ -257,6 +281,14 @@ export async function handleRaffleEntryRequest(
       raffleId: input.raffleId,
       email: input.email,
       displayName: input.displayName,
+      recipientName: input.recipientName,
+      addressLine1: input.addressLine1,
+      addressLine2: input.addressLine2,
+      city: input.city,
+      stateProvince: input.stateProvince,
+      postalCode: input.postalCode,
+      countryCode: input.countryCode,
+      phone: input.phone,
       rulesVersion: input.rulesVersion,
       requestTokenHash: createRequestTokenHash(input.requestId),
       requestFingerprintHash: createRequestFingerprint(input),
