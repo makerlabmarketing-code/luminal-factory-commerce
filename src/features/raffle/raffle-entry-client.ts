@@ -11,6 +11,14 @@ export async function submitRaffleEntry(input: Readonly<{
   requestId: string;
   email: string;
   displayName: string;
+  recipientName: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  stateProvince: string;
+  postalCode: string;
+  countryCode: string;
+  phone: string;
   rulesVersion: string;
   rulesAccepted: true;
   captchaToken: string;
