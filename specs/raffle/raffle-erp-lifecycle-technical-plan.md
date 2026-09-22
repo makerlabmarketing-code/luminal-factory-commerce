@@ -307,6 +307,51 @@ ERP:
 - tests for authorization, signing and transition handling
 - runtime flag default false
 
+## ERP-created raffle publication and Home countdown
+
+A new raffle created/configured from ERP follows this management sequence:
+
+```text
+ERP draft
+  -> signed Commerce Admin API mutation
+  -> Commerce raffle DRAFT/SCHEDULED
+  -> approved media + opens_at + closes_at + publication
+  -> Home raffle adapter discovers the published scheduled raffle
+  -> teaser/question-mark + opening countdown
+  -> authoritative OPEN reconciliation
+  -> reveal media + Enter raffle CTA
+```
+
+ERP owns the operational create/edit/publish UI, but Commerce remains authoritative for persisted raffle state and public presentation eligibility.
+
+Recommended ERP management scope additions:
+
+```text
+commerce.raffle.write
+commerce.raffle.publish
+```
+
+Recommended future management operations:
+
+```text
+POST  /api/admin/v1/raffles
+PATCH /api/admin/v1/raffles/{raffleId}
+POST  /api/admin/v1/raffles/{raffleId}/publish
+POST  /api/admin/v1/raffles/{raffleId}/unpublish
+```
+
+Create/update payload must keep Product and Raffle separate while allowing approved product/media linkage.
+
+For the first public release, Home selects:
+1. an OPEN published raffle;
+2. otherwise the nearest published SCHEDULED raffle by `opens_at`;
+3. otherwise an approved completed/result fallback;
+4. otherwise the brand/object fallback.
+
+The client countdown is presentation only. Reaching zero triggers server-state revalidation; it never grants entry by itself.
+
+The Home visual contract is owned by `specs/home/home-page-specification.md`, section **Scheduled Raffle Teaser + Countdown Contract**.
+
 ## Private raffle test route
 
 For end-to-end testing before a public raffle is listed in navigation, use an unlisted test route that is intentionally absent from menus and public discovery.
