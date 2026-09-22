@@ -1,7 +1,8 @@
 import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/supabase/database.types";
 import { z } from "zod";
 import { COMMERCE_ADMIN_SCOPES, type CommerceAdminScope } from "./commerce-admin-contract";
 import { readCommerceAdminEnvironment } from "./commerce-admin-env";
@@ -13,7 +14,8 @@ export const COMMERCE_ADMIN_CONTRACT_VERSION = "2026-09-11" as const;
 const MAX_REQUEST_BYTES = 256_000;
 const requestIdSchema = z.uuid();
 
-type PrivilegedClient = ReturnType<typeof createClient>;
+export type CommerceAdminPrivilegedClient = SupabaseClient<Database>;
+type PrivilegedClient = CommerceAdminPrivilegedClient;
 type RpcClient = Readonly<{
   rpc(name: string, args: Readonly<Record<string, unknown>>): PromiseLike<{ data: unknown; error: unknown }>;
 }>;
@@ -62,7 +64,7 @@ function createPrivilegedClient(): PrivilegedClient {
     throw new Error("Commerce Admin Supabase configuration is invalid.");
   }
   if (url.protocol !== "https:" || !secretKey) throw new Error("Commerce Admin Supabase configuration is invalid.");
-  return createClient(url.origin, secretKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  return createClient<Database>(url.origin, secretKey, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
 function asHomepageHeroClient(client: PrivilegedClient): CommerceAdminSupabaseClient {
