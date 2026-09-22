@@ -1,6 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
+import type { Json } from "@/lib/supabase/database.types";
 import type { CommerceAdminPrivilegedClient } from "./commerce-admin-route-runtime";
 import type {
   ProductDraftMutationWire,
@@ -93,7 +94,7 @@ async function executeProductMutation(
     action: "create_draft" | "update_draft" | "publish" | "archive";
     targetId: string | null;
     requestFingerprint: string;
-    product: unknown;
+    product: Json | null;
   }>,
 ): Promise<ProductAdminWire> {
   const { data, error } = await client.rpc("manage_catalog_product", {
@@ -116,7 +117,7 @@ async function executeRaffleMutation(
     action: "create_draft" | "update_draft" | "publish" | "unpublish";
     targetId: string | null;
     requestFingerprint: string;
-    raffle: unknown;
+    raffle: Json | null;
   }>,
 ): Promise<RaffleAdminWire> {
   const { data, error } = await client.rpc("manage_raffle", {
