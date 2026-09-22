@@ -307,6 +307,64 @@ ERP:
 - tests for authorization, signing and transition handling
 - runtime flag default false
 
+## Private raffle test route
+
+For end-to-end testing before a public raffle is listed in navigation, use an unlisted test route that is intentionally absent from menus and public discovery.
+
+Recommended pattern:
+
+```text
+/raffle/test/{slug-or-token}
+```
+
+or a dedicated test-only route guarded by a server-side runtime flag and opaque test token.
+
+Rules:
+
+- not linked from header, footer, sitemap, archive, home or raffle discovery
+- `noindex, nofollow`
+- unavailable unless an exact server-side test flag is enabled
+- require an opaque, revocable test token or equivalent server-side access check
+- test raffles must be explicitly marked as test fixtures and excluded from public result/listing queries
+- do not rely on route secrecy alone as authorization
+- use the same trusted entry API and database rules as the real raffle so the test exercises the actual flow
+- test email delivery and ERP integration remain separately gated
+- test fixture cleanup must be exact and auditable
+
+This private route is preferred over weakening the public raffle visibility contract.
+
+## Customer data retention and loyalty
+
+Owner direction on 2026-09-22: raffle customer/contact and shipping data may be retained beyond one raffle so Luminal can recognize repeat customers and later support loyalty/VIP benefits.
+
+Do not make raffle-entry PII itself the permanent loyalty source of truth.
+
+Recommended model:
+
+```text
+raffle entry
+  -> operational submission snapshot
+
+customer/contact profile
+  -> reusable identity/contact/address book
+
+customer activity / loyalty ledger
+  -> future points, repeat-purchase/VIP history
+```
+
+Rules:
+
+- the raffle entry preserves the historical submission snapshot
+- reusable customer/address records must be created or linked through an explicit trusted transition
+- email equality alone must not silently merge unrelated identities
+- marketing/benefit eligibility must be separated from operational raffle consent
+- promotional messaging requires a separate marketing preference/consent state where applicable
+- loyalty points/VIP status must be derived from auditable activity, not manually overwritten totals
+- address reuse should support multiple addresses and a default-address concept rather than one address column on the customer row
+- public result and analytics must never expose full PII
+
+Initial implementation may retain non-winner address data, but live activation must include a documented retention/access policy and a way to honor later correction/deletion requirements without corrupting raffle history or fulfilled orders.
+
 ## Activation sequence
 
 1. repository implementation and tests
