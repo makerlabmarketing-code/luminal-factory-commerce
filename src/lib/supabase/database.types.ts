@@ -801,15 +801,160 @@ export type Database = {
           },
         ]
       }
+      raffle_winner_allocation_events: {
+        Row: {
+          actor_id: string
+          allocation_id: string
+          created_at: string
+          event_type: string
+          from_status: string | null
+          id: string
+          note: string | null
+          raffle_id: string
+          request_id: string
+          to_status: string | null
+        }
+        Insert: {
+          actor_id: string
+          allocation_id: string
+          created_at?: string
+          event_type: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          raffle_id: string
+          request_id: string
+          to_status?: string | null
+        }
+        Update: {
+          actor_id?: string
+          allocation_id?: string
+          created_at?: string
+          event_type?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          raffle_id?: string
+          request_id?: string
+          to_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raffle_winner_allocation_events_allocation_id_fkey"
+            columns: ["allocation_id"]
+            isOneToOne: false
+            referencedRelation: "raffle_winner_allocations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "raffle_winner_allocation_events_raffle_id_fkey"
+            columns: ["raffle_id"]
+            isOneToOne: false
+            referencedRelation: "raffles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      raffle_winner_allocations: {
+        Row: {
+          allocation_sequence: number
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          completed_at: string | null
+          confirmed_at: string | null
+          created_at: string
+          fulfillment_due_at: string | null
+          id: string
+          order_id: string | null
+          paid_at: string | null
+          payment_deadline_at: string | null
+          public_code: string
+          raffle_entry_id: string
+          raffle_id: string
+          selected_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          allocation_sequence: number
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          fulfillment_due_at?: string | null
+          id?: string
+          order_id?: string | null
+          paid_at?: string | null
+          payment_deadline_at?: string | null
+          public_code?: string
+          raffle_entry_id: string
+          raffle_id: string
+          selected_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          allocation_sequence?: number
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          fulfillment_due_at?: string | null
+          id?: string
+          order_id?: string | null
+          paid_at?: string | null
+          payment_deadline_at?: string | null
+          public_code?: string
+          raffle_entry_id?: string
+          raffle_id?: string
+          selected_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raffle_winner_allocations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "order_payment_summary"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "raffle_winner_allocations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "raffle_winner_allocations_raffle_entry_id_fkey"
+            columns: ["raffle_entry_id"]
+            isOneToOne: false
+            referencedRelation: "raffle_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "raffle_winner_allocations_raffle_id_fkey"
+            columns: ["raffle_id"]
+            isOneToOne: false
+            referencedRelation: "raffles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       raffles: {
         Row: {
           closes_at: string | null
           created_at: string
           id: string
           is_published: boolean
+          is_test: boolean
           opens_at: string | null
           product_id: string | null
           published_at: string | null
+          results_published_at: string | null
           rules_summary: string | null
           rules_version: string
           slug: string
@@ -817,15 +962,18 @@ export type Database = {
           summary: string | null
           title: string
           updated_at: string
+          variant_id: string | null
         }
         Insert: {
           closes_at?: string | null
           created_at?: string
           id?: string
           is_published?: boolean
+          is_test?: boolean
           opens_at?: string | null
           product_id?: string | null
           published_at?: string | null
+          results_published_at?: string | null
           rules_summary?: string | null
           rules_version: string
           slug: string
@@ -833,15 +981,18 @@ export type Database = {
           summary?: string | null
           title: string
           updated_at?: string
+          variant_id?: string | null
         }
         Update: {
           closes_at?: string | null
           created_at?: string
           id?: string
           is_published?: boolean
+          is_test?: boolean
           opens_at?: string | null
           product_id?: string | null
           published_at?: string | null
+          results_published_at?: string | null
           rules_summary?: string | null
           rules_version?: string
           slug?: string
@@ -849,6 +1000,7 @@ export type Database = {
           summary?: string | null
           title?: string
           updated_at?: string
+          variant_id?: string | null
         }
         Relationships: [
           {
@@ -856,6 +1008,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "raffles_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
         ]
@@ -1004,6 +1163,28 @@ export type Database = {
           p_request_fingerprint_hash: string
           p_request_token_hash: string
           p_rules_version: string
+        }
+        Returns: {
+          entry_reference: string
+          entry_state: string
+        }[]
+      }
+      submit_guest_raffle_entry_v2: {
+        Args: {
+          p_address_line_1: string
+          p_address_line_2: string
+          p_city: string
+          p_country_code: string
+          p_display_name: string
+          p_email: string
+          p_phone: string
+          p_postal_code: string
+          p_raffle_id: string
+          p_recipient_name: string
+          p_request_fingerprint_hash: string
+          p_request_token_hash: string
+          p_rules_version: string
+          p_state_province: string
         }
         Returns: {
           entry_reference: string
