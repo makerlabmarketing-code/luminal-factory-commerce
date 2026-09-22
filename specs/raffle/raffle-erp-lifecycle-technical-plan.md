@@ -7,7 +7,8 @@
 - Production data/schema writes: not authorized
 - Runtime/email activation: not authorized
 - Execution gate: `RAFFLE-ERP-LIFECYCLE-01`
-- Blocking business decision: shipping-data collection point
+- Shipping-data decision: `OPTION_B_FULL_ADDRESS_AT_ENTRY_APPROVED_2026-09-22`
+- Remaining Production gate: schema/API implementation approval
 
 ## Current Production facts
 
@@ -249,43 +250,38 @@ Avoid separate pages for every tiny transition.
 
 ## Shipping-data decision
 
-This is the only business decision that blocks the first schema/API implementation.
+Owner decision on 2026-09-22: **collect the full shipping address during raffle entry**.
 
-To calculate shipping before the winner payment email, choose one:
+The implementation must isolate shipping PII from the core raffle-entry row instead of widening the public-domain entry record with address fields.
 
-### Option A: collect full shipping data at raffle entry
+Recommended private 1:1 relation:
 
-Pros:
-- total shipping can be calculated immediately after winner selection
+```text
+raffle_entry_shipping_addresses
+- raffle_entry_id uuid pk/fk -> raffle_entries(id)
+- recipient_name text
+- address_line_1 text
+- address_line_2 text nullable
+- city text
+- state_province text
+- postal_code text nullable
+- country_code char(2)
+- phone text nullable
+- created_at / updated_at
+```
 
-Cost:
-- stores full address/phone PII for every entrant, including non-winners
+Rules:
 
-### Option B: collect minimal location at entry, full address only for winner
+- no browser SELECT/INSERT/UPDATE grants
+- created only through the trusted raffle-entry operation in the same transaction as the entry
+- returned to ERP only through the privileged Commerce Admin API and only to staff with entry/customer-data permission
+- never exposed in public raffle results, logs, analytics or generic error payloads
+- normalize country code and trim address fields server-side
+- keep phone optional at schema level until carrier requirements are locked
+- winner/order creation snapshots the shipping destination required for fulfillment so later entry-PII cleanup cannot corrupt an order
+- non-winner shipping PII needs a separately approved retention/deletion rule before live raffle activation
 
-Example entry fields:
-- country/region
-- city/province
-- postal code where applicable
-
-Pros:
-- materially less PII for non-winners
-- enough for fixed/zone-based shipping rules
-
-Cost:
-- exact shipping may require a later winner-only address step
-
-### Option C: collect no shipping data until winner
-
-Pros:
-- strongest data minimization
-
-Cost:
-- requires one extra winner contact step before ERP can send the final payment total
-
-Recommended default: **Option B** if Luminal uses predictable region/zone shipping; otherwise **Option C**.
-
-Do not implement full-address collection for every entrant without explicit approval.
+The guest-entry request fingerprint/idempotency contract must include the normalized shipping payload. A replay with the same request token but different shipping data fails closed.
 
 ## Schema/package work after gate approval
 
