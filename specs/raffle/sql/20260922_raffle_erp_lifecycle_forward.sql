@@ -189,61 +189,7 @@ begin
     or p_state_province is null
     or length(btrim(p_state_province)) not between 1 and 120
     or p_country_code is null
-    or v_country_code !~ '^[A-Z]{2}
-    or (p_address_line_2 is not null and length(btrim(p_address_line_2)) not between 1 and 240)
-    or (p_postal_code is not null and length(btrim(p_postal_code)) not between 1 and 32)
-    or (p_phone is not null and length(btrim(p_phone)) not between 5 and 32)
-  then
-    raise exception 'invalid raffle shipping input' using errcode = '22023';
-  end if;
-
-  select *
-  into v_result
-  from public.submit_guest_raffle_entry(
-    p_raffle_id,
-    p_email,
-    p_display_name,
-    p_rules_version,
-    p_request_token_hash,
-    p_request_fingerprint_hash
-  );
-
-  if v_result.entry_state = 'submitted' and v_result.entry_reference is not null then
-    insert into private.raffle_entry_shipping_addresses (
-      raffle_entry_id,
-      recipient_name,
-      address_line_1,
-      address_line_2,
-      city,
-      state_province,
-      postal_code,
-      country_code,
-      phone
-    ) values (
-      v_result.entry_reference,
-      btrim(p_recipient_name),
-      btrim(p_address_line_1),
-      nullif(btrim(p_address_line_2), ''),
-      btrim(p_city),
-      btrim(p_state_province),
-      nullif(btrim(p_postal_code), ''),
-      v_country_code,
-      nullif(btrim(p_phone), '')
-    )
-    on conflict (raffle_entry_id) do nothing;
-  end if;
-
-  return query select v_result.entry_state::text, v_result.entry_reference::uuid;
-end;
-$$;
-
-revoke execute on function public.submit_guest_raffle_entry_v2(
-  uuid, text, text, text, text, text, text, text, text, text, text, text, text, text
-) from public, anon, authenticated;
-grant execute on function public.submit_guest_raffle_entry_v2(
-  uuid, text, text, text, text, text, text, text, text, text, text, text, text, text
-) to service_role;
-
+    or v_country_code !~ '^[A-Z]{2}$'
     or (p_address_line_2 is not null and length(btrim(p_address_line_2)) not between 1 and 240)
     or (p_postal_code is not null and length(btrim(p_postal_code)) not between 1 and 32)
     or (p_phone is not null and length(btrim(p_phone)) not between 5 and 32)
