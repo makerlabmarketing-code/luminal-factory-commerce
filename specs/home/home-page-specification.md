@@ -7,7 +7,7 @@
 | Title | Home Page Specification — Raffle-First |
 | Status | `APPROVED` / `IMPLEMENTATION_READY` |
 | Owner | Luminal Factory Commerce storefront |
-| Last updated | 2026-08-05 |
+| Last updated | 2026-09-22 |
 | Source experience script | `docs/page-scripts/home-raffle-first-experience-script-draft.md` |
 | Related roadmap phase | Phase 3 — Static storefront routes / Home design-definition gate |
 | Implementation status | `IMPLEMENTATION_READY` for first slice only |
@@ -134,6 +134,90 @@ B. Non-transactional release placeholder — safer first implementation if raffl
 C. Brand/object study — safest when no release data or asset is approved; useful for visual foundation but weaker as raffle-first commerce discovery.
 
 Owner-approved first-slice decision: use option B, a non-transactional release placeholder. Option A remains a future target only after public raffle data, media, route, and commerce boundaries are approved.
+
+## 4.6A Scheduled Raffle Teaser + Countdown Contract
+
+Owner direction approved on 2026-09-22: when ERP publishes/schedules a new raffle for the storefront, Home must automatically surface that raffle as the primary raffle moment before the entry window opens.
+
+### ERP → Home behavior
+
+A raffle prepared from ERP becomes eligible for Home presentation only after Commerce accepts the privileged management mutation and the raffle is:
+
+- published;
+- in a truthful scheduled/open lifecycle state;
+- linked to approved release/product media;
+- configured with authoritative `opens_at` and `closes_at`.
+
+ERP does not push presentation state directly into the browser. ERP changes Commerce raffle state through the Commerce Management API; Home then reads the resulting public Commerce state.
+
+### Scheduled state
+
+Before `opens_at`:
+
+- Home presents the upcoming raffle prominently.
+- Show a live countdown to the authoritative opening instant.
+- Product/release media is intentionally concealed by an approved teaser treatment.
+- The primary teaser motif is a large question-mark reveal rather than the final product image.
+- No Entry/Join CTA is available.
+- A non-transactional detail CTA may be shown only if the scheduled raffle detail page is approved for pre-open viewing.
+- The page must communicate that the raffle is scheduled, not open.
+
+The question-mark composition should be adapted into Luminal's visual language through framed geometry, negative space, controlled light and logo-related planes. Do not copy Artkey's exact composition or branding.
+
+### Opening transition
+
+When the countdown reaches zero, the browser must **not** declare the raffle open by itself.
+
+Instead:
+
+1. the countdown reaches zero;
+2. Home requests/revalidates authoritative raffle state;
+3. only when Commerce returns `OPEN` and server/database time is inside the approved window may Home:
+   - reveal the approved raffle/product media;
+   - change the state label to `Raffle open`;
+   - expose the primary `Enter raffle` action;
+   - route the user to the real `/raffle/[slug]` entry experience.
+
+If the authoritative state has not changed yet, Home stays fail-closed and displays a short opening/pending state instead of showing an unsafe Entry CTA.
+
+### Open state
+
+While the raffle is open:
+
+- full approved media replaces the teaser/question-mark treatment;
+- primary CTA becomes `Enter raffle`;
+- closing time/countdown may be shown;
+- CTA always routes into the trusted raffle detail/entry flow rather than submitting directly from Home.
+
+### Closed and later states
+
+After the entry window closes:
+
+- remove the Entry CTA immediately after authoritative state reconciliation;
+- show `Closed`, `Drawing`, or result state truthfully;
+- public result appears only after the approved ERP/Commerce result-publication transition;
+- completed releases bridge into Archive.
+
+### Featured raffle selection
+
+First release assumes one primary Home raffle moment.
+
+Selection order:
+
+1. one currently `OPEN` published raffle;
+2. otherwise the nearest upcoming published `SCHEDULED` raffle by `opens_at`;
+3. otherwise the most relevant recently completed/result state when approved;
+4. otherwise the existing brand/object fallback.
+
+If future operations need multiple simultaneous raffles or manual Home prioritization, add an explicit ERP-managed featured/pinning contract rather than relying on row creation order.
+
+### Accessibility and motion
+
+- Countdown includes readable day/hour/minute/second text and must not spam screen readers every second.
+- Question-mark teaser has meaningful release text outside the image.
+- Reduced-motion uses static teaser/reveal states.
+- Opening reveal may animate once, but essential state and CTA do not depend on animation.
+- Mobile keeps countdown, state and opening CTA above secondary content.
 
 ## 4.7 Raffle State Model
 
