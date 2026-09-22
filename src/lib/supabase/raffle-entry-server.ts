@@ -25,13 +25,21 @@ export function getServerRaffleEntryService(): RaffleEntryService | undefined {
   if (!client) return undefined;
   return {
     async submit(input) {
-      const { data, error } = await client.rpc("submit_guest_raffle_entry", {
+      const { data, error } = await client.rpc("submit_guest_raffle_entry_v2", {
         p_raffle_id: input.raffleId,
         p_email: input.email,
         p_display_name: input.displayName,
         p_rules_version: input.rulesVersion,
         p_request_token_hash: input.requestTokenHash,
         p_request_fingerprint_hash: input.requestFingerprintHash,
+        p_recipient_name: input.recipientName,
+        p_address_line_1: input.addressLine1,
+        p_address_line_2: input.addressLine2,
+        p_city: input.city,
+        p_state_province: input.stateProvince,
+        p_postal_code: input.postalCode,
+        p_country_code: input.countryCode,
+        p_phone: input.phone,
       });
       if (error || !Array.isArray(data) || data.length !== 1) return null;
       const row = data[0];
