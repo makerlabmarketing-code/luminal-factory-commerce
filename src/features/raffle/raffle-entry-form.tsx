@@ -32,6 +32,14 @@ type RaffleEntryFormProps = Readonly<{
 export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: RaffleEntryFormProps) {
   const emailId = useId();
   const nameId = useId();
+  const recipientNameId = useId();
+  const addressLine1Id = useId();
+  const addressLine2Id = useId();
+  const cityId = useId();
+  const stateProvinceId = useId();
+  const postalCodeId = useId();
+  const countryCodeId = useId();
+  const phoneId = useId();
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const requestIdRef = useRef<string | null>(null);
@@ -113,6 +121,14 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
       requestId,
       email: String(formData.get("email") ?? ""),
       displayName: String(formData.get("displayName") ?? ""),
+      recipientName: String(formData.get("recipientName") ?? ""),
+      addressLine1: String(formData.get("addressLine1") ?? ""),
+      addressLine2: String(formData.get("addressLine2") ?? ""),
+      city: String(formData.get("city") ?? ""),
+      stateProvince: String(formData.get("stateProvince") ?? ""),
+      postalCode: String(formData.get("postalCode") ?? ""),
+      countryCode: String(formData.get("countryCode") ?? ""),
+      phone: String(formData.get("phone") ?? ""),
       rulesVersion,
       rulesAccepted: true,
       captchaToken,
@@ -166,8 +182,50 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
           <div className="account-field">
             <label htmlFor={emailId}>Email</label>
             <input id={emailId} name="email" type="email" inputMode="email" autoComplete="email" maxLength={254} required />
-            <span>Chỉ dùng để quản lý entry và liên hệ theo quy định của raffle.</span>
+            <span>Dùng để quản lý entry, liên hệ winner và lịch sử khách hàng theo chính sách của Luminal.</span>
           </div>
+
+          <div className="raffle-entry-shipping">
+            <div>
+              <p className="eyebrow">Shipping information</p>
+              <h3>Thông tin giao hàng</h3>
+              <p>Thông tin này được lưu riêng khỏi entry công khai và chỉ dùng cho vận hành raffle, fulfillment và hồ sơ khách hàng được phép.</p>
+            </div>
+            <div className="account-field">
+              <label htmlFor={recipientNameId}>Tên người nhận</label>
+              <input id={recipientNameId} name="recipientName" autoComplete="shipping name" minLength={2} maxLength={120} required />
+            </div>
+            <div className="account-field">
+              <label htmlFor={addressLine1Id}>Địa chỉ</label>
+              <input id={addressLine1Id} name="addressLine1" autoComplete="shipping address-line1" minLength={3} maxLength={240} required />
+            </div>
+            <div className="account-field">
+              <label htmlFor={addressLine2Id}>Địa chỉ bổ sung</label>
+              <input id={addressLine2Id} name="addressLine2" autoComplete="shipping address-line2" maxLength={240} />
+            </div>
+            <div className="account-field">
+              <label htmlFor={cityId}>Thành phố / Quận huyện</label>
+              <input id={cityId} name="city" autoComplete="shipping address-level2" maxLength={120} required />
+            </div>
+            <div className="account-field">
+              <label htmlFor={stateProvinceId}>Tỉnh / Bang / Khu vực</label>
+              <input id={stateProvinceId} name="stateProvince" autoComplete="shipping address-level1" maxLength={120} required />
+            </div>
+            <div className="account-field">
+              <label htmlFor={postalCodeId}>Postal code</label>
+              <input id={postalCodeId} name="postalCode" autoComplete="shipping postal-code" maxLength={32} />
+            </div>
+            <div className="account-field">
+              <label htmlFor={countryCodeId}>Mã quốc gia</label>
+              <input id={countryCodeId} name="countryCode" autoComplete="shipping country" inputMode="text" minLength={2} maxLength={2} placeholder="VN" required />
+              <span>Dùng mã ISO 2 ký tự, ví dụ VN, US, JP.</span>
+            </div>
+            <div className="account-field">
+              <label htmlFor={phoneId}>Số điện thoại</label>
+              <input id={phoneId} name="phone" type="tel" autoComplete="shipping tel" maxLength={32} />
+            </div>
+          </div>
+
           <label className="raffle-entry-consent">
             <input type="checkbox" name="rulesAccepted" required />
             <span>Tôi đồng ý với rules phiên bản {rulesVersion} và xác nhận thông tin trên là chính xác.</span>
