@@ -98,6 +98,23 @@ export async function listRaffleWinnerAllocations(client: CommerceAdminPrivilege
 
 type WinnerAction = "select" | "confirm" | "confirm_payment" | "start_fulfillment" | "complete" | "cancel" | "reallocate";
 
+type WinnerRpcClient = Readonly<{
+  rpc(
+    name: "manage_raffle_winner_allocation",
+    args: Readonly<{
+      p_operation_id: string;
+      p_client_id: string;
+      p_action: WinnerAction;
+      p_raffle_id: string;
+      p_allocation_id: string | null;
+      p_entry_id: string | null;
+      p_actor_id: string;
+      p_request_fingerprint: string;
+      p_payload: Json;
+    }>,
+  ): PromiseLike<{ data: unknown; error: Readonly<{ code?: string; message?: string }> | null }>;
+}>;
+
 async function executeWinnerAction(
   client: CommerceAdminPrivilegedClient,
   input: Readonly<{
@@ -112,7 +129,8 @@ async function executeWinnerAction(
     payload: Json;
   }>,
 ) {
-  const { data, error } = await client.rpc("manage_raffle_winner_allocation", {
+  const rpcClient = client as unknown as WinnerRpcClient;
+  const { data, error } = await rpcClient.rpc("manage_raffle_winner_allocation", {
     p_operation_id: input.operationId,
     p_client_id: input.clientId,
     p_action: input.action,
