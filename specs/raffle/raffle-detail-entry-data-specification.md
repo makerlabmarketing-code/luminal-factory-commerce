@@ -46,11 +46,23 @@ Conceptual fields:
 - created timestamp
 - idempotency/request token if used
 
+Owner decision on 2026-09-22: the entry form also collects the full shipping address. Shipping PII must be persisted in a dedicated private 1:1 relation keyed by `raffle_entry_id`, not flattened into the core entry record.
+
+Minimum shipping fields:
+- recipient name
+- address line 1
+- optional address line 2
+- city
+- state/province/region
+- country code
+- postal code where applicable
+- optional phone until carrier requirements are finalized
+
 No payment/order/inventory columns belong on the entry record by default.
 
 ## Approved identity model
 
-First implementation uses **guest email entry** only.
+First implementation uses **guest email entry** with a full shipping-address payload.
 
 - Normalize email server-side.
 - Hard uniqueness guard: `(raffle_id, normalized_email)` or an equivalent normalized identity constraint supported by the inspected schema.
@@ -150,7 +162,7 @@ The raffle/entry foundation migration is applied in Production. Runtime enableme
 Approved on 2026-08-09:
 - identity: guest email
 - uniqueness: one valid entry per normalized email per raffle
-- minimal entry fields: email + display/name + rules/privacy agreement
+- entry fields: email + display/name + rules/privacy agreement + full shipping address in an isolated PII relation
 - Supabase: Production raffle/entry foundation now applied; runtime remains disabled
 - duplicate response: generic privacy-safe `already_entered`
 - payment/order/winner administration: separately gated
