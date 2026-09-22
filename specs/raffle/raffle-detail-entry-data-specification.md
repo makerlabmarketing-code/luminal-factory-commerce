@@ -5,10 +5,10 @@
 - Status: `APPROVED` / `IMPLEMENTATION_PLANNING_READY`
 - Date: 2026-08-09
 - Owner approval: `2026-08-09`
-- Implementation status: `SCHEMA_INSPECTED_TECHNICAL_PLAN_PREPARED`
-- Data status: `APPROVED_CONTRACT_NOT_APPLIED`
+- Implementation status: `PRODUCTION_SCHEMA_APPLIED_RUNTIME_DISABLED`
+- Data status: `FOUNDATION_APPLIED_ZERO_LIVE_RAFFLE_ROWS`
 
-This specification defines the approved contract for `/raffle/[slug]` and the first raffle entry mutation. Production schema inspection completed read-only on 2026-09-18 and confirmed that no raffle or raffle-entry table currently exists. No migration may be applied until the actual schema/RLS plan is reviewed and separately approved for Production execution.
+This specification defines the approved contract for `/raffle/[slug]` and the first raffle entry mutation. Production migration `20260918063545_create_raffle_entry_foundation` is present and the Production schema currently contains `public.raffles`, `public.raffle_entries`, the guest-entry RPC, rate-limit persistence and public published-raffle read policy. Both raffle tables currently contain zero rows. Runtime activation and any live raffle/entry smoke remain separately gated.
 
 ## Public route contract
 
@@ -130,7 +130,7 @@ Before live entry:
 
 Entry records must not become orders merely because a winner is selected.
 
-A separate approved winner/payment contract must define the transition from selected winner to payment opportunity and eventual order. ERP remains the owner of administrative winner operations unless a later architecture explicitly changes that boundary.
+The approved business-flow contract for selected winner, ERP operations, shipping amount, payment instruction, manual payment verification, fulfillment email and manual reallocation is `specs/raffle/raffle-winner-erp-fulfillment-specification.md`. ERP remains the owner of administrative winner operations.
 
 ## Migration gate
 
@@ -143,10 +143,7 @@ Before any Supabase write:
 6. verify Preview with the intended environment
 7. verify database contract before merge
 
-The direct schema inspection and technical-plan steps are complete. Migration
-authoring, rollback validation, Production application, runtime enablement, and
-the live entry smoke remain separately gated:
-`NO_DATABASE_CHANGE_APPLIED_YET`.
+The raffle/entry foundation migration is applied in Production. Runtime enablement, live raffle data creation, guest-entry smoke, winner-allocation persistence and ERP integration remain separately gated. No live raffle or entry row is authorized by this document.
 
 ## Owner approval record
 
@@ -154,7 +151,7 @@ Approved on 2026-08-09:
 - identity: guest email
 - uniqueness: one valid entry per normalized email per raffle
 - minimal entry fields: email + display/name + rules/privacy agreement
-- Supabase: intended persistence layer, pending direct schema inspection
+- Supabase: Production raffle/entry foundation now applied; runtime remains disabled
 - duplicate response: generic privacy-safe `already_entered`
 - payment/order/winner administration: separately gated
 
