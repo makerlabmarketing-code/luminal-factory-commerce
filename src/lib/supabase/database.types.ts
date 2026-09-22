@@ -1136,6 +1136,20 @@ export type Database = {
         }
         Returns: Json
       }
+      manage_raffle_winner_allocation: {
+        Args: {
+          p_action: string
+          p_actor_id: string
+          p_allocation_id: string
+          p_client_id: string
+          p_entry_id: string
+          p_operation_id: string
+          p_payload: Json
+          p_raffle_id: string
+          p_request_fingerprint: string
+        }
+        Returns: Json
+      }
       merge_verified_customer_guest_cart: {
         Args: {
           p_auth_user_id: string
@@ -1149,6 +1163,20 @@ export type Database = {
         }[]
       }
       publish_homepage_hero: { Args: { target_id: string }; Returns: boolean }
+      publish_raffle_result: {
+        Args: {
+          p_actor_id: string
+          p_client_id: string
+          p_operation_id: string
+          p_raffle_id: string
+          p_request_fingerprint: string
+        }
+        Returns: Json
+      }
+      read_raffle_entries_for_admin: {
+        Args: { p_raffle_id: string }
+        Returns: Json
+      }
       read_verified_customer_cart: {
         Args: { p_auth_user_id: string }
         Returns: Json
