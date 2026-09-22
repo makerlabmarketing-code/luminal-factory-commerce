@@ -124,20 +124,45 @@ The client UI is not the sole enforcement layer.
 
 Winner selection is an operational process.
 
-The ERP should own winner management and administrative selection workflow.
+The ERP owns winner management, administrative selection, shipping amount confirmation, payment follow-up, fulfillment tracking, cancellation and manual reallocation.
 
 The storefront may:
 
 - show customer winner status
 - show payment deadline
-- allow authorized winner payment
-- show public results when approved
+- show approved public results
+- expose only the customer-facing payment or fulfillment surfaces explicitly approved for a release
 
 The storefront must not expose privileged winner selection capabilities.
+
+Winner allocation is separate from the raffle entry and from the raffle event lifecycle. The first approved operational direction uses these conceptual allocation states:
+
+- SELECTED
+- CONFIRMED
+- PAYMENT_PENDING
+- PAID
+- FULFILLING
+- COMPLETED
+- CANCELLED
+- REALLOCATED
+
+A cancelled or reallocated winner relationship must preserve history rather than rewriting the original entry.
+
+Automatic payment expiry and fallback-winner selection are deferred for the initial low-volume workflow; ERP staff may perform those transitions manually with audit history.
 
 ## Payment
 
 Payments represent financial transactions.
+
+For the first raffle fulfillment workflow, ERP may send payment instructions and staff may manually verify receipt. Sending a winner email or payment instruction does not mean payment succeeded.
+
+A winner amount due is conceptually:
+
+    product amount
+    + explicit shipping charge
+    = amount due
+
+Do not overwrite catalog product price to absorb shipping.
 
 Revenue must derive from successful payment transactions and refunds.
 
@@ -164,6 +189,8 @@ An order may originate from:
 A raffle entry itself is not an order.
 
 Do not create an order for every unsuccessful raffle entry.
+
+The winner-to-order transition must be explicit and trusted. The resulting fulfillment obligation must preserve linkage to the raffle, original entry, winner allocation, selected product/variant and authoritative payment context.
 
 ## Refund
 
@@ -294,6 +321,14 @@ Archive records or public archive presentation may include:
 - historical availability
 
 The archive is part of Luminal Factory's brand memory.
+
+## Raffle ERP Fulfillment Contract
+
+The approved business-flow specification for winner operations, shipping, email, payment confirmation, fulfillment and manual reallocation is:
+
+    specs/raffle/raffle-winner-erp-fulfillment-specification.md
+
+ERP remains the operational owner. Commerce remains the owner of public raffle experience and the final privileged Commerce mutation boundary.
 
 ## Domain Change Rule
 
