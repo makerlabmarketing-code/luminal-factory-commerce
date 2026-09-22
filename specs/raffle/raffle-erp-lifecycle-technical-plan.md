@@ -4,11 +4,13 @@
 
 - Prepared: 2026-09-22
 - Business flow: approved
-- Production data/schema writes: not authorized
+- Application status: `HOME_COUNTDOWN_SLICE_IMPLEMENTED_DEFAULT_OFF`
+- Schema package status: `DRAFT_FORWARD_ROLLBACK_VALIDATION_PREPARED`
+- Production data/schema writes: `LIVE_APPROVAL_REQUIRED`
 - Runtime/email activation: not authorized
-- Execution gate: `RAFFLE-ERP-LIFECYCLE-01`
+- Execution gate: `RAFFLE-ERP-LIFECYCLE-01` approved for repository implementation
 - Shipping-data decision: `OPTION_B_FULL_ADDRESS_AT_ENTRY_APPROVED_2026-09-22`
-- Remaining Production gate: schema/API implementation approval
+- Next live gate: `RAFFLE-ERP-SCHEMA-01`
 
 ## Current Production facts
 
@@ -282,6 +284,25 @@ Rules:
 - non-winner shipping PII needs a separately approved retention/deletion rule before live raffle activation
 
 The guest-entry request fingerprint/idempotency contract must include the normalized shipping payload. A replay with the same request token but different shipping data fails closed.
+
+## Prepared schema package
+
+Repository-only SQL drafts are prepared and are **not** under `supabase/migrations`:
+
+- `specs/raffle/sql/20260922_raffle_erp_lifecycle_forward.sql`
+- `specs/raffle/sql/20260922_raffle_erp_lifecycle_rollback.sql`
+- `specs/raffle/sql/20260922_raffle_erp_lifecycle_validation.sql`
+
+The forward draft covers:
+
+- private raffle-entry shipping PII
+- test-raffle isolation via `raffles.is_test`
+- optional raffle variant linkage
+- winner allocations + immutable transition evidence
+- private order shipping snapshot
+- additive `submit_guest_raffle_entry_v2` so the current RPC remains compatible during rollout
+
+No SQL has been executed. Promotion to `supabase/migrations`, rollback validation against Production, or any Production apply requires explicit `RAFFLE-ERP-SCHEMA-01` approval.
 
 ## Schema/package work after gate approval
 
