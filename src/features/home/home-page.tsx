@@ -8,6 +8,8 @@ import { getHeroModelPresentation } from "./hero-model-data";
 import { HeroObjectStage } from "./hero-object-stage";
 import { HeroTextMotionController } from "./hero-copy-motion";
 import { HomeDriftWall } from "./home-drift-wall";
+import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
+import { getHomeFeaturedRaffle } from "@/features/raffle/raffle-home-service";
 
 type HomeMediaFrameProps = Readonly<{
   media: HomeMediaContract;
@@ -35,11 +37,15 @@ function HomeMediaFrame({ media, className, imageClassName, placeholderClassName
 
 export async function HomePage() {
   const content = homePageContent;
-  const heroPresentation = await getHeroModelPresentation();
+  const [heroPresentation, featuredRaffle] = await Promise.all([
+    getHeroModelPresentation(),
+    getHomeFeaturedRaffle(),
+  ]);
   const heroTitleWords = content.hero.title.trim().split(/\s+/);
 
   return (
     <main id="main-content" className="wave-home">
+      {featuredRaffle ? <HomeRaffleSpotlight raffle={featuredRaffle} /> : null}
       <section className="revival-hero" aria-labelledby="hero-title">
         <div className="hero-atmosphere" aria-hidden="true" />
         <Container className="revival-hero-inner lg:!grid-cols-[minmax(0,.72fr)_minmax(28rem,1.28fr)] lg:!gap-[clamp(2rem,5vw,6rem)]">
