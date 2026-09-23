@@ -49,6 +49,13 @@ test("HOME-3D-PATH-02 terminates at Meet Meowhe and turns the camera left", () =
   assert.match(immersive, /luminal:hero-orbit-offset/);
 });
 
+test("desktop Meowhe scales down before Brand Revival enters the viewport", () => {
+  const immersive = read("src/features/home/home-immersive-experience.tsx");
+  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.98[\s\S]*?scale: 0\.54[\s\S]*?opacity: 1/);
+  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.80[\s\S]*?scale: 0\.42[\s\S]*?opacity: 0\.62/);
+  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.64[\s\S]*?scale: 0\.32[\s\S]*?opacity: 0/);
+});
+
 test("Hero 3D follows pointer on desktop and the same persistent GLB travels on mobile", () => {
   const stage = read("src/features/home/hero-object-stage.tsx");
   const home = read("src/features/home/home-page.tsx");
