@@ -600,11 +600,16 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
 
 @media (max-width: 899px) {
   .wave-home[data-home-immersive="true"] .revival-hero {
+    min-height: 118svh;
     overflow: hidden;
   }
 
+  .wave-home[data-home-immersive="true"] .revival-hero-inner {
+    min-height: 118svh;
+  }
+
   .home-hero-object-corridor {
-    min-height: 31rem;
+    min-height: 36svh;
   }
 
   .home-hero-object-note {

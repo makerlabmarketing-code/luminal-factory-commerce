@@ -211,11 +211,11 @@
   .modelLayer {
     position: fixed;
     z-index: 1;
-    top: 38svh;
-    left: -10vw;
+    top: 66svh;
+    left: 2vw;
     right: auto;
-    width: 120vw;
-    height: min(54svh, 34rem);
+    width: 96vw;
+    height: min(34svh, 24rem);
     transform-origin: 50% 50%;
     pointer-events: none;
   }

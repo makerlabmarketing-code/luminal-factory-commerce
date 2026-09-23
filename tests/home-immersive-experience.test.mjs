@@ -63,6 +63,18 @@ test("Hero 3D follows pointer on desktop and the same persistent GLB travels on 
   assert.doesNotMatch(home, /home-object-mobile-stage/);
 });
 
+test("mobile Hero reserves a lower safe stage before the GLB travels upward", () => {
+  const immersive = read("src/features/home/home-immersive-experience.tsx");
+  const css = read("src/features/home/home-immersive-experience.module.css");
+  const global = read("src/app/globals.css");
+  assert.match(immersive, /scale: 0\.88/);
+  assert.match(immersive, /yVh: -34/);
+  assert.match(css, /top: 66svh/);
+  assert.match(css, /width: 96vw/);
+  assert.match(global, /min-height: 118svh/);
+  assert.match(global, /home-hero-object-corridor[\s\S]*min-height: 36svh/);
+});
+
 test("immersive Home remains bounded by raffle, mobile and reduced-motion priorities", () => {
   const home = read("src/features/home/home-page.tsx");
   const immersive = read("src/features/home/home-immersive-experience.tsx");

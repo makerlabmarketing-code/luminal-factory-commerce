@@ -44,7 +44,7 @@ const desktopStates: ReadonlyArray<MotionDefinition> = [
     section: "hero",
     anchor: "top",
     viewportOffset: 0,
-    state: { xVw: 0, yVh: 0, scale: 1, rotationDeg: 0, orbitDeg: 0, opacity: 1 },
+    state: { xVw: 0, yVh: 0, scale: 0.88, rotationDeg: 0, orbitDeg: 0, opacity: 1 },
   },
   {
     section: "featured",
@@ -71,13 +71,13 @@ const compactStates: ReadonlyArray<MotionDefinition> = [
     section: "featured",
     anchor: "top",
     viewportOffset: 0.7,
-    state: { xVw: -7, yVh: -22, scale: 0.76, rotationDeg: -2.5, orbitDeg: -28, opacity: 1 },
+    state: { xVw: -6, yVh: -34, scale: 0.80, rotationDeg: -2.5, orbitDeg: -28, opacity: 1 },
   },
   {
     section: "featured",
     anchor: "bottom",
     viewportOffset: 0.42,
-    state: { xVw: -8, yVh: -24, scale: 0.70, rotationDeg: -3.5, orbitDeg: -34, opacity: 0 },
+    state: { xVw: -7, yVh: -38, scale: 0.74, rotationDeg: -3.5, orbitDeg: -34, opacity: 0 },
   },
 ];
 
