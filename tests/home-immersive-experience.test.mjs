@@ -85,6 +85,18 @@ test("mobile Hero reserves a lower safe stage then fades and zooms out before Br
   assert.match(global, /home-hero-object-corridor[\s\S]*min-height: 36svh/);
 });
 
+test("Made at Luminal collapsed cards expose their step title in the sticky strip", () => {
+  const home = read("src/features/home/home-page.tsx");
+  const stack = read("src/features/home/made-at-luminal-stack.tsx");
+  assert.match(home, /MadeAtLuminalStack/);
+  assert.match(home, /<MadeAtLuminalStack steps=\{content\.process\} \/>/);
+  assert.match(stack, /data-process-collapsed/);
+  assert.match(stack, /nextStickyTop/);
+  assert.match(stack, /\{step\.number\} \/ \{step\.title\}/);
+  assert.match(stack, /top-\[0\.22rem\]/);
+  assert.match(stack, /motion-reduce:static/);
+});
+
 test("immersive Home remains bounded by raffle, mobile and reduced-motion priorities", () => {
   const home = read("src/features/home/home-page.tsx");
   const immersive = read("src/features/home/home-immersive-experience.tsx");
