@@ -32,12 +32,14 @@ const INTRO_MAXIMUM_MS = 4800;
 const LOGO_DOCK_MS = 1080;
 const MOTION_EPSILON = 0.002;
 
-const desktopStates: ReadonlyArray<Readonly<{
+type MotionDefinition = Readonly<{
   section: "hero" | "featured";
   anchor: "top" | "bottom";
   viewportOffset: number;
   state: MotionState;
-}>> = [
+}>;
+
+const desktopStates: ReadonlyArray<MotionDefinition> = [
   {
     section: "hero",
     anchor: "top",
@@ -55,6 +57,27 @@ const desktopStates: ReadonlyArray<Readonly<{
     anchor: "bottom",
     viewportOffset: 0.34,
     state: { xVw: -40, yVh: 6, scale: 0.67, rotationDeg: -4.5, orbitDeg: -35, opacity: 0 },
+  },
+];
+
+const compactStates: ReadonlyArray<MotionDefinition> = [
+  {
+    section: "hero",
+    anchor: "top",
+    viewportOffset: 0,
+    state: { xVw: 0, yVh: 0, scale: 1, rotationDeg: 0, orbitDeg: 0, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "top",
+    viewportOffset: 0.7,
+    state: { xVw: -7, yVh: -22, scale: 0.76, rotationDeg: -2.5, orbitDeg: -28, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "bottom",
+    viewportOffset: 0.42,
+    state: { xVw: -8, yVh: -24, scale: 0.70, rotationDeg: -3.5, orbitDeg: -34, opacity: 0 },
   },
 ];
 
@@ -234,13 +257,15 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     const layer = modelLayerRef.current;
     if (!layer) return;
 
-    const desktopMotion = window.matchMedia("(min-width: 900px) and (hover: hover) and (pointer: fine)");
+    const compactMotion = window.matchMedia("(max-width: 1023px), (hover: none) and (pointer: coarse)");
+    const interactivePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (!desktopMotion.matches || reducedMotion.matches) return;
+    if (reducedMotion.matches) return;
 
+    let motionStates: ReadonlyArray<MotionDefinition> = compactMotion.matches ? compactStates : desktopStates;
     let keyframes: MotionKeyframe[] = [];
     let frameHandle: number | null = null;
-    let current: MotionState = desktopStates[0].state;
+    let current: MotionState = motionStates[0].state;
     let target: MotionState = current;
 
     const apply = (state: MotionState) => {
@@ -257,7 +282,8 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
     const rebuildKeyframes = () => {
       const viewportHeight = window.innerHeight;
-      keyframes = desktopStates.flatMap(({ section, anchor, viewportOffset, state }) => {
+      motionStates = compactMotion.matches ? compactStates : desktopStates;
+      keyframes = motionStates.flatMap(({ section, anchor, viewportOffset, state }) => {
         const element = document.querySelector<HTMLElement>(`[data-home-3d-section="${section}"]`);
         if (!element) return [];
         const rect = element.getBoundingClientRect();
@@ -273,7 +299,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
     const animate = () => {
       frameHandle = null;
-      const blend = 0.115;
+      const blend = compactMotion.matches ? 0.16 : 0.115;
       current = {
         xVw: interpolate(current.xVw, target.xVw, blend),
         yVh: interpolate(current.yVh, target.yVh, blend),
@@ -292,7 +318,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     const schedule = () => {
       target = readMotionState(window.scrollY, keyframes);
       const featured = keyframes[1]?.scrollY ?? window.innerHeight;
-      layer.style.pointerEvents = window.scrollY < featured ? "auto" : "none";
+      layer.style.pointerEvents = interactivePointer.matches && window.scrollY < featured ? "auto" : "none";
       if (frameHandle === null) frameHandle = window.requestAnimationFrame(animate);
     };
 
@@ -325,7 +351,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
   return (
     <div className={styles.experience} data-home-immersive-experience="true">
       <div ref={modelLayerRef} className={styles.modelLayer} data-home-immersive-model="true">
-        <HeroObjectStage media={media} presentation={presentation} preload />
+        <HeroObjectStage media={media} presentation={presentation} preload allowTouch3d />
       </div>
 
       <div className={styles.introRoot} data-phase={phase} aria-hidden={phase === "done" ? "true" : undefined}>

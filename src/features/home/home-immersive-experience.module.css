@@ -200,23 +200,24 @@
   100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0) brightness(1.08); }
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1023px), (hover: none) and (pointer: coarse) {
   .experience {
-    position: absolute;
-    inset: 0 auto auto 0;
+    position: fixed;
+    inset: 0;
     width: 100%;
     height: 100svh;
   }
 
   .modelLayer {
-    position: absolute;
-    z-index: 2;
-    inset: 12rem -18vw auto -18vw;
-    width: auto;
-    height: 32rem;
-    opacity: 1 !important;
-    transform: none !important;
-    pointer-events: none !important;
+    position: fixed;
+    z-index: 1;
+    top: 38svh;
+    left: -10vw;
+    right: auto;
+    width: 120vw;
+    height: min(54svh, 34rem);
+    transform-origin: 50% 50%;
+    pointer-events: none;
   }
 
   .blueprint {

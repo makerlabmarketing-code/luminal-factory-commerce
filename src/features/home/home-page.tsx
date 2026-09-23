@@ -95,17 +95,9 @@ export async function HomePage() {
         >
           <Container className="featured-object-grid">
             {immersive ? (
-              <div className="home-object-corridor">
-                <span aria-hidden="true" />
-                <i aria-hidden="true" />
-                <div className="home-object-mobile-stage">
-                  <HeroObjectStage
-                    media={homePageMedia.hero}
-                    presentation={heroPresentation}
-                    allowTouch3d
-                    mobileOnly
-                  />
-                </div>
+              <div className="home-object-corridor" aria-hidden="true">
+                <span />
+                <i />
               </div>
             ) : (
               <HomeMediaFrame
