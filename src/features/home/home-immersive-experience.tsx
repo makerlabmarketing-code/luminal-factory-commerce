@@ -227,12 +227,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       brandAnimation?.cancel();
       unlock();
     };
-  }, [
-    enabled,
-    presentation.camera.phiDeg,
-    presentation.camera.radiusPercent,
-    presentation.camera.thetaDeg,
-  ]);
+  }, [enabled]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -320,7 +315,12 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       layer.style.transform = "";
       layer.style.opacity = "";
     };
-  }, [enabled]);
+  }, [
+    enabled,
+    presentation.camera.phiDeg,
+    presentation.camera.radiusPercent,
+    presentation.camera.thetaDeg,
+  ]);
 
   if (!enabled) return null;
 
