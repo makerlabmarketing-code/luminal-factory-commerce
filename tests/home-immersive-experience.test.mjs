@@ -63,12 +63,15 @@ test("Hero 3D follows pointer on desktop and the same persistent GLB travels on 
   assert.doesNotMatch(home, /home-object-mobile-stage/);
 });
 
-test("mobile Hero reserves a lower safe stage before the GLB travels upward", () => {
+test("mobile Hero reserves a lower safe stage then fades and zooms out before Brand Revival", () => {
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   const css = read("src/features/home/home-immersive-experience.module.css");
   const global = read("src/app/globals.css");
-  assert.match(immersive, /scale: 0\.88/);
-  assert.match(immersive, /yVh: -34/);
+  assert.match(immersive, /const desktopStates[\s\S]*?scale: 1,/);
+  assert.match(immersive, /const compactStates[\s\S]*?yVh: -34[\s\S]*?scale: 0\.80/);
+  assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.44[\s\S]*?opacity: 1/);
+  assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.22[\s\S]*?scale: 0\.60[\s\S]*?opacity: 0\.42/);
+  assert.match(immersive, /const compactStates[\s\S]*?anchor: "bottom"[\s\S]*?viewportOffset: 0\.96[\s\S]*?scale: 0\.48[\s\S]*?opacity: 0/);
   assert.match(css, /top: 66svh/);
   assert.match(css, /width: 96vw/);
   assert.match(global, /min-height: 118svh/);
