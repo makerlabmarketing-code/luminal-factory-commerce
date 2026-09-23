@@ -48,13 +48,13 @@ const desktopStates: ReadonlyArray<Readonly<{
     section: "featured",
     anchor: "top",
     viewportOffset: 0.52,
-    state: { xVw: -38, yVh: 7, scale: 0.71, rotationDeg: 4.5, orbitDeg: 18, opacity: 1 },
+    state: { xVw: -39, yVh: 7, scale: 0.70, rotationDeg: 3.5, orbitDeg: 32, opacity: 1 },
   },
   {
     section: "featured",
     anchor: "bottom",
     viewportOffset: 0.34,
-    state: { xVw: -39, yVh: 6, scale: 0.68, rotationDeg: 5.5, orbitDeg: 20, opacity: 0 },
+    state: { xVw: -40, yVh: 6, scale: 0.67, rotationDeg: 4.5, orbitDeg: 35, opacity: 0 },
   },
 ];
 
@@ -248,13 +248,11 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         `translate3d(${state.xVw.toFixed(3)}vw, ${state.yVh.toFixed(3)}vh, 0) scale(${state.scale.toFixed(4)}) rotate(${state.rotationDeg.toFixed(3)}deg)`;
       layer.style.opacity = state.opacity.toFixed(4);
 
-      const viewer = layer.querySelector<HTMLElement>("model-viewer");
-      if (viewer) {
-        viewer.setAttribute(
-          "camera-orbit",
-          `${presentation.camera.thetaDeg + state.orbitDeg}deg ${presentation.camera.phiDeg}deg ${presentation.camera.radiusPercent}%`,
-        );
-      }
+      window.dispatchEvent(
+        new CustomEvent("luminal:hero-orbit-offset", {
+          detail: { orbitDeg: state.orbitDeg },
+        }),
+      );
     };
 
     const rebuildKeyframes = () => {

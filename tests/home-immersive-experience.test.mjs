@@ -33,7 +33,7 @@ test("HOME-HERO-LAYOUT-02 moves the traveling object outside the clipped main co
   const immersive = read("src/features/home/home-immersive-experience.module.css");
   assert.match(home, /<HomeImmersiveExperience[\s\S]*?<main id="main-content"/);
   assert.match(home, /home-hero-object-corridor/);
-  assert.match(home, /Object in motion · Meowhe/);
+  assert.doesNotMatch(home, /Our browser-safe 3D study introduces the character/);
   assert.match(home, /featured-object-immersive/);
   assert.match(immersive, /position: fixed/);
 });
@@ -44,10 +44,22 @@ test("HOME-3D-PATH-02 terminates at Meet Meowhe and turns the camera right", () 
   assert.match(immersive, /section: "hero" \| "featured"/);
   assert.doesNotMatch(immersive, /section: "hero" \| "featured" \| "revival"/);
   assert.match(immersive, /anchor: "bottom"/);
-  assert.match(immersive, /xVw: -38/);
-  assert.match(immersive, /orbitDeg: 18/);
-  assert.match(immersive, /camera-orbit/);
-  assert.match(immersive, /presentation\.camera\.thetaDeg \+ state\.orbitDeg/);
+  assert.match(immersive, /xVw: -39/);
+  assert.match(immersive, /orbitDeg: 32/);
+  assert.match(immersive, /luminal:hero-orbit-offset/);
+});
+
+test("Hero 3D follows pointer without click-drag and mobile Meet keeps a 3D presentation", () => {
+  const stage = read("src/features/home/hero-object-stage.tsx");
+  const home = read("src/features/home/home-page.tsx");
+  assert.match(stage, /pointer-follow-and-recenter/);
+  assert.doesNotMatch(stage, /setPointerCapture/);
+  assert.doesNotMatch(stage, /pointerdown/);
+  assert.match(stage, /normalizedX/);
+  assert.match(stage, /allowTouch3d/);
+  assert.match(stage, /mobileOnly/);
+  assert.match(home, /allowTouch3d/);
+  assert.match(home, /mobileOnly/);
 });
 
 test("immersive Home remains bounded by raffle, mobile and reduced-motion priorities", () => {

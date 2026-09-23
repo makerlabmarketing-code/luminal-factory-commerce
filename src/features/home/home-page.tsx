@@ -81,13 +81,7 @@ export async function HomePage() {
             <div className="home-hero-object-corridor relative min-w-0 lg:-mr-[min(7vw,7rem)] lg:pt-6">
               {featuredRaffle ? (
                 <HeroObjectStage media={homePageMedia.hero} presentation={heroPresentation} />
-              ) : (
-                <div className="home-hero-object-note" data-hero-copy-support>
-                  <p className="eyebrow">Object in motion · Meowhe</p>
-                  <p>Our browser-safe 3D study introduces the character as a physical object, then lets it travel with you through the first chapters of Luminal.</p>
-                  <span aria-hidden="true">Drag to inspect · Scroll to follow</span>
-                </div>
-              )}
+              ) : null}
             </div>
 
             <p className="hero-scroll-note" aria-hidden="true">Scroll to follow the object <span>↓</span></p>
@@ -101,9 +95,17 @@ export async function HomePage() {
         >
           <Container className="featured-object-grid">
             {immersive ? (
-              <div className="home-object-corridor" aria-hidden="true">
-                <span />
-                <i />
+              <div className="home-object-corridor">
+                <span aria-hidden="true" />
+                <i aria-hidden="true" />
+                <div className="home-object-mobile-stage">
+                  <HeroObjectStage
+                    media={homePageMedia.hero}
+                    presentation={heroPresentation}
+                    allowTouch3d
+                    mobileOnly
+                  />
+                </div>
               </div>
             ) : (
               <HomeMediaFrame
