@@ -176,7 +176,7 @@ export async function HomePage() {
 
         <section className="made-at-luminal section overflow-visible" aria-labelledby="making-title">
           <Container>
-            <header className="editorial-heading md:sticky md:top-20 md:z-0 md:pb-8" data-luminal-reveal="copy">
+            <header className="editorial-heading md:sticky md:top-20 md:z-0 md:pb-8" data-luminal-reveal="copy" data-made-at-luminal-header="true">
               <div><p className="eyebrow">Made at Luminal</p><h2 id="making-title">From thought<br />to artifact.</h2></div>
               <p>Four measured movements. Digital tools support the process; the final character still comes from the hand.</p>
             </header>
