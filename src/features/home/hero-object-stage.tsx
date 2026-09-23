@@ -8,6 +8,9 @@ import type { HeroModelPresentation } from "./hero-model-config";
 type HeroObjectStageProps = Readonly<{
   media: HomeMediaContract;
   presentation: HeroModelPresentation;
+  preload?: boolean;
+  allowTouch3d?: boolean;
+  mobileOnly?: boolean;
 }>;
 
 type NetworkInformationLike = {
@@ -28,10 +31,8 @@ const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
-const HERO_DRAG_YAW_MAX_DEG = 22;
-const HERO_DRAG_PITCH_MAX_DEG = 8;
-const HERO_DRAG_YAW_DEG_PER_PIXEL = 0.16;
-const HERO_DRAG_PITCH_DEG_PER_PIXEL = 0.1;
+const HERO_POINTER_YAW_MAX_DEG = 18;
+const HERO_POINTER_PITCH_MAX_DEG = 6;
 const HERO_POINTER_FOLLOW_RATE = 20;
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
 
@@ -65,7 +66,13 @@ function ensureModelViewer() {
   });
 }
 
-export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
+export function HeroObjectStage({
+  media,
+  presentation,
+  preload = false,
+  allowTouch3d = false,
+  mobileOnly = false,
+}: HeroObjectStageProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
@@ -78,6 +85,9 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     const preview = previewRef.current;
     const mount = modelMountRef.current;
     if (!stage || !mount || media.availability !== "available") return;
+
+    const mobileViewport = window.matchMedia("(max-width: 899px)").matches;
+    if (mobileOnly && !mobileViewport) return;
 
     mount.style.display = "";
     mount.style.opacity = "0";
@@ -94,7 +104,11 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     const constrainedNetwork = connection?.saveData === true
       || connection?.effectiveType === "slow-2g"
       || connection?.effectiveType === "2g";
-    const posterOnly = !finePointer || constrainedNetwork;
+    const posterOnly = constrainedNetwork || (!finePointer && !allowTouch3d);
+    const signalObjectReady = (mode: string) => {
+      document.documentElement.dataset.luminalHeroObjectReady = mode;
+      window.dispatchEvent(new CustomEvent("luminal:hero-object-ready", { detail: { mode } }));
+    };
 
     if (posterOnly) {
       stage.dataset.heroMode = !finePointer ? "poster-coarse-pointer" : "poster-constrained-network";
@@ -104,6 +118,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         preview.style.visibility = "visible";
         preview.style.opacity = "1";
       }
+      signalObjectReady("poster");
       return;
     }
 
@@ -124,7 +139,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
     let fallbackTimeout: number | null = null;
     let pointerAnimationFrame: number | null = null;
     let previousPointerFrameTime = performance.now();
-    let pointerDrag: { pointerId: number; x: number; y: number; pitchDeg: number; yawDeg: number } | null = null;
+    let scrollOrbitOffsetDeg = 0;
     const pointerTarget = { pitchDeg: 0, yawDeg: 0 };
     const pointerCurrent = { pitchDeg: 0, yawDeg: 0 };
 
@@ -133,7 +148,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       if (!viewer) return;
       viewer.setAttribute(
         "camera-orbit",
-        `${presentation.camera.thetaDeg - pointerCurrent.yawDeg}deg ${presentation.camera.phiDeg - pointerCurrent.pitchDeg}deg ${presentation.camera.radiusPercent}%`,
+        `${presentation.camera.thetaDeg + scrollOrbitOffsetDeg - pointerCurrent.yawDeg}deg ${presentation.camera.phiDeg - pointerCurrent.pitchDeg}deg ${presentation.camera.radiusPercent}%`,
       );
     };
 
@@ -165,47 +180,29 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       pointerAnimationFrame = window.requestAnimationFrame(animatePointerTilt);
     };
 
-    const handlePointerDown = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
-      if (event.pointerType === "mouse" && event.button !== 0) return;
-
-      pointerDrag = {
-        pointerId: event.pointerId,
-        x: event.clientX,
-        y: event.clientY,
-        pitchDeg: pointerTarget.pitchDeg,
-        yawDeg: pointerTarget.yawDeg,
-      };
-      stage.setPointerCapture(event.pointerId);
-      stage.style.cursor = "grabbing";
-    };
-
     const handlePointerMove = (event: PointerEvent) => {
-      if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
+      if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+      const rect = stage.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
 
-      pointerTarget.yawDeg = clamp(
-        pointerDrag.yawDeg + (event.clientX - pointerDrag.x) * HERO_DRAG_YAW_DEG_PER_PIXEL,
-        -HERO_DRAG_YAW_MAX_DEG,
-        HERO_DRAG_YAW_MAX_DEG,
-      );
-      pointerTarget.pitchDeg = clamp(
-        pointerDrag.pitchDeg + (event.clientY - pointerDrag.y) * HERO_DRAG_PITCH_DEG_PER_PIXEL,
-        -HERO_DRAG_PITCH_MAX_DEG,
-        HERO_DRAG_PITCH_MAX_DEG,
-      );
+      const normalizedX = clamp(((event.clientX - rect.left) / rect.width) * 2 - 1, -1, 1);
+      const normalizedY = clamp(((event.clientY - rect.top) / rect.height) * 2 - 1, -1, 1);
+
+      pointerTarget.yawDeg = normalizedX * HERO_POINTER_YAW_MAX_DEG;
+      pointerTarget.pitchDeg = normalizedY * HERO_POINTER_PITCH_MAX_DEG;
       startPointerTilt();
     };
 
-    const settlePointerTilt = (event?: PointerEvent) => {
-      if (event && pointerDrag && event.pointerId !== pointerDrag.pointerId) return;
-      if (pointerDrag && stage.hasPointerCapture(pointerDrag.pointerId)) {
-        stage.releasePointerCapture(pointerDrag.pointerId);
-      }
-      pointerDrag = null;
-      stage.style.cursor = "grab";
+    const settlePointerTilt = () => {
       pointerTarget.pitchDeg = 0;
       pointerTarget.yawDeg = 0;
       startPointerTilt();
+    };
+
+    const handleScrollOrbit = (event: Event) => {
+      const detail = (event as CustomEvent<{ orbitDeg?: number }>).detail;
+      scrollOrbitOffsetDeg = clamp(detail?.orbitDeg ?? 0, -45, 45);
+      applyPointerOrbit();
     };
 
     const showError = () => {
@@ -217,6 +214,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         preview.style.display = "none";
         preview.style.visibility = "hidden";
       }
+      signalObjectReady("fallback-error");
     };
 
     const mountViewer = async () => {
@@ -251,17 +249,18 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         viewer.setAttribute("max-field-of-view", `${presentation.camera.maxFieldOfViewDeg}deg`);
         viewer.setAttribute("camera-target", "auto auto auto");
 
-        if (!reducedMotion) {
-          stage.style.cursor = "grab";
-          stage.addEventListener("pointerdown", handlePointerDown);
+        if (!reducedMotion && finePointer) {
           stage.addEventListener("pointermove", handlePointerMove);
           stage.addEventListener("pointerleave", settlePointerTilt);
-          stage.addEventListener("pointerup", settlePointerTilt);
-          stage.addEventListener("pointercancel", settlePointerTilt);
         }
+        window.addEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
         viewer.addEventListener("load", () => {
-          stage.dataset.heroMode = reducedMotion ? "enhanced-static" : "enhanced-drag-to-rotate";
+          stage.dataset.heroMode = reducedMotion
+            ? "enhanced-static"
+            : finePointer
+              ? "enhanced-pointer-follow"
+              : "enhanced-touch-static";
           if (loaderRef.current) {
             loaderRef.current.style.opacity = "0";
             window.setTimeout(() => {
@@ -270,6 +269,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
           }
           if (errorRef.current) errorRef.current.style.opacity = "0";
           mount.style.opacity = "1";
+          signalObjectReady("3d");
         }, { once: true });
 
         viewer.addEventListener("error", showError, { once: true });
@@ -298,13 +298,17 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       }, HERO_IDLE_FALLBACK_MS);
     };
 
-    observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer?.disconnect();
-      scheduleMountViewer();
-    }, { rootMargin: "160px" });
+    if (preload) {
+      void mountViewer();
+    } else {
+      observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer?.disconnect();
+        scheduleMountViewer();
+      }, { rootMargin: "160px" });
 
-    observer.observe(stage);
+      observer.observe(stage);
+    }
 
     return () => {
       cancelled = true;
@@ -316,26 +320,25 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       }
       if (fallbackTimeout !== null) window.clearTimeout(fallbackTimeout);
       if (pointerAnimationFrame !== null) window.cancelAnimationFrame(pointerAnimationFrame);
-      stage.removeEventListener("pointerdown", handlePointerDown);
       stage.removeEventListener("pointermove", handlePointerMove);
       stage.removeEventListener("pointerleave", settlePointerTilt);
-      stage.removeEventListener("pointerup", settlePointerTilt);
-      stage.removeEventListener("pointercancel", settlePointerTilt);
-      stage.style.cursor = "";
+      window.removeEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
       viewerRef.current = null;
       mount.replaceChildren();
     };
-  }, [media.alt, media.availability, presentation]);
+  }, [allowTouch3d, media.alt, media.availability, mobileOnly, preload, presentation]);
 
   return (
     <div
       ref={stageRef}
-      className="hero-object-stage group select-none !min-h-[30rem] !overflow-visible !border-0 !bg-transparent lg:!min-h-[46rem]"
+      className={`hero-object-stage group select-none !min-h-[30rem] !overflow-visible !border-0 !bg-transparent lg:!min-h-[46rem] ${mobileOnly ? "hero-object-stage-mobile-only" : ""}`}
       data-hero-renderer="model-viewer"
-      data-hero-interaction="drag-to-rotate-and-recenter"
+      data-hero-interaction={mobileOnly ? "touch-static" : "pointer-follow-and-recenter"}
       data-hero-mode="capability-gated"
       data-hero-tint={presentation.tint ?? "default"}
+      data-hero-preload={preload ? "true" : "false"}
+      data-hero-mobile-only={mobileOnly ? "true" : "false"}
     >
       {media.availability === "available" ? (
         <>

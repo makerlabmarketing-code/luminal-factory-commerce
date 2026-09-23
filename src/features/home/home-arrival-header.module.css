@@ -1,0 +1,360 @@
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 80;
+  pointer-events: none;
+}
+
+.shell {
+  position: relative;
+  width: min(calc(100% - 2rem), 88rem);
+  height: 5.5rem;
+  margin-inline: auto;
+}
+
+.rail {
+  position: absolute;
+  z-index: 0;
+  left: 1.6rem;
+  right: 1.6rem;
+  top: 1rem;
+  height: 3.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(238, 248, 255, 0.055), rgba(255, 255, 255, 0.025) 42%, rgba(243, 201, 232, 0.035)),
+    rgba(5, 5, 5, 0.66);
+  box-shadow: 0 0.75rem 3rem rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  transform: scaleX(0.035);
+  transform-origin: 1.75rem 50%;
+  transition:
+    transform 760ms cubic-bezier(.22, 1, .36, 1) 120ms,
+    opacity 360ms ease 90ms;
+}
+
+.logoDock,
+.menuButton {
+  position: absolute;
+  z-index: 4;
+  top: 1rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(8, 8, 9, 0.88);
+  box-shadow: 0 0.85rem 2.8rem rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(18px);
+}
+
+.logoDock {
+  left: 1.6rem;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.84);
+  transition:
+    opacity 120ms ease,
+    transform 460ms cubic-bezier(.16, 1, .3, 1);
+  pointer-events: none;
+}
+
+.logoDock::before,
+.logoDock::after {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  z-index: -1;
+  border: 1px solid rgba(185, 233, 255, 0.28);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+  pointer-events: none;
+}
+
+.logoDock img {
+  width: 2.75rem;
+  height: 2.75rem;
+  object-fit: contain;
+}
+
+.railLabel {
+  position: absolute;
+  z-index: 2;
+  left: 5.85rem;
+  top: 2.72rem;
+  transform: translateY(-50%);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(242, 242, 240, 0.38);
+  opacity: 0;
+  filter: blur(5px);
+  transition:
+    opacity 420ms ease 360ms,
+    filter 500ms ease 360ms;
+}
+
+.desktopNav {
+  position: absolute;
+  z-index: 3;
+  top: 1rem;
+  right: 1.6rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.42rem;
+  padding: 0.36rem 0.4rem;
+  pointer-events: none;
+}
+
+.navBubble {
+  --nav-index: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 32% 16%, rgba(185, 233, 255, 0.055), transparent 48%),
+    rgba(11, 11, 12, 0.78);
+  color: rgba(242, 242, 240, 0.72);
+  font-size: 0.69rem;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateY(-0.45rem) scale(0.78);
+  filter: blur(3px);
+  box-shadow: 0 0.35rem 1.6rem rgba(0, 0, 0, 0.16);
+  transition:
+    opacity 300ms ease calc(390ms + var(--nav-index) * 55ms),
+    transform 680ms cubic-bezier(.16, 1.24, .28, 1) calc(360ms + var(--nav-index) * 55ms),
+    filter 420ms ease calc(390ms + var(--nav-index) * 55ms),
+    border-color 200ms ease,
+    background 200ms ease,
+    color 200ms ease;
+}
+
+.navBubble:hover {
+  border-color: rgba(185, 233, 255, 0.28);
+  background:
+    radial-gradient(circle at 32% 16%, rgba(185, 233, 255, 0.11), transparent 50%),
+    rgba(17, 18, 20, 0.96);
+  color: #f2f2f0;
+}
+
+.menuButton {
+  right: 0.55rem;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  padding: 0;
+  color: #f2f2f0;
+  cursor: pointer;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.62);
+  transition:
+    opacity 260ms ease 510ms,
+    transform 620ms cubic-bezier(.18, 1.45, .32, 1) 450ms,
+    border-color 220ms ease,
+    background 220ms ease;
+}
+
+.menuButton span {
+  width: 1.15rem;
+  height: 1px;
+  border-radius: 999px;
+  background: currentColor;
+  transition: transform 300ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.header[data-stage="revealed"] .rail {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.header[data-stage="revealed"] .logoDock {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.header[data-stage="revealed"] .logoDock::before {
+  animation: dockRipple 820ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.header[data-stage="revealed"] .logoDock::after {
+  animation: dockRipple 980ms 90ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.header[data-stage="revealed"] .railLabel {
+  opacity: 1;
+  filter: blur(0);
+}
+
+.header[data-stage="revealed"] .desktopNav {
+  pointer-events: auto;
+}
+
+.header[data-stage="revealed"] .navBubble {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+.header[data-stage="revealed"] .menuButton {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.header[data-menu-open="true"] .menuButton span:first-child {
+  transform: translateY(0.22rem) rotate(45deg);
+}
+
+.header[data-menu-open="true"] .menuButton span:last-child {
+  transform: translateY(-0.22rem) rotate(-45deg);
+}
+
+.mobilePanel {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: none;
+  align-items: start;
+  padding: 5.8rem 0.8rem 1rem;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 240ms ease, visibility 0s linear 240ms;
+}
+
+.menuBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 3, 4, 0.74);
+  backdrop-filter: blur(22px);
+}
+
+.mobilePanel ul {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.65rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mobilePanel li {
+  --nav-index: 0;
+  opacity: 0;
+  transform: translateY(-0.7rem) scale(0.82);
+  transition:
+    opacity 260ms ease calc(55ms + var(--nav-index) * 55ms),
+    transform 540ms cubic-bezier(.18, 1.35, .32, 1) calc(30ms + var(--nav-index) * 55ms);
+}
+
+.mobilePanel a {
+  min-height: 4.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 28% 15%, rgba(185, 233, 255, 0.06), transparent 45%),
+    rgba(10, 10, 11, 0.94);
+  color: rgba(242, 242, 240, 0.84);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.24);
+}
+
+.mobilePanel i {
+  font-style: normal;
+  color: rgba(185, 233, 255, 0.55);
+}
+
+.header[data-menu-open="true"] .mobilePanel {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.header[data-menu-open="true"] .mobilePanel li {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@keyframes dockRipple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.68;
+  }
+  100% {
+    width: 9rem;
+    height: 9rem;
+    opacity: 0;
+  }
+}
+
+@media (max-width: 899px) {
+  .shell {
+    height: 4.8rem;
+  }
+
+  .rail {
+    left: 0.55rem;
+    right: 0.55rem;
+    top: 0.65rem;
+  }
+
+  .logoDock {
+    left: 0.55rem;
+    top: 0.65rem;
+  }
+
+  .railLabel,
+  .desktopNav {
+    display: none;
+  }
+
+  .menuButton {
+    display: flex;
+    top: 0.65rem;
+  }
+
+  .mobilePanel {
+    display: grid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail,
+  .logoDock,
+  .railLabel,
+  .navBubble,
+  .menuButton,
+  .mobilePanel,
+  .mobilePanel li {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .logoDock::before,
+  .logoDock::after {
+    animation: none !important;
+  }
+}

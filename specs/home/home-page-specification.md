@@ -481,3 +481,54 @@ This addendum supersedes the first-slice placeholder composition where it confli
 - Only approved browser derivatives of real photography may ship. Google Drive is an ingest source, never a runtime CDN. STL, ZBrush files, sculpt masters, high-density meshes, and manufacturing assets are forbidden.
 - Auth, cart, customer cart merge, order, payment, inventory, raffle lifecycle/entry, Supabase schema, RLS, runtime flags, OTP, Production data, and gated feature state are unchanged.
 - If approved photography is unavailable in the execution environment, implementation must state the limitation and keep honest reserved media frames; it must not fabricate provenance or publish unapproved legacy/research media. Production-media completion remains blocked until those frames are replaced and visually reviewed.
+
+## 4.10B HOME-3D-SCROLL-01 — Immersive Loader + Traveling Object
+
+Owner approval: `APPROVED_2026-09-23`
+
+Reference evidence: owner-supplied screen recording of the NOZO Home experience. The recording is used only to study motion behavior. No NOZO branding, assets, copy, product geometry, color system, or complete composition may be copied.
+
+### Observed reference behavior
+
+- A full-screen loading veil appears before the page experience.
+- The brand mark is centered inside restrained technical/drafting geometry.
+- The loader remains long enough for the first 3D object to be ready behind the veil.
+- The centered mark resolves toward a compact corner position as the page is revealed.
+- One prominent 3D object remains visually continuous while the visitor scrolls through several sections.
+- Scroll changes the object's viewport position, scale and orientation with a damped/scrubbed feel rather than discrete section jumps.
+- Later sections allow the object to recede so typography and content can take priority.
+
+The reference's internal implementation is not source-confirmed. Only the visible behavior above is treated as observed evidence.
+
+### Luminal adaptation
+
+- Preloader minimum duration is approximately 2.1 seconds, but exit is coupled to the Hero object's ready signal rather than a fixed cosmetic delay.
+- A hard maximum wait prevents the loader from deadlocking if 3D loading fails.
+- The existing Luminal web GLB is mounted eagerly behind the loading veil on eligible desktop clients.
+- Luminal's own logo is the traveling brand element. It materializes centrally, then settles into the top-left corner.
+- Loader geometry uses Luminal material cues: dark field, diamond/cube construction lines, ice/pink/lavender reflections and a restrained top progress line.
+- The 3D object becomes a fixed visual layer on eligible desktop clients and follows a controlled path across Hero → Featured Object → Brand Revival → Archive, then recedes before Colorway Studies.
+- The object is decorative motion only. It never owns commerce state or blocks CTA behavior.
+- When a featured raffle is present, the existing raffle-first presentation remains authoritative and this immersive Home model handoff is disabled until raffle media/model choreography receives a separate integration pass.
+- Mobile uses the existing static/poster-oriented Hero presentation instead of a page-wide fixed 3D traversal.
+- Reduced motion skips the loader choreography and disables the scroll traversal.
+- The intro is shown once per browser session to avoid repeated friction during ordinary navigation.
+
+### Motion budget
+
+Primary motion:
+- traveling Hero 3D object.
+
+Secondary motion:
+- initial brand/load transition.
+- existing bounded Hero copy/pointer response.
+
+No additional continuous particle, cursor-trail or background animation is introduced.
+
+### Performance and resilience
+
+- Current fallback Hero GLB is approximately 1.6 MB and is suitable for an eager first-object experiment, subject to measured Production performance.
+- Existing constrained-network and coarse-pointer poster gates remain intact.
+- Loader exit accepts 3D ready, poster ready, or bounded error fallback.
+- No manufacturing/STL asset is exposed.
+- Scroll choreography uses transforms/opacity only and cleans up listeners/animation frames on unmount.
