@@ -45,7 +45,7 @@ test("HOME-3D-PATH-02 terminates at Meet Meowhe and turns the camera right", () 
   assert.doesNotMatch(immersive, /section: "hero" \| "featured" \| "revival"/);
   assert.match(immersive, /anchor: "bottom"/);
   assert.match(immersive, /xVw: -39/);
-  assert.match(immersive, /orbitDeg: 32/);
+  assert.match(immersive, /orbitDeg: -32/);
   assert.match(immersive, /luminal:hero-orbit-offset/);
 });
 
