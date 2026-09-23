@@ -20,6 +20,7 @@ type MotionState = Readonly<{
   yVh: number;
   scale: number;
   rotationDeg: number;
+  orbitDeg: number;
   opacity: number;
 }>;
 
@@ -32,15 +33,29 @@ const LOGO_DOCK_MS = 1080;
 const MOTION_EPSILON = 0.002;
 
 const desktopStates: ReadonlyArray<Readonly<{
-  section: "hero" | "featured" | "revival" | "archive" | "gallery";
+  section: "hero" | "featured";
+  anchor: "top" | "bottom";
   viewportOffset: number;
   state: MotionState;
 }>> = [
-  { section: "hero", viewportOffset: 0, state: { xVw: 0, yVh: 0, scale: 1, rotationDeg: 0, opacity: 1 } },
-  { section: "featured", viewportOffset: 0.5, state: { xVw: -31, yVh: 10, scale: 0.76, rotationDeg: -6, opacity: 1 } },
-  { section: "revival", viewportOffset: 0.54, state: { xVw: 24, yVh: -6, scale: 0.56, rotationDeg: 5, opacity: 0.72 } },
-  { section: "archive", viewportOffset: 0.5, state: { xVw: -28, yVh: 11, scale: 0.62, rotationDeg: -4, opacity: 0.62 } },
-  { section: "gallery", viewportOffset: 0.64, state: { xVw: 11, yVh: -10, scale: 0.43, rotationDeg: 6, opacity: 0 } },
+  {
+    section: "hero",
+    anchor: "top",
+    viewportOffset: 0,
+    state: { xVw: 0, yVh: 0, scale: 1, rotationDeg: 0, orbitDeg: 0, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "top",
+    viewportOffset: 0.52,
+    state: { xVw: -38, yVh: 7, scale: 0.71, rotationDeg: 4.5, orbitDeg: 18, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "bottom",
+    viewportOffset: 0.34,
+    state: { xVw: -39, yVh: 6, scale: 0.68, rotationDeg: 5.5, orbitDeg: 20, opacity: 0 },
+  },
 ];
 
 function clamp01(value: number) {
@@ -71,6 +86,7 @@ function readMotionState(scrollY: number, keyframes: readonly MotionKeyframe[]):
       yVh: interpolate(from.yVh, to.yVh, progress),
       scale: interpolate(from.scale, to.scale, progress),
       rotationDeg: interpolate(from.rotationDeg, to.rotationDeg, progress),
+      orbitDeg: interpolate(from.orbitDeg, to.orbitDeg, progress),
       opacity: interpolate(from.opacity, to.opacity, progress),
     };
   }
@@ -84,6 +100,7 @@ function stateDistance(left: MotionState, right: MotionState) {
     Math.abs(left.yVh - right.yVh) / 20,
     Math.abs(left.scale - right.scale),
     Math.abs(left.rotationDeg - right.rotationDeg) / 10,
+    Math.abs(left.orbitDeg - right.orbitDeg) / 24,
     Math.abs(left.opacity - right.opacity),
   );
 }
@@ -210,7 +227,12 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       brandAnimation?.cancel();
       unlock();
     };
-  }, [enabled]);
+  }, [
+    enabled,
+    presentation.camera.phiDeg,
+    presentation.camera.radiusPercent,
+    presentation.camera.thetaDeg,
+  ]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -230,15 +252,25 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       layer.style.transform =
         `translate3d(${state.xVw.toFixed(3)}vw, ${state.yVh.toFixed(3)}vh, 0) scale(${state.scale.toFixed(4)}) rotate(${state.rotationDeg.toFixed(3)}deg)`;
       layer.style.opacity = state.opacity.toFixed(4);
+
+      const viewer = layer.querySelector<HTMLElement>("model-viewer");
+      if (viewer) {
+        viewer.setAttribute(
+          "camera-orbit",
+          `${presentation.camera.thetaDeg + state.orbitDeg}deg ${presentation.camera.phiDeg}deg ${presentation.camera.radiusPercent}%`,
+        );
+      }
     };
 
     const rebuildKeyframes = () => {
       const viewportHeight = window.innerHeight;
-      keyframes = desktopStates.flatMap(({ section, viewportOffset, state }) => {
+      keyframes = desktopStates.flatMap(({ section, anchor, viewportOffset, state }) => {
         const element = document.querySelector<HTMLElement>(`[data-home-3d-section="${section}"]`);
         if (!element) return [];
-        const absoluteTop = element.getBoundingClientRect().top + window.scrollY;
-        return [{ scrollY: Math.max(0, absoluteTop - viewportHeight * viewportOffset), ...state }];
+        const rect = element.getBoundingClientRect();
+        const absoluteTop = rect.top + window.scrollY;
+        const absoluteAnchor = anchor === "bottom" ? absoluteTop + rect.height : absoluteTop;
+        return [{ scrollY: Math.max(0, absoluteAnchor - viewportHeight * viewportOffset), ...state }];
       }).sort((left, right) => left.scrollY - right.scrollY);
 
       target = readMotionState(window.scrollY, keyframes);
@@ -254,6 +286,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         yVh: interpolate(current.yVh, target.yVh, blend),
         scale: interpolate(current.scale, target.scale, blend),
         rotationDeg: interpolate(current.rotationDeg, target.rotationDeg, blend),
+        orbitDeg: interpolate(current.orbitDeg, target.orbitDeg, blend),
         opacity: interpolate(current.opacity, target.opacity, blend),
       };
       apply(current);

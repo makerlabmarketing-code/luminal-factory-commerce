@@ -38,6 +38,18 @@ test("HOME-HERO-LAYOUT-02 moves the traveling object outside the clipped main co
   assert.match(immersive, /position: fixed/);
 });
 
+
+test("HOME-3D-PATH-02 terminates at Meet Meowhe and turns the camera right", () => {
+  const immersive = read("src/features/home/home-immersive-experience.tsx");
+  assert.match(immersive, /section: "hero" \| "featured"/);
+  assert.doesNotMatch(immersive, /section: "hero" \| "featured" \| "revival"/);
+  assert.match(immersive, /anchor: "bottom"/);
+  assert.match(immersive, /xVw: -38/);
+  assert.match(immersive, /orbitDeg: 18/);
+  assert.match(immersive, /camera-orbit/);
+  assert.match(immersive, /presentation\.camera\.thetaDeg \+ state\.orbitDeg/);
+});
+
 test("immersive Home remains bounded by raffle, mobile and reduced-motion priorities", () => {
   const home = read("src/features/home/home-page.tsx");
   const immersive = read("src/features/home/home-immersive-experience.tsx");

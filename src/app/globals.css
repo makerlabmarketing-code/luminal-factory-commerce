@@ -524,12 +524,28 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
 }
 
 .featured-object-immersive .featured-object-grid {
-  min-height: 82svh;
+  min-height: 88svh;
+  grid-template-columns: minmax(0, 1.18fr) minmax(19rem, 0.82fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+.featured-object-immersive .featured-object-copy {
+  max-width: 30rem;
+  justify-self: end;
+  padding-right: clamp(0.5rem, 2vw, 2rem);
+}
+
+.featured-object-immersive .featured-object-copy h2 {
+  max-width: 7ch;
+  font-size: clamp(3.25rem, 5.2vw, 5.9rem);
+  line-height: 0.9;
 }
 
 .home-object-corridor {
   position: relative;
   min-height: min(78vh, 50rem);
+  margin-left: clamp(-3rem, -3vw, -1.5rem);
   border-left: 1px solid rgba(255, 255, 255, 0.055);
   border-bottom: 1px solid rgba(255, 255, 255, 0.055);
   background:
@@ -602,7 +618,19 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
     min-height: auto;
   }
 
+  .featured-object-immersive .featured-object-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .featured-object-immersive .featured-object-copy {
+    max-width: none;
+    justify-self: stretch;
+    padding-right: 0;
+  }
+
   .home-object-corridor {
     min-height: 30rem;
+    margin-left: 0;
   }
 }
