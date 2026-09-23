@@ -42,14 +42,17 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       }
 
       const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const collapsedStripPx = STICKY_STEP_REM * rootFontSize + 2;
       const next = steps.map((_, index) => {
         if (index >= steps.length - 1) return false;
 
+        const currentCard = itemRefs.current[index];
         const nextCard = itemRefs.current[index + 1];
-        if (!nextCard) return false;
+        if (!currentCard || !nextCard) return false;
 
-        const nextStickyTop = (STICKY_BASE_REM + (index + 1) * STICKY_STEP_REM) * rootFontSize;
-        return nextCard.getBoundingClientRect().top <= nextStickyTop + 2;
+        const currentTop = currentCard.getBoundingClientRect().top;
+        const nextTop = nextCard.getBoundingClientRect().top;
+        return nextTop <= currentTop + collapsedStripPx;
       });
 
       setCollapsed((previous) => statesEqual(previous, next) ? previous : next);
@@ -77,12 +80,16 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
 
   return (
     <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh]">
-      {steps.map((step, index) => (
+      {steps.map((step, index) => {
+        const isLast = index === steps.length - 1;
+        return (
         <li
           ref={(node) => {
             itemRefs.current[index] = node;
           }}
-          className="relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0d0d0e]/95 p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:sticky md:min-h-[60svh] md:p-10 motion-reduce:static"
+          className={`relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0d0d0e]/95 p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:sticky md:p-10 motion-reduce:static ${
+            isLast ? "md:min-h-[calc(100svh-12rem)]" : "md:min-h-[60svh]"
+          }`}
           style={{ top: `calc(${STICKY_BASE_REM}rem + ${index * STICKY_STEP_REM}rem)`, zIndex: index + 1 }}
           key={step.number}
           data-process-collapsed={collapsed[index] ? "true" : "false"}
@@ -118,7 +125,8 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
             {step.number}
           </span>
         </li>
-      ))}
+        );
+      })}
     </ol>
   );
 }
