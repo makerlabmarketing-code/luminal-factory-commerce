@@ -55,8 +55,20 @@ const desktopStates: ReadonlyArray<MotionDefinition> = [
   {
     section: "featured",
     anchor: "bottom",
-    viewportOffset: 0.34,
-    state: { xVw: -40, yVh: 6, scale: 0.67, rotationDeg: -4.5, orbitDeg: -35, opacity: 0 },
+    viewportOffset: 0.98,
+    state: { xVw: -39.5, yVh: 6.5, scale: 0.54, rotationDeg: -4, orbitDeg: -34, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "bottom",
+    viewportOffset: 0.80,
+    state: { xVw: -40, yVh: 6, scale: 0.42, rotationDeg: -4.5, orbitDeg: -35, opacity: 0.62 },
+  },
+  {
+    section: "featured",
+    anchor: "bottom",
+    viewportOffset: 0.64,
+    state: { xVw: -40, yVh: 5.5, scale: 0.32, rotationDeg: -4.5, orbitDeg: -35, opacity: 0 },
   },
 ];
 
