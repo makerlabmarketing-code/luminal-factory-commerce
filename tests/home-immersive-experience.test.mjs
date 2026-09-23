@@ -91,10 +91,13 @@ test("Made at Luminal collapsed cards expose their step title in the sticky stri
   assert.match(home, /MadeAtLuminalStack/);
   assert.match(home, /<MadeAtLuminalStack steps=\{content\.process\} \/>/);
   assert.match(stack, /data-process-collapsed/);
-  assert.match(stack, /nextStickyTop/);
+  assert.match(stack, /collapsedStripPx/);
+  assert.match(stack, /nextTop <= currentTop \+ collapsedStripPx/);
   assert.match(stack, /\{step\.number\} \/ \{step\.title\}/);
   assert.match(stack, /top-\[0\.22rem\]/);
   assert.match(stack, /motion-reduce:static/);
+  assert.match(stack, /md:min-h-\[calc\(100svh-12rem\)\]/);
+  assert.match(stack, /isLast \? "md:min-h-\[calc\(100svh-12rem\)\]"/);
 });
 
 test("immersive Home remains bounded by raffle, mobile and reduced-motion priorities", () => {
