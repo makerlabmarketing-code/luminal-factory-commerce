@@ -44,7 +44,7 @@ const desktopStates: ReadonlyArray<MotionDefinition> = [
     section: "hero",
     anchor: "top",
     viewportOffset: 0,
-    state: { xVw: 0, yVh: 0, scale: 0.88, rotationDeg: 0, orbitDeg: 0, opacity: 1 },
+    state: { xVw: 0, yVh: 0, scale: 1, rotationDeg: 0, orbitDeg: 0, opacity: 1 },
   },
   {
     section: "featured",
@@ -70,14 +70,26 @@ const compactStates: ReadonlyArray<MotionDefinition> = [
   {
     section: "featured",
     anchor: "top",
-    viewportOffset: 0.7,
+    viewportOffset: 0.70,
     state: { xVw: -6, yVh: -34, scale: 0.80, rotationDeg: -2.5, orbitDeg: -28, opacity: 1 },
   },
   {
     section: "featured",
+    anchor: "top",
+    viewportOffset: 0.44,
+    state: { xVw: -6.5, yVh: -38, scale: 0.74, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "top",
+    viewportOffset: 0.22,
+    state: { xVw: -7, yVh: -42, scale: 0.60, rotationDeg: -3.5, orbitDeg: -33, opacity: 0.42 },
+  },
+  {
+    section: "featured",
     anchor: "bottom",
-    viewportOffset: 0.42,
-    state: { xVw: -7, yVh: -38, scale: 0.74, rotationDeg: -3.5, orbitDeg: -34, opacity: 0 },
+    viewportOffset: 0.96,
+    state: { xVw: -7, yVh: -48, scale: 0.48, rotationDeg: -4, orbitDeg: -34, opacity: 0 },
   },
 ];
 
