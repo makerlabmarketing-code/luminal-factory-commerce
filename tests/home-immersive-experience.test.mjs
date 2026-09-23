@@ -16,14 +16,16 @@ test("HOME-3D-HANDOFF-02 uses a measured logo dock before revealing Home navigat
   assert.match(immersive, /luminal:brand-docked/);
 });
 
-test("Home header rail and bubble control remain unavailable until dock completion", () => {
+test("Home header rail and desktop navigation bubbles remain unavailable until dock completion", () => {
   const header = read("src/features/home/home-arrival-header.tsx");
   const css = read("src/features/home/home-arrival-header.module.css");
   assert.match(header, /type HeaderStage = "waiting" \| "revealed"/);
+  assert.match(header, /className=\{styles\.desktopNav\}/);
+  assert.match(header, /className=\{styles\.navBubble\}/);
   assert.match(css, /data-stage="revealed"/);
   assert.match(css, /dockRipple/);
-  assert.match(css, /menuButton/);
-  assert.match(css, /scale\(0\.62\)/);
+  assert.match(css, /\.navBubble/);
+  assert.match(css, /var\(--nav-index\)/);
 });
 
 test("HOME-HERO-LAYOUT-02 moves the traveling object outside the clipped main composition", () => {

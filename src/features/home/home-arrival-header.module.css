@@ -22,28 +22,28 @@
   border: 1px solid rgba(255, 255, 255, 0.075);
   border-radius: 999px;
   background:
-    linear-gradient(90deg, rgba(238, 248, 255, 0.055), rgba(255, 255, 255, 0.025) 38%, rgba(243, 201, 232, 0.035)),
-    rgba(5, 5, 5, 0.62);
+    linear-gradient(90deg, rgba(238, 248, 255, 0.055), rgba(255, 255, 255, 0.025) 42%, rgba(243, 201, 232, 0.035)),
+    rgba(5, 5, 5, 0.66);
   box-shadow: 0 0.75rem 3rem rgba(0, 0, 0, 0.22);
   backdrop-filter: blur(18px);
   opacity: 0;
   transform: scaleX(0.035);
   transform-origin: 1.75rem 50%;
   transition:
-    transform 720ms cubic-bezier(.22, 1, .36, 1) 120ms,
-    opacity 380ms ease 90ms;
+    transform 760ms cubic-bezier(.22, 1, .36, 1) 120ms,
+    opacity 360ms ease 90ms;
 }
 
 .logoDock,
 .menuButton {
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   top: 1rem;
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(8, 8, 9, 0.86);
+  background: rgba(8, 8, 9, 0.88);
   box-shadow: 0 0.85rem 2.8rem rgba(0, 0, 0, 0.32);
   backdrop-filter: blur(18px);
 }
@@ -89,17 +89,68 @@
   font-size: 0.58rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(242, 242, 240, 0.42);
+  color: rgba(242, 242, 240, 0.38);
   opacity: 0;
   filter: blur(5px);
   transition:
-    opacity 440ms ease 390ms,
-    filter 520ms ease 390ms;
+    opacity 420ms ease 360ms,
+    filter 500ms ease 360ms;
+}
+
+.desktopNav {
+  position: absolute;
+  z-index: 3;
+  top: 1rem;
+  right: 1.6rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.42rem;
+  padding: 0.36rem 0.4rem;
+  pointer-events: none;
+}
+
+.navBubble {
+  --nav-index: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 32% 16%, rgba(185, 233, 255, 0.055), transparent 48%),
+    rgba(11, 11, 12, 0.78);
+  color: rgba(242, 242, 240, 0.72);
+  font-size: 0.69rem;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateY(-0.45rem) scale(0.78);
+  filter: blur(3px);
+  box-shadow: 0 0.35rem 1.6rem rgba(0, 0, 0, 0.16);
+  transition:
+    opacity 300ms ease calc(390ms + var(--nav-index) * 55ms),
+    transform 680ms cubic-bezier(.16, 1.24, .28, 1) calc(360ms + var(--nav-index) * 55ms),
+    filter 420ms ease calc(390ms + var(--nav-index) * 55ms),
+    border-color 200ms ease,
+    background 200ms ease,
+    color 200ms ease;
+}
+
+.navBubble:hover {
+  border-color: rgba(185, 233, 255, 0.28);
+  background:
+    radial-gradient(circle at 32% 16%, rgba(185, 233, 255, 0.11), transparent 50%),
+    rgba(17, 18, 20, 0.96);
+  color: #f2f2f0;
 }
 
 .menuButton {
-  right: 1.6rem;
-  display: flex;
+  right: 0.55rem;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -111,15 +162,10 @@
   opacity: 0;
   transform: scale(0.62);
   transition:
-    opacity 260ms ease 540ms,
-    transform 660ms cubic-bezier(.18, 1.55, .32, 1) 480ms,
+    opacity 260ms ease 510ms,
+    transform 620ms cubic-bezier(.18, 1.45, .32, 1) 450ms,
     border-color 220ms ease,
     background 220ms ease;
-}
-
-.menuButton:hover {
-  border-color: rgba(185, 233, 255, 0.3);
-  background: rgba(15, 17, 20, 0.94);
 }
 
 .menuButton span {
@@ -154,6 +200,16 @@
   filter: blur(0);
 }
 
+.header[data-stage="revealed"] .desktopNav {
+  pointer-events: auto;
+}
+
+.header[data-stage="revealed"] .navBubble {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
 .header[data-stage="revealed"] .menuButton {
   opacity: 1;
   transform: scale(1);
@@ -168,76 +224,67 @@
   transform: translateY(-0.22rem) rotate(-45deg);
 }
 
-.menuPanel {
+.mobilePanel {
   position: fixed;
   inset: 0;
   z-index: -1;
-  display: grid;
+  display: none;
   align-items: start;
-  padding: 7.2rem max(1rem, calc((100vw - 88rem) / 2 + 1rem)) 2rem;
+  padding: 5.8rem 0.8rem 1rem;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 260ms ease, visibility 0s linear 260ms;
+  transition: opacity 240ms ease, visibility 0s linear 240ms;
 }
 
 .menuBackdrop {
   position: absolute;
   inset: 0;
-  background: rgba(3, 3, 4, 0.72);
+  background: rgba(3, 3, 4, 0.74);
   backdrop-filter: blur(22px);
 }
 
-.menuPanel ul {
+.mobilePanel ul {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.45rem;
+  gap: 0.65rem;
+  width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.menuPanel li {
+.mobilePanel li {
+  --nav-index: 0;
   opacity: 0;
-  transform: translateY(-1rem) scale(0.72);
+  transform: translateY(-0.7rem) scale(0.82);
   transition:
-    opacity 260ms ease,
-    transform 620ms cubic-bezier(.18, 1.5, .32, 1);
+    opacity 260ms ease calc(55ms + var(--nav-index) * 55ms),
+    transform 540ms cubic-bezier(.18, 1.35, .32, 1) calc(30ms + var(--nav-index) * 55ms);
 }
 
-.menuPanel a {
-  min-height: clamp(7rem, 11vw, 10rem);
+.mobilePanel a {
+  min-height: 4.7rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.2rem 1.45rem;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 1rem 1.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.085);
   border-radius: 999px;
   background:
-    radial-gradient(circle at 30% 20%, rgba(185, 233, 255, 0.07), transparent 42%),
-    rgba(10, 10, 11, 0.93);
-  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.3);
-  font-size: clamp(0.78rem, 1.3vw, 1.05rem);
-  color: rgba(242, 242, 240, 0.82);
-  transition: border-color 220ms ease, transform 220ms ease, background 220ms ease;
+    radial-gradient(circle at 28% 15%, rgba(185, 233, 255, 0.06), transparent 45%),
+    rgba(10, 10, 11, 0.94);
+  color: rgba(242, 242, 240, 0.84);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.24);
 }
 
-.menuPanel a:hover {
-  transform: translateY(-0.25rem);
-  border-color: rgba(185, 233, 255, 0.28);
-  background:
-    radial-gradient(circle at 30% 20%, rgba(185, 233, 255, 0.11), transparent 45%),
-    rgba(14, 15, 17, 0.98);
-}
-
-.menuPanel i {
+.mobilePanel i {
   font-style: normal;
   color: rgba(185, 233, 255, 0.55);
 }
 
-.header[data-menu-open="true"] .menuPanel {
+.header[data-menu-open="true"] .mobilePanel {
   z-index: 1;
   opacity: 1;
   visibility: visible;
@@ -245,7 +292,7 @@
   transition-delay: 0s;
 }
 
-.header[data-menu-open="true"] .menuPanel li {
+.header[data-menu-open="true"] .mobilePanel li {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
@@ -254,11 +301,11 @@
   0% {
     width: 0;
     height: 0;
-    opacity: 0.72;
+    opacity: 0.68;
   }
   100% {
-    width: 10rem;
-    height: 10rem;
+    width: 9rem;
+    height: 9rem;
     opacity: 0;
   }
 }
@@ -279,26 +326,18 @@
     top: 0.65rem;
   }
 
-  .menuButton {
-    right: 0.55rem;
-    top: 0.65rem;
-  }
-
-  .railLabel {
+  .railLabel,
+  .desktopNav {
     display: none;
   }
 
-  .menuPanel {
-    padding: 5.8rem 0.8rem 1rem;
+  .menuButton {
+    display: flex;
+    top: 0.65rem;
   }
 
-  .menuPanel ul {
-    grid-template-columns: 1fr;
-    gap: 0.65rem;
-  }
-
-  .menuPanel a {
-    min-height: 4.7rem;
+  .mobilePanel {
+    display: grid;
   }
 }
 
@@ -306,9 +345,10 @@
   .rail,
   .logoDock,
   .railLabel,
+  .navBubble,
   .menuButton,
-  .menuPanel,
-  .menuPanel li {
+  .mobilePanel,
+  .mobilePanel li {
     transition-duration: 1ms !important;
     transition-delay: 0ms !important;
   }

@@ -80,13 +80,26 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
 
         <span className={styles.railLabel} aria-hidden="true">Luminal Factory</span>
 
+        <nav className={styles.desktopNav} aria-label="Điều hướng chính">
+          {navigation.map((item, index) => (
+            <Link
+              href={item.href}
+              key={item.href}
+              className={styles.navBubble}
+              style={{ "--nav-index": index } as React.CSSProperties}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
         <button
           type="button"
           className={styles.menuButton}
           onClick={() => setMenuOpen((value) => !value)}
           aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
           aria-expanded={menuOpen}
-          aria-controls="home-arrival-menu"
+          aria-controls="home-arrival-mobile-menu"
         >
           <span />
           <span />
@@ -94,15 +107,18 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
       </div>
 
       <nav
-        id="home-arrival-menu"
-        className={styles.menuPanel}
-        aria-label="Điều hướng chính"
+        id="home-arrival-mobile-menu"
+        className={styles.mobilePanel}
+        aria-label="Điều hướng chính trên di động"
         aria-hidden={!menuOpen}
       >
         <div className={styles.menuBackdrop} onClick={() => setMenuOpen(false)} aria-hidden="true" />
         <ul>
           {navigation.map((item, index) => (
-            <li key={item.href} style={{ transitionDelay: menuOpen ? `${90 + index * 55}ms` : "0ms" }}>
+            <li
+              key={item.href}
+              style={{ "--nav-index": index } as React.CSSProperties}
+            >
               <Link href={item.href} onClick={() => setMenuOpen(false)}>
                 <span>{item.label}</span>
                 <i aria-hidden="true">↗</i>
