@@ -48,13 +48,13 @@ const desktopStates: ReadonlyArray<Readonly<{
     section: "featured",
     anchor: "top",
     viewportOffset: 0.52,
-    state: { xVw: -39, yVh: 7, scale: 0.70, rotationDeg: 3.5, orbitDeg: 32, opacity: 1 },
+    state: { xVw: -39, yVh: 7, scale: 0.70, rotationDeg: -3.5, orbitDeg: -32, opacity: 1 },
   },
   {
     section: "featured",
     anchor: "bottom",
     viewportOffset: 0.34,
-    state: { xVw: -40, yVh: 6, scale: 0.67, rotationDeg: 4.5, orbitDeg: 35, opacity: 0 },
+    state: { xVw: -40, yVh: 6, scale: 0.67, rotationDeg: -4.5, orbitDeg: -35, opacity: 0 },
   },
 ];
 
