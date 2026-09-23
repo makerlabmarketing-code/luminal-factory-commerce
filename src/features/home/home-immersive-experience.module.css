@@ -1,19 +1,17 @@
 .experience {
-  position: relative;
-  min-width: 0;
-}
-
-.reserve {
-  min-height: 30rem;
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
 }
 
 .modelLayer {
   position: fixed;
-  z-index: 18;
-  top: 8vh;
-  right: -2vw;
-  width: min(58vw, 62rem);
-  height: min(82vh, 52rem);
+  z-index: 1;
+  top: 7vh;
+  right: -1vw;
+  width: min(59vw, 64rem);
+  height: min(84vh, 54rem);
   transform-origin: 52% 52%;
   will-change: transform, opacity;
   pointer-events: auto;
@@ -31,6 +29,10 @@
   pointer-events: none;
 }
 
+.introRoot[data-phase="done"] {
+  visibility: hidden;
+}
+
 .veil {
   position: absolute;
   inset: 0;
@@ -42,8 +44,14 @@
     linear-gradient(180deg, #06080c 0%, #050505 68%, #070708 100%);
   opacity: 1;
   transition:
-    opacity 720ms cubic-bezier(.22, 1, .36, 1),
-    visibility 0s linear 720ms;
+    opacity 760ms cubic-bezier(.22, 1, .36, 1),
+    visibility 0s linear 760ms;
+}
+
+.introRoot[data-phase="docking"] .veil,
+.introRoot[data-phase="done"] .veil {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .progress {
@@ -62,6 +70,12 @@
   transform-origin: left center;
   background: linear-gradient(90deg, rgba(185, 233, 255, 0.25), #eef8ff 52%, rgba(243, 201, 232, 0.42));
   animation: introProgress 2.15s cubic-bezier(.2, .7, .2, 1) forwards;
+}
+
+.introRoot[data-phase="docking"] .progress span,
+.introRoot[data-phase="done"] .progress span {
+  transform: scaleX(1);
+  transition: transform 240ms ease-out;
 }
 
 .blueprint {
@@ -140,20 +154,13 @@
   z-index: 2;
   top: 50%;
   left: 50%;
-  width: clamp(6.8rem, 9vw, 9.5rem);
+  width: clamp(7rem, 9.5vw, 9.8rem);
   aspect-ratio: 1;
-  transform: translate(-50%, -50%) scale(0.82);
+  transform: translate(-50%, -50%);
   opacity: 0;
   filter: brightness(1.08) saturate(0.82);
-  transition:
-    top 920ms cubic-bezier(.76, 0, .24, 1),
-    left 920ms cubic-bezier(.76, 0, .24, 1),
-    width 920ms cubic-bezier(.76, 0, .24, 1),
-    transform 920ms cubic-bezier(.76, 0, .24, 1),
-    opacity 500ms ease,
-    filter 500ms ease;
   animation: brandMaterialize 760ms 360ms cubic-bezier(.22, 1, .36, 1) forwards;
-  pointer-events: auto;
+  will-change: transform;
 }
 
 .travelBrand img {
@@ -176,28 +183,6 @@
   color: rgba(242, 242, 240, 0.38);
 }
 
-.introRoot[data-phase="exiting"] .travelBrand,
-.introRoot[data-phase="done"] .travelBrand {
-  top: clamp(1rem, 2.2vw, 1.65rem);
-  left: clamp(1rem, 2.2vw, 1.65rem);
-  width: clamp(3rem, 4vw, 4rem);
-  transform: translate(0, 0) scale(1);
-  opacity: 1;
-  filter: brightness(1) saturate(0.92);
-}
-
-.introRoot[data-phase="exiting"] .veil,
-.introRoot[data-phase="done"] .veil {
-  opacity: 0;
-  visibility: hidden;
-}
-
-.introRoot[data-phase="exiting"] .progress span,
-.introRoot[data-phase="done"] .progress span {
-  transform: scaleX(1);
-  transition: transform 260ms ease-out;
-}
-
 @keyframes introProgress {
   0% { transform: scaleX(0.03); }
   70% { transform: scaleX(0.72); }
@@ -216,14 +201,17 @@
 }
 
 @media (max-width: 899px) {
-  .reserve {
-    min-height: 32rem;
+  .experience {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    height: 100svh;
   }
 
   .modelLayer {
     position: absolute;
     z-index: 2;
-    inset: 0 -18vw auto -18vw;
+    inset: 12rem -18vw auto -18vw;
     width: auto;
     height: 32rem;
     opacity: 1 !important;
@@ -237,11 +225,6 @@
 
   .travelBrand {
     width: 6.5rem;
-  }
-
-  .introRoot[data-phase="exiting"] .travelBrand,
-  .introRoot[data-phase="done"] .travelBrand {
-    width: 3rem;
   }
 }
 
@@ -258,7 +241,6 @@
 
   .travelBrand {
     opacity: 1;
-    transition: none;
   }
 
   .modelLayer {

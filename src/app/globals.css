@@ -464,3 +464,145 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
   [data-luminal-reveal] { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
   [data-luminal-spotlight]::after { display: none !important; }
 }
+
+
+/* HOME-3D-HANDOFF-02 / HOME-HERO-LAYOUT-02 prototype */
+.wave-home[data-home-immersive="true"] .revival-hero {
+  min-height: 100svh;
+  overflow: visible;
+}
+
+.wave-home[data-home-immersive="true"] .revival-hero-inner {
+  min-height: 100svh;
+  padding-top: clamp(7rem, 11vh, 9rem);
+}
+
+.wave-home[data-home-immersive="true"] .revival-hero-copy,
+.wave-home[data-home-immersive="true"] .home-hero-object-note,
+.wave-home[data-home-immersive="true"] .featured-object-copy,
+.wave-home[data-home-immersive="true"] .brand-revival > .container,
+.wave-home[data-home-immersive="true"] .selected-archive > .container {
+  position: relative;
+  z-index: 42;
+}
+
+.home-hero-object-corridor {
+  min-height: min(72vh, 48rem);
+}
+
+.home-hero-object-note {
+  position: absolute;
+  right: 0;
+  bottom: clamp(2rem, 8vh, 6rem);
+  width: min(21rem, 72%);
+  padding: 1rem 0 0 1.15rem;
+  border-left: 1px solid rgba(185, 233, 255, 0.28);
+  color: rgba(242, 242, 240, 0.58);
+}
+
+.home-hero-object-note > p:nth-child(2) {
+  margin: 0.8rem 0 1rem;
+  font-size: 0.84rem;
+  line-height: 1.65;
+}
+
+.home-hero-object-note > span {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(185, 233, 255, 0.52);
+}
+
+.featured-object-immersive {
+  position: relative;
+  min-height: 100svh;
+  overflow: visible;
+  background:
+    radial-gradient(circle at 28% 48%, rgba(185, 233, 255, 0.045), transparent 28rem),
+    #080808;
+}
+
+.featured-object-immersive .featured-object-grid {
+  min-height: 82svh;
+}
+
+.home-object-corridor {
+  position: relative;
+  min-height: min(78vh, 50rem);
+  border-left: 1px solid rgba(255, 255, 255, 0.055);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.018), transparent 45%),
+    radial-gradient(circle at 42% 48%, rgba(185, 233, 255, 0.045), transparent 42%);
+}
+
+.home-object-corridor::before,
+.home-object-corridor::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.home-object-corridor::before {
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(238, 248, 255, 0.12), transparent);
+}
+
+.home-object-corridor::after {
+  top: 12%;
+  bottom: 12%;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(238, 248, 255, 0.09), transparent);
+}
+
+.home-object-corridor span,
+.home-object-corridor i {
+  position: absolute;
+  border: 1px solid rgba(238, 248, 255, 0.08);
+  transform: rotate(45deg);
+}
+
+.home-object-corridor span {
+  width: 42%;
+  aspect-ratio: 1;
+  left: 28%;
+  top: 26%;
+}
+
+.home-object-corridor i {
+  width: 18%;
+  aspect-ratio: 1;
+  left: 40%;
+  top: 38%;
+  border-color: rgba(243, 201, 232, 0.1);
+}
+
+@media (max-width: 899px) {
+  .wave-home[data-home-immersive="true"] .revival-hero {
+    overflow: hidden;
+  }
+
+  .home-hero-object-corridor {
+    min-height: 31rem;
+  }
+
+  .home-hero-object-note {
+    right: auto;
+    left: 0;
+    bottom: 1rem;
+    width: min(22rem, 90%);
+  }
+
+  .featured-object-immersive {
+    min-height: auto;
+  }
+
+  .home-object-corridor {
+    min-height: 30rem;
+  }
+}

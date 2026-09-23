@@ -264,3 +264,17 @@ Escalate only when a decision has material system-wide consequences, introduces 
 - **Completed:** Formal specification addendum, technical plan, task ledger, thin Home route, server-rendered feature composition, typed content, responsive gallery styling, motion budget, reduced-motion fallback, focused tests, and local desktop/mobile visual review; review-only PNG captures are intentionally excluded from Git.
 - **Blocked completion item:** This Codex session exposes no connected Google Drive resource or product image binary. Real product media replacement and crop/alt review are therefore pending; no unapproved image, hotlink, or production master was substituted.
 - **Non-goals preserved:** Auth, cart, merge, order, payment, inventory, raffle, Supabase schema/RLS, runtime flags, OTP, Production data, gated features, push, and deployment.
+
+
+## Home immersive motion prototype — `IN_PROGRESS`
+
+- **Objective:** Turn the Home opening into a continuous object-led experience: preload the first 3D object, hand the brand mark into navigation, then let the object travel through the first Home chapters.
+- **Reference basis:** Owner-supplied NOZO screen recording plus the owner-supplied BubbleMenu interaction sample. External/reference behavior is adapted, not copied.
+- **HOME-3D-SCROLL-01:** Preview prototype exists. It preloads the existing Hero GLB, shows a bounded intro veil, and lets one 3D object travel through Hero → Featured → Revival → Archive before receding at Gallery.
+- **HOME-3D-HANDOFF-02:** `IN_PROGRESS`. Replace the hard-coded logo-to-corner transition with a measured dock target. The real Home header stays visually absent until the traveling logo reaches the dock; only then does a restrained ripple reveal the header rail and the menu control appears as a bubble.
+- **HOME-HERO-LAYOUT-02:** `IN_PROGRESS`. Move the page-wide 3D layer outside the Hero clipping/stacking context, reserve a visual corridor for the object, and turn the next section into an object introduction tied directly to the Meowhe Hero study.
+- **HOME-3D-PATH-02:** `IN_PROGRESS`. Retune section keyframes so the object avoids important copy/media, moves with heavier damping, and recedes before the Colorway gallery.
+- **Mobile/reduced motion:** No page-wide fixed 3D traversal on narrow/coarse-pointer clients; reduced motion skips the handoff choreography.
+- **Raffle priority:** When a featured raffle is active, current raffle-first Home presentation remains authoritative. The immersive object traversal is disabled until a dedicated raffle-model integration is approved.
+- **Production gate:** Prototype/Preview only. Do not merge to Production until the owner approves logo handoff timing, menu reveal, object corridor and scroll path.
+- **Validation target:** Vercel Preview build, first-load/repeat-load, slow/failing GLB, backward/forward scroll, resize, menu keyboard behavior, mobile and reduced-motion review.

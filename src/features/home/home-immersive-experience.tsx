@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
 import type { HeroModelPresentation } from "./hero-model-config";
@@ -14,7 +13,7 @@ type HomeImmersiveExperienceProps = Readonly<{
   enabled: boolean;
 }>;
 
-type IntroPhase = "loading" | "exiting" | "done";
+type IntroPhase = "loading" | "docking" | "done";
 
 type MotionState = Readonly<{
   xVw: number;
@@ -29,7 +28,7 @@ type MotionKeyframe = MotionState & Readonly<{ scrollY: number }>;
 const INTRO_SESSION_KEY = "luminal-home-intro-v1";
 const INTRO_MINIMUM_MS = 2100;
 const INTRO_MAXIMUM_MS = 4800;
-const INTRO_EXIT_MS = 980;
+const LOGO_DOCK_MS = 1080;
 const MOTION_EPSILON = 0.002;
 
 const desktopStates: ReadonlyArray<Readonly<{
@@ -38,10 +37,10 @@ const desktopStates: ReadonlyArray<Readonly<{
   state: MotionState;
 }>> = [
   { section: "hero", viewportOffset: 0, state: { xVw: 0, yVh: 0, scale: 1, rotationDeg: 0, opacity: 1 } },
-  { section: "featured", viewportOffset: 0.52, state: { xVw: -27, yVh: 11, scale: 0.78, rotationDeg: -7, opacity: 1 } },
-  { section: "revival", viewportOffset: 0.5, state: { xVw: -5, yVh: -7, scale: 0.68, rotationDeg: 6, opacity: 0.94 } },
-  { section: "archive", viewportOffset: 0.48, state: { xVw: -22, yVh: 13, scale: 0.76, rotationDeg: -4, opacity: 0.86 } },
-  { section: "gallery", viewportOffset: 0.62, state: { xVw: 7, yVh: -9, scale: 0.54, rotationDeg: 7, opacity: 0 } },
+  { section: "featured", viewportOffset: 0.5, state: { xVw: -31, yVh: 10, scale: 0.76, rotationDeg: -6, opacity: 1 } },
+  { section: "revival", viewportOffset: 0.54, state: { xVw: 24, yVh: -6, scale: 0.56, rotationDeg: 5, opacity: 0.72 } },
+  { section: "archive", viewportOffset: 0.5, state: { xVw: -28, yVh: 11, scale: 0.62, rotationDeg: -4, opacity: 0.62 } },
+  { section: "gallery", viewportOffset: 0.64, state: { xVw: 11, yVh: -10, scale: 0.43, rotationDeg: 6, opacity: 0 } },
 ];
 
 function clamp01(value: number) {
@@ -91,6 +90,7 @@ function stateDistance(left: MotionState, right: MotionState) {
 
 export function HomeImmersiveExperience({ media, presentation, enabled }: HomeImmersiveExperienceProps) {
   const modelLayerRef = useRef<HTMLDivElement>(null);
+  const travelBrandRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<IntroPhase>("loading");
 
   useEffect(() => {
@@ -108,6 +108,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     }
 
     if (reducedMotion || seenIntro) {
+      document.documentElement.dataset.luminalBrandDocked = "true";
       setPhase("done");
       return;
     }
@@ -119,12 +120,13 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     body.style.overflow = "hidden";
     body.style.overscrollBehavior = "none";
     root.dataset.luminalIntro = "loading";
+    delete root.dataset.luminalBrandDocked;
 
     let disposed = false;
     let minimumElapsed = false;
     let objectReady = Boolean(root.dataset.luminalHeroObjectReady);
-    let exitStarted = false;
-    let exitTimer: number | null = null;
+    let dockingStarted = false;
+    let brandAnimation: Animation | null = null;
 
     const unlock = () => {
       body.style.overflow = previousOverflow;
@@ -132,49 +134,80 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       delete root.dataset.luminalIntro;
     };
 
-    const completeExit = () => {
+    const finishDock = () => {
       if (disposed) return;
+      root.dataset.luminalBrandDocked = "true";
+      window.dispatchEvent(new CustomEvent("luminal:brand-docked"));
       setPhase("done");
       unlock();
       try {
         window.sessionStorage.setItem(INTRO_SESSION_KEY, "1");
       } catch {
-        // Storage may be unavailable in privacy modes; the intro still completes safely.
+        // Storage can be unavailable in privacy modes without blocking the experience.
       }
     };
 
-    const maybeExit = () => {
-      if (disposed || exitStarted || !minimumElapsed || !objectReady) return;
-      exitStarted = true;
-      setPhase("exiting");
-      root.dataset.luminalIntro = "exiting";
-      exitTimer = window.setTimeout(completeExit, INTRO_EXIT_MS);
+    const dockBrand = () => {
+      if (disposed || dockingStarted || !minimumElapsed || !objectReady) return;
+      dockingStarted = true;
+      setPhase("docking");
+      root.dataset.luminalIntro = "docking";
+
+      window.requestAnimationFrame(() => {
+        const traveler = travelBrandRef.current;
+        const dock = document.querySelector<HTMLElement>("[data-home-logo-dock]");
+        if (!traveler || !dock) {
+          finishDock();
+          return;
+        }
+
+        const from = traveler.getBoundingClientRect();
+        const to = dock.getBoundingClientRect();
+        const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+        const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+        const scale = to.width / Math.max(from.width, 1);
+
+        brandAnimation = traveler.animate(
+          [
+            { transform: "translate(-50%, -50%) translate3d(0, 0, 0) scale(1)" },
+            { transform: `translate(-50%, -50%) translate3d(${dx}px, ${dy}px, 0) scale(${scale})` },
+          ],
+          {
+            duration: LOGO_DOCK_MS,
+            easing: "cubic-bezier(.68, 0, .18, 1)",
+            fill: "forwards",
+          },
+        );
+
+        brandAnimation.addEventListener("finish", finishDock, { once: true });
+        brandAnimation.addEventListener("cancel", finishDock, { once: true });
+      });
     };
 
     const handleObjectReady = () => {
       objectReady = true;
-      maybeExit();
+      dockBrand();
     };
 
     window.addEventListener("luminal:hero-object-ready", handleObjectReady);
 
     const minimumTimer = window.setTimeout(() => {
       minimumElapsed = true;
-      maybeExit();
+      dockBrand();
     }, INTRO_MINIMUM_MS);
 
     const maximumTimer = window.setTimeout(() => {
       objectReady = true;
       minimumElapsed = true;
-      maybeExit();
+      dockBrand();
     }, INTRO_MAXIMUM_MS);
 
     return () => {
       disposed = true;
       window.clearTimeout(minimumTimer);
       window.clearTimeout(maximumTimer);
-      if (exitTimer !== null) window.clearTimeout(exitTimer);
       window.removeEventListener("luminal:hero-object-ready", handleObjectReady);
+      brandAnimation?.cancel();
       unlock();
     };
   }, [enabled]);
@@ -215,7 +248,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
     const animate = () => {
       frameHandle = null;
-      const blend = 0.14;
+      const blend = 0.115;
       current = {
         xVw: interpolate(current.xVw, target.xVw, blend),
         yVh: interpolate(current.yVh, target.yVh, blend),
@@ -256,19 +289,11 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     };
   }, [enabled]);
 
-  if (!enabled) {
-    return <HeroObjectStage media={media} presentation={presentation} />;
-  }
+  if (!enabled) return null;
 
   return (
     <div className={styles.experience} data-home-immersive-experience="true">
-      <div className={styles.reserve} aria-hidden="true" />
-
-      <div
-        ref={modelLayerRef}
-        className={styles.modelLayer}
-        data-home-immersive-model="true"
-      >
+      <div ref={modelLayerRef} className={styles.modelLayer} data-home-immersive-model="true">
         <HeroObjectStage media={media} presentation={presentation} preload />
       </div>
 
@@ -283,21 +308,19 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
             <i className={styles.diamondOne} />
             <i className={styles.diamondTwo} />
           </div>
-          <p className={styles.loadingCopy} role="status" aria-live="polite">
-            Preparing the object
-          </p>
+          <p className={styles.loadingCopy} role="status" aria-live="polite">Preparing the object</p>
         </div>
 
-        <Link className={styles.travelBrand} href="/" aria-label="Luminal Factory">
+        <div ref={travelBrandRef} className={styles.travelBrand} aria-hidden="true">
           <Image
             src="/brand/luminal-factory-logo-primary.png"
             alt=""
             width={4000}
             height={4000}
             priority
-            sizes="(max-width: 899px) 72px, 144px"
+            sizes="(max-width: 899px) 104px, 152px"
           />
-        </Link>
+        </div>
       </div>
     </div>
   );
