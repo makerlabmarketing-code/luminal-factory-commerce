@@ -11,6 +11,7 @@ import { HomeImmersiveExperience } from "./home-immersive-experience";
 import { HeroTextMotionController } from "./hero-copy-motion";
 import { HomeDriftWall } from "./home-drift-wall";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
+import { MadeAtLuminalStack } from "./made-at-luminal-stack";
 import { getHomeFeaturedRaffle } from "@/features/raffle/raffle-home-service";
 
 type HomeMediaFrameProps = Readonly<{
@@ -95,17 +96,9 @@ export async function HomePage() {
         >
           <Container className="featured-object-grid">
             {immersive ? (
-              <div className="home-object-corridor">
-                <span aria-hidden="true" />
-                <i aria-hidden="true" />
-                <div className="home-object-mobile-stage">
-                  <HeroObjectStage
-                    media={homePageMedia.hero}
-                    presentation={heroPresentation}
-                    allowTouch3d
-                    mobileOnly
-                  />
-                </div>
+              <div className="home-object-corridor" aria-hidden="true">
+                <span />
+                <i />
               </div>
             ) : (
               <HomeMediaFrame
@@ -187,23 +180,7 @@ export async function HomePage() {
               <div><p className="eyebrow">Made at Luminal</p><h2 id="making-title">From thought<br />to artifact.</h2></div>
               <p>Four measured movements. Digital tools support the process; the final character still comes from the hand.</p>
             </header>
-            <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh]">
-              {content.process.map((step, index) => (
-                <li className="relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0d0d0e]/95 p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:sticky md:min-h-[60svh] md:p-10 motion-reduce:static" style={{ top: `calc(6.5rem + ${index * 1.1}rem)`, zIndex: index + 1 }} key={step.number}>
-                  <div className="grid h-full min-h-[inherit] content-between gap-12 md:grid-cols-[0.7fr_1.3fr] md:items-end" data-luminal-reveal="card" data-luminal-delay={index}>
-                    <div>
-                      <span className="font-mono text-xs tracking-[0.2em] text-white/45">{step.number} / 04</span>
-                      <h3 className="mt-5 max-w-[8ch] text-[clamp(2.6rem,7vw,7rem)] font-normal leading-[0.88] tracking-[-0.065em]">{step.title}</h3>
-                    </div>
-                    <div className="md:justify-self-end md:pb-4">
-                      <p className="max-w-[30rem] text-base leading-7 text-white/55 md:text-lg">{step.copy}</p>
-                      <div className="mt-8 h-px w-full bg-gradient-to-r from-[var(--ice)]/50 via-white/10 to-transparent" aria-hidden="true" />
-                    </div>
-                  </div>
-                  <span className="pointer-events-none absolute -right-4 -top-10 select-none text-[clamp(8rem,22vw,18rem)] font-semibold leading-none tracking-[-0.1em] text-white/[0.025]" aria-hidden="true">{step.number}</span>
-                </li>
-              ))}
-            </ol>
+            <MadeAtLuminalStack steps={content.process} />
           </Container>
         </section>
 

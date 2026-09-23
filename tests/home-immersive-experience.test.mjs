@@ -39,7 +39,7 @@ test("HOME-HERO-LAYOUT-02 moves the traveling object outside the clipped main co
 });
 
 
-test("HOME-3D-PATH-02 terminates at Meet Meowhe and turns the camera right", () => {
+test("HOME-3D-PATH-02 terminates at Meet Meowhe and turns the camera left", () => {
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   assert.match(immersive, /section: "hero" \| "featured"/);
   assert.doesNotMatch(immersive, /section: "hero" \| "featured" \| "revival"/);
@@ -49,17 +49,52 @@ test("HOME-3D-PATH-02 terminates at Meet Meowhe and turns the camera right", () 
   assert.match(immersive, /luminal:hero-orbit-offset/);
 });
 
-test("Hero 3D follows pointer without click-drag and mobile Meet keeps a 3D presentation", () => {
+test("desktop Meowhe scales down before Brand Revival enters the viewport", () => {
+  const immersive = read("src/features/home/home-immersive-experience.tsx");
+  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.98[\s\S]*?scale: 0\.54[\s\S]*?opacity: 1/);
+  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.80[\s\S]*?scale: 0\.42[\s\S]*?opacity: 0\.62/);
+  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.64[\s\S]*?scale: 0\.32[\s\S]*?opacity: 0/);
+});
+
+test("Hero 3D follows pointer on desktop and the same persistent GLB travels on mobile", () => {
   const stage = read("src/features/home/hero-object-stage.tsx");
   const home = read("src/features/home/home-page.tsx");
+  const immersive = read("src/features/home/home-immersive-experience.tsx");
   assert.match(stage, /pointer-follow-and-recenter/);
   assert.doesNotMatch(stage, /setPointerCapture/);
   assert.doesNotMatch(stage, /pointerdown/);
   assert.match(stage, /normalizedX/);
-  assert.match(stage, /allowTouch3d/);
-  assert.match(stage, /mobileOnly/);
-  assert.match(home, /allowTouch3d/);
-  assert.match(home, /mobileOnly/);
+  assert.match(immersive, /compactStates/);
+  assert.match(immersive, /allowTouch3d/);
+  assert.match(immersive, /max-width: 1023px/);
+  assert.doesNotMatch(home, /home-object-mobile-stage/);
+});
+
+test("mobile Hero reserves a lower safe stage then fades and zooms out before Brand Revival", () => {
+  const immersive = read("src/features/home/home-immersive-experience.tsx");
+  const css = read("src/features/home/home-immersive-experience.module.css");
+  const global = read("src/app/globals.css");
+  assert.match(immersive, /const desktopStates[\s\S]*?scale: 1,/);
+  assert.match(immersive, /const compactStates[\s\S]*?yVh: -34[\s\S]*?scale: 0\.80/);
+  assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.44[\s\S]*?opacity: 1/);
+  assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.22[\s\S]*?scale: 0\.60[\s\S]*?opacity: 0\.42/);
+  assert.match(immersive, /const compactStates[\s\S]*?anchor: "bottom"[\s\S]*?viewportOffset: 0\.96[\s\S]*?scale: 0\.48[\s\S]*?opacity: 0/);
+  assert.match(css, /top: 66svh/);
+  assert.match(css, /width: 96vw/);
+  assert.match(global, /min-height: 118svh/);
+  assert.match(global, /home-hero-object-corridor[\s\S]*min-height: 36svh/);
+});
+
+test("Made at Luminal collapsed cards expose their step title in the sticky strip", () => {
+  const home = read("src/features/home/home-page.tsx");
+  const stack = read("src/features/home/made-at-luminal-stack.tsx");
+  assert.match(home, /MadeAtLuminalStack/);
+  assert.match(home, /<MadeAtLuminalStack steps=\{content\.process\} \/>/);
+  assert.match(stack, /data-process-collapsed/);
+  assert.match(stack, /nextStickyTop/);
+  assert.match(stack, /\{step\.number\} \/ \{step\.title\}/);
+  assert.match(stack, /top-\[0\.22rem\]/);
+  assert.match(stack, /motion-reduce:static/);
 });
 
 test("immersive Home remains bounded by raffle, mobile and reduced-motion priorities", () => {
@@ -67,9 +102,9 @@ test("immersive Home remains bounded by raffle, mobile and reduced-motion priori
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   const css = read("src/features/home/home-immersive-experience.module.css");
   assert.match(home, /const immersive = !featuredRaffle/);
-  assert.match(immersive, /min-width: 900px/);
+  assert.match(immersive, /max-width: 1023px/);
   assert.match(immersive, /prefers-reduced-motion: reduce/);
-  assert.match(css, /@media \(max-width: 899px\)/);
+  assert.match(css, /@media \(max-width: 1023px\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
