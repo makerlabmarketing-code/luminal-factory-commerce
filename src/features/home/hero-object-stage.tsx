@@ -8,6 +8,7 @@ import type { HeroModelPresentation } from "./hero-model-config";
 type HeroObjectStageProps = Readonly<{
   media: HomeMediaContract;
   presentation: HeroModelPresentation;
+  preload?: boolean;
 }>;
 
 type NetworkInformationLike = {
@@ -65,7 +66,7 @@ function ensureModelViewer() {
   });
 }
 
-export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
+export function HeroObjectStage({ media, presentation, preload = false }: HeroObjectStageProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
@@ -95,6 +96,10 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       || connection?.effectiveType === "slow-2g"
       || connection?.effectiveType === "2g";
     const posterOnly = !finePointer || constrainedNetwork;
+    const signalObjectReady = (mode: string) => {
+      document.documentElement.dataset.luminalHeroObjectReady = mode;
+      window.dispatchEvent(new CustomEvent("luminal:hero-object-ready", { detail: { mode } }));
+    };
 
     if (posterOnly) {
       stage.dataset.heroMode = !finePointer ? "poster-coarse-pointer" : "poster-constrained-network";
@@ -104,6 +109,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         preview.style.visibility = "visible";
         preview.style.opacity = "1";
       }
+      signalObjectReady("poster");
       return;
     }
 
@@ -217,6 +223,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
         preview.style.display = "none";
         preview.style.visibility = "hidden";
       }
+      signalObjectReady("fallback-error");
     };
 
     const mountViewer = async () => {
@@ -270,6 +277,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
           }
           if (errorRef.current) errorRef.current.style.opacity = "0";
           mount.style.opacity = "1";
+          signalObjectReady("3d");
         }, { once: true });
 
         viewer.addEventListener("error", showError, { once: true });
@@ -298,13 +306,17 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       }, HERO_IDLE_FALLBACK_MS);
     };
 
-    observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer?.disconnect();
-      scheduleMountViewer();
-    }, { rootMargin: "160px" });
+    if (preload) {
+      void mountViewer();
+    } else {
+      observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer?.disconnect();
+        scheduleMountViewer();
+      }, { rootMargin: "160px" });
 
-    observer.observe(stage);
+      observer.observe(stage);
+    }
 
     return () => {
       cancelled = true;
@@ -326,7 +338,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       viewerRef.current = null;
       mount.replaceChildren();
     };
-  }, [media.alt, media.availability, presentation]);
+  }, [media.alt, media.availability, preload, presentation]);
 
   return (
     <div
@@ -336,6 +348,7 @@ export function HeroObjectStage({ media, presentation }: HeroObjectStageProps) {
       data-hero-interaction="drag-to-rotate-and-recenter"
       data-hero-mode="capability-gated"
       data-hero-tint={presentation.tint ?? "default"}
+      data-hero-preload={preload ? "true" : "false"}
     >
       {media.availability === "available" ? (
         <>

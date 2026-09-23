@@ -1,0 +1,267 @@
+.experience {
+  position: relative;
+  min-width: 0;
+}
+
+.reserve {
+  min-height: 30rem;
+}
+
+.modelLayer {
+  position: fixed;
+  z-index: 18;
+  top: 8vh;
+  right: -2vw;
+  width: min(58vw, 62rem);
+  height: min(82vh, 52rem);
+  transform-origin: 52% 52%;
+  will-change: transform, opacity;
+  pointer-events: auto;
+}
+
+.modelLayer :global(.hero-object-stage) {
+  height: 100%;
+  min-height: 100% !important;
+}
+
+.introRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(185, 233, 255, 0.05), transparent 30rem),
+    linear-gradient(180deg, #06080c 0%, #050505 68%, #070708 100%);
+  opacity: 1;
+  transition:
+    opacity 720ms cubic-bezier(.22, 1, .36, 1),
+    visibility 0s linear 720ms;
+}
+
+.progress {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(0.03);
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(185, 233, 255, 0.25), #eef8ff 52%, rgba(243, 201, 232, 0.42));
+  animation: introProgress 2.15s cubic-bezier(.2, .7, .2, 1) forwards;
+}
+
+.blueprint {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(64vw, 48rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  opacity: 0.74;
+}
+
+.blueprint i {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.ringOuter,
+.ringInner {
+  border: 1px solid rgba(238, 248, 255, 0.12);
+  border-radius: 50%;
+  animation: blueprintSettle 1.8s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.ringOuter {
+  inset: 4%;
+  border-left-color: transparent;
+  border-bottom-color: rgba(200, 196, 255, 0.2);
+}
+
+.ringInner {
+  inset: 24%;
+  border-right-color: transparent;
+  border-top-color: rgba(243, 201, 232, 0.15);
+  animation-delay: 80ms;
+}
+
+.axisHorizontal {
+  left: 4%;
+  right: 4%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(238, 248, 255, 0.16) 20%, rgba(238, 248, 255, 0.16) 80%, transparent);
+}
+
+.axisVertical {
+  top: 4%;
+  bottom: 4%;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(238, 248, 255, 0.11) 20%, rgba(238, 248, 255, 0.11) 80%, transparent);
+}
+
+.diamondOne,
+.diamondTwo {
+  left: 50%;
+  top: 50%;
+  border: 1px solid rgba(238, 248, 255, 0.11);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.diamondOne {
+  width: 34%;
+  height: 34%;
+}
+
+.diamondTwo {
+  width: 17%;
+  height: 17%;
+  border-color: rgba(185, 233, 255, 0.18);
+}
+
+.travelBrand {
+  position: fixed;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: clamp(6.8rem, 9vw, 9.5rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(0.82);
+  opacity: 0;
+  filter: brightness(1.08) saturate(0.82);
+  transition:
+    top 920ms cubic-bezier(.76, 0, .24, 1),
+    left 920ms cubic-bezier(.76, 0, .24, 1),
+    width 920ms cubic-bezier(.76, 0, .24, 1),
+    transform 920ms cubic-bezier(.76, 0, .24, 1),
+    opacity 500ms ease,
+    filter 500ms ease;
+  animation: brandMaterialize 760ms 360ms cubic-bezier(.22, 1, .36, 1) forwards;
+  pointer-events: auto;
+}
+
+.travelBrand img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.loadingCopy {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(2rem, 5vh, 4rem);
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(242, 242, 240, 0.38);
+}
+
+.introRoot[data-phase="exiting"] .travelBrand,
+.introRoot[data-phase="done"] .travelBrand {
+  top: clamp(1rem, 2.2vw, 1.65rem);
+  left: clamp(1rem, 2.2vw, 1.65rem);
+  width: clamp(3rem, 4vw, 4rem);
+  transform: translate(0, 0) scale(1);
+  opacity: 1;
+  filter: brightness(1) saturate(0.92);
+}
+
+.introRoot[data-phase="exiting"] .veil,
+.introRoot[data-phase="done"] .veil {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.introRoot[data-phase="exiting"] .progress span,
+.introRoot[data-phase="done"] .progress span {
+  transform: scaleX(1);
+  transition: transform 260ms ease-out;
+}
+
+@keyframes introProgress {
+  0% { transform: scaleX(0.03); }
+  70% { transform: scaleX(0.72); }
+  100% { transform: scaleX(0.9); }
+}
+
+@keyframes blueprintSettle {
+  from { opacity: 0; transform: scale(0.88) rotate(-7deg); }
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes brandMaterialize {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.82); filter: blur(8px) brightness(1.7); }
+  58% { opacity: 0.72; }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0) brightness(1.08); }
+}
+
+@media (max-width: 899px) {
+  .reserve {
+    min-height: 32rem;
+  }
+
+  .modelLayer {
+    position: absolute;
+    z-index: 2;
+    inset: 0 -18vw auto -18vw;
+    width: auto;
+    height: 32rem;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: none !important;
+  }
+
+  .blueprint {
+    width: min(92vw, 34rem);
+  }
+
+  .travelBrand {
+    width: 6.5rem;
+  }
+
+  .introRoot[data-phase="exiting"] .travelBrand,
+  .introRoot[data-phase="done"] .travelBrand {
+    width: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .veil {
+    transition-duration: 120ms;
+  }
+
+  .progress span,
+  .blueprint i,
+  .travelBrand {
+    animation: none !important;
+  }
+
+  .travelBrand {
+    opacity: 1;
+    transition: none;
+  }
+
+  .modelLayer {
+    will-change: auto;
+  }
+}

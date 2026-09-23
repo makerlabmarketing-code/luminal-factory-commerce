@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
 import { getHeroModelPresentation } from "./hero-model-data";
-import { HeroObjectStage } from "./hero-object-stage";
+import { HomeImmersiveExperience } from "./home-immersive-experience";
 import { HeroTextMotionController } from "./hero-copy-motion";
 import { HomeDriftWall } from "./home-drift-wall";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
@@ -46,7 +46,7 @@ export async function HomePage() {
   return (
     <main id="main-content" className="wave-home">
       {featuredRaffle ? <HomeRaffleSpotlight raffle={featuredRaffle} /> : null}
-      <section className="revival-hero" aria-labelledby="hero-title">
+      <section className="revival-hero" aria-labelledby="hero-title" data-home-3d-section="hero">
         <div className="hero-atmosphere" aria-hidden="true" />
         <Container className="revival-hero-inner lg:!grid-cols-[minmax(0,.72fr)_minmax(28rem,1.28fr)] lg:!gap-[clamp(2rem,5vw,6rem)]">
           <div className="revival-hero-copy lg:max-w-[34rem] lg:-translate-y-[4vh]" data-hero-text-motion="word-reveal">
@@ -66,13 +66,17 @@ export async function HomePage() {
             <HeroTextMotionController />
           </div>
           <div className="relative min-w-0 lg:-mr-[min(7vw,7rem)] lg:pt-6">
-            <HeroObjectStage media={homePageMedia.hero} presentation={heroPresentation} />
+            <HomeImmersiveExperience
+              media={homePageMedia.hero}
+              presentation={heroPresentation}
+              enabled={!featuredRaffle}
+            />
           </div>
           <p className="hero-scroll-note" aria-hidden="true">Scroll to enter the archive <span>↓</span></p>
         </Container>
       </section>
 
-      <section className="featured-object" aria-labelledby="featured-title">
+      <section className="featured-object" aria-labelledby="featured-title" data-home-3d-section="featured">
         <Container className="featured-object-grid">
           <HomeMediaFrame media={homePageMedia.featured} className="featured-object-media border border-white/10 shadow-[0_3rem_9rem_rgba(0,0,0,0.28)]" imageClassName="home-product-image featured-product-image" placeholderClassName="featured-object-form" motionReveal="media" motionSpotlight />
           <div className="featured-object-copy self-start lg:sticky lg:top-28" data-luminal-reveal="copy">
@@ -85,7 +89,7 @@ export async function HomePage() {
         </Container>
       </section>
 
-      <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title">
+      <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title" data-home-3d-section="revival">
         <Container>
           <p className="eyebrow" data-luminal-reveal="copy">A studio in transition</p>
           <h2 id="revival-title" data-luminal-reveal="copy"><span>Lazy Factory</span><i aria-hidden="true">→</i>Luminal Factory</h2>
@@ -93,7 +97,7 @@ export async function HomePage() {
         </Container>
       </section>
 
-      <section className="selected-archive section [content-visibility:auto] [contain-intrinsic-size:auto_1500px]" aria-labelledby="archive-title">
+      <section className="selected-archive section [content-visibility:auto] [contain-intrinsic-size:auto_1500px]" aria-labelledby="archive-title" data-home-3d-section="archive">
         <Container>
           <header className="editorial-heading" data-luminal-reveal="copy">
             <div><p className="eyebrow">Selected archive</p><h2 id="archive-title">Objects with a past.</h2></div>
@@ -120,7 +124,7 @@ export async function HomePage() {
         </Container>
       </section>
 
-      <section className="home-gallery section border-t border-white/10 bg-[#070707] [content-visibility:auto] [contain-intrinsic-size:auto_980px]" aria-labelledby="gallery-title">
+      <section className="home-gallery section border-t border-white/10 bg-[#070707] [content-visibility:auto] [contain-intrinsic-size:auto_980px]" aria-labelledby="gallery-title" data-home-3d-section="gallery">
         <Container>
           <header className="editorial-heading" data-luminal-reveal="copy">
             <div><p className="eyebrow">Colorway studies</p><h2 id="gallery-title">One character.<br />Three moods.</h2></div>
