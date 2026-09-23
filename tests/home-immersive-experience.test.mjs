@@ -85,19 +85,29 @@ test("mobile Hero reserves a lower safe stage then fades and zooms out before Br
   assert.match(global, /home-hero-object-corridor[\s\S]*min-height: 36svh/);
 });
 
-test("Made at Luminal collapsed cards expose their step title in the sticky strip", () => {
+test("Made at Luminal keeps collapsed titles visible and releases Step 04 into the next section", () => {
   const home = read("src/features/home/home-page.tsx");
   const stack = read("src/features/home/made-at-luminal-stack.tsx");
   assert.match(home, /MadeAtLuminalStack/);
   assert.match(home, /<MadeAtLuminalStack steps=\{content\.process\} \/>/);
-  assert.match(stack, /data-process-collapsed/);
+  assert.match(home, /data-made-at-luminal-header="true"/);
+  assert.match(home, /md:z-30/);
+  assert.match(home, /md:pb-0/);
+  assert.match(stack, /data-process-title-rail="true"/);
+  assert.match(stack, /steps\.slice\(0, -1\)/);
   assert.match(stack, /collapsedStripPx/);
   assert.match(stack, /nextTop <= currentTop \+ collapsedStripPx/);
   assert.match(stack, /\{step\.number\} \/ \{step\.title\}/);
-  assert.match(stack, /top-\[0\.22rem\]/);
-  assert.match(stack, /motion-reduce:static/);
-  assert.match(stack, /md:min-h-\[calc\(100svh-12rem\)\]/);
-  assert.match(stack, /isLast \? "md:min-h-\[calc\(100svh-12rem\)\]"/);
+  assert.match(stack, /data-process-terminal=\{isLast \? "true" : undefined\}/);
+  assert.match(stack, /isLast \? "md:relative" : "md:sticky"/);
+  assert.match(stack, /top: isLast \? undefined/);
+  assert.match(stack, /md:pb-0/);
+  assert.match(stack, /--process-stack-top/);
+  assert.match(stack, /HEADER_STICKY_TOP_REM/);
+  assert.match(stack, /HEADER_STACK_GAP_REM/);
+  assert.match(stack, /var\(--process-stack-top, 15rem\)/);
+  assert.match(stack, /md:min-h-\[60svh\]/);
+  assert.doesNotMatch(stack, /100svh-12rem/);
 });
 
 test("immersive Home remains bounded by raffle, mobile and reduced-motion priorities", () => {
