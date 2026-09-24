@@ -624,7 +624,7 @@ begin
       return;
   end;
 end;
-$function$
+$function$;
 
 
 revoke execute on function public.merge_verified_customer_guest_cart(uuid, text, text)
