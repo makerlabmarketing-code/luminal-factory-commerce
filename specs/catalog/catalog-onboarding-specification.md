@@ -2,7 +2,7 @@
 
 ## Document metadata
 
-- **Status:** `PARTIALLY_APPROVED_MEDIA_CONFIRMATION_REQUIRED`
+- **Status:** `CONTENT_MATRIX_PROPOSED_LIVE_APPROVAL_REQUIRED`
 - **Date:** 2026-09-20
 - **Application:** Luminal Factory Commerce
 - **Database:** `bkmbhcfokobmhfzgsfzh`
@@ -54,16 +54,50 @@ No Production data operation may start until all fields below are explicit.
 | --- | --- |
 | Product | Approved: `Meowhe Lolipop`, slug `meowhe-lolipop` |
 | Product type | Approved: `artisan_keycap` |
-| Description | Proposed truthful copy requires final owner confirmation |
+| Description | Proposed: `Meowhe Lolipop is a small-batch artisan keycap by Luminal Factory, featuring the colorful Lolipop finish of the Meowhe character.` |
 | Variant | Approved: `Lolipop`, SKU `LF-MEOWHE-LOLIPOP-01` |
 | Price | Approved: `$70.00 USD` = `7000` minor units |
-| Media | Exact approved local WebP path, alt text and crop suitability |
-| Publication | Explicit approval to publish immediately |
+| Media | Proposed and Production-verified: `/images/home/archive-meowhe.webp`; alt `Meowhe Lolipop artisan keycap in the colorful Lolipop colorway` |
+| Publication | Proposed: publish immediately in the same atomic transaction after `CATALOG-PROD-ONBOARDING-01` |
 
 Candidate local media already present in the reviewed storefront include
 Lolipop, Mictlán and Mono archive WebPs below `/images/home/`. Their existing
 Homepage approval does not silently grant catalog-product usage; the owner must
 select the exact image for this product operation.
+
+## Proposed final content matrix
+
+This matrix is now complete enough for owner review. It is **not** live
+authorization by itself.
+
+| Field | Exact proposed value |
+| --- | --- |
+| Product name | `Meowhe Lolipop` |
+| Slug | `meowhe-lolipop` |
+| Product type | `artisan_keycap` |
+| Description | `Meowhe Lolipop is a small-batch artisan keycap by Luminal Factory, featuring the colorful Lolipop finish of the Meowhe character.` |
+| Release type | `direct` |
+| Status | `published` |
+| Variant name | `Lolipop` |
+| SKU | `LF-MEOWHE-LOLIPOP-01` |
+| Currency | `USD` |
+| Price | `7000` minor units = `$70.00` |
+| Media path | `/images/home/archive-meowhe.webp` |
+| Media alt | `Meowhe Lolipop artisan keycap in the colorful Lolipop colorway` |
+| Primary media | `true`, `sort_order = 0` |
+| Publication timing | Immediate in the approved atomic transaction |
+
+### Media verification — 2026-09-24
+
+- The selected WebP exists in `master` at
+  `public/images/home/archive-meowhe.webp`.
+- The deployed Production URL
+  `/images/home/archive-meowhe.webp` returned HTTP 200 with
+  `content-type: image/webp` and `content-length: 120326`.
+- No new Storage bucket, object upload, Drive URL or remote media origin is
+  required for this first catalog item.
+- Existing Homepage usage already presents this asset as Lolipop Meowhe media;
+  catalog-product use still requires owner approval through the live gate.
 
 ## Data contract
 
