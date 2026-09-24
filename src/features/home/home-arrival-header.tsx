@@ -15,10 +15,7 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!immersive) {
-      setStage("revealed");
-      return;
-    }
+    if (!immersive) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let seenIntro = false;
@@ -33,8 +30,8 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
       || seenIntro
       || document.documentElement.dataset.luminalBrandDocked === "true"
     ) {
-      setStage("revealed");
-      return;
+      const revealFrame = window.requestAnimationFrame(() => setStage("revealed"));
+      return () => window.cancelAnimationFrame(revealFrame);
     }
 
     const reveal = () => setStage("revealed");
@@ -54,7 +51,7 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
   return (
     <header
       className={styles.header}
-      data-stage={stage}
+      data-stage={immersive ? stage : "revealed"}
       data-menu-open={menuOpen ? "true" : "false"}
     >
       <a className="skip-link" href="#main-content">Bỏ qua đến nội dung chính</a>
