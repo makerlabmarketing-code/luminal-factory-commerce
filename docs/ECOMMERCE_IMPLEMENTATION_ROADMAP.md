@@ -203,8 +203,14 @@ Every phase uses the same contract fields below.
   Guest Cart and verified Customer Cart validated publication/variant state but
   did not encode the raffle-only keycap rule. The hardening slice adds a
   database backstop plus server eligibility checks so `artisan_keycap` fails
-  closed as `catalog_selection_unavailable`. Runtime remains disabled while
-  this boundary is delivered.
+  closed as `catalog_selection_unavailable`.
+- **Cart product-type Production evidence:** Migration
+  `20260924030014_enforce_cart_raffle_product_boundary` is applied. A
+  `cart_items` trigger rejects artisan-keycap line writes; verified customer
+  reads/set and guest→customer merge revalidation exclude
+  `artisan_keycap`; execute grants remain service-role-only. Postflight
+  retained zero customers, carts, cart items, orders, payments and refunds, and
+  advisors added no new warning/error. Cart/Auth runtime remains disabled.
 - **USD decision:** The owner approved `CART-USD-01`, Meowhe Lolipop at `$70.00`
   and internal SKU `LF-MEOWHE-LOLIPOP-01`. The local Cart contract now uses USD
   cents consistently across persistence, RPC validation and presentation.
