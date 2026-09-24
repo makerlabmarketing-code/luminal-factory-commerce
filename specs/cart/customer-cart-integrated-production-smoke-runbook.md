@@ -53,14 +53,20 @@ tokens into Git, chat, screenshots, CI output or application logs.
 
 ## Mandatory catalog prerequisite
 
-The smoke needs exactly one owner-approved, already-published direct-shop
-product and active variant combination because guest/customer cart writes
-revalidate published catalog membership.
+The smoke needs exactly one owner-approved, already-published **cart-eligible
+non-keycap** product and active variant combination because guest/customer cart
+writes revalidate both published catalog membership and the product-type
+boundary.
 
-Stop if no such catalog row exists. Do not create, publish or repurpose a
-temporary Production product under this approval. Record only the chosen
-product/variant IDs in the private operator session; do not change price,
-publication, media, inventory or product content.
+Artisan keycaps are raffle-only and must never be selected for this smoke.
+Meowhe Lolipop is therefore not a Cart prerequisite even though it is already
+published in the public catalog. The Cart smoke must use an approved toy / 3D
+model product that is not `artisan_keycap`.
+
+Stop if no such non-keycap catalog row exists. Do not create, publish or
+repurpose a temporary Production product under this approval. Record only the
+chosen product/variant IDs in the private operator session; do not change
+price, publication, media, inventory or product content.
 
 ## Read-only preflight
 
@@ -82,7 +88,8 @@ publication, media, inventory or product content.
    execute grants; browser roles remain denied from cart tables and RPCs.
 7. Confirm the retained signed-out OTP-smoke Auth identity is available for the
    owner. Do not create or delete an Auth user during preflight.
-8. Select one approved published direct-shop product/variant prerequisite.
+8. Select one approved published cart-eligible non-keycap product/variant
+   prerequisite. Explicitly reject any `artisan_keycap` selection.
 
 Stop on source drift, unexpected rows/sessions, missing configuration, grant or
 RLS drift, absent catalog prerequisite, a non-READY deployment, or any already
@@ -156,7 +163,8 @@ this run. Never truncate tables or delete by a broad time range.
 
 Stop without retrying, broadening scope or deleting unrelated data if:
 
-- the approved catalog row changes or becomes unavailable;
+- the approved catalog row changes, becomes unavailable or resolves to an
+  `artisan_keycap`;
 - more than one OTP, guest cart, customer cart, customer or merge receipt is
   created;
 - identity verification is unavailable or a verified session falls back to
