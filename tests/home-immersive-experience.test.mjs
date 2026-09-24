@@ -85,7 +85,7 @@ test("mobile Hero reserves a lower safe stage then fades and zooms out before Br
   assert.match(global, /home-hero-object-corridor[\s\S]*min-height: 36svh/);
 });
 
-test("Made at Luminal keeps collapsed titles visible and releases Step 04 into the next section", () => {
+test("Made at Luminal exits the sticky chrome together with terminal Step 04", () => {
   const home = read("src/features/home/home-page.tsx");
   const stack = read("src/features/home/made-at-luminal-stack.tsx");
   assert.match(home, /MadeAtLuminalStack/);
@@ -101,6 +101,12 @@ test("Made at Luminal keeps collapsed titles visible and releases Step 04 into t
   assert.match(stack, /data-process-terminal=\{isLast \? "true" : undefined\}/);
   assert.match(stack, /isLast \? "md:relative" : "md:sticky"/);
   assert.match(stack, /top: isLast \? undefined/);
+  assert.match(stack, /terminalTargetTop/);
+  assert.match(stack, /releaseDistance = Math\.max\(0, terminalTargetTop - terminalTop\)/);
+  assert.match(stack, /--process-release-y/);
+  assert.match(stack, /header\.style\.translate/);
+  assert.match(stack, /translate: "0 var\(--process-release-y, 0px\)"/);
+  assert.match(stack, /translate: isLast \? undefined : "0 var\(--process-release-y, 0px\)"/);
   assert.match(stack, /md:pb-0/);
   assert.match(stack, /--process-stack-top/);
   assert.match(stack, /HEADER_STICKY_TOP_REM/);

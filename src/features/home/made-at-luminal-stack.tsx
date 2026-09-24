@@ -38,6 +38,9 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       const list = listRef.current;
       if (!desktop.matches || reducedMotion.matches) {
         list?.style.removeProperty("--process-stack-top");
+        list?.style.removeProperty("--process-release-y");
+        const header = document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']");
+        header?.style.removeProperty("translate");
         setCollapsed((previous) => {
           const next = steps.map(() => false);
           return statesEqual(previous, next) ? previous : next;
@@ -47,14 +50,25 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
 
       const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
       const header = document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']");
+      let stackTopPx = 0;
       if (list && header) {
         const headerHeight = header.getBoundingClientRect().height;
-        const stackTopPx = (
+        stackTopPx = (
           HEADER_STICKY_TOP_REM * rootFontSize
           + headerHeight
           + HEADER_STACK_GAP_REM * rootFontSize
         );
         list.style.setProperty("--process-stack-top", `${Math.round(stackTopPx)}px`);
+
+        const terminalIndex = steps.length - 1;
+        const terminalCard = itemRefs.current[terminalIndex];
+        const terminalTargetTop = stackTopPx + terminalIndex * STICKY_STEP_REM * rootFontSize;
+        const terminalTop = terminalCard?.getBoundingClientRect().top ?? terminalTargetTop;
+        const releaseDistance = Math.max(0, terminalTargetTop - terminalTop);
+        const releaseY = `-${Math.round(releaseDistance)}px`;
+
+        list.style.setProperty("--process-release-y", releaseY);
+        header.style.translate = `0 ${releaseY}`;
       }
 
       const collapsedStripPx = STICKY_STEP_REM * rootFontSize + 2;
@@ -86,6 +100,8 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
 
     return () => {
       if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
+      listRef.current?.style.removeProperty("--process-release-y");
+      document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']")?.style.removeProperty("translate");
       window.removeEventListener("scroll", scheduleMeasure);
       window.removeEventListener("resize", scheduleMeasure);
       desktop.removeEventListener("change", scheduleMeasure);
@@ -97,7 +113,10 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
     <div ref={listRef} className="relative">
       <div
         className="pointer-events-none sticky z-20 hidden h-px overflow-visible md:block motion-reduce:hidden"
-        style={{ top: "var(--process-stack-top, 15rem)" }}
+        style={{
+          top: "var(--process-stack-top, 15rem)",
+          translate: "0 var(--process-release-y, 0px)",
+        }}
         aria-hidden="true"
         data-process-title-rail="true"
       >
@@ -128,6 +147,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
               style={{
                 top: isLast ? undefined : `calc(var(--process-stack-top, 15rem) + ${index * STICKY_STEP_REM}rem)`,
                 zIndex: index + 1,
+                translate: isLast ? undefined : "0 var(--process-release-y, 0px)",
               }}
               key={step.number}
               data-process-collapsed={collapsed[index] ? "true" : "false"}
