@@ -45,7 +45,7 @@ test("raffle adapters use the canonical Production-generated contract", () => {
 test("raffle request boundary rejects cross-site and oversized input", () => {
   const request = read("src/features/raffle/raffle-entry-request.ts");
   const route = read("src/app/api/raffle-entry/route.ts");
-  assert.match(request, /RAFFLE_ENTRY_REQUEST_MAX_BYTES = 8 \* 1024/);
+  assert.match(request, /RAFFLE_ENTRY_REQUEST_MAX_BYTES = 12 \* 1024/);
   assert.match(request, /contentType !== "application\/json"/);
   assert.match(request, /allowedOrigins\.has\(origin\)/);
   assert.match(request, /sec-fetch-site/);
