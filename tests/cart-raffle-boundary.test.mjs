@@ -24,6 +24,8 @@ test("database rejects artisan keycaps and customer-cart RPC returns unavailable
   assert.match(migration, /products\.product_type <> 'artisan_keycap'/);
   assert.match(migration, /catalog_selection_unavailable/);
   assert.match(migration, /private\.verified_customer_cart_document/);
+  assert.match(migration, /merge_verified_customer_guest_cart/);
+  assert.match(migration, /v_unavailable := v_unavailable \+ 1/);
   assert.doesNotMatch(
     migration,
     /(?:insert into|update|delete from)\s+public\.(?:inventory_items|orders|payments|refunds|raffles|raffle_entries)/i,
