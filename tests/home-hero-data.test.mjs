@@ -63,7 +63,7 @@ test("homepage reads one active Hero through a server-only validated adapter", (
   assert.match(adapter, /AbortSignal\.timeout\(HERO_CONFIG_TIMEOUT_MS\)/);
   assert.match(adapter, /storage\/v1\/object\/public\/\$\{HERO_BUCKET\}/);
   assert.match(adapter, /defaultHeroModelPresentation/);
-  assert.match(home, /await getHeroModelPresentation\(\)/);
+  assert.match(home, /Promise\.all\(\[[\s\S]*getHeroModelPresentation\(\),[\s\S]*getHomeFeaturedRaffle\(\)/);
   assert.match(home, /presentation=\{heroPresentation\}/);
 });
 
