@@ -155,13 +155,10 @@ function stateDistance(left: MotionState, right: MotionState) {
 export function HomeImmersiveExperience({ media, presentation, enabled }: HomeImmersiveExperienceProps) {
   const modelLayerRef = useRef<HTMLDivElement>(null);
   const travelBrandRef = useRef<HTMLDivElement>(null);
-  const [phase, setPhase] = useState<IntroPhase>("loading");
+  const [phase, setPhase] = useState<IntroPhase>(() => enabled ? "loading" : "done");
 
   useEffect(() => {
-    if (!enabled) {
-      setPhase("done");
-      return;
-    }
+    if (!enabled) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let seenIntro = false;
@@ -173,8 +170,8 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
     if (reducedMotion || seenIntro) {
       document.documentElement.dataset.luminalBrandDocked = "true";
-      setPhase("done");
-      return;
+      const finishFrame = window.requestAnimationFrame(() => setPhase("done"));
+      return () => window.cancelAnimationFrame(finishFrame);
     }
 
     const root = document.documentElement;
