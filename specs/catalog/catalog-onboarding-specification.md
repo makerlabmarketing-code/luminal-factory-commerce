@@ -2,170 +2,80 @@
 
 ## Document metadata
 
-- **Status:** `CONTENT_MATRIX_PROPOSED_LIVE_APPROVAL_REQUIRED`
-- **Date:** 2026-09-20
+- **Status:** `COMPLETED_EXISTING_PRODUCTION_VALIDATED`
+- **Original date:** 2026-09-20
+- **Production execution:** 2026-09-21
+- **Revalidation:** 2026-09-24
 - **Application:** Luminal Factory Commerce
 - **Database:** `bkmbhcfokobmhfzgsfzh`
-- **Planning gate:** `CATALOG-ONBOARDING-01`
 - **Live data gate:** `CATALOG-PROD-ONBOARDING-01`
-- **Runtime state:** every Commerce and raffle runtime flag remains `false`
+- **Runtime state:** Commerce Cart/Auth runtime remains disabled
 
 ## Purpose
 
-Onboard one real, owner-approved direct-shop product so the published catalog,
-Shop presentation and later Phase 6 integrated cart smoke have a truthful
-Production prerequisite. This is content onboarding, not a temporary test
-fixture.
+Record the first permanent published Commerce catalog object and its public
+presentation boundary.
 
-The first slice creates exactly:
+This catalog entry is an **artisan keycap**. Luminal Factory's business rule is
+that artisan keycaps are sold through the raffle flow, not through Cart.
+Publishing a keycap in the public catalog does not make it Cart-eligible.
 
-- one published `products` row;
-- one active `product_variants` row;
-- one active variant-specific `product_prices` row in USD;
-- one primary image `product_media` row.
+## Production record
 
-It does not create inventory, orders, payments, customers, carts, raffle data,
-ERP records or a new runtime surface.
+Read-only verification on 2026-09-24 confirms the transaction had already been
+executed on 2026-09-21. Do not execute the onboarding transaction again.
 
-## Verified Production baseline
-
-Read-only inspection on 2026-09-20 confirmed:
-
-| Resource | Count |
-| --- | ---: |
-| Products | 0 |
-| Published products | 0 |
-| Variants / active variants | 0 / 0 |
-| Prices / active prices | 0 / 0 |
-| Product media | 0 |
-| Storage buckets / objects | 1 / 0 |
-
-The only Storage bucket is the public, purpose-specific `homepage-hero`
-bucket. It must not be repurposed for catalog media. The first catalog item may
-use an approved root-relative WebP already shipped with the storefront; a
-future Storage-backed catalog needs its own separately reviewed bucket and
-upload policy.
-
-## Required owner decisions
-
-No Production data operation may start until all fields below are explicit.
-
-| Field | Required decision |
+| Field | Production value |
 | --- | --- |
-| Product | Approved: `Meowhe Lolipop`, slug `meowhe-lolipop` |
-| Product type | Approved: `artisan_keycap` |
-| Description | Proposed: `Meowhe Lolipop is a small-batch artisan keycap by Luminal Factory, featuring the colorful Lolipop finish of the Meowhe character.` |
-| Variant | Approved: `Lolipop`, SKU `LF-MEOWHE-LOLIPOP-01` |
-| Price | Approved: `$70.00 USD` = `7000` minor units |
-| Media | Proposed and Production-verified: `/images/home/archive-meowhe.webp`; alt `Meowhe Lolipop artisan keycap in the colorful Lolipop colorway` |
-| Publication | Proposed: publish immediately in the same atomic transaction after `CATALOG-PROD-ONBOARDING-01` |
-
-Candidate local media already present in the reviewed storefront include
-Lolipop, Mictlán and Mono archive WebPs below `/images/home/`. Their existing
-Homepage approval does not silently grant catalog-product usage; the owner must
-select the exact image for this product operation.
-
-## Proposed final content matrix
-
-This matrix is now complete enough for owner review. It is **not** live
-authorization by itself.
-
-| Field | Exact proposed value |
-| --- | --- |
+| Product ID | `4717c1b7-1bd1-45a6-b310-a116c60fe8bc` |
 | Product name | `Meowhe Lolipop` |
 | Slug | `meowhe-lolipop` |
 | Product type | `artisan_keycap` |
-| Description | `Meowhe Lolipop is a small-batch artisan keycap by Luminal Factory, featuring the colorful Lolipop finish of the Meowhe character.` |
+| Description | `Meowhe Lolipop is the first colorway of the Meowhe artisan keycap, combining a candy-inspired palette with mismatched eyes and a mischievous grin. Originally introduced during the Lazy Factory chapter, it returns as part of Luminal Factory’s revival.` |
 | Release type | `direct` |
 | Status | `published` |
-| Variant name | `Lolipop` |
+| Variant ID | `7f8dfd08-f4ca-485d-b69a-f337e19622c5` |
+| Variant | `Lolipop` |
 | SKU | `LF-MEOWHE-LOLIPOP-01` |
+| Price ID | `26ee2912-b5f4-4c4e-b3dd-02693aa399a1` |
 | Currency | `USD` |
 | Price | `7000` minor units = `$70.00` |
-| Media path | `/images/home/archive-meowhe.webp` |
-| Media alt | `Meowhe Lolipop artisan keycap in the colorful Lolipop colorway` |
-| Primary media | `true`, `sort_order = 0` |
-| Publication timing | Immediate in the approved atomic transaction |
+| Media ID | `2a334d13-925e-4524-8e4d-6ee86089b23c` |
+| Media path | `/images/home/gallery/lolipop-candy-stones.webp` |
+| Media alt | `Meowhe Lolipop artisan keycap photographed on pastel candy stones` |
+| Published at | `2026-09-21T07:26:35.468166Z` |
 
-### Media verification — 2026-09-24
+A separate draft product, `raffle-flow-test-object`, exists only for raffle
+flow testing and is not public catalog content.
 
-- The selected WebP exists in `master` at
-  `public/images/home/archive-meowhe.webp`.
-- The deployed Production URL
-  `/images/home/archive-meowhe.webp` returned HTTP 200 with
-  `content-type: image/webp` and `content-length: 120326`.
-- No new Storage bucket, object upload, Drive URL or remote media origin is
-  required for this first catalog item.
-- Existing Homepage usage already presents this asset as Lolipop Meowhe media;
-  catalog-product use still requires owner approval through the live gate.
+## Validation evidence — 2026-09-24
 
-## Data contract
+- Production has exactly one published Meowhe Lolipop product, one matching
+  active variant, one active USD price and one primary media row.
+- `/shop` publicly renders Meowhe Lolipop at $70.
+- `/shop/meowhe-lolipop` returns HTTP 200.
+- Customers, carts, cart items, inventory, orders, payments and refunds remain
+  zero-row.
+- Catalog RLS continues to expose only published products and their active
+  variants/prices/media.
+- Vercel reported no runtime error for Shop/Cart/Account routes in the
+  postflight window.
+- Supabase advisors produced no new catalog-specific warning/error.
 
-### Product
+## Cart / raffle boundary
 
-- `slug` matches `^[a-z0-9]+(?:-[a-z0-9]+)*$` and is permanent.
-- `name` and `description` contain only approved product facts.
-- `release_type = 'direct'`.
-- `status = 'published'` only in the final atomic operation.
-- `published_at` is the operation timestamp and is not future-dated.
+- `artisan_keycap` is raffle-only.
+- Guest Cart and verified Customer Cart must reject `artisan_keycap`.
+- A future `CART-INTEGRATED-SMOKE-01` requires an approved published
+  non-keycap toy / 3D model product.
+- Meowhe Lolipop must not be used as the Cart smoke fixture.
+- Checkout/order/payment work remains outside this catalog gate.
 
-### Variant
+## Safety note
 
-- belongs to the new product;
-- has one owner-approved, unique SKU;
-- `is_active = true`;
-- uses an empty attributes object unless a reviewed attribute is required.
+The 2026-09-24 approval of `CATALOG-PROD-ONBOARDING-01` was treated as a
+reconfirmation after preflight discovered the already-existing 2026-09-21
+Production row. No duplicate insert or content mutation was performed.
 
-### Price
-
-- belongs to both the new product and its one active variant;
-- `currency = 'USD'`;
-- `amount_minor = 7000`, representing 70 dollars in cents;
-- `is_active = true`, with no end date;
-- is the only active price for this product/variant.
-
-### Media
-
-- belongs to the product and may be variant-specific;
-- `media_type = 'image'`;
-- `storage_path` is one approved root-relative local WebP path for this first
-  slice;
-- includes truthful alt text;
-- `sort_order = 0` and `is_primary = true`;
-- does not introduce a Drive URL or arbitrary remote origin.
-
-## Public and server boundaries
-
-- Existing public grants and RLS remain unchanged: browser roles may read only
-  published products, active variants, current active prices and their media.
-- Inserts use the existing trusted operator/service boundary only; no browser
-  write policy or grant is added.
-- The Shop and Cart adapters continue validating the public response as
-  untrusted input.
-- The Cart line must resolve exactly one price whose `variant_id` equals the
-  selected variant; otherwise its estimate correctly remains incomplete.
-- Publication does not enable Add to Cart, Auth, merge, customer Cart, raffle,
-  checkout, inventory or payment runtime.
-
-## Acceptance criteria
-
-1. The exact owner-approved values are recorded before mutation.
-2. One transaction inserts the four reviewed rows and returns their IDs.
-3. Anonymous read sees exactly one published direct product, its active
-   variant, one matching USD price and one primary image.
-4. `/shop` and the product detail route render the approved facts and image
-   without falling back to fixture content.
-5. `/cart`, `/account` and all mutation routes remain disabled.
-6. No other Commerce, raffle, Auth, Storage or ERP row changes.
-7. Rollback can target the one recorded product ID and its descendants.
-
-## Gate sequence
-
-1. `CATALOG-ONBOARDING-01` approves this plan and preparation only.
-2. The owner supplies and approves the final content matrix.
-3. `CATALOG-PROD-ONBOARDING-01` separately authorizes the exact four-row
-   Production transaction and its exact rollback if required.
-4. A separately approved push/deploy is needed only if selected media is not
-   already present on the deployed source.
-5. After read-only storefront validation, `CART-INTEGRATED-SMOKE-01` remains a
-   distinct live approval for temporary flag activation, OTP and cart writes.
+Any future content change to Meowhe Lolipop requires a new targeted approval;
+do not reuse this onboarding gate for updates.
