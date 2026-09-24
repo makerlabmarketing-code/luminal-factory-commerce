@@ -22,11 +22,19 @@ test("homepage has the semantic Wave 1 hero and Archive-first CTA", () => {
 
 test("home follows the owner-approved Wave 1 editorial hierarchy", () => {
   const home = read("src/features/home/home-page.tsx");
-  const sections = ["revival-hero", "featured-object", "brand-revival", "selected-archive", "made-at-luminal", "commerce-split"];
+  const sections = [
+    '<section className="revival-hero"',
+    'aria-labelledby="featured-title"',
+    '<section className="brand-revival',
+    '<section className="selected-archive',
+    '<section className="home-gallery',
+    '<section className="made-at-luminal',
+    '<section className="commerce-split',
+  ];
   let previous = -1;
   for (const section of sections) {
     const current = home.indexOf(section);
-    assert.ok(current > previous);
+    assert.ok(current > previous, `${section} must follow the prior section`);
     previous = current;
   }
   assert.match(home, /href="\/archive"/);

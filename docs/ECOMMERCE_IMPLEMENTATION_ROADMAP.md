@@ -180,22 +180,37 @@ Every phase uses the same contract fields below.
   `specs/cart/customer-cart-integrated-production-smoke-runbook.md` defines one
   bounded anonymous cart → OTP → atomic merge → verified cart mutation →
   sign-out → rollback/cleanup flow. It deliberately refuses to manufacture a
-  temporary Production catalog row; one owner-approved, already-published
-  direct-shop product/variant is a prerequisite.
+  temporary Production catalog row. The prerequisite is one owner-approved,
+  already-published **cart-eligible non-keycap** product/variant.
+- **Business boundary:** Artisan keycaps are raffle-only and must never enter
+  Guest Cart or verified Customer Cart. Cart is reserved for approved non-keycap
+  toys / 3D models. Meowhe Lolipop is therefore excluded from
+  `CART-INTEGRATED-SMOKE-01` even though it is publicly listed in Shop.
 - **Next gate:** `CART-INTEGRATED-SMOKE-01` separately authorizes the short
   enabled Production window, one OTP, bounded cart/customer writes, immediate
-  restoration of all flags to false and exact cleanup. Do not execute it while
-  the catalog prerequisite is absent.
-- **Catalog prerequisite baseline:** A read-only check on 2026-09-20 confirmed
-  zero products, variants, prices and product-media rows. Storage contains only
-  the empty, purpose-specific `homepage-hero` bucket, which will not be
-  repurposed for catalog media.
-- **Catalog onboarding preparation:** `specs/catalog/` defines one permanent,
-  owner-approved direct product with one active variant, one matching USD price
-  and one primary local WebP. `CATALOG-PROD-ONBOARDING-01` is required before
-  any live row is inserted; all runtime flags remain false. The owner must first
-  approve the exact name/slug, description, product type, variant/SKU, price and
-  media/alt text.
+  restoration of all flags to false and exact cleanup. Do not execute it until
+  a published cart-eligible non-keycap product exists.
+- **Catalog Production state:** Meowhe Lolipop was onboarded once on 2026-09-21
+  as published `artisan_keycap`, SKU `LF-MEOWHE-LOLIPOP-01`, USD 7000,
+  with one active variant and one primary media row. The 2026-09-24 preflight
+  detected this existing record and correctly skipped any duplicate insert.
+  A separate `raffle-flow-test-object` remains draft/private.
+- **Catalog onboarding closure:** `CATALOG-PROD-ONBOARDING-01` is complete for
+  Meowhe Lolipop and must not be reused to mutate it. Read-only revalidation on
+  2026-09-24 confirmed public Shop rendering, zero customer/cart/order/payment
+  rows and no Vercel runtime error.
+- **Cart product-type hardening — 2026-09-24:** Production review found
+  Guest Cart and verified Customer Cart validated publication/variant state but
+  did not encode the raffle-only keycap rule. The hardening slice adds a
+  database backstop plus server eligibility checks so `artisan_keycap` fails
+  closed as `catalog_selection_unavailable`.
+- **Cart product-type Production evidence:** Migration
+  `20260924030014_enforce_cart_raffle_product_boundary` is applied. A
+  `cart_items` trigger rejects artisan-keycap line writes; verified customer
+  reads/set and guest→customer merge revalidation exclude
+  `artisan_keycap`; execute grants remain service-role-only. Postflight
+  retained zero customers, carts, cart items, orders, payments and refunds, and
+  advisors added no new warning/error. Cart/Auth runtime remains disabled.
 - **USD decision:** The owner approved `CART-USD-01`, Meowhe Lolipop at `$70.00`
   and internal SKU `LF-MEOWHE-LOLIPOP-01`. The local Cart contract now uses USD
   cents consistently across persistence, RPC validation and presentation.

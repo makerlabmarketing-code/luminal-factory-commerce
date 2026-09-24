@@ -12,7 +12,7 @@ const heroModelPath = "public/models/meowhe-hero.glb";
 test("homepage hero uses a replaceable presentation contract with the current optimized GLB default", () => {
   assert.match(heroConfig, /modelSrc: "\/models\/meowhe-hero\.glb"/);
   assert.match(heroConfig, /tint: null/);
-  assert.match(homePageSource, /await getHeroModelPresentation\(\)/);
+  assert.match(homePageSource, /Promise\.all\(\[[\s\S]*getHeroModelPresentation\(\),[\s\S]*getHomeFeaturedRaffle\(\)/);
   assert.match(homePageSource, /presentation=\{heroPresentation\}/);
   assert.match(heroSource, /presentation\.modelSrc/);
   assert.equal(fs.existsSync(heroModelPath), true);
@@ -40,7 +40,7 @@ test("desktop Hero keeps the product poster out of the 3D loading and error path
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("Hero stays front-facing until drag and recenters after release", () => {
+test("Hero follows pointer without capture, composes scroll orbit, and recenters on leave", () => {
   assert.match(heroConfig, /rollDeg: 0/);
   assert.match(heroConfig, /pitchDeg: -52/);
   assert.match(heroConfig, /yawDeg: 0/);
@@ -48,36 +48,21 @@ test("Hero stays front-facing until drag and recenters after release", () => {
   assert.match(heroConfig, /phiDeg: 82/);
   assert.match(heroConfig, /radiusPercent: 103/);
   assert.match(heroConfig, /autoRotate: false/);
-  assert.match(heroConfig, /autoRotateDelayMs: 700/);
-  assert.match(heroConfig, /rotationPerSecondDeg: 3/);
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
-  assert.match(heroSource, /presentation\.orientation\.rollDeg/);
-  assert.match(heroSource, /presentation\.orientation\.pitchDeg/);
-  assert.match(heroSource, /presentation\.orientation\.yawDeg/);
   assert.match(heroSource, /const applyPointerOrbit/);
-  assert.match(heroSource, /presentation\.camera\.thetaDeg - pointerCurrent\.yawDeg/);
+  assert.match(heroSource, /presentation\.camera\.thetaDeg \+ scrollOrbitOffsetDeg - pointerCurrent\.yawDeg/);
   assert.match(heroSource, /presentation\.camera\.phiDeg - pointerCurrent\.pitchDeg/);
-  assert.doesNotMatch(heroSource, /presentation\.camera\.thetaDeg \+ pointerCurrent\.yawDeg/);
-  assert.doesNotMatch(heroSource, /presentation\.camera\.phiDeg \+ pointerCurrent\.pitchDeg/);
-  assert.doesNotMatch(heroSource, /presentation\.orientation\.pitchDeg \+ pointerCurrent/);
-  assert.doesNotMatch(heroSource, /presentation\.orientation\.yawDeg \+ pointerCurrent/);
-  assert.match(heroSource, /data-hero-interaction="drag-to-rotate-and-recenter"/);
-  assert.doesNotMatch(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
-  assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
-  assert.match(heroSource, /HERO_DRAG_YAW_MAX_DEG = 22/);
-  assert.match(heroSource, /HERO_DRAG_PITCH_MAX_DEG = 8/);
-  assert.match(heroSource, /HERO_DRAG_YAW_DEG_PER_PIXEL = 0\.16/);
-  assert.match(heroSource, /HERO_DRAG_PITCH_DEG_PER_PIXEL = 0\.1/);
+  assert.match(heroSource, /luminal:hero-orbit-offset/);
+  assert.match(heroSource, /data-hero-interaction=\{mobileOnly \? "touch-static" : "pointer-follow-and-recenter"\}/);
+  assert.match(heroSource, /HERO_POINTER_YAW_MAX_DEG = 18/);
+  assert.match(heroSource, /HERO_POINTER_PITCH_MAX_DEG = 6/);
   assert.match(heroSource, /HERO_POINTER_FOLLOW_RATE = 20/);
-  assert.match(heroSource, /stage\.addEventListener\("pointerdown", handlePointerDown\)/);
+  assert.match(heroSource, /HERO_POINTER_SETTLE_EPSILON_DEG = 0\.01/);
   assert.match(heroSource, /stage\.addEventListener\("pointermove", handlePointerMove\)/);
   assert.match(heroSource, /stage\.addEventListener\("pointerleave", settlePointerTilt\)/);
-  assert.match(heroSource, /stage\.addEventListener\("pointerup", settlePointerTilt\)/);
-  assert.match(heroSource, /stage\.setPointerCapture\(event\.pointerId\)/);
-  assert.match(heroSource, /stage\.releasePointerCapture\(pointerDrag\.pointerId\)/);
-  assert.match(heroSource, /window\.cancelAnimationFrame\(pointerAnimationFrame\)/);
-  assert.doesNotMatch(heroSource, /POINTER_THETA_RANGE_DEG|POINTER_PHI_RANGE_DEG|reactiveLightRef|Move to explore/);
-  assert.doesNotMatch(heroSource, /data-hero-lens|fluid-glass|backdropFilter/);
+  assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
+  assert.doesNotMatch(heroSource, /pointerdown|setPointerCapture|releasePointerCapture/);
+  assert.doesNotMatch(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
   assert.doesNotMatch(heroSource, /viewer\.setAttribute\("camera-controls"/);
 });
 
@@ -85,7 +70,7 @@ test("constrained clients keep the image fallback while eligible desktop defers 
   assert.match(heroSource, /connection\?\.saveData === true/);
   assert.match(heroSource, /connection\?\.effectiveType === "slow-2g"/);
   assert.match(heroSource, /connection\?\.effectiveType === "2g"/);
-  assert.match(heroSource, /posterOnly = !finePointer \|\| constrainedNetwork/);
+  assert.match(heroSource, /posterOnly = constrainedNetwork \|\| \(!finePointer && !allowTouch3d\)/);
   assert.match(heroSource, /poster-coarse-pointer/);
   assert.match(heroSource, /poster-constrained-network/);
   assert.match(heroSource, /preview\.style\.display = "block"/);
@@ -96,9 +81,10 @@ test("constrained clients keep the image fallback while eligible desktop defers 
   assert.match(heroSource, /clearTimeout\(fallbackTimeout\)/);
 });
 
-test("reduced motion keeps an eligible desktop model static instead of removing the 3D object", () => {
+test("reduced motion keeps an eligible model static and disables pointer-follow", () => {
   assert.match(heroSource, /prefers-reduced-motion: reduce/);
-  assert.match(heroSource, /enhanced-static/);
-  assert.match(heroSource, /enhanced-drag-to-rotate/);
-  assert.match(heroSource, /if \(!reducedMotion\) \{[\s\S]*pointermove/);
+  assert.match(heroSource, /reducedMotion[\s\S]*"enhanced-static"/);
+  assert.match(heroSource, /if \(!reducedMotion && finePointer\)/);
+  assert.match(heroSource, /stage\.addEventListener\("pointermove", handlePointerMove\)/);
+  assert.match(heroSource, /allowTouch3d/);
 });

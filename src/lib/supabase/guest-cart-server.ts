@@ -102,12 +102,12 @@ export function createSupabaseGuestCartRepository(client: CommerceClient): Guest
     async isPublishedCatalogSelection(input) {
       const { data: product, error: productError } = await client
         .from("products")
-        .select("id")
+        .select("id,product_type")
         .eq("id", input.productId)
         .eq("status", "published")
         .maybeSingle();
       if (productError) throwPersistenceFailure("product availability lookup", productError);
-      if (!product) return false;
+      if (!product || product.product_type === "artisan_keycap") return false;
       if (!input.variantId) return true;
 
       const { data: variant, error: variantError } = await client

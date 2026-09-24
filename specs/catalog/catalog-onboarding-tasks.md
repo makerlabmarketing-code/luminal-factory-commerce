@@ -1,22 +1,23 @@
 # Catalog Onboarding Tasks
 
-Status: `CONTENT_MATRIX_PROPOSED_LIVE_APPROVAL_REQUIRED`
+Status: `COMPLETED_EXISTING_PRODUCTION_VALIDATED`
 
-- [x] CO001 Confirm the live catalog and Storage baseline read-only.
-- [x] CO002 Map product, variant, price and media fields to the deployed schema.
-- [x] CO003 Trace Shop and Cart adapter requirements for a complete line.
-- [x] CO004 Define least-privilege publication and exact rollback boundaries.
-- [x] CO005 Prepare `CATALOG-PROD-ONBOARDING-01` runbook and static checks.
-- [ ] CO006 Obtain owner confirmation of the now-complete proposed content
-  matrix. Name, slug, product type, variant, SKU and `$70.00 USD` were
-  previously approved; exact description, selected media/alt and immediate
-  publication are now explicitly proposed.
-- [x] CO007 Confirm the selected media is already deployed. Production
-  `/images/home/archive-meowhe.webp` returned HTTP 200 as `image/webp` on
-  2026-09-24; no source delivery or Storage upload is required.
-- [ ] CO008 Obtain `CATALOG-PROD-ONBOARDING-01`.
-- [ ] CO009 Re-run read-only preflight, execute the exact transaction once and
-  record its four IDs privately.
-- [ ] CO010 Validate public RLS reads, Shop rendering and disabled runtime.
-- [ ] CO011 Run aggregate database/advisor/Vercel postflight.
-- [ ] CO012 Obtain and execute `CART-INTEGRATED-SMOKE-01` separately.
+- [x] CO001 Confirm live catalog and Storage baseline.
+- [x] CO002 Map product, variant, price and media fields.
+- [x] CO003 Trace Shop presentation requirements.
+- [x] CO004 Define least-privilege publication and rollback boundary.
+- [x] CO005 Prepare `CATALOG-PROD-ONBOARDING-01` runbook.
+- [x] CO006 Approve Meowhe Lolipop content used by the 2026-09-21 Production
+  onboarding.
+- [x] CO007 Confirm catalog media is deployed.
+- [x] CO008 Obtain `CATALOG-PROD-ONBOARDING-01`.
+- [x] CO009 Execute the Production onboarding once on 2026-09-21. Never rerun
+  the insert transaction for the same slug/SKU.
+- [x] CO010 Validate public RLS reads and Shop rendering.
+- [x] CO011 Revalidate aggregate database/advisor/Vercel postflight on
+  2026-09-24.
+- [x] CO012 Record the business correction: artisan keycaps are raffle-only and
+  are not valid Cart smoke prerequisites.
+
+Next Cart prerequisite: one owner-approved published non-keycap toy / 3D model
+product. `CART-INTEGRATED-SMOKE-01` remains blocked until that exists.

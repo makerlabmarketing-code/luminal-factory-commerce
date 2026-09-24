@@ -6,7 +6,15 @@ const read = (path) => readFileSync(path, "utf8");
 
 test("Homepage follows the approved editorial sequence with the colorway gallery", () => {
   const home = read("src/features/home/home-page.tsx");
-  const order = ["revival-hero", "featured-object", "brand-revival", "selected-archive", "home-gallery", "made-at-luminal", "commerce-split"];
+  const order = [
+    '<section className="revival-hero"',
+    'aria-labelledby="featured-title"',
+    '<section className="brand-revival',
+    '<section className="selected-archive',
+    '<section className="home-gallery',
+    '<section className="made-at-luminal',
+    '<section className="commerce-split',
+  ];
   order.reduce((previous, marker) => {
     const position = home.indexOf(marker);
     assert.ok(position > previous, `${marker} must follow the prior section`);
