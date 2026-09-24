@@ -211,6 +211,14 @@ Every phase uses the same contract fields below.
   `artisan_keycap`; execute grants remain service-role-only. Postflight
   retained zero customers, carts, cart items, orders, payments and refunds, and
   advisors added no new warning/error. Cart/Auth runtime remains disabled.
+- **Cart product-type delivery evidence:** PR #85 passed GitHub CI run #337,
+  including lint, typecheck, tests, security and Production build, then merged
+  to `master` as `98703979e622751c5c725d16b7f3235932f567fd`.
+  Vercel Production deployment `dpl_NHr5djaVkZxU5tRSRyFmFQDbQqsQ`
+  reached `READY`. Read-only post-deploy counts remained zero for customers,
+  carts, cart items, orders, payments and refunds; Meowhe Lolipop remained one
+  published product with one matching variant. No Production runtime error was
+  reported in the verification window.
 - **USD decision:** The owner approved `CART-USD-01`, Meowhe Lolipop at `$70.00`
   and internal SKU `LF-MEOWHE-LOLIPOP-01`. The local Cart contract now uses USD
   cents consistently across persistence, RPC validation and presentation.
