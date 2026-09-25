@@ -101,7 +101,7 @@ Commerce must reject a request when any of these conditions fail:
 8. the route requires that scope;
 9. the ERP actor/workspace metadata passes any additional Commerce policy for the operation.
 
-Nonce acceptance must be atomic. Commerce Production now satisfies that requirement through the private durable replay store and the service-role-only `consume_commerce_admin_nonce` RPC. A process-local in-memory set is not used.
+Nonce acceptance must be atomic. A process-local in-memory set is not sufficient for multi-instance Production. Commerce Production now satisfies both requirements through the private durable replay store and the service-role-only `consume_commerce_admin_nonce` RPC.
 
 Replay protection and operation idempotency remain separate. Homepage Hero mutations use the private idempotency receipt store and `manage_homepage_hero` RPC so retries reuse the same result instead of duplicating work. Production integration runtime remains disabled until the remaining ERP/credential/E2E gates pass.
 
