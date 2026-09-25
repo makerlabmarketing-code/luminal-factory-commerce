@@ -1,6 +1,6 @@
 # Homepage Hero Asset Storage Production Runbook
 
-Status: `OWNER_APPROVAL_REQUIRED`  
+Status: `HERO-ASSET-PUBLISH-GUARD-01 PASS`  
 Date: 2026-09-25  
 Migration gate: `HERO-ASSET-PUBLISH-GUARD-01`  
 Asset-write gate: `HERO-ASSET-STORAGE-01`
@@ -30,8 +30,9 @@ Read-only checks on 2026-09-25 confirmed:
   `private.commerce_admin_audit_events` exist;
 - `manage_homepage_hero`, `consume_commerce_admin_nonce` and audit RPCs
   exist;
-- the original helper functions remain, but the
-  `homepage_hero_require_assets_before_publish` trigger is absent;
+- the original existence-only asset guard trigger remained present from the
+  2026-09-11 migration; however it did not enforce MIME/size metadata and the
+  publish RPC did not perform its own precheck before deactivating another Hero;
 - Production Commerce Admin API returns `INTEGRATION_DISABLED`.
 
 ## Scope
@@ -73,12 +74,14 @@ select jsonb_build_object(
 ) as preflight;
 ```
 
-Expected before this gate:
+Observed before this gate on 2026-09-25:
 
 - Hero rows: 1
 - active rows: 0
 - Storage objects: 0
-- guard trigger: false
+- legacy guard trigger: true
+- corrective helper `homepage_hero_asset_object_ready`: absent
+- corrective migration ledger entry: absent
 
 Also confirm the live Admin route still returns `INTEGRATION_DISABLED`.
 
@@ -196,3 +199,23 @@ After this migration passes, the next Production write is separate:
 That gate uploads one approved derived web GLB into `homepage-hero`, verifies
 its Storage metadata and updates/selects a draft path if needed. It does not
 activate ERP↔Commerce runtime by itself.
+
+
+## Production result — 2026-09-25
+
+`HERO-ASSET-PUBLISH-GUARD-01` passed.
+
+- Applied ledger version:
+  `20260925065040_restore_homepage_hero_asset_publish_guard`
+- Missing-asset behavioral fixture was rejected with the expected check
+  violation and left zero fixture rows.
+- Postflight kept 1 Hero row, 0 active Hero rows and 0 `homepage-hero` Storage
+  objects.
+- The corrective trigger and helper functions exist.
+- `anon` and `authenticated` cannot execute
+  `homepage_hero_asset_object_ready(text,text)`; `service_role` can.
+- `publish_homepage_hero` performs asset readiness validation before
+  deactivating any previously active Hero.
+- Commerce Admin API still returns `INTEGRATION_DISABLED`.
+
+The next independent write gate is `HERO-ASSET-STORAGE-01`.
