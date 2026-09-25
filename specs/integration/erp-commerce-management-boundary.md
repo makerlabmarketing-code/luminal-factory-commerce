@@ -1,6 +1,6 @@
 # ERP → Commerce Management Boundary
 
-Status: preparatory contract only. No live management route, secret, runtime flag or Production mutation is enabled by this document.
+Status: management routes and server contracts are implemented but remain runtime-disabled in Production. No ERP→Commerce request, secret provisioning, Hero asset upload or Production Hero mutation is enabled by this document.
 
 ## Decision
 
@@ -101,9 +101,9 @@ Commerce must reject a request when any of these conditions fail:
 8. the route requires that scope;
 9. the ERP actor/workspace metadata passes any additional Commerce policy for the operation.
 
-Nonce acceptance must be atomic. A process-local in-memory set is not sufficient for multi-instance Production. The concrete durable replay store will be selected before routes are activated. Integration stays disabled until that exists and has concurrency tests.
+Nonce acceptance is atomic and durable in Commerce Production through the private replay store and the service-role-only `consume_commerce_admin_nonce` RPC. A process-local in-memory set is not used.
 
-Replay protection and operation idempotency are separate. Retryable writes that could duplicate work also require an idempotency key/result record at the relevant Commerce service boundary.
+Replay protection and operation idempotency remain separate. Homepage Hero mutations use the private idempotency receipt store and `manage_homepage_hero` RPC so retries reuse the same result instead of duplicating work. Production integration runtime remains disabled until the remaining ERP/credential/E2E gates pass.
 
 ## Credential lifecycle
 
@@ -135,7 +135,7 @@ Commerce remains the final authorization authority. A signed ERP claim proves wh
 
 The first management API contract is `v1`. Future modules should extend the same boundary instead of creating module-specific privileged backdoors.
 
-Proposed route family after implementation approval:
+Implemented default-off route family:
 
 ```text
 /api/admin/v1/homepage-hero
@@ -143,9 +143,10 @@ Proposed route family after implementation approval:
 /api/admin/v1/homepage-hero/:id/publish
 /api/admin/v1/homepage-hero/:id/unpublish
 /api/admin/v1/homepage-hero/assets
+/api/admin/v1/homepage-hero/assets/upload-ticket
 ```
 
-These routes are not live yet.
+These routes are not live yet because `COMMERCE_ADMIN_INTEGRATION_ENABLED` remains false in Production.
 
 ## Homepage Hero responsibility
 
@@ -168,7 +169,18 @@ The `homepage-hero` Storage bucket remains the runtime source for remote Hero as
 
 Google Drive may be accepted later only as an import source. The Commerce server must download, validate and copy the derived web asset into approved Commerce Storage before a draft may be published. Drive is not a runtime fallback or CDN.
 
-The current bucket limit is 10 MB. The upload boundary must validate size, extension/content type, binary signature where applicable, destination path and final Storage existence before using the Commerce service role or allowing publish.
+The current bucket limit is 10 MB.
+
+Asset upload uses a two-step capability instead of sending GLB/image binary through the HMAC JSON body:
+
+1. ERP requests a small signed JSON upload-ticket operation through the Commerce Admin API.
+2. Commerce validates asset kind, extension, MIME type and declared size, then creates a unique path and a Supabase signed upload URL valid for two hours.
+3. The browser uploads the binary directly to that signed Storage URL without receiving a Commerce service-role key.
+4. ERP selects the resulting Storage path in a Hero draft.
+5. Before publish, Commerce downloads and validates the actual model/poster bytes; GLB must carry the `glTF` magic and version 2 header.
+6. The database publish boundary independently requires the Storage object to exist with approved MIME metadata and a size between 1 byte and 10 MB before changing the active Hero.
+
+The binary bytes do not travel inside the HMAC JSON body. Signed upload authority is path-scoped and temporary.
 
 ## Request and response rules
 
@@ -189,13 +201,19 @@ The boundary must reject unsupported content types, malformed duplicate security
 
 ## Current code contract
 
-`src/features/management/commerce-admin-contract.ts` owns Commerce scopes and Homepage Hero payload validation.
+`src/features/management/commerce-admin-contract.ts` owns Commerce scopes, asset bounds and Homepage Hero payload validation.
 
-`src/features/management/commerce-admin-security-contract.ts` owns the transport-level signed-envelope constants, schemas, timestamp policy and canonical request format. It intentionally contains no secret, Supabase client, route implementation or live verifier.
+`src/features/management/commerce-admin-wire-contract.ts` owns strict management JSON request schemas, including upload-ticket requests.
+
+`src/features/management/homepage-hero-asset-service.ts` owns Storage listing, signed upload-ticket generation and pre-publish binary validation.
+
+`src/features/management/commerce-admin-security-contract.ts` owns the transport-level signed-envelope constants, schemas, timestamp policy and canonical request format. It intentionally contains no secret or browser credential.
+
+The Commerce Admin route runtime owns HMAC verification, durable replay consumption, privileged server clients and audit persistence.
 
 ## Activation gates
 
-Before any route becomes live:
+The current route code is default-off. Before Production ERP→Commerce activation:
 
 1. review the ERP-side HMAC transport implementation against the exact canonical string contract;
 2. implement Commerce verification using raw body bytes, SHA-256, HMAC-SHA256 and constant-time comparison;
@@ -211,3 +229,13 @@ Before any route becomes live:
 12. receive explicit approval before enabling the Production integration runtime flag.
 
 Until those gates pass, existing Homepage Hero behavior remains unchanged and no ERP→Commerce request is sent.
+
+
+## Current delivery gates — 2026-09-25
+
+The owner reopened Homepage Hero administration while pausing the logo redesign track.
+
+- `HERO-ASSET-PUBLISH-GUARD-01`: apply the corrective database migration that restores the Storage publish trigger and makes `publish_homepage_hero` verify Storage metadata before deactivating the current Hero. This is a Production database write and requires explicit approval.
+- `HERO-ASSET-STORAGE-01`: upload the approved derived web GLB into the public `homepage-hero` bucket and verify its Storage metadata/path. This is a Production Storage write and requires explicit approval.
+- ERP route/UI work is application-only and may be prepared while the integration runtime remains false; it does not authorize credential provisioning or live requests.
+- HMAC credential provisioning, E2E handshake and Production runtime activation keep their existing separate security/test/live gates.

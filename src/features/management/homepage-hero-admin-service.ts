@@ -140,7 +140,7 @@ function normalizeDraft(input: HomepageHeroDraftMutationWire["draft"]) {
 
 function persistenceFailure(error: SupabaseError | null): never {
   if (error?.code === "P0002") throw new HomepageHeroAdminServiceError("HERO_NOT_FOUND", "Homepage Hero không tồn tại.");
-  if (error?.code === "23505" || error?.code === "22023" || error?.code === "55P03") {
+  if (error?.code === "23505" || error?.code === "23514" || error?.code === "22023" || error?.code === "55P03") {
     throw new HomepageHeroAdminServiceError("HERO_CONFLICT", "Homepage Hero operation conflicts with existing state.");
   }
   throw new HomepageHeroAdminServiceError("PERSISTENCE_FAILED", "Homepage Hero persistence failed.");

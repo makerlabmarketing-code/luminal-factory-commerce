@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { HOMEPAGE_HERO_ASSET_MAX_BYTES } from "./commerce-admin-contract";
 
 const homepageHeroSettingsSchema = z
   .object({
@@ -39,3 +40,53 @@ export const homepageHeroPublishMutationSchema = z.object({ operationId: z.uuid(
 
 export type HomepageHeroDraftMutationWire = z.infer<typeof homepageHeroDraftMutationSchema>;
 export type HomepageHeroPublishMutationWire = z.infer<typeof homepageHeroPublishMutationSchema>;
+
+
+export const homepageHeroAssetUploadTicketRequestSchema = z
+  .object({
+    kind: z.enum(["model", "poster"]),
+    fileName: z
+      .string()
+      .trim()
+      .min(1)
+      .max(180)
+      .refine((value) => !/[\\/]/.test(value), "Asset file names must not contain path separators."),
+    contentType: z.enum([
+      "model/gltf-binary",
+      "application/octet-stream",
+      "image/webp",
+      "image/avif",
+      "image/png",
+    ]),
+    sizeBytes: z.number().int().min(1).max(HOMEPAGE_HERO_ASSET_MAX_BYTES),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const normalizedName = value.fileName.toLowerCase();
+
+    if (value.kind === "model") {
+      if (!normalizedName.endsWith(".glb")) {
+        context.addIssue({ code: "custom", message: "Homepage Hero model uploads must use GLB." });
+      }
+      if (!["model/gltf-binary", "application/octet-stream"].includes(value.contentType)) {
+        context.addIssue({ code: "custom", message: "Homepage Hero model content type is invalid." });
+      }
+      return;
+    }
+
+    const expectedContentType = normalizedName.endsWith(".webp")
+      ? "image/webp"
+      : normalizedName.endsWith(".avif")
+        ? "image/avif"
+        : normalizedName.endsWith(".png")
+          ? "image/png"
+          : null;
+
+    if (!expectedContentType || value.contentType !== expectedContentType) {
+      context.addIssue({ code: "custom", message: "Homepage Hero poster extension and content type must match." });
+    }
+  });
+
+export type HomepageHeroAssetUploadTicketRequestWire = z.infer<
+  typeof homepageHeroAssetUploadTicketRequestSchema
+>;
