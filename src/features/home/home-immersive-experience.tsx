@@ -72,6 +72,39 @@ const desktopStates: ReadonlyArray<MotionDefinition> = [
   },
 ];
 
+const tabletLandscapeStates: ReadonlyArray<MotionDefinition> = [
+  {
+    section: "hero",
+    anchor: "top",
+    viewportOffset: 0,
+    state: { xVw: 0, yVh: 0, scale: 1, rotationDeg: 0, orbitDeg: 0, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "top",
+    viewportOffset: 0.58,
+    state: { xVw: -34, yVh: 7, scale: 0.68, rotationDeg: -3, orbitDeg: -30, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "bottom",
+    viewportOffset: 0.96,
+    state: { xVw: -35, yVh: 6.5, scale: 0.53, rotationDeg: -3.5, orbitDeg: -33, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "bottom",
+    viewportOffset: 0.78,
+    state: { xVw: -35.5, yVh: 6, scale: 0.41, rotationDeg: -4, orbitDeg: -34, opacity: 0.62 },
+  },
+  {
+    section: "featured",
+    anchor: "bottom",
+    viewportOffset: 0.62,
+    state: { xVw: -36, yVh: 5.5, scale: 0.31, rotationDeg: -4, orbitDeg: -35, opacity: 0 },
+  },
+];
+
 const compactStates: ReadonlyArray<MotionDefinition> = [
   {
     section: "hero",
@@ -278,12 +311,23 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     const layer = modelLayerRef.current;
     if (!layer) return;
 
-    const compactMotion = window.matchMedia("(max-width: 1023px), (hover: none) and (pointer: coarse)");
+    const compactMotion = window.matchMedia(
+      "(max-width: 899px), (hover: none) and (pointer: coarse) and (orientation: portrait)",
+    );
+    const tabletLandscapeMotion = window.matchMedia(
+      "(min-width: 900px) and (max-width: 1366px) and (orientation: landscape) and (hover: none) and (pointer: coarse)",
+    );
     const interactivePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) return;
 
-    let motionStates: ReadonlyArray<MotionDefinition> = compactMotion.matches ? compactStates : desktopStates;
+    const resolveMotionStates = (): ReadonlyArray<MotionDefinition> => {
+      if (tabletLandscapeMotion.matches) return tabletLandscapeStates;
+      if (compactMotion.matches) return compactStates;
+      return desktopStates;
+    };
+
+    let motionStates: ReadonlyArray<MotionDefinition> = resolveMotionStates();
     let keyframes: MotionKeyframe[] = [];
     let frameHandle: number | null = null;
     let current: MotionState = motionStates[0].state;
@@ -303,7 +347,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
     const rebuildKeyframes = () => {
       const viewportHeight = window.innerHeight;
-      motionStates = compactMotion.matches ? compactStates : desktopStates;
+      motionStates = resolveMotionStates();
       keyframes = motionStates.flatMap(({ section, anchor, viewportOffset, state }) => {
         const element = document.querySelector<HTMLElement>(`[data-home-3d-section="${section}"]`);
         if (!element) return [];
@@ -320,7 +364,11 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
     const animate = () => {
       frameHandle = null;
-      const blend = compactMotion.matches ? 0.16 : 0.115;
+      const blend = compactMotion.matches
+        ? 0.16
+        : tabletLandscapeMotion.matches
+          ? 0.135
+          : 0.115;
       current = {
         xVw: interpolate(current.xVw, target.xVw, blend),
         yVh: interpolate(current.yVh, target.yVh, blend),
