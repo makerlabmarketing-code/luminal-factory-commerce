@@ -200,7 +200,7 @@
   100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0) brightness(1.08); }
 }
 
-@media (max-width: 1023px), (hover: none) and (pointer: coarse) {
+@media (max-width: 899px), (hover: none) and (pointer: coarse) and (orientation: portrait) {
   .experience {
     position: fixed;
     inset: 0;
@@ -226,6 +226,36 @@
 
   .travelBrand {
     width: 6.5rem;
+  }
+}
+
+
+@media (min-width: 900px) and (max-width: 1366px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  .experience {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100svh;
+  }
+
+  .modelLayer {
+    position: fixed;
+    z-index: 1;
+    top: 10svh;
+    left: auto;
+    right: -7vw;
+    width: min(64vw, 48rem);
+    height: min(78svh, 46rem);
+    transform-origin: 52% 50%;
+    pointer-events: none;
+  }
+
+  .blueprint {
+    width: min(68vw, 40rem);
+  }
+
+  .travelBrand {
+    width: 7rem;
   }
 }
 
