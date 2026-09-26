@@ -200,7 +200,9 @@
   100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0) brightness(1.08); }
 }
 
-@media (max-width: 1023px), (hover: none) and (pointer: coarse) {
+/* Keep this query aligned with compactMotion. Touch alone must not select the
+   lower mobile stage on landscape tablets with room for the desktop layout. */
+@media (max-width: 1023px), (orientation: portrait) and (hover: none) and (pointer: coarse) {
   .experience {
     position: fixed;
     inset: 0;
@@ -226,6 +228,12 @@
 
   .travelBrand {
     width: 6.5rem;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .modelLayer {
+    pointer-events: none;
   }
 }
 

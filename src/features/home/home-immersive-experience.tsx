@@ -278,7 +278,9 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     const layer = modelLayerRef.current;
     if (!layer) return;
 
-    const compactMotion = window.matchMedia("(max-width: 1023px), (hover: none) and (pointer: coarse)");
+    // Match the stage CSS: landscape tablets use the wide path, while portrait
+    // touch devices keep the lower stage even at the iPad Pro's 1024px width.
+    const compactMotion = window.matchMedia("(max-width: 1023px), (orientation: portrait) and (hover: none) and (pointer: coarse)");
     const interactivePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) return;
@@ -349,11 +351,14 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     };
 
     rebuildKeyframes();
+    schedule();
+    compactMotion.addEventListener("change", handleResize);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", handleResize);
 
     return () => {
       if (frameHandle !== null) window.cancelAnimationFrame(frameHandle);
+      compactMotion.removeEventListener("change", handleResize);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", handleResize);
       layer.style.pointerEvents = "";
