@@ -66,7 +66,9 @@ test("Hero 3D follows pointer on desktop and the same persistent GLB travels on 
   assert.match(stage, /normalizedX/);
   assert.match(immersive, /compactStates/);
   assert.match(immersive, /allowTouch3d/);
-  assert.match(immersive, /max-width: 1023px/);
+  assert.match(immersive, /max-width: 899px/);
+  assert.match(immersive, /tabletLandscapeStates/);
+  assert.match(immersive, /max-width: 1366px/);
   assert.doesNotMatch(home, /home-object-mobile-stage/);
 });
 
@@ -83,6 +85,19 @@ test("mobile Hero reserves a lower safe stage then fades and zooms out before Br
   assert.match(css, /width: 96vw/);
   assert.match(global, /min-height: 118svh/);
   assert.match(global, /home-hero-object-corridor[\s\S]*min-height: 36svh/);
+});
+
+test("iPad landscape keeps the Hero object in a right-side viewport stage instead of the phone bottom dock", () => {
+  const immersive = read("src/features/home/home-immersive-experience.tsx");
+  const css = read("src/features/home/home-immersive-experience.module.css");
+  assert.match(immersive, /const tabletLandscapeStates[\s\S]*xVw: -34[\s\S]*scale: 0\.68/);
+  assert.match(immersive, /orientation: landscape/);
+  assert.match(immersive, /max-width: 1366px/);
+  assert.match(css, /min-width: 900px[\s\S]*max-width: 1366px[\s\S]*orientation: landscape/);
+  assert.match(css, /top: 10svh/);
+  assert.match(css, /right: -7vw/);
+  assert.match(css, /width: min\(64vw, 48rem\)/);
+  assert.match(css, /height: min\(78svh, 46rem\)/);
 });
 
 test("Made at Luminal exits the sticky chrome together with terminal Step 04", () => {
@@ -124,9 +139,11 @@ test("immersive Home remains bounded by raffle, mobile and reduced-motion priori
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   const css = read("src/features/home/home-immersive-experience.module.css");
   assert.match(home, /const immersive = !featuredRaffle/);
-  assert.match(immersive, /max-width: 1023px/);
+  assert.match(immersive, /max-width: 899px/);
+  assert.match(immersive, /max-width: 1366px/);
   assert.match(immersive, /prefers-reduced-motion: reduce/);
-  assert.match(css, /@media \(max-width: 1023px\)/);
+  assert.match(css, /@media \(max-width: 899px\)/);
+  assert.match(css, /@media \(min-width: 900px\) and \(max-width: 1366px\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
