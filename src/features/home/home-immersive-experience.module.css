@@ -231,6 +231,14 @@
   }
 }
 
+/* Portrait tablets have more vertical space than phones; lift the object so
+   its visual center does not sit against the bottom of the first viewport. */
+@media (min-width: 700px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  .modelLayer {
+    top: 60svh;
+  }
+}
+
 @media (hover: none) and (pointer: coarse) {
   .modelLayer {
     pointer-events: none;
