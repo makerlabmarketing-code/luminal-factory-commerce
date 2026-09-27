@@ -105,6 +105,39 @@ const compactStates: ReadonlyArray<MotionDefinition> = [
   },
 ];
 
+const portraitTabletStates: ReadonlyArray<MotionDefinition> = [
+  {
+    section: "hero",
+    anchor: "top",
+    viewportOffset: 0,
+    state: { xVw: 0, yVh: 0, scale: 1, rotationDeg: 0, orbitDeg: 0, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "top",
+    viewportOffset: 0.70,
+    state: { xVw: -39, yVh: 0, scale: 0.80, rotationDeg: -2.5, orbitDeg: -28, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "top",
+    viewportOffset: 0.44,
+    state: { xVw: -40, yVh: 0, scale: 0.72, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
+  },
+  {
+    section: "featured",
+    anchor: "top",
+    viewportOffset: 0.22,
+    state: { xVw: -40, yVh: -2, scale: 0.58, rotationDeg: -3.5, orbitDeg: -33, opacity: 0.42 },
+  },
+  {
+    section: "featured",
+    anchor: "bottom",
+    viewportOffset: 0.96,
+    state: { xVw: -40, yVh: -4, scale: 0.48, rotationDeg: -4, orbitDeg: -34, opacity: 0 },
+  },
+];
+
 function clamp01(value: number) {
   return Math.min(Math.max(value, 0), 1);
 }
@@ -281,11 +314,15 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     // Match the stage CSS: landscape tablets use the wide path, while portrait
     // touch devices keep the lower stage even at the iPad Pro's 1024px width.
     const compactMotion = window.matchMedia("(max-width: 1023px), (orientation: portrait) and (hover: none) and (pointer: coarse)");
+    const portraitTabletMotion = window.matchMedia("(min-width: 700px) and (orientation: portrait) and (hover: none) and (pointer: coarse)");
     const interactivePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) return;
 
-    let motionStates: ReadonlyArray<MotionDefinition> = compactMotion.matches ? compactStates : desktopStates;
+    const selectMotionStates = () => portraitTabletMotion.matches
+      ? portraitTabletStates
+      : compactMotion.matches ? compactStates : desktopStates;
+    let motionStates: ReadonlyArray<MotionDefinition> = selectMotionStates();
     let keyframes: MotionKeyframe[] = [];
     let frameHandle: number | null = null;
     let current: MotionState = motionStates[0].state;
@@ -305,7 +342,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
     const rebuildKeyframes = () => {
       const viewportHeight = window.innerHeight;
-      motionStates = compactMotion.matches ? compactStates : desktopStates;
+      motionStates = selectMotionStates();
       keyframes = motionStates.flatMap(({ section, anchor, viewportOffset, state }) => {
         const element = document.querySelector<HTMLElement>(`[data-home-3d-section="${section}"]`);
         if (!element) return [];
@@ -353,12 +390,14 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     rebuildKeyframes();
     schedule();
     compactMotion.addEventListener("change", handleResize);
+    portraitTabletMotion.addEventListener("change", handleResize);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", handleResize);
 
     return () => {
       if (frameHandle !== null) window.cancelAnimationFrame(frameHandle);
       compactMotion.removeEventListener("change", handleResize);
+      portraitTabletMotion.removeEventListener("change", handleResize);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", handleResize);
       layer.style.pointerEvents = "";
