@@ -231,11 +231,22 @@
   }
 }
 
-/* Portrait tablets have more vertical space than phones; lift the object so
-   its visual center does not sit against the bottom of the first viewport. */
+/* Portrait tablets have room for a side composition. Keep the model beside
+   the hero copy so its opaque silhouette cannot cover the description/CTAs. */
 @media (min-width: 700px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
   .modelLayer {
-    top: 60svh;
+    top: 37svh;
+    left: auto;
+    right: -4vw;
+    width: 48vw;
+    height: min(50svh, 36rem);
+  }
+}
+
+@media (min-width: 700px) and (max-width: 799px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  .modelLayer {
+    right: -6vw;
+    width: 45vw;
   }
 }
 
