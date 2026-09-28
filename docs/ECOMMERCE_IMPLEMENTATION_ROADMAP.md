@@ -2,6 +2,35 @@
 
 This is the authoritative task roadmap. Status vocabulary: `NOT_STARTED`, `IN_PROGRESS`, `CODE_COMPLETE`, `MERGED`, `DEPLOYED`, `OPERATOR_RETEST_REQUIRED`, `LIVE_APPROVAL_REQUIRED`, `BLOCKED`, `COMPLETED`. A code change in a PR is `CODE_COMPLETE`; it is not `MERGED` or `DEPLOYED` without external evidence.
 
+## 2026-09-28 Commerce standalone and Homepage Hero checkpoint
+
+- C-002–C-005 in the coordination sheet completed read-only source and
+  Production boundary audits. All ten source runtime flags are represented as
+  `false` in `.env.example`; the missing saved-address declaration was added on
+  `master` as `fcb6d42f`. Local `npm run check` passed (299 tests, lint with two
+  pre-existing warnings, typecheck, security and build); Vercel Production is
+  `READY` and the homepage returned HTTP 200.
+- `customer_addresses` exists on the Commerce project with ownership RLS for
+  each browser-role operation. Account and saved-address runtime remain gated.
+  Guest/cart/Auth/merge remain default-off. The integrated Cart smoke still
+  requires `CART-INTEGRATED-SMOKE-01` and an approved, published cart-eligible
+  non-keycap product; no live fixture was run in this audit.
+- Production advisors returned no ERROR. Twenty no-policy notices correspond to
+  RLS default-deny tables; a read-only grant check found no direct anon or
+  authenticated table privileges on all twenty. The one Auth password warning
+  requires review before password sign-in. Five missing-FK-index and nine
+  unused-index INFO notices require workload evidence before SQL changes.
+- ERP Homepage Hero routes and manager UI are code-complete in
+  [PR #207](https://github.com/makerlabmarketing-code/luminal-factory-erp/pull/207),
+  still open. Commerce Admin integration is disabled, with no HMAC credential,
+  live Hero publish or E2E activation. Denied-auth/replay audit needs a bounded
+  write design before live activation; an unauthenticated endpoint must not
+  write an unbounded database event for each invalid request. Use existing
+  infrastructure; no paid Supabase branch is needed.
+- Next Commerce step is C-007 standalone readiness after this C-006 document
+  reconciliation. Homepage gallery management later in Phase 8 is a distinct
+  backlog item and remains `NOT_STARTED`.
+
 Every phase uses the same contract fields below.
 
 ## Phase 0 — Repository foundation — `CODE_COMPLETE`

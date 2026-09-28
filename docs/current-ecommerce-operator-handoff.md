@@ -1,5 +1,23 @@
 # Current Ecommerce operator handoff
 
+## 2026-09-28 Commerce standalone audit and Hero integration handoff
+
+- Coordination tasks C-002–C-005: the source runtime flags now all have
+  explicit `false` entries in `.env.example` (`fcb6d42f` adds saved addresses).
+  Production `customer_addresses` and its ownership RLS match generated types;
+  Cart/Auth/merge remain disabled. Integrated Cart smoke still requires its
+  separate gate and one published, cart-eligible non-keycap fixture.
+- Supabase security/performance advisors were read only. Twenty no-policy
+  tables were confirmed default-deny for anon/authenticated roles; there is one
+  password-protection warning, five missing-FK-index notices and nine
+  unused-index notices. No SQL was changed.
+- ERP PR #207 has Hero server routes and UI but is not merged. Keep Commerce
+  Admin runtime disabled. Design a bounded denied-auth/replay audit before
+  provisioning HMAC credentials and running controlled E2E. Do not write one
+  persistent audit record per arbitrary invalid public request without a
+  durable abuse bound. No new Supabase project or paid branch is required.
+- Next: C-007 standalone readiness, then the still-gated integration sequence.
+
 ## 2026-08-30 Customer/cart merge database rollout passed
 
 - **Ledger:** Exact migration `20260829151610_customer_cart_merge.sql` was applied once as `20260830070209_customer_cart_merge` after transactional rollback validation passed.

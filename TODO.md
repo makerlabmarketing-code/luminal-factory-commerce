@@ -1,5 +1,25 @@
 # Luminal Factory Commerce TODO
 
+## Current checkpoint — 2026-09-28
+
+The checklist below is an early foundation backlog. For current execution status,
+use the [implementation roadmap](docs/ECOMMERCE_IMPLEMENTATION_ROADMAP.md)
+and the [ERP & Commerce coordination sheet](https://docs.google.com/spreadsheets/d/1R9HKuFyYe4xrYbvVD-6abV1Br-_c6Jia6G9O0geKCxY/edit).
+
+- Commerce standalone audit C-002–C-005 is complete. All ten source runtime
+  flags are declared default-off in `.env.example`; customer-address schema,
+  generated types and ownership RLS match Production. Guest cart, customer
+  Auth/cart and merge remain disabled, with their integrated smoke still gated.
+- Next: C-006 documentation reconciliation, then C-007 standalone readiness.
+  The latest read-only advisors show no ERROR: twenty intentional default-deny
+  no-policy notices, one leaked-password-protection warning, five unindexed
+  foreign keys and nine unused-index notices. Do not alter SQL from this audit.
+- The separate Homepage Hero ERP consumer and UI are in
+  [ERP PR #207](https://github.com/makerlabmarketing-code/luminal-factory-erp/pull/207),
+  not merged. Commerce Admin runtime is still disabled; denied-request audit,
+  credentials, controlled E2E and live activation retain separate gates. No
+  additional Supabase project or paid branch is planned.
+
 ## Current Phase
 
 Foundation and design definition.
