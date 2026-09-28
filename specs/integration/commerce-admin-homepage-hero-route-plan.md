@@ -1,6 +1,6 @@
 # Commerce Admin Homepage Hero route slice
 
-Status: application code prepared on `master`; Production integration runtime remains default-off. The new idempotency migration is repository-only and must not be applied to Production without a separate database approval gate.
+Status: application code prepared on `master`; Production integration runtime remains default-off. The Commerce Production migration ledger records the idempotency migration as applied. Runtime credentials, ERP handshake and activation remain separate gates.
 
 ## Implemented application boundary
 
@@ -24,7 +24,7 @@ Mutations call a single Commerce-owned RPC, `public.manage_homepage_hero(...)`. 
 
 Draft update is intentionally limited to inactive rows. A published Hero must not be silently edited as a draft.
 
-## Idempotency gap closed in code, not yet Production
+## Idempotency persistence verified in Production
 
 ERP already sends `operationId`. The prepared migration stores a private receipt keyed by `(client_id, operation_id)` and binds it to a SHA-256 fingerprint of method + path + signed body hash. A retry of the same operation returns the stored result; reuse for another request fails closed. The claim and Hero mutation are in the same PostgreSQL transaction, so a failed mutation rolls back the claim rather than leaving a false success receipt.
 
@@ -32,7 +32,12 @@ Migration file:
 
 `supabase/migrations/20260912150000_add_commerce_admin_hero_idempotency.sql`
 
-This migration has **not** been approved or applied to Production by this slice.
+Read-only verification on 2026-09-28 found ledger entry
+`20260922031133_add_commerce_admin_hero_idempotency`, the private receipt
+table and the `public.manage_homepage_hero` RPC in the Commerce Production
+project. This reconciles the earlier repository-only status; it does not
+establish that the ERP↔Commerce runtime or an end-to-end handshake is live.
+Do not reapply the migration.
 
 ## Still disabled
 
@@ -40,14 +45,20 @@ This migration has **not** been approved or applied to Production by this slice.
 - No real HMAC Production credential is configured by repository code.
 - No ERP -> Commerce Production request has been sent.
 - No Homepage Hero Production row or Storage object is changed by this slice.
-- Asset upload/import route is still out of scope.
+- The separately delivered asset list and signed upload-ticket routes remain
+  runtime-disabled with the rest of the Management API.
 
 ## Remaining gates
 
 1. Run repository quality gate and fix any static/type/build failures.
-2. Review/rollback-validate the idempotency migration.
-3. Receive separate approval before applying that migration to Commerce Production.
-4. Provision environment-specific current/previous HMAC credentials without enabling runtime.
-5. Run non-destructive tamper, replay, rotation and idempotency validation with test-only credentials.
-6. Add/review the derived Hero asset upload boundary before ERP upload UI depends on it.
-7. Receive separate approval before enabling Production integration runtime.
+2. Retain the read-only migration-ledger and structural evidence; do not replay
+   the already applied idempotency migration.
+3. Provision distinct test-only HMAC credentials and a non-production Commerce
+   environment without enabling Production runtime.
+4. Run denied-auth, tamper, replay, rotation, idempotency and authorized
+   ERP↔Commerce E2E validation there, including the asset upload boundary.
+5. Review the ERP consumer and permission decision, then receive separate
+   approval before enabling Production integration runtime.
+
+As of the 2026-09-28 read-only check, the Commerce Supabase project has no
+development branch available for the non-production E2E run.
