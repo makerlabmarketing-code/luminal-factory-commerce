@@ -192,9 +192,10 @@ Commerce Admin denied-auth/replay audit is prepared as a private, RLS-enabled
 sample table and a service-role-only `SECURITY INVOKER` RPC. One row per
 ten-minute category/configured-key bucket bounds persisted records; unverified
 requests are never keyed by caller-controlled identity. The 30-day cleanup
-and application adapter are subject to a separate Production schema gate.
-Commerce Admin runtime stays disabled until migration validation, credentials,
-controlled E2E and live approval pass.
+and application adapter were applied and validated on Commerce Production
+as `20260929020944_add_bounded_commerce_admin_denial_audit`.
+Commerce Admin runtime stays disabled until credentials, controlled E2E
+and live approval pass.
 
 Assume RLS is required for customer-owned data.
 

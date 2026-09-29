@@ -1,15 +1,16 @@
 # I-004 denied-auth/replay audit rollout
 
-Status: code and migration prepared locally. Commerce Admin runtime remains off.
-No Production SQL, credentials, or live requests have been changed.
+Status: application commit `fbb78b7` on Commerce `master`; Production
+migration applied and validated as
+`20260929020944_add_bounded_commerce_admin_denial_audit`. Commerce Admin
+runtime remains off; no HMAC credentials or live ERP request were configured.
 
 ## Delivery
 
 The exact forward migration is
 `supabase/migrations/20260929020152_add_bounded_commerce_admin_denial_audit.sql`.
-Commit it to Commerce `master` only after the Production schema gate is
-approved; the Supabase GitHub integration may apply migrations on push.
-Do not create a Supabase preview branch or another project.
+It was committed to Commerce `master` and applied once to the existing
+Commerce Supabase project. No preview branch or new project was created.
 
 The application must remain disabled until this migration is verified. It
 attempts at most one audit RPC per ten-minute category/key bucket per running
@@ -17,6 +18,17 @@ function instance. The database primary key permits one persisted sample per
 bucket globally; a distributed flood can still create RPC traffic.
 
 ## Postflight checks
+
+Completed on 2026-09-29: ledger exact-once; RLS enabled and zero policies;
+anon/authenticated have no table or RPC privileges; service role can execute
+the invoker RPC; one cleanup job exists. A rollback-scoped transaction
+confirmed first sample true, duplicate false for each category and an
+invalid category/key pair rejected with SQLSTATE 22023. Final sample row
+count was zero. Security advisor had no new ERROR; existing informational
+default-deny notice remains. GitHub quality passed, Vercel READY, homepage
+200 and Admin route 503 `INTEGRATION_DISABLED`.
+
+The reusable verification sequence is:
 
 1. Migration ledger contains the new version exactly once; the table,
    invoker RPC and one cleanup Cron job exist.

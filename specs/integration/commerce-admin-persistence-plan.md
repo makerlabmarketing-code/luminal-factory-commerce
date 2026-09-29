@@ -48,7 +48,9 @@ Audit retention is fixed at 180 days. Cleanup is database-local through the `com
 
 ## Denied authentication and replay samples (I-004)
 
-Prepared, not applied: `20260929020152_add_bounded_commerce_admin_denial_audit.sql`.
+Applied on Commerce Production as ledger
+`20260929020944_add_bounded_commerce_admin_denial_audit` from source
+`20260929020152_add_bounded_commerce_admin_denial_audit.sql`.
 The service-role-only invoker RPC writes at most one row for each ten-minute
 bucket and category. Unverified requests share the empty key; a replay may
 use the configured key ID only after the signature, credential, audience and
@@ -64,10 +66,12 @@ days through a daily Cron cleanup.
 This is a sampled security signal, not an exact count of denied requests.
 An abusive distributed flood can still generate database RPC attempts from
 new function instances; edge traffic controls and usage monitoring remain
-operational safeguards. The migration must be applied and validated before
-the Commerce Admin runtime is enabled. Do not commit it to `master` until
-the schema gate is approved because the Supabase integration may apply
-migrations on a Production push.
+operational safeguards. Production postflight confirmed RLS enabled, no
+policies, no anon/authenticated table or RPC access, a service-role-only
+invoker RPC and one cleanup job. Duplicate samples returned true then false,
+invalid category/key was rejected, and rollback left zero fixture rows.
+Commerce Admin runtime remains disabled pending credentials, E2E and live
+approval.
 
 ## Production validation record
 

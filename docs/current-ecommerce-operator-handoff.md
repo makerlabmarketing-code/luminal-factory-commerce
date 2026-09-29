@@ -1,5 +1,19 @@
 # Current Ecommerce operator handoff
 
+## 2026-09-29 bounded Commerce Admin denial audit
+
+- I-004 code was delivered directly to Commerce `master` at `fbb78b7`.
+  Production migration ledger records
+  `20260929020944_add_bounded_commerce_admin_denial_audit`; no paid branch
+  or new Supabase project was created.
+- The private denial-sample table is RLS-enabled with no browser access.
+  First/duplicate and invalid-category fixtures passed in a rolled-back
+  transaction; zero rows remain. GitHub quality passed and Vercel Production
+  is READY. Homepage returned 200; Admin returned 503
+  `INTEGRATION_DISABLED`.
+- ERP PR #207 is still open. HMAC credential provisioning, controlled E2E,
+  and Production runtime activation remain separate gates.
+
 ## 2026-09-28 Commerce standalone audit and Hero integration handoff
 
 - Coordination tasks C-002–C-005: the source runtime flags now all have
