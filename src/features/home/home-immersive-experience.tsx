@@ -50,19 +50,19 @@ const desktopStates: ReadonlyArray<MotionDefinition> = [
     section: "featured",
     anchor: "top",
     viewportOffset: 0.52,
-    state: { xVw: -39, yVh: 7, scale: 0.70, rotationDeg: -3.5, orbitDeg: -32, opacity: 1 },
+    state: { xVw: -49, yVh: 7, scale: 0.70, rotationDeg: -3.5, orbitDeg: -32, opacity: 1 },
   },
   {
     section: "featured",
-    anchor: "top",
-    viewportOffset: 0.25,
-    state: { xVw: -39.5, yVh: 6.5, scale: 0.54, rotationDeg: -4, orbitDeg: -34, opacity: 0.6 },
+    anchor: "bottom",
+    viewportOffset: 0.98,
+    state: { xVw: -49, yVh: 7, scale: 0.70, rotationDeg: -3.5, orbitDeg: -32, opacity: 1 },
   },
   {
     section: "featured",
-    anchor: "top",
-    viewportOffset: 0.06,
-    state: { xVw: -40, yVh: 5.5, scale: 0.32, rotationDeg: -4.5, orbitDeg: -35, opacity: 0 },
+    anchor: "bottom",
+    viewportOffset: 0.55,
+    state: { xVw: -49, yVh: 7, scale: 0.62, rotationDeg: -3.5, orbitDeg: -32, opacity: 0 },
   },
 ];
 
@@ -87,15 +87,15 @@ const compactStates: ReadonlyArray<MotionDefinition> = [
   },
   {
     section: "featured",
-    anchor: "top",
-    viewportOffset: 0.22,
-    state: { xVw: -7, yVh: -42, scale: 0.60, rotationDeg: -3.5, orbitDeg: -33, opacity: 0.42 },
+    anchor: "bottom",
+    viewportOffset: 0.98,
+    state: { xVw: -6.5, yVh: -38, scale: 0.74, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
   },
   {
     section: "featured",
-    anchor: "top",
-    viewportOffset: 0.05,
-    state: { xVw: -7, yVh: -48, scale: 0.48, rotationDeg: -4, orbitDeg: -34, opacity: 0 },
+    anchor: "bottom",
+    viewportOffset: 0.55,
+    state: { xVw: -6.5, yVh: -38, scale: 0.66, rotationDeg: -3, orbitDeg: -31, opacity: 0 },
   },
 ];
 
@@ -120,15 +120,15 @@ const portraitTabletStates: ReadonlyArray<MotionDefinition> = [
   },
   {
     section: "featured",
-    anchor: "top",
-    viewportOffset: 0.22,
-    state: { xVw: -40, yVh: -2, scale: 0.58, rotationDeg: -3.5, orbitDeg: -33, opacity: 0.42 },
+    anchor: "bottom",
+    viewportOffset: 0.98,
+    state: { xVw: -40, yVh: 0, scale: 0.72, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
   },
   {
     section: "featured",
-    anchor: "top",
-    viewportOffset: 0.05,
-    state: { xVw: -40, yVh: -4, scale: 0.48, rotationDeg: -4, orbitDeg: -34, opacity: 0 },
+    anchor: "bottom",
+    viewportOffset: 0.55,
+    state: { xVw: -40, yVh: 0, scale: 0.64, rotationDeg: -3, orbitDeg: -31, opacity: 0 },
   },
 ];
 

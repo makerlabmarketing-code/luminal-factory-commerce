@@ -39,26 +39,26 @@ test("HOME-HERO-LAYOUT-02 moves the traveling object outside the clipped main co
 });
 
 
-test("HOME-3D-PATH-02 reaches the colorway burst and turns the camera left", () => {
+test("HOME-3D-PATH-02 parks beside the colorways and turns the camera left", () => {
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   const home = read("src/features/home/home-page.tsx");
   const burst = read("src/features/home/home-archive-burst.tsx");
   assert.match(immersive, /section: "hero" \| "featured"/);
   assert.doesNotMatch(immersive, /section: "hero" \| "featured" \| "revival"/);
   assert.match(immersive, /anchor: "top"/);
-  assert.match(immersive, /xVw: -39/);
+  assert.match(immersive, /xVw: -49/);
   assert.match(immersive, /orbitDeg: -32/);
   assert.match(immersive, /luminal:hero-orbit-offset/);
   assert.match(home, /<HomeArchiveBurst colorways=\{homePageMedia\.gallery\.slice\(0, 3\)\} \/>/);
-  assert.match(burst, /Objects with a past\./);
-  assert.match(burst, /data-home-immersive-model/);
+  assert.match(burst, /Meet Meowhe\./);
+  assert.doesNotMatch(burst, /data-home-immersive-model/);
 });
 
-test("desktop Meowhe fades as the colorways settle before Brand Revival", () => {
+test("desktop Meowhe stays beside the colorways then fades before Brand Revival", () => {
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.52[\s\S]*?scale: 0\.70[\s\S]*?opacity: 1/);
-  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.25[\s\S]*?scale: 0\.54[\s\S]*?opacity: 0\.6/);
-  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.06[\s\S]*?scale: 0\.32[\s\S]*?opacity: 0/);
+  assert.match(immersive, /const desktopStates[\s\S]*?anchor: "bottom"[\s\S]*?viewportOffset: 0\.98[\s\S]*?scale: 0\.70[\s\S]*?opacity: 1/);
+  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.55[\s\S]*?scale: 0\.62[\s\S]*?opacity: 0/);
 });
 
 test("Hero 3D follows pointer on desktop and the same persistent GLB travels on mobile", () => {
@@ -82,8 +82,8 @@ test("mobile Hero reserves a lower safe stage then fades and zooms out before Br
   assert.match(immersive, /const desktopStates[\s\S]*?scale: 1,/);
   assert.match(immersive, /const compactStates[\s\S]*?yVh: -34[\s\S]*?scale: 0\.80/);
   assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.44[\s\S]*?opacity: 1/);
-  assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.22[\s\S]*?scale: 0\.60[\s\S]*?opacity: 0\.42/);
-  assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.05[\s\S]*?scale: 0\.48[\s\S]*?opacity: 0/);
+  assert.match(immersive, /const compactStates[\s\S]*?anchor: "bottom"[\s\S]*?viewportOffset: 0\.98[\s\S]*?scale: 0\.74[\s\S]*?opacity: 1/);
+  assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.55[\s\S]*?scale: 0\.66[\s\S]*?opacity: 0/);
   assert.match(css, /top: 66svh/);
   assert.match(css, /width: 96vw/);
   assert.match(global, /min-height: 118svh/);
