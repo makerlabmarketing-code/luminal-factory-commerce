@@ -13,6 +13,8 @@ import type { CommerceAdminSupabaseClient } from "./homepage-hero-admin-service"
 export const COMMERCE_ADMIN_CONTRACT_VERSION = "2026-09-11" as const;
 const MAX_REQUEST_BYTES = 256_000;
 const requestIdSchema = z.uuid();
+const DENIAL_SAMPLE_WINDOW_MS = 10 * 60_000;
+const denialSampleAttempts = new Map<string, number>();
 
 export type CommerceAdminPrivilegedClient = SupabaseClient<Database>;
 type PrivilegedClient = CommerceAdminPrivilegedClient;
@@ -73,6 +75,28 @@ function asHomepageHeroClient(client: PrivilegedClient): CommerceAdminSupabaseCl
 
 function asRpcClient(client: PrivilegedClient | CommerceAdminSupabaseClient): RpcClient {
   return client as unknown as RpcClient;
+}
+
+async function sampleCommerceAdminDenial(
+  client: RpcClient,
+  category: "authentication_failed" | "replay",
+  trustedKeyId: string,
+): Promise<void> {
+  const bucket = Math.floor(Date.now() / DENIAL_SAMPLE_WINDOW_MS);
+  const localKey = `${category}:${trustedKeyId}`;
+  if (denialSampleAttempts.get(localKey) === bucket) return;
+  denialSampleAttempts.set(localKey, bucket);
+
+  try {
+    const { error } = await client.rpc("record_commerce_admin_denial_sample", {
+      p_category: category,
+      p_key_id: trustedKeyId,
+    });
+    if (error) throw new Error("Commerce Admin denial audit persistence failed.");
+  } catch {
+    // Keep the cooldown on persistence failure to avoid retry storms.
+    console.error("Commerce Admin denial audit persistence failed.");
+  }
 }
 
 function buildCredentials(environment: ReturnType<typeof readCommerceAdminEnvironment>) {
@@ -157,7 +181,17 @@ export async function authorizeCommerceAdminRoute(
     },
   ).catch(() => null);
 
-  if (!verification?.ok) {
+  if (!verification) {
+    return commerceAdminFailure(requestId, 401, "AUTHENTICATION_FAILED", "Commerce Admin request authentication failed.");
+  }
+  if (!verification.ok) {
+    // Unverified headers never become audit identity or a database key.
+    const isReplay = verification.reason === "replay";
+    await sampleCommerceAdminDenial(
+      replayClient,
+      isReplay ? "replay" : "authentication_failed",
+      verification.reason === "replay" ? verification.identity.keyId : "",
+    );
     return commerceAdminFailure(requestId, 401, "AUTHENTICATION_FAILED", "Commerce Admin request authentication failed.");
   }
 

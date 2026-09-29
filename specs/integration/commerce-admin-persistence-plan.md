@@ -46,6 +46,29 @@ The normal application credential has append-only semantics: `service_role` rece
 
 Audit retention is fixed at 180 days. Cleanup is database-local through the `commerce-admin-audit-cleanup` Cron job.
 
+## Denied authentication and replay samples (I-004)
+
+Prepared, not applied: `20260929020152_add_bounded_commerce_admin_denial_audit.sql`.
+The service-role-only invoker RPC writes at most one row for each ten-minute
+bucket and category. Unverified requests share the empty key; a replay may
+use the configured key ID only after the signature, credential, audience and
+scope checks pass. Raw signatures, request bodies, headers, claimed actors
+and claimed request IDs are never stored. A local ten-minute attempt cache
+reduces duplicate RPC calls per function instance; the database unique key
+enforces the global row bound across instances. Failed persistence leaves
+the public 401 unchanged, keeps the cooldown to avoid retry storms and is
+logged without request contents. A failed
+replay-store RPC is not labelled as invalid authentication. Retention is 30
+days through a daily Cron cleanup.
+
+This is a sampled security signal, not an exact count of denied requests.
+An abusive distributed flood can still generate database RPC attempts from
+new function instances; edge traffic controls and usage monitoring remain
+operational safeguards. The migration must be applied and validated before
+the Commerce Admin runtime is enabled. Do not commit it to `master` until
+the schema gate is approved because the Supabase integration may apply
+migrations on a Production push.
+
 ## Production validation record
 
 Production migration ledger version: `20260911145411_add_commerce_admin_security_persistence`.

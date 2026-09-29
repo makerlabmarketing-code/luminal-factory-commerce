@@ -188,6 +188,14 @@ Production gates.
 
 ## Row-Level Security
 
+Commerce Admin denied-auth/replay audit is prepared as a private, RLS-enabled
+sample table and a service-role-only `SECURITY INVOKER` RPC. One row per
+ten-minute category/configured-key bucket bounds persisted records; unverified
+requests are never keyed by caller-controlled identity. The 30-day cleanup
+and application adapter are subject to a separate Production schema gate.
+Commerce Admin runtime stays disabled until migration validation, credentials,
+controlled E2E and live approval pass.
+
 Assume RLS is required for customer-owned data.
 
 Examples:

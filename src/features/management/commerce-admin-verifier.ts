@@ -43,7 +43,8 @@ export type CommerceAdminVerifiedIdentity = Readonly<{
 
 export type CommerceAdminVerificationResult =
   | Readonly<{ ok: true; identity: CommerceAdminVerifiedIdentity }>
-  | Readonly<{ ok: false }>;
+  | Readonly<{ ok: false; reason?: "authentication_failed" }>
+  | Readonly<{ ok: false; reason: "replay"; identity: CommerceAdminVerifiedIdentity }>;
 
 export type CommerceAdminVerificationInput = Readonly<{
   headers: Headers;
@@ -161,23 +162,22 @@ export async function verifyCommerceAdminRequest(
   if (credential.secret.byteLength < COMMERCE_ADMIN_MIN_SECRET_BYTES) return { ok: false };
   if (!credential.allowedScopes.has(scope)) return { ok: false };
 
+  const identity: CommerceAdminVerifiedIdentity = {
+    subject: `${envelope.clientId}:${envelope.actorId}`,
+    clientId: envelope.clientId,
+    keyId: envelope.keyId,
+    actorId: envelope.actorId,
+    workspaceId: envelope.workspaceId,
+    scope,
+    requestId: envelope.requestId,
+  };
+
   const replayAccepted = await dependencies.replayStore.consume({
     keyId: envelope.keyId,
     nonce: envelope.nonce,
     requestId: envelope.requestId,
   });
-  if (!replayAccepted) return { ok: false };
+  if (!replayAccepted) return { ok: false, reason: "replay", identity };
 
-  return {
-    ok: true,
-    identity: {
-      subject: `${envelope.clientId}:${envelope.actorId}`,
-      clientId: envelope.clientId,
-      keyId: envelope.keyId,
-      actorId: envelope.actorId,
-      workspaceId: envelope.workspaceId,
-      scope,
-      requestId: envelope.requestId,
-    },
-  };
+  return { ok: true, identity };
 }
