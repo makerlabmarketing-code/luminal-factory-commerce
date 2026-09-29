@@ -10,6 +10,7 @@ import { HomeArrivalHeader } from "./home-arrival-header";
 import { HomeImmersiveExperience } from "./home-immersive-experience";
 import { HeroTextMotionController } from "./hero-copy-motion";
 import { HomeDriftWall } from "./home-drift-wall";
+import { HomeArchiveBurst } from "./home-archive-burst";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
 import { MadeAtLuminalStack } from "./made-at-luminal-stack";
 import { getHomeFeaturedRaffle } from "@/features/raffle/raffle-home-service";
@@ -94,13 +95,8 @@ export async function HomePage() {
           aria-labelledby="featured-title"
           data-home-3d-section="featured"
         >
-          <Container className="featured-object-grid">
-            {immersive ? (
-              <div className="home-object-corridor" aria-hidden="true">
-                <span />
-                <i />
-              </div>
-            ) : (
+          {immersive ? <HomeArchiveBurst colorways={homePageMedia.gallery.slice(0, 3)} /> : (
+            <Container className="featured-object-grid">
               <HomeMediaFrame
                 media={homePageMedia.featured}
                 className="featured-object-media border border-white/10 shadow-[0_3rem_9rem_rgba(0,0,0,0.28)]"
@@ -109,24 +105,15 @@ export async function HomePage() {
                 motionReveal="media"
                 motionSpotlight
               />
-            )}
-
-            <div className="featured-object-copy self-start lg:sticky lg:top-28" data-luminal-reveal="copy">
-              <p className="eyebrow">{immersive ? "01 / Object in motion" : content.featured.index}</p>
-              <h2 id="featured-title">{immersive ? "Meet Meowhe." : content.featured.title}</h2>
-              <p className="object-provenance">
-                {immersive ? "Luminal Revival · Browser 3D study" : content.featured.collection}
-              </p>
-              <p className="featured-story">
-                {immersive
-                  ? "Meowhe becomes the visual guide for this opening sequence: a collectible character with enough weight and silhouette to move through the page as an object, not just an image."
-                  : content.featured.story}
-              </p>
-              <Link className="text-link" href="/archive">
-                {immersive ? "Explore the Meowhe archive" : "View object record"} <span aria-hidden="true">↗</span>
-              </Link>
-            </div>
-          </Container>
+              <div className="featured-object-copy self-start lg:sticky lg:top-28" data-luminal-reveal="copy">
+                <p className="eyebrow">{content.featured.index}</p>
+                <h2 id="featured-title">{content.featured.title}</h2>
+                <p className="object-provenance">{content.featured.collection}</p>
+                <p className="featured-story">{content.featured.story}</p>
+                <Link className="text-link" href="/archive">View object record <span aria-hidden="true">↗</span></Link>
+              </div>
+            </Container>
+          )}
         </section>
 
         <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title" data-home-3d-section="revival">
@@ -137,7 +124,7 @@ export async function HomePage() {
           </Container>
         </section>
 
-        <section className="selected-archive section [content-visibility:auto] [contain-intrinsic-size:auto_1500px]" aria-labelledby="archive-title" data-home-3d-section="archive">
+        {!immersive ? <section className="selected-archive section [content-visibility:auto] [contain-intrinsic-size:auto_1500px]" aria-labelledby="archive-title" data-home-3d-section="archive">
           <Container>
             <header className="editorial-heading" data-luminal-reveal="copy">
               <div><p className="eyebrow">Selected archive</p><h2 id="archive-title">Objects with a past.</h2></div>
@@ -162,7 +149,7 @@ export async function HomePage() {
             </div>
             <Link className="text-link archive-link" href="/archive">Explore the full archive <span aria-hidden="true">↗</span></Link>
           </Container>
-        </section>
+        </section> : null}
 
         <section className="home-gallery section border-t border-white/10 bg-[#070707] [content-visibility:auto] [contain-intrinsic-size:auto_980px]" aria-labelledby="gallery-title" data-home-3d-section="gallery">
           <Container>

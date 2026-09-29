@@ -1,0 +1,116 @@
+.scene {
+  position: sticky;
+  top: 5.5rem;
+  width: min(calc(100% - 2rem), 88rem);
+  height: calc(100svh - 5.5rem);
+  min-height: 38rem;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(19rem, 0.8fr);
+  align-items: center;
+  gap: clamp(1rem, 3vw, 4rem);
+  isolation: isolate;
+}
+
+.field {
+  position: relative;
+  width: 100%;
+  height: min(78svh, 45rem);
+}
+
+.bubble {
+  position: absolute;
+  z-index: 2;
+  width: clamp(9rem, 16vw, 15rem);
+  aspect-ratio: 1;
+  display: block;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.bubble1 { left: 5%; top: 32%; }
+.bubble2 { left: 47%; top: 8%; width: clamp(8.5rem, 14vw, 13rem); }
+.bubble3 { left: 52%; top: 58%; width: clamp(8.5rem, 14vw, 13rem); }
+
+.imageShell {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 50%;
+  background: #101011;
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.45), 0 0 2.5rem rgba(185, 233, 255, 0.075);
+  transition: border-color 240ms ease, box-shadow 240ms ease;
+}
+
+.imageShell img { object-fit: cover; }
+.bubble:hover .imageShell,
+.bubble:focus-visible .imageShell {
+  border-color: rgba(185, 233, 255, 0.65);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.45), 0 0 3rem rgba(185, 233, 255, 0.2);
+}
+
+.bubbleLabel {
+  display: block;
+  margin-top: 0.75rem;
+  text-align: center;
+  color: rgba(242, 242, 240, 0.75);
+  font: 0.6rem var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.copy {
+  position: relative;
+  z-index: 3;
+  max-width: 31rem;
+}
+
+.copy h2 {
+  max-width: 9ch;
+  margin: 1rem 0 1.8rem;
+  font-size: clamp(3.25rem, 5.2vw, 6rem);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+}
+
+.copy > p:not(.eyebrow) {
+  max-width: 30rem;
+  margin-bottom: 2rem;
+  color: var(--muted-foreground);
+  line-height: 1.8;
+}
+
+@media (max-width: 899px) {
+  .scene {
+    top: 4.8rem;
+    height: calc(100svh - 4.8rem);
+    min-height: 38rem;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 0.55fr) minmax(0, 0.45fr);
+    gap: 0;
+  }
+
+  .field { height: 100%; }
+  .bubble { width: clamp(7.5rem, 28vw, 12rem); }
+  .bubble1 { left: 5%; top: 28%; }
+  .bubble2 { left: 40%; top: 4%; width: clamp(7rem, 24vw, 10rem); }
+  .bubble3 { left: 62%; top: 44%; width: clamp(7rem, 24vw, 10rem); }
+  .copy { align-self: start; padding: 0 0.75rem; }
+  .copy h2 { font-size: clamp(2.8rem, 9vw, 4.8rem); }
+}
+
+@media (max-width: 500px) {
+  .bubble1 { left: 2%; }
+  .bubble2 { left: 37%; }
+  .bubble3 { left: 65%; }
+  .bubbleLabel { font-size: 0.52rem; letter-spacing: 0.1em; }
+  .copy > p:not(.eyebrow) { line-height: 1.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble { will-change: auto; }
+}

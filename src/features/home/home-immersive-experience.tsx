@@ -54,20 +54,14 @@ const desktopStates: ReadonlyArray<MotionDefinition> = [
   },
   {
     section: "featured",
-    anchor: "bottom",
-    viewportOffset: 0.98,
-    state: { xVw: -39.5, yVh: 6.5, scale: 0.54, rotationDeg: -4, orbitDeg: -34, opacity: 1 },
+    anchor: "top",
+    viewportOffset: 0.25,
+    state: { xVw: -39.5, yVh: 6.5, scale: 0.54, rotationDeg: -4, orbitDeg: -34, opacity: 0.6 },
   },
   {
     section: "featured",
-    anchor: "bottom",
-    viewportOffset: 0.80,
-    state: { xVw: -40, yVh: 6, scale: 0.42, rotationDeg: -4.5, orbitDeg: -35, opacity: 0.62 },
-  },
-  {
-    section: "featured",
-    anchor: "bottom",
-    viewportOffset: 0.64,
+    anchor: "top",
+    viewportOffset: 0.06,
     state: { xVw: -40, yVh: 5.5, scale: 0.32, rotationDeg: -4.5, orbitDeg: -35, opacity: 0 },
   },
 ];
@@ -99,8 +93,8 @@ const compactStates: ReadonlyArray<MotionDefinition> = [
   },
   {
     section: "featured",
-    anchor: "bottom",
-    viewportOffset: 0.96,
+    anchor: "top",
+    viewportOffset: 0.05,
     state: { xVw: -7, yVh: -48, scale: 0.48, rotationDeg: -4, orbitDeg: -34, opacity: 0 },
   },
 ];
@@ -132,8 +126,8 @@ const portraitTabletStates: ReadonlyArray<MotionDefinition> = [
   },
   {
     section: "featured",
-    anchor: "bottom",
-    viewportOffset: 0.96,
+    anchor: "top",
+    viewportOffset: 0.05,
     state: { xVw: -40, yVh: -4, scale: 0.48, rotationDeg: -4, orbitDeg: -34, opacity: 0 },
   },
 ];

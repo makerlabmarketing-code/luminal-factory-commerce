@@ -540,12 +540,15 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
 
 .featured-object-immersive {
   position: relative;
-  min-height: 100svh;
+  min-height: 185svh;
+  padding-block: 0;
   overflow: visible;
   background:
     radial-gradient(circle at 28% 48%, rgba(185, 233, 255, 0.045), transparent 28rem),
     #080808;
 }
+
+.featured-object-immersive > div { z-index: 42; }
 
 .featured-object-immersive .featured-object-grid {
   min-height: 88svh;
@@ -644,7 +647,7 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
   }
 
   .featured-object-immersive {
-    min-height: auto;
+    min-height: 185svh;
   }
 
   .featured-object-immersive .featured-object-grid {
