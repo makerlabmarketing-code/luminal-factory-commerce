@@ -5,6 +5,7 @@ import test from "node:test";
 const home = fs.readFileSync("src/features/home/home-page.tsx", "utf8");
 const heroStage = fs.readFileSync("src/features/home/hero-object-stage.tsx", "utf8");
 const header = fs.readFileSync("src/components/layout/header.tsx", "utf8");
+const arrivalHeader = fs.readFileSync("src/features/home/home-arrival-header.tsx", "utf8");
 const footer = fs.readFileSync("src/components/layout/footer.tsx", "utf8");
 const media = fs.readFileSync("src/content/homepage-media.ts", "utf8");
 const layoutPlan = fs.readFileSync("specs/homepage-layout-performance-pass.md", "utf8");
@@ -27,10 +28,11 @@ test("legacy decorative Hero watermark stays out of the Homepage", () => {
 });
 
 test("small header branding keeps source geometry without competing with the product Hero preload", () => {
-  assert.match(header, /width=\{4000\}/);
-  assert.match(header, /height=\{4000\}/);
-  assert.match(header, /sizes="60px"/);
-  assert.doesNotMatch(header, /loading="eager"|\bpriority\b|\bpreload\b/);
+  assert.match(header, /<HomeArrivalHeader immersive=\{false\}/);
+  assert.match(arrivalHeader, /width=\{4000\}/);
+  assert.match(arrivalHeader, /height=\{4000\}/);
+  assert.match(arrivalHeader, /sizes="56px"/);
+  assert.match(arrivalHeader, /priority=\{immersive\}/);
 });
 
 test("footer branding declares its rendered width instead of requesting an oversized source", () => {

@@ -71,7 +71,7 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
             width={4000}
             height={4000}
             sizes="56px"
-            priority
+            priority={immersive}
           />
         </Link>
 
@@ -108,6 +108,7 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
         className={styles.mobilePanel}
         aria-label="Điều hướng chính trên di động"
         aria-hidden={!menuOpen}
+        inert={!menuOpen}
       >
         <div className={styles.menuBackdrop} onClick={() => setMenuOpen(false)} aria-hidden="true" />
         <ul>
