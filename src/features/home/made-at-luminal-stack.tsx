@@ -139,8 +139,8 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
           </div>
         ))}
         <div
-          className={`absolute left-6 right-6 h-px bg-white/20 transition-opacity duration-200 motion-reduce:transition-none ${
-            collapsed[steps.length - 2] ? "opacity-100" : "opacity-0"
+          className={`absolute left-6 right-6 h-px bg-white/25 transition-opacity duration-200 motion-reduce:transition-none ${
+            collapsed[steps.length - 2] || terminalActive ? "opacity-100" : "opacity-0"
           }`}
           style={{ top: `${(steps.length - 1) * STICKY_STEP_REM - 0.12}rem` }}
         />
