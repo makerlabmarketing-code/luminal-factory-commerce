@@ -84,6 +84,17 @@
   filter: brightness(1.06);
 }
 
+:global(.made-at-luminal ol > li[data-process-collapsed="true"]) {
+  border-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(13, 13, 14, 0.95);
+  box-shadow: 0 2rem 7rem rgba(0, 0, 0, 0.38);
+}
+
+:global(.made-at-luminal ol > li[data-process-collapsed="true"])::before,
+:global(.made-at-luminal ol > li[data-process-collapsed="true"])::after {
+  opacity: 0;
+}
+
 :global(.made-at-luminal ol > li h3) {
   max-width: 8ch;
   font-size: clamp(3.25rem, 8.3vw, 8.5rem);

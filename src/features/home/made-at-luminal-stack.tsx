@@ -138,12 +138,17 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
             {step.number} / {step.title}
           </div>
         ))}
-        <div
-          className={`absolute left-6 right-6 h-px bg-white/25 transition-opacity duration-200 motion-reduce:transition-none ${
-            collapsed[steps.length - 2] || terminalActive ? "opacity-100" : "opacity-0"
-          }`}
-          style={{ top: `${(steps.length - 1) * STICKY_STEP_REM - 0.12}rem` }}
-        />
+        {steps.slice(0, -1).map((step, index) => (
+          <div
+            key={`separator-${step.number}`}
+            className={`absolute left-6 right-6 h-px bg-white/25 transition-opacity duration-200 motion-reduce:transition-none ${
+              collapsed[index] || (terminalActive && index === steps.length - 2)
+                ? "opacity-100"
+                : "opacity-0"
+            }`}
+            style={{ top: `${(index + 1) * STICKY_STEP_REM - 0.12}rem` }}
+          />
+        ))}
       </div>
 
       <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh] md:pb-0">

@@ -64,6 +64,11 @@ export function LuminalMotionLayer() {
       const activeCard = document.elementFromPoint(pointerX, pointerY)?.closest<HTMLElement>(BENTO_SELECTOR) ?? null;
 
       document.querySelectorAll<HTMLElement>(BENTO_SELECTOR).forEach((card) => {
+        if (card.dataset.processCollapsed === "true") {
+          card.style.setProperty("--luminal-bento-intensity", "0");
+          delete card.dataset.luminalBentoActive;
+          return;
+        }
         const rect = card.getBoundingClientRect();
         const dx = pointerX < rect.left ? rect.left - pointerX : pointerX > rect.right ? pointerX - rect.right : 0;
         const dy = pointerY < rect.top ? rect.top - pointerY : pointerY > rect.bottom ? pointerY - rect.bottom : 0;

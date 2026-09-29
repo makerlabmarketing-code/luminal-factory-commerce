@@ -40,8 +40,8 @@
   place-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 50% 46%, rgba(185, 233, 255, 0.05), transparent 30rem),
-    linear-gradient(180deg, #06080c 0%, #050505 68%, #070708 100%);
+    radial-gradient(circle at 50% 50%, rgba(185, 233, 255, 0.025), transparent 30rem),
+    #050505;
   opacity: 1;
   transition:
     opacity 760ms cubic-bezier(.22, 1, .36, 1),
