@@ -60,9 +60,11 @@ test("colorways begin immediately and return on the first upward scroll within t
   assert.equal(scale(scene.bubbles[0]), 1);
   // The positional reveal target is still saturated after this tiny upward scroll.
   scene.scroll(-10);
-  scene.tick(32);
-  assert.ok(scale(scene.bubbles[0]) < 0.98);
-  scene.tick(850);
+  scene.tick(640);
+  assert.ok(scale(scene.bubbles[2]) < 1);
+  assert.equal(scene.copy.style.opacity, "1.000");
+  for (const bubble of scene.bubbles) assert.equal(bubble.style.visibility, "visible");
+  scene.tick(2400);
   for (const bubble of scene.bubbles) {
     assert.equal(bubble.style.visibility, "hidden");
     assert.equal(scale(bubble), 0.08);
@@ -89,4 +91,31 @@ test("reversing during a partial reveal cancels outward motion and can replay re
     scene.scroll(5);
   }
   scene.cleanup();
+});
+
+
+test("reverse playback matches forward positions, scale and opacity throughout the reveal", () => {
+  const forward = mountScene();
+  const samples = new Map();
+  const capture = (scene) => ({
+    bubbles: scene.bubbles.map((bubble) => ({ ...bubble.style })),
+    copy: { ...scene.copy.style },
+  });
+  let previous = 0;
+  for (const time of [640, 1280, 1920, 2560, 2960]) {
+    forward.tick(time - previous);
+    samples.set(time, capture(forward));
+    previous = time;
+  }
+  const reverse = mountScene();
+  reverse.tick(2960);
+  reverse.scroll(-10);
+  previous = 2960;
+  for (const time of [2560, 1920, 1280, 640]) {
+    reverse.tick(previous - time);
+    assert.deepEqual(capture(reverse), samples.get(time));
+    previous = time;
+  }
+  forward.cleanup();
+  reverse.cleanup();
 });

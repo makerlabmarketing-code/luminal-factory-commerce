@@ -36,8 +36,8 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       if (!section) return;
       const delta = previousTime === null ? 16 : Math.min(64, now - previousTime);
       previousTime = now;
-      // Returning starts at the first upward scroll, even inside the held stage.
-      if (target < elapsed) elapsed += (target - elapsed) * (1 - Math.exp(-delta / 45));
+      // Both directions traverse the same timeline at the same speed.
+      if (target < elapsed) elapsed = Math.max(target, elapsed - delta);
       else elapsed = Math.min(target, elapsed + delta);
       if (Math.abs(target - elapsed) < 1) elapsed = target;
       const model = document.querySelector<HTMLElement>("[data-home-immersive-model]");
@@ -72,7 +72,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       if (scrollY < previousScrollY - 0.01) target = 0;
       else if (scrollY > previousScrollY + 0.01) {
         const top = section.getBoundingClientRect().top;
-        target = 3200 * clamp01((window.innerHeight * 0.52 - top) / (window.innerHeight * 0.27));
+        target = 2960 * clamp01((window.innerHeight * 0.52 - top) / (window.innerHeight * 0.27));
       }
       previousScrollY = scrollY;
       if (frame === null) frame = window.requestAnimationFrame(render);
