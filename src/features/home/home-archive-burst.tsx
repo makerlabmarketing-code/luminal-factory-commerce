@@ -26,57 +26,57 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     if (!scene || !copy || reducedMotion.matches) return;
 
     let frame: number | null = null;
-    let startedAt: number | null = null;
     let arrivalAt: number | null = null;
-    let finished = false;
-    const origins = new Map<HTMLAnchorElement, { x: number; y: number }>();
+    let previousTime: number | null = null;
+    let elapsed = 0;
     const render = (now: number) => {
       frame = null;
       const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
       if (!section) return;
       const top = section.getBoundingClientRect().top;
-      if (arrivalAt === null && top <= window.innerHeight * 0.25) arrivalAt = now;
-      // Let the traveling model settle before measuring the shared reveal origin.
-      if (startedAt === null && arrivalAt !== null && now - arrivalAt >= 650) {
-        startedAt = now;
-        const model = document.querySelector<HTMLElement>("[data-home-immersive-model]");
-        const source = model?.getBoundingClientRect();
-        const bounds = scene.getBoundingClientRect();
-        bubbleRefs.current.forEach((bubble) => {
-          if (!bubble) return;
-          origins.set(bubble, {
-            x: (source ? source.left + source.width / 2 : bounds.left + bounds.width * 0.25) - bounds.left - bubble.offsetLeft - bubble.offsetWidth / 2,
-            y: (source ? source.top + source.height / 2 : bounds.top + bounds.height * 0.45) - bounds.top - bubble.offsetTop - bubble.offsetHeight / 2,
-          });
-        });
-      }
-      const elapsed = startedAt === null ? 0 : Math.max(0, now - startedAt);
+      const target = 3200 * clamp01((window.innerHeight * 0.52 - top) / (window.innerHeight * 0.27));
+      if (target > 0 && arrivalAt === null) arrivalAt = now;
+      const delta = previousTime === null ? 0 : Math.min(64, now - previousTime);
+      previousTime = now;
+      const ready = arrivalAt !== null && now - arrivalAt >= 650;
+      if (target < elapsed) elapsed = Math.max(target, elapsed - delta * 1.6);
+      else if (ready) elapsed = Math.min(target, elapsed + delta);
+      if (target === 0 && elapsed === 0) arrivalAt = null;
+      const model = document.querySelector<HTMLElement>("[data-home-immersive-model]");
+      const source = model?.getBoundingClientRect();
+      const bounds = scene.getBoundingClientRect();
       scene.style.setProperty("--stage-light", clamp01(elapsed / 1400).toFixed(3));
       bubbleRefs.current.forEach((bubble, index) => {
         if (!bubble) return;
-        const arrival = startedAt === null ? 0 : clamp01((elapsed - index * 280) / 2400);
+        const arrival = clamp01((elapsed - index * 280) / 2400);
         const eased = 1 - Math.pow(1 - arrival, 3);
-        const origin = origins.get(bubble) ?? { x: 0, y: 0 };
+        const origin = {
+          x: (source ? source.left + source.width / 2 : bounds.left + bounds.width * 0.25) - bounds.left - bubble.offsetLeft - bubble.offsetWidth / 2,
+          y: (source ? source.top + source.height / 2 : bounds.top + bounds.height * 0.45) - bounds.top - bubble.offsetTop - bubble.offsetHeight / 2,
+        };
         const arc = Math.sin(arrival * Math.PI) * (index === 2 ? 60 : -70);
         bubble.style.transform = `translate3d(${(origin.x * (1 - eased)).toFixed(1)}px, ${(origin.y * (1 - eased) + arc).toFixed(1)}px, 0) scale(${(0.08 + eased * 0.92).toFixed(3)})`;
         bubble.style.opacity = clamp01(arrival * 5).toFixed(3);
         bubble.style.visibility = arrival > 0 ? "visible" : "hidden";
       });
-      const copyProgress = startedAt === null ? 0 : clamp01((elapsed - 600) / 1400);
+      const copyProgress = clamp01((elapsed - 600) / 1400);
       copy.style.opacity = copyProgress.toFixed(3);
       copy.style.transform = `translate3d(0, ${((1 - copyProgress) * 20).toFixed(1)}px, 0)`;
       copy.style.visibility = copyProgress > 0 ? "visible" : "hidden";
-      finished = elapsed >= 3200;
-      if (arrivalAt !== null && !finished) frame = window.requestAnimationFrame(render);
+      if (Math.abs(target - elapsed) > 0.1 || (target > 0 && !ready)) {
+        frame = window.requestAnimationFrame(render);
+      } else previousTime = null;
     };
     const schedule = () => {
-      if (frame === null && !finished) frame = window.requestAnimationFrame(render);
+      if (frame === null) frame = window.requestAnimationFrame(render);
     };
     schedule();
     window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
     return () => {
       if (frame !== null) window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
     };
   }, []);
 

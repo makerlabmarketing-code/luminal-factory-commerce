@@ -38,7 +38,8 @@ The timer does not pretend to measure asset progress. The object-ready event is 
 
 - Hero: large object on the right.
 - Meet Meowhe: settle the model on the left and hold its size/orientation.
-- Colorways: after arrival, play one staggered 3.2-second reveal from behind the model. Curved travel decelerates with cubic ease-out as circles grow from 8% to full size.
+- Colorways: after arrival, play a reversible staggered 3.2-second reveal from behind the model. Curved travel decelerates with cubic ease-out as circles grow from 8% to full size.
+- Reverse scroll: rewind the same timeline toward the current model position; shrink and hide the circles, dim the light, and allow the reveal to replay on re-entry.
 - Stage light: a restrained static beam brightens with the reveal and connects the model, title and three separated colorways.
 - Exit: the model scrolls out with the sticky Meet Meowhe composition. It does not travel through subsequent sections or fade independently.
 - Mobile: use a compact upper-left model, centered title and separated surrounding circles. Reduced motion shows the static composition.
