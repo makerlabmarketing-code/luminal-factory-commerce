@@ -27,6 +27,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
 
     let frame: number | null = null;
     let startedAt: number | null = null;
+    let arrivalAt: number | null = null;
     let finished = false;
     const origins = new Map<HTMLAnchorElement, { x: number; y: number }>();
     const render = (now: number) => {
@@ -34,7 +35,9 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
       if (!section) return;
       const top = section.getBoundingClientRect().top;
-      if (startedAt === null && top <= window.innerHeight * 0.25) {
+      if (arrivalAt === null && top <= window.innerHeight * 0.25) arrivalAt = now;
+      // Let the traveling model settle before measuring the shared reveal origin.
+      if (startedAt === null && arrivalAt !== null && now - arrivalAt >= 650) {
         startedAt = now;
         const model = document.querySelector<HTMLElement>("[data-home-immersive-model]");
         const source = model?.getBoundingClientRect();
@@ -64,7 +67,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       copy.style.transform = `translate3d(0, ${((1 - copyProgress) * 20).toFixed(1)}px, 0)`;
       copy.style.visibility = copyProgress > 0 ? "visible" : "hidden";
       finished = elapsed >= 3200;
-      if (startedAt !== null && !finished) frame = window.requestAnimationFrame(render);
+      if (arrivalAt !== null && !finished) frame = window.requestAnimationFrame(render);
     };
     const schedule = () => {
       if (frame === null && !finished) frame = window.requestAnimationFrame(render);
