@@ -4,6 +4,15 @@ This is the authoritative task roadmap. Status vocabulary: `NOT_STARTED`, `IN_PR
 
 ## 2026-09-30 Homepage Hero continuation — I-006 preparation
 
+- Follow-up local hardening adds optional revoked-key rejection to the handshake
+  runner and executable coverage of the actual TypeScript verifier: overlap,
+  revocation, identity/audience/scope tamper, replay and UTF-8 draft retry bytes.
+  Replay persistence is an in-memory test dependency. This is repository evidence,
+  not a live HTTPS, database receipt/audit or ERP-session PASS.
+  Full `npm run check` passes: 314 tests, typecheck, static security, zero
+  production dependency vulnerabilities and build. Lint retains two existing
+  warnings. No Production configuration or live data mutation is included.
+
 - Coordination sheet confirms C-007 completed and ERP I-005/I-008 merged;
   older PR-open and standalone-next statements below are historical.
 - Added a bounded local HTTPS handshake runner and operator runbook. It checks

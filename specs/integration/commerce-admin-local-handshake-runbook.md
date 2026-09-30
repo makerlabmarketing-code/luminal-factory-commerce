@@ -28,15 +28,21 @@ Manager is deployed but cannot replace the public Hero until I-006 and I-007 pas
 4. If testing overlap rotation, configure Commerce's previous-key pair and the
    corresponding `COMMERCE_ADMIN_SMOKE_PREVIOUS_KEY_ID` and
    `COMMERCE_ADMIN_SMOKE_PREVIOUS_SECRET_BASE64` in the verifier.
+   To verify revocation, supply a separate test-only removed key through
+   `COMMERCE_ADMIN_SMOKE_REVOKED_KEY_ID` and
+   `COMMERCE_ADMIN_SMOKE_REVOKED_SECRET_BASE64`. That key must be absent from
+   Commerce's accepted current/previous configuration. Both variables are required
+   together; its ID must differ from accepted keys. The runner reports revocation
+   independently and fails unless the signed read is rejected with HTTP 401.
 5. Run `npm run verify:commerce-admin-handshake`. The runner accepts local HTTPS
    origins only, refuses disabled TLS, follows no redirects and caps each request
    at ten seconds. It stops on the first unexpected result.
 
 ## Evidence and effects
 
-The runner sends seven requests (eight with the optional previous key): authorized
+The runner sends seven requests (up to nine with previous and revoked keys): authorized
 Hero list, repeated nonce, signature/path/scope/body tampering, expired timestamp,
-and optional previous-key acceptance. A body-tamper request uses an invalid draft
+and optional previous-key acceptance and revoked-key rejection. A body-tamper request uses an invalid draft
 payload and must fail authentication. No valid create/update/publish/unpublish or
 upload request is generated. No Hero or Storage fixture is created.
 
@@ -46,7 +52,8 @@ this runner does not delete unrelated audit or replay records. It does not print
 Hero list contents, secrets, signatures, actor/workspace IDs or request headers.
 
 `HANDSHAKE_ONLY_PASS` is deliberately narrower than I-006 completion. It does not
-prove ERP session permissions, draft operation idempotency, key revocation, bounded
+prove ERP session permissions, draft operation idempotency, key revocation when
+its optional case is not configured, bounded
 audit database effects, asset upload, or production activation. After transport
 passes, complete those remaining cases using the approved draft-only fixture and
 cleanup plan before recording I-006 PASS. Production activation remains I-007.

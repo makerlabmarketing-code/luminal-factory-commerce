@@ -50,6 +50,13 @@ export function readHandshakeEnvironment(env = process.env) {
     if (previousKeyId === config.keyId) throw new Error("Previous and current key IDs must differ.");
     config.previous = { keyId: token(previousKeyId, "Previous key ID"), secret: secret(previousSecret) };
   }
+  const revokedKeyId = env.COMMERCE_ADMIN_SMOKE_REVOKED_KEY_ID?.trim();
+  const revokedSecret = env.COMMERCE_ADMIN_SMOKE_REVOKED_SECRET_BASE64?.trim();
+  if (Boolean(revokedKeyId) !== Boolean(revokedSecret)) throw new Error("Both revoked-key test variables are required together.");
+  if (revokedKeyId) {
+    if ([config.keyId, previousKeyId].includes(revokedKeyId)) throw new Error("Revoked and accepted key IDs must differ.");
+    config.revoked = { keyId: token(revokedKeyId, "Revoked key ID"), secret: secret(revokedSecret) };
+  }
   return config;
 }
 
@@ -131,7 +138,11 @@ export async function verifyHandshake(config, fetchRequest = fetch) {
   if (config.previous) {
     await check("previous_key_read", signHandshakeRequest({ ...config, ...config.previous }), 200);
   }
+  if (config.revoked) {
+    await check("revoked_key_rejected", signHandshakeRequest({ ...config, ...config.revoked }), 401);
+  }
   return { status: "HANDSHAKE_ONLY_PASS", cases, rotation: config.previous ? "PREVIOUS_KEY_ACCEPTED" : "NOT_RUN",
+    revocation: config.revoked ? "REVOKED_KEY_REJECTED" : "NOT_RUN",
     draftIdempotency: "NOT_RUN", erpSession: "NOT_RUN", productionActivation: "NOT_RUN" };
 }
 
