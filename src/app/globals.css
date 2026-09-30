@@ -540,7 +540,7 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
 
 .featured-object-immersive {
   position: relative;
-  min-height: 185svh;
+  min-height: 125svh;
   padding-block: 0;
   overflow: visible;
   background:
@@ -647,7 +647,7 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
   }
 
   .featured-object-immersive {
-    min-height: 185svh;
+    min-height: 125svh;
   }
 
   .featured-object-immersive .featured-object-grid {

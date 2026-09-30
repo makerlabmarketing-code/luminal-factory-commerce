@@ -26,22 +26,20 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     if (!scene || !copy || reducedMotion.matches) return;
 
     let frame: number | null = null;
-    let arrivalAt: number | null = null;
     let previousTime: number | null = null;
     let elapsed = 0;
+    let target = 0;
+    let previousScrollY = window.scrollY - 1;
     const render = (now: number) => {
       frame = null;
       const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
       if (!section) return;
-      const top = section.getBoundingClientRect().top;
-      const target = 3200 * clamp01((window.innerHeight * 0.52 - top) / (window.innerHeight * 0.27));
-      if (target > 0 && arrivalAt === null) arrivalAt = now;
-      const delta = previousTime === null ? 0 : Math.min(64, now - previousTime);
+      const delta = previousTime === null ? 16 : Math.min(64, now - previousTime);
       previousTime = now;
-      const ready = arrivalAt !== null && now - arrivalAt >= 650;
-      if (target < elapsed) elapsed = Math.max(target, elapsed - delta * 1.6);
-      else if (ready) elapsed = Math.min(target, elapsed + delta);
-      if (target === 0 && elapsed === 0) arrivalAt = null;
+      // Returning starts at the first upward scroll, even inside the held stage.
+      if (target < elapsed) elapsed += (target - elapsed) * (1 - Math.exp(-delta / 45));
+      else elapsed = Math.min(target, elapsed + delta);
+      if (Math.abs(target - elapsed) < 1) elapsed = target;
       const model = document.querySelector<HTMLElement>("[data-home-immersive-model]");
       const source = model?.getBoundingClientRect();
       const bounds = scene.getBoundingClientRect();
@@ -63,20 +61,33 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       copy.style.opacity = copyProgress.toFixed(3);
       copy.style.transform = `translate3d(0, ${((1 - copyProgress) * 20).toFixed(1)}px, 0)`;
       copy.style.visibility = copyProgress > 0 ? "visible" : "hidden";
-      if (Math.abs(target - elapsed) > 0.1 || (target > 0 && !ready)) {
+      if (Math.abs(target - elapsed) > 0.1) {
         frame = window.requestAnimationFrame(render);
       } else previousTime = null;
     };
     const schedule = () => {
+      const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
+      if (!section) return;
+      const scrollY = window.scrollY;
+      if (scrollY < previousScrollY - 0.01) target = 0;
+      else if (scrollY > previousScrollY + 0.01) {
+        const top = section.getBoundingClientRect().top;
+        target = 3200 * clamp01((window.innerHeight * 0.52 - top) / (window.innerHeight * 0.27));
+      }
+      previousScrollY = scrollY;
       if (frame === null) frame = window.requestAnimationFrame(render);
+    };
+    const resize = () => {
+      previousScrollY = window.scrollY - 1;
+      schedule();
     };
     schedule();
     window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", resize);
     return () => {
       if (frame !== null) window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", resize);
     };
   }, []);
 
