@@ -2,6 +2,19 @@
 
 This is the authoritative task roadmap. Status vocabulary: `NOT_STARTED`, `IN_PROGRESS`, `CODE_COMPLETE`, `MERGED`, `DEPLOYED`, `OPERATOR_RETEST_REQUIRED`, `LIVE_APPROVAL_REQUIRED`, `BLOCKED`, `COMPLETED`. A code change in a PR is `CODE_COMPLETE`; it is not `MERGED` or `DEPLOYED` without external evidence.
 
+## 2026-09-30 Homepage Hero continuation — I-006 preparation
+
+- Coordination sheet confirms C-007 completed and ERP I-005/I-008 merged;
+  older PR-open and standalone-next statements below are historical.
+- Added a bounded local HTTPS handshake runner and operator runbook. It checks
+  transport/signature/tamper/replay and optional previous-key acceptance without
+  creating a Hero/Storage fixture or changing Production flags.
+- Real handshake remains unrun pending trusted local HTTPS and matching test
+  configuration. Draft idempotency, ERP session permissions, key revocation,
+  bounded audit verification and I-007 activation remain outstanding.
+- The manager UI is deployed; replacing the public Hero through ERP still
+  requires the remaining integration gates. No paid/new branch is needed.
+
 ## 2026-09-28 Commerce standalone and Homepage Hero checkpoint
 
 - C-002–C-005 in the coordination sheet completed read-only source and

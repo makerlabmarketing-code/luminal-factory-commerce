@@ -32,6 +32,7 @@
     "security:static": "node scripts/security-gate.mjs",
     "security:audit": "npm audit --omit=dev --audit-level=high",
     "security": "npm run security:static && npm run security:audit",
+    "verify:commerce-admin-handshake": "node scripts/verify-commerce-admin-handshake.mjs",
     "verify:guest-cart-staging": "node scripts/verify-guest-cart-staging.mjs",
     "check": "npm run lint && npm run typecheck && npm test && npm run security && npm run build"
   },

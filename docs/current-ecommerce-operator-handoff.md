@@ -1,5 +1,17 @@
 # Current Ecommerce operator handoff
 
+## 2026-09-30 I-006 handshake runner preparation
+
+- Current coordination sheet supersedes the old C-007-next / PR #207-open notes:
+  C-007 is complete and ERP Hero route/UI are merged and deployed default-off.
+- Run `npm run verify:commerce-admin-handshake` following
+  `specs/integration/commerce-admin-local-handshake-runbook.md` against a trusted
+  local HTTPS Commerce process with matching test-only HMAC configuration.
+- Production runtime stays off. No live handshake was run, and no Hero/Storage
+  fixture, credential or cloud infrastructure was created by this preparation.
+- A runner PASS covers only handshake/tamper/replay and optional previous-key
+  acceptance; the rest of I-006 and I-007 remain open.
+
 ## 2026-09-29 bounded Commerce Admin denial audit
 
 - I-004 code was delivered directly to Commerce `master` at `fbb78b7`.
