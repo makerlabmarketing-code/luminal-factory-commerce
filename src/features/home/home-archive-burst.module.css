@@ -11,7 +11,11 @@
 .field { position: absolute; inset: 0; }
 .spotlight {
   position: absolute;
-  inset: -5.5rem -1rem 0;
+  top: -5.5rem;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
   pointer-events: none;
   opacity: var(--stage-light);
   background: conic-gradient(from 155deg at 76% 0%, transparent 0deg, rgba(185,233,255,.06) 12deg, rgba(255,239,206,.10) 25deg, transparent 47deg), radial-gradient(ellipse at 74% 48%, rgba(255,232,189,.09), transparent 55%);
