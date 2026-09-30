@@ -58,12 +58,6 @@ const desktopStates: ReadonlyArray<MotionDefinition> = [
     viewportOffset: 0.98,
     state: { xVw: -49, yVh: 7, scale: 0.70, rotationDeg: -3.5, orbitDeg: -32, opacity: 1 },
   },
-  {
-    section: "featured",
-    anchor: "bottom",
-    viewportOffset: 0.55,
-    state: { xVw: -49, yVh: 7, scale: 0.62, rotationDeg: -3.5, orbitDeg: -32, opacity: 0 },
-  },
 ];
 
 const compactStates: ReadonlyArray<MotionDefinition> = [
@@ -83,19 +77,13 @@ const compactStates: ReadonlyArray<MotionDefinition> = [
     section: "featured",
     anchor: "top",
     viewportOffset: 0.44,
-    state: { xVw: -6.5, yVh: -38, scale: 0.74, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
+    state: { xVw: -22, yVh: -52, scale: 0.68, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
   },
   {
     section: "featured",
     anchor: "bottom",
     viewportOffset: 0.98,
-    state: { xVw: -6.5, yVh: -38, scale: 0.74, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
-  },
-  {
-    section: "featured",
-    anchor: "bottom",
-    viewportOffset: 0.55,
-    state: { xVw: -6.5, yVh: -38, scale: 0.66, rotationDeg: -3, orbitDeg: -31, opacity: 0 },
+    state: { xVw: -22, yVh: -52, scale: 0.68, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
   },
 ];
 
@@ -116,19 +104,13 @@ const portraitTabletStates: ReadonlyArray<MotionDefinition> = [
     section: "featured",
     anchor: "top",
     viewportOffset: 0.44,
-    state: { xVw: -40, yVh: 0, scale: 0.72, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
+    state: { xVw: -48, yVh: -29, scale: 0.68, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
   },
   {
     section: "featured",
     anchor: "bottom",
     viewportOffset: 0.98,
-    state: { xVw: -40, yVh: 0, scale: 0.72, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
-  },
-  {
-    section: "featured",
-    anchor: "bottom",
-    viewportOffset: 0.55,
-    state: { xVw: -40, yVh: 0, scale: 0.64, rotationDeg: -3, orbitDeg: -31, opacity: 0 },
+    state: { xVw: -48, yVh: -29, scale: 0.68, rotationDeg: -3, orbitDeg: -31, opacity: 1 },
   },
 ];
 
@@ -323,8 +305,10 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     let target: MotionState = current;
 
     const apply = (state: MotionState) => {
+      const featuredSection = document.querySelector<HTMLElement>('[data-home-3d-section="featured"]');
+      const releaseY = featuredSection ? Math.min(0, featuredSection.getBoundingClientRect().bottom - window.innerHeight) : 0;
       layer.style.transform =
-        `translate3d(${state.xVw.toFixed(3)}vw, ${state.yVh.toFixed(3)}vh, 0) scale(${state.scale.toFixed(4)}) rotate(${state.rotationDeg.toFixed(3)}deg)`;
+        `translate3d(${state.xVw.toFixed(3)}vw, calc(${state.yVh.toFixed(3)}vh + ${releaseY.toFixed(1)}px), 0) scale(${state.scale.toFixed(4)}) rotate(${state.rotationDeg.toFixed(3)}deg)`;
       layer.style.opacity = state.opacity.toFixed(4);
 
       window.dispatchEvent(

@@ -51,14 +51,14 @@ test("HOME-3D-PATH-02 parks beside the colorways and turns the camera left", () 
   assert.match(immersive, /luminal:hero-orbit-offset/);
   assert.match(home, /<HomeArchiveBurst colorways=\{homePageMedia\.gallery\.slice\(0, 3\)\} \/>/);
   assert.match(burst, /Meet Meowhe\./);
-  assert.doesNotMatch(burst, /data-home-immersive-model/);
+  assert.match(burst, /data-home-immersive-model/);
 });
 
-test("desktop Meowhe stays beside the colorways then fades before Brand Revival", () => {
+test("desktop Meowhe parks beside the colorways and leaves with the scene", () => {
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.52[\s\S]*?scale: 0\.70[\s\S]*?opacity: 1/);
   assert.match(immersive, /const desktopStates[\s\S]*?anchor: "bottom"[\s\S]*?viewportOffset: 0\.98[\s\S]*?scale: 0\.70[\s\S]*?opacity: 1/);
-  assert.match(immersive, /const desktopStates[\s\S]*?viewportOffset: 0\.55[\s\S]*?scale: 0\.62[\s\S]*?opacity: 0/);
+  assert.match(immersive, /featuredSection.getBoundingClientRect\(\).bottom - window.innerHeight/);
 });
 
 test("Hero 3D follows pointer on desktop and the same persistent GLB travels on mobile", () => {
@@ -82,8 +82,8 @@ test("mobile Hero reserves a lower safe stage then fades and zooms out before Br
   assert.match(immersive, /const desktopStates[\s\S]*?scale: 1,/);
   assert.match(immersive, /const compactStates[\s\S]*?yVh: -34[\s\S]*?scale: 0\.80/);
   assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.44[\s\S]*?opacity: 1/);
-  assert.match(immersive, /const compactStates[\s\S]*?anchor: "bottom"[\s\S]*?viewportOffset: 0\.98[\s\S]*?scale: 0\.74[\s\S]*?opacity: 1/);
-  assert.match(immersive, /const compactStates[\s\S]*?viewportOffset: 0\.55[\s\S]*?scale: 0\.66[\s\S]*?opacity: 0/);
+  assert.match(immersive, /const compactStates[\s\S]*?anchor: "bottom"[\s\S]*?viewportOffset: 0\.98[\s\S]*?scale: 0\.68[\s\S]*?opacity: 1/);
+  assert.match(immersive, /releaseY/);
   assert.match(css, /top: 66svh/);
   assert.match(css, /width: 96vw/);
   assert.match(global, /min-height: 118svh/);

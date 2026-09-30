@@ -548,7 +548,7 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
     #080808;
 }
 
-.featured-object-immersive > div { z-index: 42; }
+.featured-object-immersive > div { z-index: 20; }
 
 .featured-object-immersive .featured-object-grid {
   min-height: 88svh;
