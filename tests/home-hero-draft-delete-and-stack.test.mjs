@@ -7,7 +7,9 @@ const read = (file) => readFileSync(file, "utf8");
 test("folder tiers use real consistent card outlines without detached overlay separators", () => {
   const stack = read("src/features/home/made-at-luminal-stack.tsx");
   assert.match(stack, /rounded-\[1\.75rem\] border border-white\/25/);
-  assert.doesNotMatch(stack, /items-start border-b/);
+  assert.match(stack, /items-start border-t border-white\/25/);
+  assert.match(stack, /md:border-t-transparent/);
+  assert.match(stack, /translate: isLast \? undefined : "0 var\(--process-release-y, 0px\)"/);
   assert.doesNotMatch(stack, /key=\{`separator-\$\{step\.number\}\`\}/);
 });
 
