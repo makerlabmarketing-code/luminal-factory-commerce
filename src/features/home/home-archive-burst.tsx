@@ -35,11 +35,23 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     const REVEAL_VIEWPORT_START = 0.29;
     const REVEAL_VIEWPORT_SPAN = 0.29;
     const FLIGHT_EASING_PER_SECOND = 16;
-    const BUBBLE_FLIGHT: ReadonlyArray<Readonly<{ x: number; y: number }>> = [
-      { x: -112, y: 80 },
-      { x: 118, y: -90 },
-      { x: 74, y: 105 },
-    ];
+    // The launch point sits beside Meowhe's left-side silhouette, independent
+    // from live GLB geometry or scroll transforms. Measure the scene only at
+    // mount/resize so the flight arc is stable and responsive.
+    const BUBBLE_FLIGHT: Array<{ x: number; y: number }> = [];
+    const measureFlight = () => {
+      const rect = scene.getBoundingClientRect();
+      const originX = rect.width * 0.29;
+      const originY = rect.height * 0.50;
+      bubbleRefs.current.forEach((bubble, index) => {
+        if (!bubble) return;
+        BUBBLE_FLIGHT[index] = {
+          x: originX - bubble.offsetLeft - bubble.offsetWidth * 0.5,
+          y: originY - bubble.offsetTop - bubble.offsetHeight * 0.5,
+        };
+      });
+    };
+    measureFlight();
 
     const render = (now: number) => {
       frame = null;
@@ -55,7 +67,8 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
         if (!bubble) return;
         const arrival = clamp01((progress - index * 0.06) / 0.79);
         const eased = 1 - Math.pow(1 - arrival, 3);
-        const flight = BUBBLE_FLIGHT[index] ?? BUBBLE_FLIGHT[0];
+        const flight = BUBBLE_FLIGHT[index] ?? { x: -120, y: 80 };
+        bubble.dataset.landed = arrival >= 0.999 ? "true" : "false";
         const drift = 1 - eased;
         const arc = Math.sin(arrival * Math.PI) * (index === 2 ? 20 : -16);
         bubble.style.transform = `translate3d(${(flight.x * drift).toFixed(1)}px, ${(flight.y * drift + arc).toFixed(1)}px, 0) scale(${(0.08 + eased * 0.92).toFixed(3)})`;
@@ -83,7 +96,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       );
       if (frame === null) frame = window.requestAnimationFrame(render);
     };
-    const resize = () => schedule();
+    const resize = () => { measureFlight(); schedule(); };
     schedule();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", resize);
@@ -106,18 +119,19 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
             ref={(node) => { bubbleRefs.current[index] = node; }}
             aria-label={`Xem colorway ${colorway.colorway} trong archive`}
           >
-            <span className={styles.imageShell}>
-              <Image src={colorway.src} alt={colorway.alt} fill sizes="(max-width: 700px) 38vw, 230px" style={{ objectPosition: colorway.objectPosition ?? "center" }} />
+            <span className={styles.floatBody}>
+              <span className={styles.imageShell}>
+                <Image src={colorway.src} alt={colorway.alt} fill sizes="(max-width: 700px) 38vw, 230px" style={{ objectPosition: colorway.objectPosition ?? "center" }} />
+              </span>
+              <span className={styles.bubbleLabel}>{colorway.colorway}</span>
             </span>
-            <span className={styles.bubbleLabel}>{colorway.colorway}</span>
           </Link>
         ))}
       </div>
 
       <div ref={copyRef} className={styles.copy}>
-        <p className="eyebrow">01 / A character with a past</p>
         <h2 id="featured-title">Meet Meowhe.</h2>
-        <p>One character, three earlier colorways. Explore Meowhe in Lolipop, Mictlán, and Mono.</p>
+        <p>A character with a past. Explore three earlier colorways: Lolipop, Mictlán, and Mono.</p>
         <Link className="text-link" href="/archive">Explore the full archive <span aria-hidden="true">↗</span></Link>
       </div>
     </div>
