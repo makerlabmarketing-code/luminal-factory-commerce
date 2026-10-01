@@ -5,13 +5,13 @@ import test from "node:test";
 const source = readFileSync("src/features/home/hero-model-data.ts", "utf8");
 
 test("homepage Hero config is revalidated instead of fetched no-store on every request", () => {
-  assert.match(source, /HERO_CONFIG_REVALIDATE_SECONDS = 60/);
+  assert.match(source, /HERO_CONFIG_REVALIDATE_SECONDS = 10/);
   assert.match(source, /next: \{ revalidate: HERO_CONFIG_REVALIDATE_SECONDS, tags: \[HERO_CONFIG_CACHE_TAG\] \}/);
   assert.doesNotMatch(source, /cache:\s*["']no-store["']/);
 });
 
 test("homepage Hero config keeps a tight failure budget and stable cache key", () => {
-  assert.match(source, /HERO_CONFIG_TIMEOUT_MS = 350/);
+  assert.match(source, /HERO_CONFIG_TIMEOUT_MS = 1800/);
   assert.match(source, /AbortSignal\.timeout\(HERO_CONFIG_TIMEOUT_MS\)/);
   assert.doesNotMatch(source, /new Date\(\)\.toISOString\(\)/);
   assert.doesNotMatch(source, /published_at/);
@@ -21,4 +21,9 @@ test("homepage Hero still fails safely to the bundled presentation", () => {
   assert.match(source, /return \(await requestActiveHero\(\)\) \?\? defaultHeroModelPresentation/);
   assert.match(source, /if \(!response\.ok\) return null/);
   assert.match(source, /catch \{[\s\S]*return null;[\s\S]*\}/);
+});
+
+test("homepage is request-rendered so deployments never bake a stale published Hero", () => {
+  const page = readFileSync("src/app/page.tsx", "utf8");
+  assert.match(page, /export const dynamic = "force-dynamic"/);
 });
