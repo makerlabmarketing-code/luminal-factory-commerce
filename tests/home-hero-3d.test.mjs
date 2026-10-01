@@ -63,7 +63,7 @@ test("Hero follows pointer without capture, composes scroll orbit, and recenters
   assert.match(heroSource, /stage\.addEventListener\("pointerleave", settlePointerTilt\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
   assert.doesNotMatch(heroSource, /pointerdown|setPointerCapture|releasePointerCapture/);
-  assert.doesNotMatch(heroSource, /viewer\.setAttribute\("auto-rotate", ""\)/);
+  assert.match(heroSource, /if \(presentation\.autoRotate && !reducedMotion\)/);
   assert.doesNotMatch(heroSource, /viewer\.setAttribute\("camera-controls"/);
 });
 

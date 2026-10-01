@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
+import { applyHeroMaterialTint, type HeroModelMaterial } from "./hero-model-materials";
 import type { HeroModelPresentation } from "./hero-model-config";
 
 type HeroObjectStageProps = Readonly<{
@@ -224,7 +225,7 @@ export function HeroObjectStage({
         await ensureModelViewer();
         if (cancelled || viewerRef.current) return;
 
-        const viewer = document.createElement("model-viewer");
+        const viewer = document.createElement("model-viewer") as HTMLElement & { model?: { materials: HeroModelMaterial[] } };
         viewer.style.display = "block";
         viewer.style.width = "100%";
         viewer.style.height = "100%";
@@ -249,6 +250,9 @@ export function HeroObjectStage({
         viewer.setAttribute("min-field-of-view", `${presentation.camera.minFieldOfViewDeg}deg`);
         viewer.setAttribute("max-field-of-view", `${presentation.camera.maxFieldOfViewDeg}deg`);
         viewer.setAttribute("camera-target", "auto auto auto");
+        viewer.setAttribute("rotation-per-second", `${presentation.rotationPerSecondDeg}deg`);
+        viewer.setAttribute("auto-rotate-delay", String(presentation.autoRotateDelayMs));
+        if (presentation.autoRotate && !reducedMotion) viewer.setAttribute("auto-rotate", "");
 
         if (!reducedMotion && finePointer) {
           stage.addEventListener("pointermove", handlePointerMove);
@@ -257,6 +261,7 @@ export function HeroObjectStage({
         window.addEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
         viewer.addEventListener("load", () => {
+          applyHeroMaterialTint(viewer.model?.materials ?? [], presentation.tint);
           stage.dataset.heroMode = reducedMotion
             ? "enhanced-static"
             : finePointer
