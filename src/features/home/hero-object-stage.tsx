@@ -320,6 +320,8 @@ export function HeroObjectStage({
         viewer.addEventListener("error", showError, { once: true });
         mount.replaceChildren(viewer);
         viewerRef.current = viewer;
+        // Apply the resting text-facing angle immediately, even before any scroll event.
+        applyPointerOrbit();
       } catch {
         showError();
       }
