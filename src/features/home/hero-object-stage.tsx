@@ -32,9 +32,9 @@ const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
-const HERO_POINTER_YAW_MAX_DEG = 24;
-const HERO_POINTER_PITCH_MAX_DEG = 18;
-const HERO_POINTER_FOLLOW_RATE = 26;
+const HERO_POINTER_YAW_MAX_DEG = 17;
+const HERO_POINTER_PITCH_MAX_DEG = 12;
+const HERO_POINTER_FOLLOW_RATE = 9;
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
 
 function clamp(value: number, minimum: number, maximum: number) {
@@ -149,7 +149,7 @@ export function HeroObjectStage({
       if (!viewer) return;
       viewer.setAttribute(
         "camera-orbit",
-        `${presentation.camera.thetaDeg + scrollOrbitOffsetDeg - pointerCurrent.yawDeg}deg ${presentation.camera.phiDeg - pointerCurrent.pitchDeg}deg ${presentation.camera.radiusPercent}%`,
+        `${presentation.camera.thetaDeg + scrollOrbitOffsetDeg + pointerCurrent.yawDeg}deg ${presentation.camera.phiDeg - pointerCurrent.pitchDeg}deg ${presentation.camera.radiusPercent}%`,
       );
     };
 
@@ -183,7 +183,22 @@ export function HeroObjectStage({
 
     const handlePointerMove = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
-      const rect = stage.getBoundingClientRect();
+      // The traveling object must keep following the pointer in Meet Meowhe.
+      // Use the active section as the pointer space, never an off-screen stage.
+      const heroSection = document.querySelector<HTMLElement>('[data-home-3d-section="hero"]');
+      const meetSection = document.querySelector<HTMLElement>('[data-home-3d-section="featured"]');
+      const within = (element: HTMLElement | null) => {
+        if (!element) return false;
+        const bounds = element.getBoundingClientRect();
+        return event.clientX >= bounds.left && event.clientX <= bounds.right
+          && event.clientY >= bounds.top && event.clientY <= bounds.bottom;
+      };
+      const activeRegion = within(meetSection) ? meetSection : within(heroSection) ? heroSection : null;
+      if (!activeRegion) {
+        settlePointerTilt();
+        return;
+      }
+      const rect = activeRegion.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
 
       const normalizedX = clamp(((event.clientX - rect.left) / rect.width) * 2 - 1, -1, 1);
@@ -252,11 +267,13 @@ export function HeroObjectStage({
         viewer.setAttribute("camera-target", "auto auto auto");
         viewer.setAttribute("rotation-per-second", `${presentation.rotationPerSecondDeg}deg`);
         viewer.setAttribute("auto-rotate-delay", String(presentation.autoRotateDelayMs));
+        // Manual cursor/scroll orbit remains available when saved auto-rotate is off.
         if (presentation.autoRotate && !reducedMotion) viewer.setAttribute("auto-rotate", "");
+        else viewer.removeAttribute("auto-rotate");
 
         if (!reducedMotion && finePointer) {
-          stage.addEventListener("pointermove", handlePointerMove);
-          stage.addEventListener("pointerleave", settlePointerTilt);
+          window.addEventListener("pointermove", handlePointerMove, { passive: true });
+          document.addEventListener("pointerleave", settlePointerTilt);
         }
         window.addEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
@@ -326,8 +343,8 @@ export function HeroObjectStage({
       }
       if (fallbackTimeout !== null) window.clearTimeout(fallbackTimeout);
       if (pointerAnimationFrame !== null) window.cancelAnimationFrame(pointerAnimationFrame);
-      stage.removeEventListener("pointermove", handlePointerMove);
-      stage.removeEventListener("pointerleave", settlePointerTilt);
+      window.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("pointerleave", settlePointerTilt);
       window.removeEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
       viewerRef.current = null;
