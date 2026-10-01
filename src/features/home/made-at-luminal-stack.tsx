@@ -127,7 +127,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       >
         {steps.slice(0, -1).map((step, index) => (
           <div
-            className={`absolute inset-x-0 flex h-[1.1rem] items-start border-t border-white/25 bg-[#0d0d0e] px-6 pt-[0.22rem] font-mono text-[0.6rem] uppercase leading-none tracking-[0.18em] text-white/55 transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
+            className={`absolute inset-x-0 flex h-[1.1rem] items-start rounded-t-[1.75rem] border-t border-white/25 bg-[#0d0d0e] px-6 pt-[0.22rem] font-mono text-[0.6rem] uppercase leading-none tracking-[0.18em] text-white/55 transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
               collapsed[index] || (terminalActive && index === steps.length - 2)
                 ? "translate-y-0 opacity-100"
                 : "-translate-y-1 opacity-0"
