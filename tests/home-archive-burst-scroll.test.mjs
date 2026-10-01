@@ -20,10 +20,11 @@ function mountScene() {
     removeEventListener: (name) => listeners.delete(name),
   };
   const section = { getBoundingClientRect: () => ({ top: 1000 - viewport.scrollY }) };
+  const sceneStyles = new Map();
   const scene = {
     closest: () => section,
     getBoundingClientRect: () => ({ left: 0, top: 88, width: 1400, height: 912 }),
-    style: { setProperty() {} },
+    style: { setProperty: (key, value) => sceneStyles.set(key, value) },
   };
   const bubbles = [0, 1, 2].map((index) => ({
     offsetLeft: 600 + index * 200, offsetTop: 100, offsetWidth: 200, offsetHeight: 200, style: {},
@@ -47,69 +48,73 @@ function mountScene() {
     }
   };
   const scroll = (distance) => { viewport.scrollY += distance; listeners.get("scroll")(); };
-  return { bubbles, copy, tick, scroll, cleanup, frames, listeners, viewport };
+  const snapshot = () => ({
+    copy: Number(copy.style.opacity),
+    light: Number(sceneStyles.get("--stage-light")),
+    bubbleScales: bubbles.map((bubble) => Number(bubble.style.transform.match(/scale\\(([^)]+)\\)/)[1])),
+  });
+  return { bubbles, copy, tick, scroll, cleanup, frames, listeners, viewport, snapshot };
 }
 
-const scale = (bubble) => Number(bubble.style.transform.match(/scale\(([^)]+)\)/)[1]);
-
-test("colorways begin immediately and return on the first upward scroll within the held section", () => {
+test("a tiny upward scroll does not retract Meet Meowhe if the reveal is still in its held viewport region", () => {
   const scene = mountScene();
-  scene.tick(16);
-  assert.equal(scene.bubbles[0].style.visibility, "visible");
-  scene.tick(3400);
-  assert.equal(scale(scene.bubbles[0]), 1);
-  // The positional reveal target is still saturated after this tiny upward scroll.
+  scene.tick(3500);
+  const before = scene.snapshot();
+  assert.equal(before.copy, 1);
+  assert.equal(before.light, 1);
+  assert.deepEqual(before.bubbleScales, [1, 1, 1]);
+
   scene.scroll(-10);
-  scene.tick(960);
-  assert.ok(scale(scene.bubbles[2]) < 1);
-  assert.equal(scene.copy.style.opacity, "1.000");
-  for (const bubble of scene.bubbles) assert.equal(bubble.style.visibility, "visible");
-  scene.tick(2400);
-  for (const bubble of scene.bubbles) {
-    assert.equal(bubble.style.visibility, "hidden");
-    assert.equal(scale(bubble), 0.08);
-  }
+  scene.tick(700);
+  assert.deepEqual(scene.snapshot(), before);
+  scene.scroll(-140);
+  scene.tick(700);
+  assert.deepEqual(scene.snapshot(), before);
+  scene.cleanup();
+});
+
+test("the same scroll position yields the same bubble, copy and light states moving up or down", () => {
+  const scene = mountScene();
+  scene.tick(3500);
+
+  scene.scroll(-420); // 580: within the symmetric reveal span 480..750.
+  scene.tick(3500);
+  const reverseState = scene.snapshot();
+  assert.ok(reverseState.copy > 0 && reverseState.copy < 1);
+  assert.ok(reverseState.light > 0 && reverseState.light < 1);
+  assert.ok(reverseState.bubbleScales[2] > 0.08 && reverseState.bubbleScales[2] < 1);
+
+  scene.scroll(-100); // 480: reveal is fully hidden.
+  scene.tick(3500);
   assert.equal(scene.copy.style.visibility, "hidden");
-  scene.scroll(10);
+  for (const bubble of scene.bubbles) assert.equal(bubble.style.visibility, "hidden");
+
+  scene.scroll(100); // back to 580, this time moving down.
+  scene.tick(3500);
+  const forwardState = scene.snapshot();
+  assert.deepEqual(forwardState, reverseState);
+  scene.cleanup();
+});
+
+test("a partial reverse by a few pixels changes the visual state gradually, without resetting content", () => {
+  const scene = mountScene();
+  scene.tick(3500);
+  scene.scroll(-400); // 600px, inside the transition.
+  scene.tick(3500);
+  const before = scene.snapshot();
+
+  scene.scroll(-5);
   scene.tick(16);
-  assert.equal(scene.bubbles[0].style.visibility, "visible");
+  const afterOneFrame = scene.snapshot();
+  assert.ok(afterOneFrame.copy <= before.copy);
+  assert.ok(afterOneFrame.copy > 0);
+  assert.ok(afterOneFrame.light > 0);
+  assert.ok(afterOneFrame.bubbleScales[2] > 0.08);
+
+  scene.scroll(5);
+  scene.tick(3500);
+  assert.deepEqual(scene.snapshot(), before);
   scene.cleanup();
   assert.equal(scene.frames.size, 0);
   assert.equal(scene.listeners.size, 0);
-});
-
-test("reversing during a partial reveal cancels outward motion and can replay repeatedly", () => {
-  const scene = mountScene();
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    scene.tick(700);
-    const before = scale(scene.bubbles[0]);
-    scene.scroll(-5);
-    scene.tick(32);
-    assert.ok(scale(scene.bubbles[0]) < before);
-    scene.tick(850);
-    assert.equal(scene.bubbles[0].style.visibility, "hidden");
-    scene.scroll(5);
-  }
-  scene.cleanup();
-});
-
-
-test("reverse playback retracts bubbles and copy smoothly with a slightly quicker exit", () => {
-  const scene = mountScene();
-  scene.tick(3400);
-  assert.equal(scene.copy.style.opacity, "1.000");
-  scene.scroll(-10);
-  scene.tick(960);
-  const firstScale = scale(scene.bubbles[2]);
-  assert.ok(firstScale > 0.08 && firstScale < 1);
-  scene.tick(320);
-  const secondScale = scale(scene.bubbles[2]);
-  assert.ok(secondScale < firstScale && secondScale > 0.08);
-  scene.tick(1920);
-  assert.equal(scene.copy.style.visibility, "hidden");
-  for (const bubble of scene.bubbles) {
-    assert.equal(bubble.style.visibility, "hidden");
-    assert.equal(scale(bubble), 0.08);
-  }
-  scene.cleanup();
 });
