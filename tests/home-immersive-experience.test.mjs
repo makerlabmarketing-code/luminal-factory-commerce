@@ -101,8 +101,8 @@ test("Made at Luminal exits the sticky chrome together with terminal Step 04", (
   assert.match(home, /data-made-at-luminal-header="true"/);
   assert.match(home, /md:z-30/);
   assert.match(home, /md:pb-0/);
-  assert.match(stack, /data-process-title-rail="true"/);
-  assert.match(stack, /steps\.slice\(0, -1\)/);
+  assert.doesNotMatch(stack, /data-process-title-rail="true"/);
+  assert.match(stack, /data-process-collapsed-label=\{step\.number\}/);
   assert.match(stack, /collapsedStripPx/);
   assert.match(stack, /nextTop <= currentTop \+ collapsedStripPx/);
   assert.match(stack, /\{step\.number\} \/ \{step\.title\}/);
@@ -112,7 +112,8 @@ test("Made at Luminal exits the sticky chrome together with terminal Step 04", (
   assert.match(stack, /terminalTargetTop/);
   assert.match(stack, /terminalActivationDistance = STICKY_STEP_REM \* rootFontSize \+ 2/);
   assert.match(stack, /isTerminalActive = terminalTop <= terminalTargetTop \+ terminalActivationDistance/);
-  assert.match(stack, /terminalActive && index === steps\.length - 2/);
+  assert.match(stack, /terminalActive/);
+  assert.match(stack, /border border-white\/25/);
   assert.match(stack, /releaseDistance = Math\.max\(0, terminalTargetTop - terminalTop\)/);
   assert.match(stack, /--process-release-y/);
   assert.match(stack, /header\.style\.translate/);
