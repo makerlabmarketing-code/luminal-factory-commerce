@@ -33,8 +33,7 @@ const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-vie
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
 const HERO_DRAG_RETURN_RATE = 5.5;
-// A restrained three-quarter view keeps the face toward the left-side copy.
-const HERO_TEXT_FACING_YAW_DEG = 10;
+// The published ERP camera angle is the Hero resting pose. No hard-coded yaw addition.
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
 // Use the same absolute camera limits in Hero and Meet Meowhe.
 const HERO_DRAG_YAW_MAX_DEG = 36;
@@ -154,13 +153,17 @@ export function HeroObjectStage({
     const applyPointerOrbit = () => {
       const viewer = viewerRef.current;
       if (!viewer) return;
-      // The landing pose looks toward the copy on the left; the Meet Meowhe
-      // section preserves its opposite scroll-directed view.
-      const landingBlend = clamp(1 - Math.abs(scrollOrbitOffsetDeg) / 32, 0, 1);
-      const landingYaw = HERO_TEXT_FACING_YAW_DEG * landingBlend;
+      // Use the saved ERP theta directly at the top. Scroll motion applies only
+      // the section transition; user drag has the same relative range in either section.
+      const sectionTheta = presentation.camera.thetaDeg + scrollOrbitOffsetDeg;
+      const orbitTheta = clamp(
+        sectionTheta + dragOffset.yawDeg,
+        sectionTheta - HERO_DRAG_YAW_MAX_DEG,
+        sectionTheta + HERO_DRAG_YAW_MAX_DEG,
+      );
       viewer.setAttribute(
         "camera-orbit",
-        `${clamp(presentation.camera.thetaDeg + landingYaw + scrollOrbitOffsetDeg + dragOffset.yawDeg, presentation.camera.thetaDeg - HERO_DRAG_YAW_MAX_DEG, presentation.camera.thetaDeg + HERO_DRAG_YAW_MAX_DEG)}deg ${clamp(presentation.camera.phiDeg + dragOffset.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
+        `${orbitTheta}deg ${clamp(presentation.camera.phiDeg + dragOffset.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
       );
     };
 
