@@ -8,7 +8,8 @@ test("folder tiers use real consistent card outlines without detached overlay se
   const stack = read("src/features/home/made-at-luminal-stack.tsx");
   assert.match(stack, /rounded-\[1\.75rem\] border border-white\/25/);
   assert.match(stack, /items-start.*border-t border-white\/25/);
-  assert.match(stack, /md:border-t-transparent/);
+  assert.match(stack, /!isLast && collapsed\[index\] \? "md:border-transparent md:shadow-none" : ""/);
+  assert.match(stack, /collapsed\[index\] \|\| \(terminalActive && index === steps\.length - 2\)/);
   assert.match(stack, /translate: isLast \? undefined : "0 var\(--process-release-y, 0px\)"/);
   assert.doesNotMatch(stack, /key=\{`separator-\$\{step\.number\}\`\}/);
 });
