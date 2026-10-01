@@ -99,7 +99,7 @@ test("reverse playback retracts bubbles and copy smoothly with a slightly quicke
   scene.tick(3400);
   assert.equal(scene.copy.style.opacity, "1.000");
   scene.scroll(-10);
-  scene.tick(640);
+  scene.tick(960);
   const firstScale = scale(scene.bubbles[2]);
   assert.ok(firstScale > 0.08 && firstScale < 1);
   scene.tick(320);
