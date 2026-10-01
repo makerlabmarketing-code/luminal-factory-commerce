@@ -81,7 +81,7 @@ export class HomepageHeroAdminServiceError extends Error {
   }
 }
 
-function toWire(rowValue: unknown): HomepageHeroPresentationWire {
+export function toWire(rowValue: unknown): HomepageHeroPresentationWire {
   const row = heroRowSchema.parse(rowValue);
   return {
     id: row.id,
@@ -113,7 +113,7 @@ function toWire(rowValue: unknown): HomepageHeroPresentationWire {
   };
 }
 
-function normalizeDraft(input: HomepageHeroDraftMutationWire["draft"]) {
+export function normalizeDraft(input: HomepageHeroDraftMutationWire["draft"]) {
   const settings = input.settings ?? {};
   return homepageHeroManagementInputSchema.parse({
     name: input.name,

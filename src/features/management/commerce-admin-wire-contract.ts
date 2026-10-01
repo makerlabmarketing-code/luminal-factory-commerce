@@ -38,6 +38,11 @@ export const homepageHeroDraftMutationSchema = z
 
 export const homepageHeroPublishMutationSchema = z.object({ operationId: z.uuid() }).strict();
 
+export const homepageHeroApplyMutationSchema = homepageHeroDraftMutationSchema.extend({
+  expectedUpdatedAt: z.iso.datetime({ offset: true }),
+}).strict();
+
+
 export type HomepageHeroDraftMutationWire = z.infer<typeof homepageHeroDraftMutationSchema>;
 export type HomepageHeroPublishMutationWire = z.infer<typeof homepageHeroPublishMutationSchema>;
 

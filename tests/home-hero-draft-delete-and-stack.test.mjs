@@ -11,12 +11,12 @@ test("folder tiers use real consistent card outlines without detached overlay se
   assert.doesNotMatch(stack, /key=\{`separator-\$\{step\.number\}\`\}/);
 });
 
-test("draft deletion is HMAC authorized and can never delete the published row or GLB assets", () => {
+test("inactive legacy-version deletion is authorized and protects the active Hero and GLB assets", () => {
   const route = read("src/app/api/admin/v1/homepage-hero/[id]/delete/route.ts");
   assert.match(route, /authorizeCommerceAdminRoute\(request, \["commerce\.hero\.write"\]\)/);
   assert.match(route, /homepageHeroPublishMutationSchema\.safeParse\(body\)/);
   assert.match(route, /\.eq\("is_active", false\)/);
-  assert.match(route, /\.is\("published_at", null\)/);
+  assert.doesNotMatch(route, /\.is\("published_at", null\)/);
   assert.match(route, /\.select\("id"\)/);
   assert.doesNotMatch(route, /storage\.from\(|storage\.remove\(/);
 });

@@ -243,10 +243,20 @@ export async function assertHomepageHeroAssetsPublishable(
     throw new HomepageHeroAssetServiceError("HERO_NOT_FOUND", "Homepage Hero không tồn tại.");
   }
 
-  const modelPath = homepageHeroModelStoragePathSchema.safeParse(hero.model_storage_path);
-  const posterPath = hero.poster_storage_path === null
+  await assertHomepageHeroInputAssetsPublishable(client, {
+    modelStoragePath: hero.model_storage_path,
+    posterStoragePath: hero.poster_storage_path,
+  });
+}
+
+export async function assertHomepageHeroInputAssetsPublishable(
+  client: CommerceAdminPrivilegedClient,
+  input: Readonly<{ modelStoragePath: string; posterStoragePath: string | null }>,
+): Promise<void> {
+  const modelPath = homepageHeroModelStoragePathSchema.safeParse(input.modelStoragePath);
+  const posterPath = input.posterStoragePath === null
     ? null
-    : homepageHeroPosterStoragePathSchema.safeParse(hero.poster_storage_path);
+    : homepageHeroPosterStoragePathSchema.safeParse(input.posterStoragePath);
 
   if (!modelPath.success || (posterPath && !posterPath.success)) {
     throw new HomepageHeroAssetServiceError("ASSET_INVALID", "Homepage Hero asset path không hợp lệ.");
