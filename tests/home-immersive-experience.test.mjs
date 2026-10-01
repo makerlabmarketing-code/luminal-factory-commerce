@@ -67,7 +67,8 @@ test("Hero 3D follows pointer on desktop and the same persistent GLB travels on 
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   assert.match(stage, /pointer-follow-and-recenter/);
   assert.doesNotMatch(stage, /setPointerCapture/);
-  assert.doesNotMatch(stage, /pointerdown/);
+  assert.match(stage, /window\.addEventListener\("pointerdown", handlePointerDown\)/);
+  assert.match(stage, /HERO_DRAG_PHI_MAX_DEG = 90/);
   assert.match(stage, /normalizedX/);
   assert.match(immersive, /compactStates/);
   assert.match(immersive, /allowTouch3d/);
