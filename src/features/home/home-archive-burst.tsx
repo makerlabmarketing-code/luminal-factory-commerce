@@ -36,8 +36,8 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       if (!section) return;
       const delta = previousTime === null ? 16 : Math.min(64, now - previousTime);
       previousTime = now;
-      // Both directions traverse the same timeline at the same speed.
-      if (target < elapsed) elapsed = Math.max(target, elapsed - delta);
+      // Retract slightly faster than arrival, without snapping the scene away.
+      if (target < elapsed) elapsed = Math.max(target, elapsed - delta * 1.2);
       else elapsed = Math.min(target, elapsed + delta);
       if (Math.abs(target - elapsed) < 1) elapsed = target;
       const model = document.querySelector<HTMLElement>("[data-home-immersive-model]");
@@ -46,7 +46,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       scene.style.setProperty("--stage-light", clamp01(elapsed / 1400).toFixed(3));
       bubbleRefs.current.forEach((bubble, index) => {
         if (!bubble) return;
-        const arrival = clamp01((elapsed - index * 280) / 2400);
+        const arrival = clamp01((elapsed - index * 220) / 1850);
         const eased = 1 - Math.pow(1 - arrival, 3);
         const origin = {
           x: (source ? source.left + source.width / 2 : bounds.left + bounds.width * 0.25) - bounds.left - bubble.offsetLeft - bubble.offsetWidth / 2,
@@ -57,7 +57,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
         bubble.style.opacity = clamp01(arrival * 5).toFixed(3);
         bubble.style.visibility = arrival > 0 ? "visible" : "hidden";
       });
-      const copyProgress = clamp01((elapsed - 600) / 1400);
+      const copyProgress = clamp01((elapsed - 640) / 1000);
       copy.style.opacity = copyProgress.toFixed(3);
       copy.style.transform = `translate3d(0, ${((1 - copyProgress) * 20).toFixed(1)}px, 0)`;
       copy.style.visibility = copyProgress > 0 ? "visible" : "hidden";
