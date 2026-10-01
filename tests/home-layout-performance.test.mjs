@@ -63,7 +63,8 @@ test("Hero 3D stays idle-loaded with bounded pointer-follow and mobile continuit
   assert.match(heroStage, /rounded-full opacity-55 blur-3xl/);
   assert.match(heroStage, /pointer-follow-and-recenter/);
   assert.match(heroStage, /allowTouch3d/);
-  assert.doesNotMatch(heroStage, /setPointerCapture|pointerdown/);
+  assert.match(heroStage, /window\.addEventListener\("pointerdown", handlePointerDown\)/);
+  assert.doesNotMatch(heroStage, /setPointerCapture/);
   assert.doesNotMatch(heroStage, /reactiveLightRef/);
   assert.match(heroStage, /HERO_POINTER_FOLLOW_RATE/);
   assert.doesNotMatch(heroStage, /data-hero-lens|fluid-glass/);
