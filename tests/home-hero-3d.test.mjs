@@ -40,7 +40,7 @@ test("desktop Hero keeps the product poster out of the 3D loading and error path
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("Hero follows pointer without capture, composes scroll orbit, and recenters on leave", () => {
+test("Hero supports constrained drag, preserves scroll orbit, and recenters on release", () => {
   assert.match(heroConfig, /rollDeg: 0/);
   assert.match(heroConfig, /pitchDeg: -52/);
   assert.match(heroConfig, /yawDeg: 0/);
@@ -50,17 +50,16 @@ test("Hero follows pointer without capture, composes scroll orbit, and recenters
   assert.match(heroConfig, /autoRotate: false/);
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
   assert.match(heroSource, /const applyPointerOrbit/);
-  assert.match(heroSource, /presentation\.camera\.thetaDeg \+ scrollOrbitOffsetDeg - pointerCurrent\.yawDeg \+ dragOffset\.yawDeg/);
-  assert.match(heroSource, /clamp\(presentation\.camera\.phiDeg - pointerCurrent\.pitchDeg \+ dragOffset\.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG\)/);
+  assert.match(heroSource, /presentation\.camera\.thetaDeg \+ landingYaw \+ scrollOrbitOffsetDeg \+ dragOffset\.yawDeg/);
+  assert.match(heroSource, /clamp\(presentation\.camera\.phiDeg \+ dragOffset\.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG\)/);
   assert.match(heroSource, /luminal:hero-orbit-offset/);
-  assert.match(heroSource, /data-hero-interaction=\{mobileOnly \? "touch-static" : "pointer-follow-and-recenter"\}/);
-  assert.match(heroSource, /HERO_POINTER_YAW_MAX_DEG = 17/);
-  assert.match(heroSource, /HERO_POINTER_PITCH_MAX_DEG = 12/);
-  assert.match(heroSource, /HERO_POINTER_FOLLOW_RATE = 9/);
-  assert.match(heroSource, /pointerTarget\.pitchDeg = -normalizedY \* HERO_POINTER_PITCH_MAX_DEG/);
+  assert.match(heroSource, /data-hero-interaction=\{mobileOnly \? "touch-static" : "drag-and-recenter"\}/);
+  assert.match(heroSource, /HERO_TEXT_FACING_YAW_DEG = 24/);
+  assert.match(heroSource, /HERO_DRAG_RETURN_RATE = 5\.5/);
+  assert.doesNotMatch(heroSource, /pointerTarget|normalizedX|normalizedY/);
   assert.match(heroSource, /HERO_POINTER_SETTLE_EPSILON_DEG = 0\.01/);
   assert.match(heroSource, /window\.addEventListener\("pointermove", handlePointerMove/);
-  assert.match(heroSource, /document\.addEventListener\("pointerleave", settlePointerTilt\)/);
+  assert.match(heroSource, /window\.addEventListener\("pointerup", handlePointerUp\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
   assert.match(heroSource, /window\.addEventListener\("pointerdown", handlePointerDown\)/);
   assert.match(heroSource, /HERO_DRAG_YAW_MAX_DEG = 40/);
@@ -100,5 +99,5 @@ test("Hero respects disabled auto-rotation and continues pointer tracking in Mee
   assert.match(heroSource, /data-home-3d-section="featured"/);
   assert.match(heroSource, /data-home-3d-section="hero"/);
   assert.match(heroSource, /window\.removeEventListener\("pointermove", handlePointerMove\)/);
-  assert.match(heroSource, /document\.removeEventListener\("pointerleave", settlePointerTilt\)/);
+  assert.match(heroSource, /window\.removeEventListener\("pointerup", handlePointerUp\)/);
 });

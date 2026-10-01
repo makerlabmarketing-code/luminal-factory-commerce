@@ -32,9 +32,8 @@ const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
-const HERO_POINTER_YAW_MAX_DEG = 17;
-const HERO_POINTER_PITCH_MAX_DEG = 12;
-const HERO_POINTER_FOLLOW_RATE = 9;
+const HERO_DRAG_RETURN_RATE = 5.5;
+const HERO_TEXT_FACING_YAW_DEG = 24;
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
 const HERO_DRAG_YAW_MAX_DEG = 40;
 const HERO_DRAG_PHI_MIN_DEG = 48;
@@ -145,8 +144,6 @@ export function HeroObjectStage({
     let pointerAnimationFrame: number | null = null;
     let previousPointerFrameTime = performance.now();
     let scrollOrbitOffsetDeg = 0;
-    const pointerTarget = { pitchDeg: 0, yawDeg: 0 };
-    const pointerCurrent = { pitchDeg: 0, yawDeg: 0 };
     const dragOffset = { yawDeg: 0, phiDeg: 0 };
     let draggingPointerId: number | null = null;
     let dragX = 0;
@@ -155,31 +152,31 @@ export function HeroObjectStage({
     const applyPointerOrbit = () => {
       const viewer = viewerRef.current;
       if (!viewer) return;
+      // The landing pose looks toward the copy on the left; the Meet Meowhe
+      // section preserves its opposite scroll-directed view.
+      const landingBlend = clamp(1 - Math.abs(scrollOrbitOffsetDeg) / 32, 0, 1);
+      const landingYaw = HERO_TEXT_FACING_YAW_DEG * landingBlend;
       viewer.setAttribute(
         "camera-orbit",
-        `${presentation.camera.thetaDeg + scrollOrbitOffsetDeg - pointerCurrent.yawDeg + dragOffset.yawDeg}deg ${clamp(presentation.camera.phiDeg - pointerCurrent.pitchDeg + dragOffset.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
+        `${presentation.camera.thetaDeg + landingYaw + scrollOrbitOffsetDeg + dragOffset.yawDeg}deg ${clamp(presentation.camera.phiDeg + dragOffset.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
       );
     };
 
     const animatePointerTilt = (time: number) => {
       const elapsedSeconds = Math.min((time - previousPointerFrameTime) / 1000, 0.05);
       previousPointerFrameTime = time;
-      const easing = 1 - Math.exp(-HERO_POINTER_FOLLOW_RATE * elapsedSeconds);
+      const easing = 1 - Math.exp(-HERO_DRAG_RETURN_RATE * elapsedSeconds);
 
       if (draggingPointerId === null) {
         dragOffset.yawDeg += (0 - dragOffset.yawDeg) * easing;
         dragOffset.phiDeg += (0 - dragOffset.phiDeg) * easing;
       }
-      pointerCurrent.pitchDeg += (pointerTarget.pitchDeg - pointerCurrent.pitchDeg) * easing;
-      pointerCurrent.yawDeg += (pointerTarget.yawDeg - pointerCurrent.yawDeg) * easing;
       applyPointerOrbit();
 
-      const pitchRemaining = Math.abs(pointerTarget.pitchDeg - pointerCurrent.pitchDeg);
-      const yawRemaining = Math.abs(pointerTarget.yawDeg - pointerCurrent.yawDeg);
       const dragRemaining = Math.max(Math.abs(dragOffset.yawDeg), Math.abs(dragOffset.phiDeg));
-      if (pitchRemaining <= HERO_POINTER_SETTLE_EPSILON_DEG && yawRemaining <= HERO_POINTER_SETTLE_EPSILON_DEG && dragRemaining <= HERO_POINTER_SETTLE_EPSILON_DEG) {
-        pointerCurrent.pitchDeg = pointerTarget.pitchDeg;
-        pointerCurrent.yawDeg = pointerTarget.yawDeg;
+      if (draggingPointerId === null && dragRemaining <= HERO_POINTER_SETTLE_EPSILON_DEG) {
+        dragOffset.yawDeg = 0;
+        dragOffset.phiDeg = 0;
         applyPointerOrbit();
         pointerAnimationFrame = null;
         return;
@@ -194,48 +191,22 @@ export function HeroObjectStage({
       pointerAnimationFrame = window.requestAnimationFrame(animatePointerTilt);
     };
 
+    // Pointer movement affects the model only while the primary button is held.
     const handlePointerMove = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
-      // The traveling object must keep following the pointer in Meet Meowhe.
-      // Use the active section as the pointer space, never an off-screen stage.
-      const heroSection = document.querySelector<HTMLElement>('[data-home-3d-section="hero"]');
-      const meetSection = document.querySelector<HTMLElement>('[data-home-3d-section="featured"]');
-      const within = (element: HTMLElement | null) => {
-        if (!element) return false;
-        const bounds = element.getBoundingClientRect();
-        return event.clientX >= bounds.left && event.clientX <= bounds.right
-          && event.clientY >= bounds.top && event.clientY <= bounds.bottom;
-      };
-      const activeRegion = within(meetSection) ? meetSection : within(heroSection) ? heroSection : null;
-      if (!activeRegion) {
-        settlePointerTilt();
-        return;
-      }
-      const rect = activeRegion.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) return;
-
-      const normalizedX = clamp(((event.clientX - rect.left) / rect.width) * 2 - 1, -1, 1);
-      const normalizedY = clamp(((event.clientY - rect.top) / rect.height) * 2 - 1, -1, 1);
-
-      if (draggingPointerId !== null) {
-        if (event.pointerId !== draggingPointerId) return;
-        dragOffset.yawDeg = clamp(dragOffset.yawDeg - (event.clientX - dragX) * HERO_DRAG_DEG_PER_PIXEL, -HERO_DRAG_YAW_MAX_DEG, HERO_DRAG_YAW_MAX_DEG);
-        dragOffset.phiDeg = clamp(dragOffset.phiDeg - (event.clientY - dragY) * HERO_DRAG_DEG_PER_PIXEL, HERO_DRAG_PHI_MIN_DEG - presentation.camera.phiDeg, HERO_DRAG_PHI_MAX_DEG - presentation.camera.phiDeg);
-        dragX = event.clientX;
-        dragY = event.clientY;
-        applyPointerOrbit();
-        return;
-      }
-      pointerTarget.yawDeg = normalizedX * HERO_POINTER_YAW_MAX_DEG;
-      // Moving toward the top raises the camera to reveal the crown and ears.
-      pointerTarget.pitchDeg = -normalizedY * HERO_POINTER_PITCH_MAX_DEG;
-      startPointerTilt();
-    };
-
-    const settlePointerTilt = () => {
-      pointerTarget.pitchDeg = 0;
-      pointerTarget.yawDeg = 0;
-      startPointerTilt();
+      if (draggingPointerId === null || draggingPointerId !== event.pointerId) return;
+      dragOffset.yawDeg = clamp(
+        dragOffset.yawDeg - (event.clientX - dragX) * HERO_DRAG_DEG_PER_PIXEL,
+        -HERO_DRAG_YAW_MAX_DEG,
+        HERO_DRAG_YAW_MAX_DEG,
+      );
+      dragOffset.phiDeg = clamp(
+        dragOffset.phiDeg - (event.clientY - dragY) * HERO_DRAG_DEG_PER_PIXEL,
+        HERO_DRAG_PHI_MIN_DEG - presentation.camera.phiDeg,
+        HERO_DRAG_PHI_MAX_DEG - presentation.camera.phiDeg,
+      );
+      dragX = event.clientX;
+      dragY = event.clientY;
+      applyPointerOrbit();
     };
 
     const handlePointerDown = (event: PointerEvent) => {
@@ -254,8 +225,6 @@ export function HeroObjectStage({
       draggingPointerId = event.pointerId;
       dragX = event.clientX;
       dragY = event.clientY;
-      pointerTarget.pitchDeg = 0;
-      pointerTarget.yawDeg = 0;
       if (presentation.autoRotate) viewerRef.current?.removeAttribute("auto-rotate");
       startPointerTilt();
     };
@@ -264,7 +233,7 @@ export function HeroObjectStage({
       if (draggingPointerId !== event.pointerId) return;
       draggingPointerId = null;
       if (presentation.autoRotate && !reducedMotion) viewerRef.current?.setAttribute("auto-rotate", "");
-      settlePointerTilt();
+      startPointerTilt();
     };
 
     const handleScrollOrbit = (event: Event) => {
@@ -327,7 +296,6 @@ export function HeroObjectStage({
           window.addEventListener("pointerdown", handlePointerDown);
           window.addEventListener("pointerup", handlePointerUp);
           window.addEventListener("pointercancel", handlePointerUp);
-          document.addEventListener("pointerleave", settlePointerTilt);
         }
         window.addEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
@@ -336,7 +304,7 @@ export function HeroObjectStage({
           stage.dataset.heroMode = reducedMotion
             ? "enhanced-static"
             : finePointer
-              ? "enhanced-pointer-follow"
+              ? "enhanced-drag-to-orbit"
               : "enhanced-touch-static";
           if (loaderRef.current) {
             loaderRef.current.style.opacity = "0";
@@ -352,6 +320,8 @@ export function HeroObjectStage({
         viewer.addEventListener("error", showError, { once: true });
         mount.replaceChildren(viewer);
         viewerRef.current = viewer;
+        // Apply the resting text-facing angle immediately, even before any scroll event.
+        applyPointerOrbit();
       } catch {
         showError();
       }
@@ -401,7 +371,6 @@ export function HeroObjectStage({
       window.removeEventListener("pointerdown", handlePointerDown);
       window.removeEventListener("pointerup", handlePointerUp);
       window.removeEventListener("pointercancel", handlePointerUp);
-      document.removeEventListener("pointerleave", settlePointerTilt);
       window.removeEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
       viewerRef.current = null;
@@ -414,7 +383,7 @@ export function HeroObjectStage({
       ref={stageRef}
       className={`hero-object-stage group select-none !min-h-[30rem] !overflow-visible !border-0 !bg-transparent lg:!min-h-[46rem] ${mobileOnly ? "hero-object-stage-mobile-only" : ""}`}
       data-hero-renderer="model-viewer"
-      data-hero-interaction={mobileOnly ? "touch-static" : "pointer-follow-and-recenter"}
+      data-hero-interaction={mobileOnly ? "touch-static" : "drag-and-recenter"}
       data-hero-mode="capability-gated"
       data-hero-tint={presentation.tint ?? "default"}
       data-hero-preload={preload ? "true" : "false"}

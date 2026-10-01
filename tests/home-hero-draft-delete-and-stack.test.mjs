@@ -4,11 +4,10 @@ import test from "node:test";
 
 const read = (file) => readFileSync(file, "utf8");
 
-test("each collapsed folder label carries its own divider without duplicate overlay separators", () => {
+test("folder tiers use real consistent card outlines without detached overlay separators", () => {
   const stack = read("src/features/home/made-at-luminal-stack.tsx");
-  assert.match(stack, /flex h-\[1\.1rem\] items-start border-b/);
-  assert.match(stack, /border-white\/20 opacity-100/);
-  assert.match(stack, /border-transparent opacity-0/);
+  assert.match(stack, /rounded-\[1\.75rem\] border border-white\/25/);
+  assert.doesNotMatch(stack, /items-start border-b/);
   assert.doesNotMatch(stack, /key=\{`separator-\$\{step\.number\}\`\}/);
 });
 
@@ -28,7 +27,7 @@ test("drag is limited to cursor-primary button, does not capture pointer, and pr
   assert.match(stage, /HERO_DRAG_YAW_MAX_DEG = 40/);
   assert.match(stage, /HERO_DRAG_PHI_MIN_DEG = 48/);
   assert.match(stage, /HERO_DRAG_PHI_MAX_DEG = 90/);
-  assert.match(stage, /draggingPointerId !== null/);
+  assert.match(stage, /draggingPointerId === null \|\| draggingPointerId !== event\.pointerId/);
   assert.match(stage, /if \(presentation\.autoRotate\) viewerRef\.current\?\.removeAttribute\("auto-rotate"\)/);
   assert.match(stage, /if \(presentation\.autoRotate && !reducedMotion\) viewerRef\.current\?\.setAttribute\("auto-rotate", ""\)/);
   assert.doesNotMatch(stage, /setPointerCapture/);
