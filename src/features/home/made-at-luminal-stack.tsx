@@ -127,10 +127,10 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       >
         {steps.slice(0, -1).map((step, index) => (
           <div
-            className={`absolute inset-x-0 flex h-[1.1rem] items-start border-b px-6 pt-[0.22rem] font-mono text-[0.6rem] uppercase leading-none tracking-[0.18em] text-white/55 transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
+            className={`absolute left-6 flex h-[1.1rem] items-start pt-[0.22rem] font-mono text-[0.6rem] uppercase leading-none tracking-[0.18em] text-white/55 transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
               collapsed[index] || (terminalActive && index === steps.length - 2)
-                ? "translate-y-0 border-white/20 opacity-100"
-                : "-translate-y-1 border-transparent opacity-0"
+                ? "translate-y-0 opacity-100"
+                : "-translate-y-1 opacity-0"
             }`}
             style={{ top: `${index * STICKY_STEP_REM}rem` }}
             key={`collapsed-${step.number}`}
@@ -149,7 +149,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
               ref={(node) => {
                 itemRefs.current[index] = node;
               }}
-              className={`relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0d0d0e]/95 p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:min-h-[60svh] md:p-10 motion-reduce:static ${
+              className={`relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/25 bg-[#0d0d0e] p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:min-h-[60svh] md:p-10 motion-reduce:static ${
                 isLast ? "md:relative" : "md:sticky"
               }`}
               style={{
