@@ -50,11 +50,13 @@ test("Hero supports constrained drag, preserves scroll orbit, and recenters on r
   assert.match(heroConfig, /autoRotate: false/);
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
   assert.match(heroSource, /const applyPointerOrbit/);
-  assert.match(heroSource, /clamp\(presentation\.camera\.thetaDeg \+ landingYaw \+ scrollOrbitOffsetDeg \+ dragOffset\.yawDeg, presentation\.camera\.thetaDeg - HERO_DRAG_YAW_MAX_DEG, presentation\.camera\.thetaDeg \+ HERO_DRAG_YAW_MAX_DEG\)/);
+  assert.match(heroSource, /const sectionTheta = presentation\.camera\.thetaDeg \+ scrollOrbitOffsetDeg/);
+  assert.match(heroSource, /sectionTheta \+ dragOffset\.yawDeg/);
+  assert.match(heroSource, /sectionTheta - HERO_DRAG_YAW_MAX_DEG/);
   assert.match(heroSource, /clamp\(presentation\.camera\.phiDeg \+ dragOffset\.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG\)/);
   assert.match(heroSource, /luminal:hero-orbit-offset/);
   assert.match(heroSource, /data-hero-interaction=\{mobileOnly \? "touch-static" : "drag-and-recenter"\}/);
-  assert.match(heroSource, /HERO_TEXT_FACING_YAW_DEG = 10/);
+  assert.doesNotMatch(heroSource, /HERO_TEXT_FACING_YAW_DEG|landingYaw/);
   assert.match(heroSource, /HERO_DRAG_RETURN_RATE = 5\.5/);
   assert.doesNotMatch(heroSource, /pointerTarget|normalizedX|normalizedY/);
   assert.match(heroSource, /HERO_POINTER_SETTLE_EPSILON_DEG = 0\.01/);
