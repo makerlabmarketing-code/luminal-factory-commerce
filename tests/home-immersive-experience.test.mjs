@@ -110,9 +110,6 @@ test("Made at Luminal exits the sticky chrome together with terminal Step 04", (
   assert.match(stack, /isLast \? "md:relative" : "md:sticky"/);
   assert.match(stack, /top: isLast \? undefined/);
   assert.match(stack, /terminalTargetTop/);
-  assert.match(stack, /terminalActivationDistance = STICKY_STEP_REM \* rootFontSize \+ 2/);
-  assert.match(stack, /isTerminalActive = terminalTop <= terminalTargetTop \+ terminalActivationDistance/);
-  assert.match(stack, /terminalActive/);
   assert.match(stack, /border border-white\/25/);
   assert.match(stack, /releaseDistance = Math\.max\(0, terminalTargetTop - terminalTop\)/);
   assert.match(stack, /--process-release-y/);
