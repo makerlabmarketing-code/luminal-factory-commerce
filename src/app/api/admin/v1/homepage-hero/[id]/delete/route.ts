@@ -10,7 +10,8 @@ import {
 
 export const dynamic = "force-dynamic";
 
-// Draft-only deletion. Published Hero and Storage files are never deleted.
+// Delete only inactive Hero versions. Both unused drafts and older previously
+// published versions are eligible; the active Hero and Storage are protected.
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const context = await authorizeCommerceAdminRoute(request, ["commerce.hero.write"]);
   if (context instanceof Response) return context;
@@ -31,12 +32,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .delete()
       .eq("id", id.data)
       .eq("is_active", false)
-      .is("published_at", null)
       .select("id");
     if (error) throw error;
     if (!data?.length) {
       await recordCommerceAdminAudit(context, { operation: "homepage_hero.delete_draft", targetId: id.data, outcome: "failed", httpStatus: 409, failureCode: "HERO_CONFLICT" }).catch(() => undefined);
-      return commerceAdminFailure(context.identity.requestId, 409, "OPERATION_CONFLICT", "Chỉ xóa được Hero chưa xuất bản.");
+      return commerceAdminFailure(context.identity.requestId, 409, "OPERATION_CONFLICT", "Chỉ xóa được Hero không còn hoạt động.");
     }
     await recordCommerceAdminAudit(context, { operation: "homepage_hero.delete_draft", targetId: id.data, outcome: "succeeded", httpStatus: 200 });
     return commerceAdminSuccess({ deletedId: id.data }, context.identity.requestId);
