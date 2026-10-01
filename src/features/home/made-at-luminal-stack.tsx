@@ -27,7 +27,6 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
   const itemRefs = useRef<Array<HTMLLIElement | null>>([]);
   const frameRef = useRef<number | null>(null);
   const [collapsed, setCollapsed] = useState<readonly boolean[]>(() => steps.map(() => false));
-  const [terminalActive, setTerminalActive] = useState(false);
 
   useEffect(() => {
     const desktop = window.matchMedia(DESKTOP_MEDIA);
@@ -46,7 +45,6 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
           const next = steps.map(() => false);
           return statesEqual(previous, next) ? previous : next;
         });
-        setTerminalActive(false);
         return;
       }
 
@@ -66,12 +64,9 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
         const terminalCard = itemRefs.current[terminalIndex];
         const terminalTargetTop = stackTopPx + terminalIndex * STICKY_STEP_REM * rootFontSize;
         const terminalTop = terminalCard?.getBoundingClientRect().top ?? terminalTargetTop;
-        const terminalActivationDistance = STICKY_STEP_REM * rootFontSize + 2;
-        const isTerminalActive = terminalTop <= terminalTargetTop + terminalActivationDistance;
         const releaseDistance = Math.max(0, terminalTargetTop - terminalTop);
         const releaseY = `-${Math.round(releaseDistance)}px`;
 
-        setTerminalActive((previous) => previous === isTerminalActive ? previous : isTerminalActive);
         list.style.setProperty("--process-release-y", releaseY);
         header.style.translate = `0 ${releaseY}`;
       }
