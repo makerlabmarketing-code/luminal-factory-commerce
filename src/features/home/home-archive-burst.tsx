@@ -32,8 +32,12 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     // Keep reveal and retract anchored to exactly the same scroll range.
     // Direction must never reset the animation to zero on a tiny upward scroll.
     const REVEAL_DURATION = 2960;
-    const REVEAL_VIEWPORT_START = 0.52;
-    const REVEAL_VIEWPORT_SPAN = 0.27;
+    // The full exit happens when the featured section boundary rises to
+    // around the model's ears (~29vh from the top on desktop). There is no
+    // long fully-visible plateau while scrolling back into the Hero section.
+    // Use the same 29vh interval for revealing and retracting.
+    const REVEAL_VIEWPORT_START = 0.29;
+    const REVEAL_VIEWPORT_SPAN = 0.29;
     const render = (now: number) => {
       frame = null;
       const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
