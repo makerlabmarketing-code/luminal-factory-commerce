@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { homepageHeroPublishMutationSchema } from "@/features/management/commerce-admin-wire-contract";
 import {
   authorizeCommerceAdminRoute,
@@ -28,6 +29,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     await assertHomepageHeroAssetsPublishable(context.privilegedClient, id.data);
     const hero = await publishHomepageHero(context.client, id.data, mutation.data, { clientId: context.identity.clientId, requestFingerprint: context.requestFingerprint });
     await recordCommerceAdminAudit(context, { operation: "homepage_hero.publish", targetId: id.data, outcome: "succeeded", httpStatus: 200 });
+    // Refresh only the public Hero presentation after a successful publish.
+    // Cache refresh must never change the result of an already committed mutation.
+    try {
+      revalidateTag("homepage-hero", { expire: 0 });
+      revalidatePath("/");
+    } catch (error) {
+      console.error("Homepage Hero cache invalidation failed after publish.", error);
+    }
     return commerceAdminSuccess(hero, context.identity.requestId);
   } catch (error) {
     const adminNotFound = error instanceof HomepageHeroAdminServiceError && error.code === "HERO_NOT_FOUND";
