@@ -291,7 +291,6 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     // touch devices keep the lower stage even at the iPad Pro's 1024px width.
     const compactMotion = window.matchMedia("(max-width: 1023px), (orientation: portrait) and (hover: none) and (pointer: coarse)");
     const portraitTabletMotion = window.matchMedia("(min-width: 700px) and (orientation: portrait) and (hover: none) and (pointer: coarse)");
-    const interactivePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) return;
 
@@ -355,8 +354,9 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
     const schedule = () => {
       target = readMotionState(window.scrollY, keyframes);
-      const featured = keyframes[1]?.scrollY ?? window.innerHeight;
-      layer.style.pointerEvents = interactivePointer.matches && window.scrollY < featured ? "auto" : "none";
+      // The pointer is tracked globally by HeroObjectStage only within Hero/Meet.
+      // The floating 3D layer must not intercept archive links and buttons.
+      layer.style.pointerEvents = "none";
       if (frameHandle === null) frameHandle = window.requestAnimationFrame(animate);
     };
 
