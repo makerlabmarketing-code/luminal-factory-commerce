@@ -50,7 +50,7 @@ test("Hero supports constrained drag, preserves scroll orbit, and recenters on r
   assert.match(heroConfig, /autoRotate: false/);
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
   assert.match(heroSource, /const applyPointerOrbit/);
-  assert.match(heroSource, /const sectionTheta = presentation\.camera\.thetaDeg \+ scrollOrbitOffsetDeg/);
+  assert.match(heroSource, /const sectionTheta = presentation\.camera\.thetaDeg \* \(1 - 2 \* scrollOrbitProgress\)/);
   assert.match(heroSource, /sectionTheta \+ dragOffset\.yawDeg/);
   assert.match(heroSource, /sectionTheta - HERO_DRAG_YAW_MAX_DEG/);
   assert.match(heroSource, /clamp\(presentation\.camera\.phiDeg \+ dragOffset\.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG\)/);
@@ -102,4 +102,14 @@ test("Hero respects disabled auto-rotation and continues pointer tracking in Mee
   assert.match(heroSource, /data-home-3d-section="hero"/);
   assert.match(heroSource, /window\.removeEventListener\("pointermove", handlePointerMove\)/);
   assert.match(heroSource, /window\.removeEventListener\("pointerup", handlePointerUp\)/);
+});
+
+test("Hero mirrors ERP yaw at Meet Meowhe without changing vertical angle or drag safety", () => {
+  const immersive = fs.readFileSync("src/features/home/home-immersive-experience.tsx", "utf8");
+  assert.match(immersive, /const orbitProgress = finalOrbitDeg === 0/);
+  assert.match(immersive, /clamp01\(state\.orbitDeg \/ finalOrbitDeg\)/);
+  assert.match(immersive, /detail: \{ orbitDeg: state\.orbitDeg, orbitProgress \}/);
+  assert.match(heroSource, /scrollOrbitProgress = clamp\(detail\?\.orbitProgress \?\? 0, 0, 1\)/);
+  assert.match(heroSource, /presentation\.camera\.phiDeg \+ dragOffset\.phiDeg/);
+  assert.doesNotMatch(heroSource, /scrollOrbitOffsetDeg/);
 });
