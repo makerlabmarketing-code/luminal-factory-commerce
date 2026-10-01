@@ -50,17 +50,17 @@ test("Hero follows pointer without capture, composes scroll orbit, and recenters
   assert.match(heroConfig, /autoRotate: false/);
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
   assert.match(heroSource, /const applyPointerOrbit/);
-  assert.match(heroSource, /presentation\.camera\.thetaDeg \+ scrollOrbitOffsetDeg - pointerCurrent\.yawDeg/);
+  assert.match(heroSource, /presentation\.camera\.thetaDeg \+ scrollOrbitOffsetDeg \+ pointerCurrent\.yawDeg/);
   assert.match(heroSource, /presentation\.camera\.phiDeg - pointerCurrent\.pitchDeg/);
   assert.match(heroSource, /luminal:hero-orbit-offset/);
   assert.match(heroSource, /data-hero-interaction=\{mobileOnly \? "touch-static" : "pointer-follow-and-recenter"\}/);
-  assert.match(heroSource, /HERO_POINTER_YAW_MAX_DEG = 24/);
-  assert.match(heroSource, /HERO_POINTER_PITCH_MAX_DEG = 18/);
-  assert.match(heroSource, /HERO_POINTER_FOLLOW_RATE = 26/);
+  assert.match(heroSource, /HERO_POINTER_YAW_MAX_DEG = 17/);
+  assert.match(heroSource, /HERO_POINTER_PITCH_MAX_DEG = 12/);
+  assert.match(heroSource, /HERO_POINTER_FOLLOW_RATE = 9/);
   assert.match(heroSource, /pointerTarget\.pitchDeg = -normalizedY \* HERO_POINTER_PITCH_MAX_DEG/);
   assert.match(heroSource, /HERO_POINTER_SETTLE_EPSILON_DEG = 0\.01/);
-  assert.match(heroSource, /stage\.addEventListener\("pointermove", handlePointerMove\)/);
-  assert.match(heroSource, /stage\.addEventListener\("pointerleave", settlePointerTilt\)/);
+  assert.match(heroSource, /window\.addEventListener\("pointermove", handlePointerMove/);
+  assert.match(heroSource, /document\.addEventListener\("pointerleave", settlePointerTilt\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
   assert.doesNotMatch(heroSource, /pointerdown|setPointerCapture|releasePointerCapture/);
   assert.match(heroSource, /if \(presentation\.autoRotate && !reducedMotion\)/);
@@ -86,6 +86,14 @@ test("reduced motion keeps an eligible model static and disables pointer-follow"
   assert.match(heroSource, /prefers-reduced-motion: reduce/);
   assert.match(heroSource, /reducedMotion[\s\S]*"enhanced-static"/);
   assert.match(heroSource, /if \(!reducedMotion && finePointer\)/);
-  assert.match(heroSource, /stage\.addEventListener\("pointermove", handlePointerMove\)/);
+  assert.match(heroSource, /window\.addEventListener\("pointermove", handlePointerMove/);
   assert.match(heroSource, /allowTouch3d/);
+});
+
+test("Hero respects disabled auto-rotation and continues pointer tracking in Meet Meowhe", () => {
+  assert.match(heroSource, /else viewer\.removeAttribute\("auto-rotate"\)/);
+  assert.match(heroSource, /data-home-3d-section="featured"/);
+  assert.match(heroSource, /data-home-3d-section="hero"/);
+  assert.match(heroSource, /window\.removeEventListener\("pointermove", handlePointerMove\)/);
+  assert.match(heroSource, /document\.removeEventListener\("pointerleave", settlePointerTilt\)/);
 });
