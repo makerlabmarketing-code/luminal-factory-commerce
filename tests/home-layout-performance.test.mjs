@@ -66,7 +66,7 @@ test("Hero 3D stays idle-loaded with bounded pointer-follow and mobile continuit
   assert.match(heroStage, /window\.addEventListener\("pointerdown", handlePointerDown\)/);
   assert.doesNotMatch(heroStage, /setPointerCapture/);
   assert.doesNotMatch(heroStage, /reactiveLightRef/);
-  assert.match(heroStage, /HERO_POINTER_FOLLOW_RATE/);
+  assert.match(heroStage, /HERO_DRAG_RETURN_RATE/);
   assert.doesNotMatch(heroStage, /data-hero-lens|fluid-glass/);
   assert.doesNotMatch(heroStage, /@react-three|from "three"/);
 });
