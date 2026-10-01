@@ -31,9 +31,9 @@ const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
-const HERO_POINTER_YAW_MAX_DEG = 18;
-const HERO_POINTER_PITCH_MAX_DEG = 6;
-const HERO_POINTER_FOLLOW_RATE = 20;
+const HERO_POINTER_YAW_MAX_DEG = 24;
+const HERO_POINTER_PITCH_MAX_DEG = 18;
+const HERO_POINTER_FOLLOW_RATE = 26;
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
 
 function clamp(value: number, minimum: number, maximum: number) {
@@ -189,7 +189,8 @@ export function HeroObjectStage({
       const normalizedY = clamp(((event.clientY - rect.top) / rect.height) * 2 - 1, -1, 1);
 
       pointerTarget.yawDeg = normalizedX * HERO_POINTER_YAW_MAX_DEG;
-      pointerTarget.pitchDeg = normalizedY * HERO_POINTER_PITCH_MAX_DEG;
+      // Moving toward the top raises the camera to reveal the crown and ears.
+      pointerTarget.pitchDeg = -normalizedY * HERO_POINTER_PITCH_MAX_DEG;
       startPointerTilt();
     };
 

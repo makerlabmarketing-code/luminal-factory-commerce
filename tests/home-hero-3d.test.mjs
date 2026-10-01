@@ -54,9 +54,10 @@ test("Hero follows pointer without capture, composes scroll orbit, and recenters
   assert.match(heroSource, /presentation\.camera\.phiDeg - pointerCurrent\.pitchDeg/);
   assert.match(heroSource, /luminal:hero-orbit-offset/);
   assert.match(heroSource, /data-hero-interaction=\{mobileOnly \? "touch-static" : "pointer-follow-and-recenter"\}/);
-  assert.match(heroSource, /HERO_POINTER_YAW_MAX_DEG = 18/);
-  assert.match(heroSource, /HERO_POINTER_PITCH_MAX_DEG = 6/);
-  assert.match(heroSource, /HERO_POINTER_FOLLOW_RATE = 20/);
+  assert.match(heroSource, /HERO_POINTER_YAW_MAX_DEG = 24/);
+  assert.match(heroSource, /HERO_POINTER_PITCH_MAX_DEG = 18/);
+  assert.match(heroSource, /HERO_POINTER_FOLLOW_RATE = 26/);
+  assert.match(heroSource, /pointerTarget\.pitchDeg = -normalizedY \* HERO_POINTER_PITCH_MAX_DEG/);
   assert.match(heroSource, /HERO_POINTER_SETTLE_EPSILON_DEG = 0\.01/);
   assert.match(heroSource, /stage\.addEventListener\("pointermove", handlePointerMove\)/);
   assert.match(heroSource, /stage\.addEventListener\("pointerleave", settlePointerTilt\)/);

@@ -1,5 +1,25 @@
 # Ecommerce implementation roadmap
 
+## 2026-10-01 — Hero pointer inspection
+
+Desktop pointer orbit expands from horizontal ±18° / vertical ±6° to
+±24° / ±18°. Moving the pointer upward raises the camera to reveal the crown
+and ears. Follow rate increases from 20 to 26; scroll composition, recenter,
+reduced-motion gating, touch fallback and frame cleanup remain in place.
+ERP preview uses the same static orientation and camera settings.
+Next.js and ESLint config are patched to 16.3.6 for GHSA-vcvr-r3jv-pc5j,
+reported by the production dependency audit; no next/og usage was found.
+Validation and deployment evidence accompany delivery. Integration flags are
+unchanged; trusted handshake and the remaining I-006/I-007 gates still apply.
+Checks: ERP 844 tests and Commerce 314 tests pass with lint, typecheck and
+production build; Commerce retains two existing lint warnings. Executing the
+actual pointer handler confirms upward orbit (64°), angle bounds, touch and
+zero-size guards. Static model orientation parity passes. Browser rendering
+verification is unavailable: Chrome download failed (TLS issuer / invalid zip).
+Operator visual retest remains required.
+Rollback: revert this application/dependency batch.
+
+
 This is the authoritative task roadmap. Status vocabulary: `NOT_STARTED`, `IN_PROGRESS`, `CODE_COMPLETE`, `MERGED`, `DEPLOYED`, `OPERATOR_RETEST_REQUIRED`, `LIVE_APPROVAL_REQUIRED`, `BLOCKED`, `COMPLETED`. A code change in a PR is `CODE_COMPLETE`; it is not `MERGED` or `DEPLOYED` without external evidence.
 
 ## 2026-09-30 Homepage Hero continuation — I-006 preparation
