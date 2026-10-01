@@ -116,31 +116,6 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
 
   return (
     <div ref={listRef} className="relative">
-      <div
-        className="pointer-events-none sticky z-20 hidden h-px overflow-visible md:block motion-reduce:hidden"
-        style={{
-          top: "var(--process-stack-top, 15rem)",
-          translate: "0 var(--process-release-y, 0px)",
-        }}
-        aria-hidden="true"
-        data-process-title-rail="true"
-      >
-        {steps.slice(0, -1).map((step, index) => (
-          <div
-            className={`absolute inset-x-0 flex h-[1.1rem] items-start rounded-t-[1.75rem] border-t border-white/25 bg-[#0d0d0e] px-6 pt-[0.22rem] font-mono text-[0.6rem] uppercase leading-none tracking-[0.18em] text-white/55 transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
-              collapsed[index] || (terminalActive && index === steps.length - 2)
-                ? "translate-y-0 opacity-100"
-                : "-translate-y-1 opacity-0"
-            }`}
-            style={{ top: `${index * STICKY_STEP_REM}rem` }}
-            key={`collapsed-${step.number}`}
-          >
-            {step.number} / {step.title}
-          </div>
-        ))}
-
-      </div>
-
       <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh] md:pb-0">
         {steps.map((step, index) => {
           const isLast = index === steps.length - 1;
@@ -149,10 +124,8 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
               ref={(node) => {
                 itemRefs.current[index] = node;
               }}
-              className={`relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/25 bg-[#0d0d0e] p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:min-h-[60svh] md:p-10 motion-reduce:static ${
+              className={`relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/25 bg-[#0d0d0e] p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] md:min-h-[60svh] md:p-10 motion-reduce:static ${
                 isLast ? "md:relative" : "md:sticky"
-              } ${
-                !isLast && collapsed[index] ? "md:border-transparent md:shadow-none" : ""
               }`}
               style={{
                 top: isLast ? undefined : `calc(var(--process-stack-top, 15rem) + ${index * STICKY_STEP_REM}rem)`,
@@ -163,6 +136,18 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
               data-process-collapsed={collapsed[index] ? "true" : "false"}
               data-process-terminal={isLast ? "true" : undefined}
             >
+              {!isLast ? (
+                <div
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute inset-x-6 top-1 z-10 hidden h-[1.1rem] items-center bg-[#0d0d0e] font-mono text-[0.6rem] uppercase leading-none tracking-[0.18em] text-white/55 transition-opacity duration-150 md:flex md:inset-x-10 ${
+                    collapsed[index] ? "opacity-100" : "opacity-0"
+                  }`}
+                  data-process-collapsed-label={step.number}
+                >
+                  {step.number} / {step.title}
+                </div>
+              ) : null}
+
               <div
                 className="grid h-full min-h-[inherit] content-between gap-12 md:grid-cols-[0.7fr_1.3fr] md:items-end"
                 data-luminal-reveal="card"
