@@ -144,7 +144,7 @@ export function HeroObjectStage({
     let fallbackTimeout: number | null = null;
     let pointerAnimationFrame: number | null = null;
     let previousPointerFrameTime = performance.now();
-    let scrollOrbitOffsetDeg = 0;
+    let scrollOrbitProgress = 0;
     const dragOffset = { yawDeg: 0, phiDeg: 0 };
     let draggingPointerId: number | null = null;
     let dragX = 0;
@@ -153,9 +153,9 @@ export function HeroObjectStage({
     const applyPointerOrbit = () => {
       const viewer = viewerRef.current;
       if (!viewer) return;
-      // Use the saved ERP theta directly at the top. Scroll motion applies only
-      // the section transition; user drag has the same relative range in either section.
-      const sectionTheta = presentation.camera.thetaDeg + scrollOrbitOffsetDeg;
+      // Hero uses ERP theta exactly, Meet Meowhe uses its mirrored angle.
+      // Reverse scrolling follows the same path back; dragging stays relative.
+      const sectionTheta = presentation.camera.thetaDeg * (1 - 2 * scrollOrbitProgress);
       const orbitTheta = clamp(
         sectionTheta + dragOffset.yawDeg,
         sectionTheta - HERO_DRAG_YAW_MAX_DEG,
@@ -242,8 +242,8 @@ export function HeroObjectStage({
     };
 
     const handleScrollOrbit = (event: Event) => {
-      const detail = (event as CustomEvent<{ orbitDeg?: number }>).detail;
-      scrollOrbitOffsetDeg = clamp(detail?.orbitDeg ?? 0, -45, 45);
+      const detail = (event as CustomEvent<{ orbitProgress?: number }>).detail;
+      scrollOrbitProgress = clamp(detail?.orbitProgress ?? 0, 0, 1);
       applyPointerOrbit();
     };
 
