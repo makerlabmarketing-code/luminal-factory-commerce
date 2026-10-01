@@ -33,11 +33,13 @@ const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-vie
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
 const HERO_DRAG_RETURN_RATE = 5.5;
-const HERO_TEXT_FACING_YAW_DEG = 24;
+// A restrained three-quarter view keeps the face toward the left-side copy.
+const HERO_TEXT_FACING_YAW_DEG = 10;
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
-const HERO_DRAG_YAW_MAX_DEG = 40;
+// Use the same absolute camera limits in Hero and Meet Meowhe.
+const HERO_DRAG_YAW_MAX_DEG = 36;
 const HERO_DRAG_PHI_MIN_DEG = 48;
-const HERO_DRAG_PHI_MAX_DEG = 90;
+const HERO_DRAG_PHI_MAX_DEG = 85;
 const HERO_DRAG_DEG_PER_PIXEL = 0.18;
 
 function clamp(value: number, minimum: number, maximum: number) {
@@ -158,7 +160,7 @@ export function HeroObjectStage({
       const landingYaw = HERO_TEXT_FACING_YAW_DEG * landingBlend;
       viewer.setAttribute(
         "camera-orbit",
-        `${presentation.camera.thetaDeg + landingYaw + scrollOrbitOffsetDeg + dragOffset.yawDeg}deg ${clamp(presentation.camera.phiDeg + dragOffset.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
+        `${clamp(presentation.camera.thetaDeg + landingYaw + scrollOrbitOffsetDeg + dragOffset.yawDeg, presentation.camera.thetaDeg - HERO_DRAG_YAW_MAX_DEG, presentation.camera.thetaDeg + HERO_DRAG_YAW_MAX_DEG)}deg ${clamp(presentation.camera.phiDeg + dragOffset.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
       );
     };
 
