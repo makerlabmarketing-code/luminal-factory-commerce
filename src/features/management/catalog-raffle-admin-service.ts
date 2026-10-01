@@ -71,9 +71,14 @@ export async function listManagedProducts(client: CommerceAdminPrivilegedClient)
     .from("products")
     .select("id,slug,name,description,product_type,release_type,status,published_at,created_at,updated_at")
     .order("updated_at", { ascending: false })
-    .limit(200);
+    .limit(201);
 
   if (error) persistenceFailure(error);
+  // Returning 200 rows without a continuation token silently hides inventory.
+  // Fail closed until an authenticated paginated contract is introduced.
+  if ((data?.length ?? 0) > 200) {
+    throw new CatalogRaffleAdminServiceError("PERSISTENCE_FAILED", "Product catalog pagination is required.");
+  }
   return z.array(productRowSchema).parse(data ?? []);
 }
 
