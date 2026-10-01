@@ -36,17 +36,17 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       if (!section) return;
       const delta = previousTime === null ? 16 : Math.min(64, now - previousTime);
       previousTime = now;
-      // Retract slightly faster than arrival, without snapping the scene away.
-      if (target < elapsed) elapsed = Math.max(target, elapsed - delta * 1.2);
-      else elapsed = Math.min(target, elapsed + delta);
+      // Faster reverse choreography, still time-based and continuous across frames.
+      if (target < elapsed) elapsed = Math.max(target, elapsed - delta * 1.55);
+      else elapsed = Math.min(target, elapsed + delta * 1.08);
       if (Math.abs(target - elapsed) < 1) elapsed = target;
       const model = document.querySelector<HTMLElement>("[data-home-immersive-model]");
       const source = model?.getBoundingClientRect();
       const bounds = scene.getBoundingClientRect();
-      scene.style.setProperty("--stage-light", clamp01(elapsed / 1400).toFixed(3));
+      scene.style.setProperty("--stage-light", clamp01(elapsed / 1120).toFixed(3));
       bubbleRefs.current.forEach((bubble, index) => {
         if (!bubble) return;
-        const arrival = clamp01((elapsed - index * 220) / 1850);
+        const arrival = clamp01((elapsed - index * 185) / 1600);
         const eased = 1 - Math.pow(1 - arrival, 3);
         const origin = {
           x: (source ? source.left + source.width / 2 : bounds.left + bounds.width * 0.25) - bounds.left - bubble.offsetLeft - bubble.offsetWidth / 2,
@@ -57,7 +57,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
         bubble.style.opacity = clamp01(arrival * 5).toFixed(3);
         bubble.style.visibility = arrival > 0 ? "visible" : "hidden";
       });
-      const copyProgress = clamp01((elapsed - 640) / 1000);
+      const copyProgress = clamp01((elapsed - 530) / 800);
       copy.style.opacity = copyProgress.toFixed(3);
       copy.style.transform = `translate3d(0, ${((1 - copyProgress) * 20).toFixed(1)}px, 0)`;
       copy.style.visibility = copyProgress > 0 ? "visible" : "hidden";
