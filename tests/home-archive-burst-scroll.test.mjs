@@ -51,7 +51,7 @@ function mountScene() {
   const snapshot = () => ({
     copy: Number(copy.style.opacity),
     light: Number(sceneStyles.get("--stage-light")),
-    bubbleScales: bubbles.map((bubble) => Number(bubble.style.transform.match(/scale\\(([^)]+)\\)/)[1])),
+    bubbleScales: bubbles.map((bubble) => Number(bubble.style.transform.match(/scale\(([^)]+)\)/)[1])),
   });
   return { bubbles, copy, tick, scroll, cleanup, frames, listeners, viewport, snapshot };
 }
