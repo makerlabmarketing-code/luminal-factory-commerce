@@ -51,7 +51,9 @@ test("HOME-3D-PATH-02 parks beside the colorways and turns the camera left", () 
   assert.match(immersive, /luminal:hero-orbit-offset/);
   assert.match(home, /<HomeArchiveBurst colorways=\{homePageMedia\.gallery\.slice\(0, 3\)\} \/>/);
   assert.match(burst, /Meet Meowhe\./);
-  assert.match(burst, /data-home-immersive-model/);
+  // Colorway flight is independent from the moving Hero model and its geometry.
+  assert.doesNotMatch(burst, /data-home-immersive-model|getBoundingClientRect\(\).*model/);
+  assert.match(burst, /BUBBLE_FLIGHT/);
 });
 
 test("desktop Meowhe parks beside the colorways and leaves with the scene", () => {

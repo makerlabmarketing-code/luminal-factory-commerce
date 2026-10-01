@@ -27,59 +27,57 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
 
     let frame: number | null = null;
     let previousTime: number | null = null;
-    let elapsed = 0;
+    let progress = 0;
     let target = 0;
-    // Keep reveal and retract anchored to exactly the same scroll range.
-    // Direction must never reset the animation to zero on a tiny upward scroll.
-    const REVEAL_DURATION = 2960;
-    // The full exit happens when the featured section boundary rises to
-    // around the model's ears (~29vh from the top on desktop). There is no
-    // long fully-visible plateau while scrolling back into the Hero section.
-    // Use the same 29vh interval for revealing and retracting.
+
+    // The section scroll boundary controls WHEN the bubbles return, not WHERE
+    // they fly from. No model position/DOM layout measurements in this loop.
     const REVEAL_VIEWPORT_START = 0.29;
     const REVEAL_VIEWPORT_SPAN = 0.29;
+    const FLIGHT_EASING_PER_SECOND = 16;
+    const BUBBLE_FLIGHT: ReadonlyArray<Readonly<{ x: number; y: number }>> = [
+      { x: -112, y: 80 },
+      { x: 118, y: -90 },
+      { x: 74, y: 105 },
+    ];
+
     const render = (now: number) => {
       frame = null;
-      const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
-      if (!section) return;
-      const delta = previousTime === null ? 16 : Math.min(64, now - previousTime);
+      const seconds = previousTime === null ? 0.016 : Math.min(0.064, (now - previousTime) / 1000);
       previousTime = now;
-      // Both directions use the same interpolation speed. The same scroll
-      // position produces the same final lighting, copy and bubble layout.
-      const step = delta * 1.08;
-      if (target < elapsed) elapsed = Math.max(target, elapsed - step);
-      else elapsed = Math.min(target, elapsed + step);
-      if (Math.abs(target - elapsed) < 1) elapsed = target;
-      const model = document.querySelector<HTMLElement>("[data-home-immersive-model]");
-      const source = model?.getBoundingClientRect();
-      const bounds = scene.getBoundingClientRect();
-      scene.style.setProperty("--stage-light", clamp01(elapsed / 1120).toFixed(3));
+      const easing = 1 - Math.exp(-FLIGHT_EASING_PER_SECOND * seconds);
+      progress += (target - progress) * easing;
+      if (Math.abs(target - progress) < 0.001) progress = target;
+
+      const lightProgress = clamp01(progress);
+      scene.style.setProperty("--stage-light", lightProgress.toFixed(3));
       bubbleRefs.current.forEach((bubble, index) => {
         if (!bubble) return;
-        const arrival = clamp01((elapsed - index * 185) / 1600);
+        const arrival = clamp01((progress - index * 0.06) / 0.79);
         const eased = 1 - Math.pow(1 - arrival, 3);
-        const origin = {
-          x: (source ? source.left + source.width / 2 : bounds.left + bounds.width * 0.25) - bounds.left - bubble.offsetLeft - bubble.offsetWidth / 2,
-          y: (source ? source.top + source.height / 2 : bounds.top + bounds.height * 0.45) - bounds.top - bubble.offsetTop - bubble.offsetHeight / 2,
-        };
-        const arc = Math.sin(arrival * Math.PI) * (index === 2 ? 60 : -70);
-        bubble.style.transform = `translate3d(${(origin.x * (1 - eased)).toFixed(1)}px, ${(origin.y * (1 - eased) + arc).toFixed(1)}px, 0) scale(${(0.08 + eased * 0.92).toFixed(3)})`;
-        bubble.style.opacity = clamp01(arrival * 5).toFixed(3);
+        const flight = BUBBLE_FLIGHT[index] ?? BUBBLE_FLIGHT[0];
+        const drift = 1 - eased;
+        const arc = Math.sin(arrival * Math.PI) * (index === 2 ? 20 : -16);
+        bubble.style.transform = `translate3d(${(flight.x * drift).toFixed(1)}px, ${(flight.y * drift + arc).toFixed(1)}px, 0) scale(${(0.08 + eased * 0.92).toFixed(3)})`;
+        bubble.style.opacity = clamp01(arrival * 4).toFixed(3);
         bubble.style.visibility = arrival > 0 ? "visible" : "hidden";
       });
-      const copyProgress = clamp01((elapsed - 530) / 800);
+
+      const copyProgress = clamp01((progress - 0.16) / 0.38);
       copy.style.opacity = copyProgress.toFixed(3);
       copy.style.transform = `translate3d(0, ${((1 - copyProgress) * 20).toFixed(1)}px, 0)`;
       copy.style.visibility = copyProgress > 0 ? "visible" : "hidden";
-      if (Math.abs(target - elapsed) > 0.1) {
+
+      if (Math.abs(target - progress) > 0.001) {
         frame = window.requestAnimationFrame(render);
       } else previousTime = null;
     };
+
     const schedule = () => {
       const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
       if (!section) return;
       const top = section.getBoundingClientRect().top;
-      target = REVEAL_DURATION * clamp01(
+      target = clamp01(
         (window.innerHeight * REVEAL_VIEWPORT_START - top)
           / (window.innerHeight * REVEAL_VIEWPORT_SPAN),
       );
