@@ -150,7 +150,8 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
                 itemRefs.current[index] = node;
               }}
               className={`relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/25 bg-[#0d0d0e] p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] backdrop-blur-md md:min-h-[60svh] md:p-10 motion-reduce:static ${
-                isLast ? "md:relative" : "md:sticky",
+                isLast ? "md:relative" : "md:sticky"
+              } ${
                 !isLast && collapsed[index] ? "md:border-t-transparent" : ""
               }`}
               style={{
