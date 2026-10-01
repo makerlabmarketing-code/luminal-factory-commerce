@@ -68,8 +68,11 @@ test("a tiny upward scroll does not retract Meet Meowhe if the reveal is still i
   scene.tick(700);
   assert.deepEqual(scene.snapshot(), before);
   scene.scroll(-140);
-  scene.tick(700);
-  assert.deepEqual(scene.snapshot(), before);
+  scene.tick(3500);
+  const mid = scene.snapshot();
+  assert.equal(mid.copy, 1);
+  assert.equal(mid.light, 1);
+  assert.ok(mid.bubbleScales[2] < 1 && mid.bubbleScales[2] > 0.08);
   scene.cleanup();
 });
 
@@ -77,19 +80,19 @@ test("the same scroll position yields the same bubble, copy and light states mov
   const scene = mountScene();
   scene.tick(3500);
 
-  scene.scroll(-420); // 580: within the symmetric reveal span 480..750.
+  scene.scroll(-195); // section top=195, within symmetric 0..290px range.
   scene.tick(3500);
   const reverseState = scene.snapshot();
   assert.ok(reverseState.copy > 0 && reverseState.copy < 1);
   assert.ok(reverseState.light > 0 && reverseState.light < 1);
   assert.ok(reverseState.bubbleScales[2] > 0.08 && reverseState.bubbleScales[2] < 1);
 
-  scene.scroll(-100); // 480: reveal is fully hidden.
+  scene.scroll(-100); // section top=295, reveal is fully hidden at >=290px.
   scene.tick(3500);
   assert.equal(scene.copy.style.visibility, "hidden");
   for (const bubble of scene.bubbles) assert.equal(bubble.style.visibility, "hidden");
 
-  scene.scroll(100); // back to 580, this time moving down.
+  scene.scroll(100); // back to section top=195, this time moving down.
   scene.tick(3500);
   const forwardState = scene.snapshot();
   assert.deepEqual(forwardState, reverseState);
@@ -99,7 +102,7 @@ test("the same scroll position yields the same bubble, copy and light states mov
 test("a partial reverse by a few pixels changes the visual state gradually, without resetting content", () => {
   const scene = mountScene();
   scene.tick(3500);
-  scene.scroll(-400); // 600px, inside the transition.
+  scene.scroll(-195); // section top=195, inside the transition.
   scene.tick(3500);
   const before = scene.snapshot();
 
