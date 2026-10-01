@@ -50,11 +50,11 @@ test("Hero supports constrained drag, preserves scroll orbit, and recenters on r
   assert.match(heroConfig, /autoRotate: false/);
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
   assert.match(heroSource, /const applyPointerOrbit/);
-  assert.match(heroSource, /presentation\.camera\.thetaDeg \+ landingYaw \+ scrollOrbitOffsetDeg \+ dragOffset\.yawDeg/);
+  assert.match(heroSource, /clamp\(presentation\.camera\.thetaDeg \+ landingYaw \+ scrollOrbitOffsetDeg \+ dragOffset\.yawDeg, presentation\.camera\.thetaDeg - HERO_DRAG_YAW_MAX_DEG, presentation\.camera\.thetaDeg \+ HERO_DRAG_YAW_MAX_DEG\)/);
   assert.match(heroSource, /clamp\(presentation\.camera\.phiDeg \+ dragOffset\.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG\)/);
   assert.match(heroSource, /luminal:hero-orbit-offset/);
   assert.match(heroSource, /data-hero-interaction=\{mobileOnly \? "touch-static" : "drag-and-recenter"\}/);
-  assert.match(heroSource, /HERO_TEXT_FACING_YAW_DEG = 24/);
+  assert.match(heroSource, /HERO_TEXT_FACING_YAW_DEG = 10/);
   assert.match(heroSource, /HERO_DRAG_RETURN_RATE = 5\.5/);
   assert.doesNotMatch(heroSource, /pointerTarget|normalizedX|normalizedY/);
   assert.match(heroSource, /HERO_POINTER_SETTLE_EPSILON_DEG = 0\.01/);
@@ -62,9 +62,9 @@ test("Hero supports constrained drag, preserves scroll orbit, and recenters on r
   assert.match(heroSource, /window\.addEventListener\("pointerup", handlePointerUp\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
   assert.match(heroSource, /window\.addEventListener\("pointerdown", handlePointerDown\)/);
-  assert.match(heroSource, /HERO_DRAG_YAW_MAX_DEG = 40/);
+  assert.match(heroSource, /HERO_DRAG_YAW_MAX_DEG = 36/);
   assert.match(heroSource, /HERO_DRAG_PHI_MIN_DEG = 48/);
-  assert.match(heroSource, /HERO_DRAG_PHI_MAX_DEG = 90/);
+  assert.match(heroSource, /HERO_DRAG_PHI_MAX_DEG = 85/);
   assert.match(heroSource, /draggingPointerId === null/);
   assert.doesNotMatch(heroSource, /setPointerCapture|releasePointerCapture/);
   assert.match(heroSource, /if \(presentation\.autoRotate && !reducedMotion\)/);

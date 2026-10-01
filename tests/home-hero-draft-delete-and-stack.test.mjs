@@ -24,9 +24,9 @@ test("inactive legacy-version deletion is authorized and protects the active Her
 test("drag is limited to cursor-primary button, does not capture pointer, and preserves no-auto-rotate choice", () => {
   const stage = read("src/features/home/hero-object-stage.tsx");
   assert.match(stage, /event\.button !== 0/);
-  assert.match(stage, /HERO_DRAG_YAW_MAX_DEG = 40/);
+  assert.match(stage, /HERO_DRAG_YAW_MAX_DEG = 36/);
   assert.match(stage, /HERO_DRAG_PHI_MIN_DEG = 48/);
-  assert.match(stage, /HERO_DRAG_PHI_MAX_DEG = 90/);
+  assert.match(stage, /HERO_DRAG_PHI_MAX_DEG = 85/);
   assert.match(stage, /draggingPointerId === null \|\| draggingPointerId !== event\.pointerId/);
   assert.match(stage, /if \(presentation\.autoRotate\) viewerRef\.current\?\.removeAttribute\("auto-rotate"\)/);
   assert.match(stage, /if \(presentation\.autoRotate && !reducedMotion\) viewerRef\.current\?\.setAttribute\("auto-rotate", ""\)/);

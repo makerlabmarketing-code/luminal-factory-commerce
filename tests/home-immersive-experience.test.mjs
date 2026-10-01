@@ -68,7 +68,7 @@ test("Hero 3D follows pointer on desktop and the same persistent GLB travels on 
   assert.match(stage, /drag-and-recenter/);
   assert.doesNotMatch(stage, /setPointerCapture/);
   assert.match(stage, /window\.addEventListener\("pointerdown", handlePointerDown\)/);
-  assert.match(stage, /HERO_DRAG_PHI_MAX_DEG = 90/);
+  assert.match(stage, /HERO_DRAG_PHI_MAX_DEG = 85/);
   assert.doesNotMatch(stage, /normalizedX|normalizedY|pointerTarget/);
   assert.match(immersive, /compactStates/);
   assert.match(immersive, /allowTouch3d/);
