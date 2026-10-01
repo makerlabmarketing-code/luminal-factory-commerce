@@ -5,8 +5,10 @@ import { z } from "zod";
 import { defaultHeroModelPresentation, type HeroModelPresentation } from "./hero-model-config";
 
 const HERO_BUCKET = "homepage-hero";
-const HERO_CONFIG_TIMEOUT_MS = 350;
-const HERO_CONFIG_REVALIDATE_SECONDS = 60;
+// Allow a normal Supabase round trip before falling back to the bundled model.
+const HERO_CONFIG_TIMEOUT_MS = 1800;
+// Short-lived data cache; publish/apply still invalidates this tag immediately.
+const HERO_CONFIG_REVALIDATE_SECONDS = 10;
 const HERO_CONFIG_CACHE_TAG = "homepage-hero";
 
 const heroRowSchema = z.object({
