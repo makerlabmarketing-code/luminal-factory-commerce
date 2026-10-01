@@ -29,16 +29,22 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     let previousTime: number | null = null;
     let elapsed = 0;
     let target = 0;
-    let previousScrollY = window.scrollY - 1;
+    // Keep reveal and retract anchored to exactly the same scroll range.
+    // Direction must never reset the animation to zero on a tiny upward scroll.
+    const REVEAL_DURATION = 2960;
+    const REVEAL_VIEWPORT_START = 0.52;
+    const REVEAL_VIEWPORT_SPAN = 0.27;
     const render = (now: number) => {
       frame = null;
       const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
       if (!section) return;
       const delta = previousTime === null ? 16 : Math.min(64, now - previousTime);
       previousTime = now;
-      // Faster reverse choreography, still time-based and continuous across frames.
-      if (target < elapsed) elapsed = Math.max(target, elapsed - delta * 1.55);
-      else elapsed = Math.min(target, elapsed + delta * 1.08);
+      // Both directions use the same interpolation speed. The same scroll
+      // position produces the same final lighting, copy and bubble layout.
+      const step = delta * 1.08;
+      if (target < elapsed) elapsed = Math.max(target, elapsed - step);
+      else elapsed = Math.min(target, elapsed + step);
       if (Math.abs(target - elapsed) < 1) elapsed = target;
       const model = document.querySelector<HTMLElement>("[data-home-immersive-model]");
       const source = model?.getBoundingClientRect();
@@ -68,19 +74,14 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     const schedule = () => {
       const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
       if (!section) return;
-      const scrollY = window.scrollY;
-      if (scrollY < previousScrollY - 0.01) target = 0;
-      else if (scrollY > previousScrollY + 0.01) {
-        const top = section.getBoundingClientRect().top;
-        target = 2960 * clamp01((window.innerHeight * 0.52 - top) / (window.innerHeight * 0.27));
-      }
-      previousScrollY = scrollY;
+      const top = section.getBoundingClientRect().top;
+      target = REVEAL_DURATION * clamp01(
+        (window.innerHeight * REVEAL_VIEWPORT_START - top)
+          / (window.innerHeight * REVEAL_VIEWPORT_SPAN),
+      );
       if (frame === null) frame = window.requestAnimationFrame(render);
     };
-    const resize = () => {
-      previousScrollY = window.scrollY - 1;
-      schedule();
-    };
+    const resize = () => schedule();
     schedule();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", resize);
