@@ -50,8 +50,8 @@ test("Hero follows pointer without capture, composes scroll orbit, and recenters
   assert.match(heroConfig, /autoRotate: false/);
   assert.match(heroSource, /viewer\.setAttribute\(\s*"orientation"/);
   assert.match(heroSource, /const applyPointerOrbit/);
-  assert.match(heroSource, /presentation\.camera\.thetaDeg \+ scrollOrbitOffsetDeg \+ pointerCurrent\.yawDeg/);
-  assert.match(heroSource, /presentation\.camera\.phiDeg - pointerCurrent\.pitchDeg/);
+  assert.match(heroSource, /presentation\.camera\.thetaDeg \+ scrollOrbitOffsetDeg - pointerCurrent\.yawDeg \+ dragOffset\.yawDeg/);
+  assert.match(heroSource, /clamp\(presentation\.camera\.phiDeg - pointerCurrent\.pitchDeg \+ dragOffset\.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG\)/);
   assert.match(heroSource, /luminal:hero-orbit-offset/);
   assert.match(heroSource, /data-hero-interaction=\{mobileOnly \? "touch-static" : "pointer-follow-and-recenter"\}/);
   assert.match(heroSource, /HERO_POINTER_YAW_MAX_DEG = 17/);
@@ -62,7 +62,12 @@ test("Hero follows pointer without capture, composes scroll orbit, and recenters
   assert.match(heroSource, /window\.addEventListener\("pointermove", handlePointerMove/);
   assert.match(heroSource, /document\.addEventListener\("pointerleave", settlePointerTilt\)/);
   assert.match(heroSource, /viewer\.style\.pointerEvents = "none"/);
-  assert.doesNotMatch(heroSource, /pointerdown|setPointerCapture|releasePointerCapture/);
+  assert.match(heroSource, /window\.addEventListener\("pointerdown", handlePointerDown\)/);
+  assert.match(heroSource, /HERO_DRAG_YAW_MAX_DEG = 40/);
+  assert.match(heroSource, /HERO_DRAG_PHI_MIN_DEG = 48/);
+  assert.match(heroSource, /HERO_DRAG_PHI_MAX_DEG = 90/);
+  assert.match(heroSource, /draggingPointerId === null/);
+  assert.doesNotMatch(heroSource, /setPointerCapture|releasePointerCapture/);
   assert.match(heroSource, /if \(presentation\.autoRotate && !reducedMotion\)/);
   assert.doesNotMatch(heroSource, /viewer\.setAttribute\("camera-controls"/);
 });
