@@ -7,9 +7,11 @@ import { defaultHeroModelPresentation, type HeroModelPresentation } from "./hero
 const HERO_BUCKET = "homepage-hero";
 const HERO_CONFIG_TIMEOUT_MS = 350;
 const HERO_CONFIG_REVALIDATE_SECONDS = 60;
+const HERO_CONFIG_CACHE_TAG = "homepage-hero";
 
 const heroRowSchema = z.object({
   model_storage_path: z.string().trim().min(1).max(512),
+  updated_at: z.string().datetime({ offset: true }),
   tint: z.string().regex(/^#[0-9A-Fa-f]{6}$/).nullable(),
   exposure: z.number().min(0.4).max(2.5),
   shadow_intensity: z.number().min(0).max(2),
@@ -33,6 +35,7 @@ type HeroRow = z.infer<typeof heroRowSchema>;
 
 const HERO_SELECT = [
   "model_storage_path",
+  "updated_at",
   "tint",
   "exposure",
   "shadow_intensity",
@@ -97,7 +100,7 @@ function mapHeroRow(row: HeroRow, projectOrigin: string): HeroModelPresentation 
   }
 
   return {
-    modelSrc,
+    modelSrc: `${modelSrc}?v=${encodeURIComponent(row.updated_at)}`,
     tint: row.tint,
     exposure: row.exposure,
     shadowIntensity: row.shadow_intensity,
@@ -136,7 +139,7 @@ async function requestActiveHero(): Promise<HeroModelPresentation | null> {
         Accept: "application/json",
         apikey: config.publishableKey,
       },
-      next: { revalidate: HERO_CONFIG_REVALIDATE_SECONDS },
+      next: { revalidate: HERO_CONFIG_REVALIDATE_SECONDS, tags: [HERO_CONFIG_CACHE_TAG] },
       signal: AbortSignal.timeout(HERO_CONFIG_TIMEOUT_MS),
     });
 

@@ -6,7 +6,7 @@ const source = readFileSync("src/features/home/hero-model-data.ts", "utf8");
 
 test("homepage Hero config is revalidated instead of fetched no-store on every request", () => {
   assert.match(source, /HERO_CONFIG_REVALIDATE_SECONDS = 60/);
-  assert.match(source, /next: \{ revalidate: HERO_CONFIG_REVALIDATE_SECONDS \}/);
+  assert.match(source, /next: \{ revalidate: HERO_CONFIG_REVALIDATE_SECONDS, tags: \[HERO_CONFIG_CACHE_TAG\] \}/);
   assert.doesNotMatch(source, /cache:\s*["']no-store["']/);
 });
 

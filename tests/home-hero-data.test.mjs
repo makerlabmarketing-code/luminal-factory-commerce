@@ -8,6 +8,8 @@ const publishRpcMigration = fs.readFileSync("supabase/migrations/20260911101000_
 const adapter = fs.readFileSync("src/features/home/hero-model-data.ts", "utf8");
 const config = fs.readFileSync("src/features/home/hero-model-config.ts", "utf8");
 const home = fs.readFileSync("src/features/home/home-page.tsx", "utf8");
+const publishRoute = fs.readFileSync("src/app/api/admin/v1/homepage-hero/[id]/publish/route.ts", "utf8");
+const unpublishRoute = fs.readFileSync("src/app/api/admin/v1/homepage-hero/[id]/unpublish/route.ts", "utf8");
 
 test("homepage Hero schema is public-read only and bounded", () => {
   assert.match(migration, /create table public\.homepage_hero_presentations/);
@@ -59,7 +61,9 @@ test("homepage reads one active Hero through a server-only validated adapter", (
   assert.match(adapter, /is_active", "eq\.true/);
   assert.match(migration, /is_active and published_at is not null and published_at <= now\(\)/);
   assert.doesNotMatch(adapter, /endpoint\.searchParams\.set\("published_at"/);
-  assert.match(adapter, /next: \{ revalidate: HERO_CONFIG_REVALIDATE_SECONDS \}/);
+  assert.match(adapter, /next: \{ revalidate: HERO_CONFIG_REVALIDATE_SECONDS, tags: \[HERO_CONFIG_CACHE_TAG\] \}/);
+  assert.match(adapter, /updated_at: z\.string\(\)\.datetime/);
+  assert.match(adapter, /modelSrc: `\$\{modelSrc\}\?v=\$\{encodeURIComponent\(row\.updated_at\)\}`/);
   assert.match(adapter, /AbortSignal\.timeout\(HERO_CONFIG_TIMEOUT_MS\)/);
   assert.match(adapter, /storage\/v1\/object\/public\/\$\{HERO_BUCKET\}/);
   assert.match(adapter, /defaultHeroModelPresentation/);
@@ -72,4 +76,12 @@ test("local GLB remains the fallback and Google Drive is not a runtime media ori
   assert.equal(fs.existsSync("public/models/meowhe-hero.glb"), true);
   assert.doesNotMatch(adapter, /drive\.google\.com|docs\.google\.com/i);
   assert.doesNotMatch(config, /drive\.google\.com|docs\.google\.com/i);
+});
+
+test("publish/unpublish invalidate only the public Homepage Hero cache after persistence", () => {
+  for (const route of [publishRoute, unpublishRoute]) {
+    assert.match(route, /revalidateTag\("homepage-hero", \{ expire: 0 \}\)/);
+    assert.match(route, /revalidatePath\("\/"\)/);
+    assert.match(route, /await recordCommerceAdminAudit\([\s\S]*?revalidateTag/);
+  }
 });

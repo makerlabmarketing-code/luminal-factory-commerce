@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { homepageHeroPublishMutationSchema } from "@/features/management/commerce-admin-wire-contract";
 import {
   authorizeCommerceAdminRoute,
@@ -23,6 +24,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   try {
     const hero = await unpublishHomepageHero(context.client, id.data, mutation.data, { clientId: context.identity.clientId, requestFingerprint: context.requestFingerprint });
     await recordCommerceAdminAudit(context, { operation: "homepage_hero.unpublish", targetId: id.data, outcome: "succeeded", httpStatus: 200 });
+    // The public Homepage must stop serving the unpublished Hero on its next request.
+    try {
+      revalidateTag("homepage-hero", { expire: 0 });
+      revalidatePath("/");
+    } catch (error) {
+      console.error("Homepage Hero cache invalidation failed after unpublish.", error);
+    }
     return commerceAdminSuccess(hero, context.identity.requestId);
   } catch (error) {
     const notFound = error instanceof HomepageHeroAdminServiceError && error.code === "HERO_NOT_FOUND";
