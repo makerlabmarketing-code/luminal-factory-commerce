@@ -27,7 +27,7 @@ function mountScene() {
     style: { setProperty: (key, value) => sceneStyles.set(key, value) },
   };
   const bubbles = [0, 1, 2].map((index) => ({
-    offsetLeft: 600 + index * 200, offsetTop: 100, offsetWidth: 200, offsetHeight: 200, style: {},
+    offsetLeft: 600 + index * 200, offsetTop: 100, offsetWidth: 200, offsetHeight: 200, style: {}, dataset: {},
   }));
   const copy = { style: {} };
   let modelQueries = 0;
@@ -56,6 +56,25 @@ function mountScene() {
   });
   return { bubbles, copy, tick, scroll, cleanup, frames, listeners, viewport, snapshot, modelQueries: () => modelQueries };
 }
+
+test("colorway bubbles launch near the left-side Hero and float after reaching their own positions", () => {
+  const scene = mountScene();
+  scene.tick(800);
+  assert.equal(scene.bubbles[0].dataset.landed, "true");
+  assert.equal(scene.bubbles[1].dataset.landed, "true");
+  const source = readFileSync("src/features/home/home-archive-burst.tsx", "utf8");
+  const css = readFileSync("src/features/home/home-archive-burst.module.css", "utf8");
+  assert.match(source, /const originX = rect\.width \* 0\.29/);
+  assert.match(source, /const originY = rect\.height \* 0\.50/);
+  assert.match(source, /bubble\.offsetLeft/);
+  assert.match(source, /measureFlight\(\)/);
+  assert.match(source, /styles\.floatBody/);
+  assert.match(css, /colorway-gentle-float/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
+  assert.doesNotMatch(source, /01 \/ A character with a past/);
+  assert.match(source, /A character with a past\. Explore three earlier colorways/);
+  scene.cleanup();
+});
 
 test("bubble paths stay independent of model movement and use no model geometry reads", () => {
   const scene = mountScene();
