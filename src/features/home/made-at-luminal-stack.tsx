@@ -38,8 +38,10 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       frameRef.current = null;
 
       const list = listRef.current;
+      const header = document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']");
       if (!desktop.matches || reducedMotion.matches) {
         list?.style.removeProperty("--process-stack-top");
+        header?.style.removeProperty("translate");
         setCollapsed((previous) => {
           const next = steps.map(() => false);
           return statesEqual(previous, next) ? previous : next;
@@ -48,7 +50,6 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       }
 
       const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      const header = document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']");
       let stackTopPx = 0;
       if (list && header) {
         const headerHeight = header.getBoundingClientRect().height;
@@ -58,6 +59,20 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
           + HEADER_STACK_GAP_REM * rootFontSize
         );
         list.style.setProperty("--process-stack-top", `${Math.round(stackTopPx)}px`);
+      }
+
+      // Once the final card reaches the bottom of the stack's containing
+      // block, native sticky releases it upward. Release ONLY the heading by
+      // the same distance, so it serves as a ceiling for all four panels and
+      // exits with Finish instead of covering the folders while they leave.
+      // Never translate the list or the other three cards.
+      const finalCard = itemRefs.current[steps.length - 1];
+      if (header && finalCard && stackTopPx > 0) {
+        const ceiling = stackTopPx + (steps.length - 1) * STICKY_STEP_REM * rootFontSize;
+        const release = Math.max(0, ceiling - finalCard.getBoundingClientRect().top);
+        header.style.translate = release > 0 ? `0 -${Math.round(release)}px` : "";
+      } else {
+        header?.style.removeProperty("translate");
       }
 
       const collapsedStripPx = STICKY_STEP_REM * rootFontSize + 2;
@@ -93,6 +108,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       window.removeEventListener("resize", scheduleMeasure);
       desktop.removeEventListener("change", scheduleMeasure);
       reducedMotion.removeEventListener("change", scheduleMeasure);
+      document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']")?.style.removeProperty("translate");
     };
   }, [steps]);
 
