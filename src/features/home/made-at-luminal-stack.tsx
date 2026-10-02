@@ -40,10 +40,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       const list = listRef.current;
       if (!desktop.matches || reducedMotion.matches) {
         list?.style.removeProperty("--process-stack-top");
-        list?.style.removeProperty("--process-release-y");
-        const header = document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']");
-        header?.style.removeProperty("translate");
-        setCollapsed((previous) => {
+         setCollapsed((previous) => {
           const next = steps.map(() => false);
           return statesEqual(previous, next) ? previous : next;
         });
@@ -62,15 +59,6 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
         );
         list.style.setProperty("--process-stack-top", `${Math.round(stackTopPx)}px`);
 
-        const terminalIndex = steps.length - 1;
-        const terminalCard = itemRefs.current[terminalIndex];
-        const terminalTargetTop = stackTopPx + terminalIndex * STICKY_STEP_REM * rootFontSize;
-        const terminalTop = terminalCard?.getBoundingClientRect().top ?? terminalTargetTop;
-        const releaseDistance = Math.max(0, terminalTargetTop - terminalTop);
-        const releaseY = `-${Math.round(releaseDistance)}px`;
-
-        list.style.setProperty("--process-release-y", releaseY);
-        header.style.translate = `0 ${releaseY}`;
       }
 
       const collapsedStripPx = STICKY_STEP_REM * rootFontSize + 2;
@@ -102,8 +90,6 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
 
     return () => {
       if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
-      listRef.current?.style.removeProperty("--process-release-y");
-      document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']")?.style.removeProperty("translate");
       window.removeEventListener("scroll", scheduleMeasure);
       window.removeEventListener("resize", scheduleMeasure);
       desktop.removeEventListener("change", scheduleMeasure);
@@ -113,7 +99,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
 
   return (
     <div ref={listRef} className="relative">
-      <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh] md:pb-0">
+      <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh] md:pb-[65svh]">
         {steps.map((step, index) => {
           const isLast = index === steps.length - 1;
           return (
@@ -121,13 +107,12 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
               ref={(node) => {
                 itemRefs.current[index] = node;
               }}
-              className={`relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/25 bg-[#0d0d0e] p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] md:min-h-[60svh] md:p-10 motion-reduce:static ${
-                isLast ? "md:relative" : "md:sticky"
-              }`}
+              className={`relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/25 bg-[#0d0d0e] p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] md:min-h-[60svh] md:p-10 md:sticky motion-reduce:static`}
               style={{
-                top: isLast ? undefined : `calc(var(--process-stack-top, 15rem) + ${index * STICKY_STEP_REM}rem)`,
+                // Each panel is bounded by its own sticky ceiling. CSS releases
+                // the entire stack at the end of its parent naturally.
+                top: `calc(var(--process-stack-top, 15rem) + ${index * STICKY_STEP_REM}rem)`,
                 zIndex: index + 1,
-                translate: isLast ? undefined : "0 var(--process-release-y, 0px)",
               }}
               key={step.number}
               data-process-collapsed={collapsed[index] ? "true" : "false"}
