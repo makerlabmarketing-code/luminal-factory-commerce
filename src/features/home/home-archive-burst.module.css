@@ -62,7 +62,7 @@
   animation: bubble-pop-collapse 460ms cubic-bezier(.2,.68,.1,1) both;
 }
 .bubble[data-pop-phase="reform"] .floatBody {
-  animation: bubble-pop-reform 930ms cubic-bezier(.19,.74,.18,1) both;
+  animation: bubble-pop-reform 1800ms cubic-bezier(.45,0,.25,1) both;
 }
 @keyframes bubble-pop-collapse {
   0% { transform: scale(1); opacity: 1; }
@@ -71,8 +71,9 @@
 }
 @keyframes bubble-pop-reform {
   0% { transform: translate3d(var(--bubble-launch-x, -120px), var(--bubble-launch-y, 60px), 0) scale(.42); opacity: 0; }
-  30% { opacity: .75; }
-  70% { transform: translate3d(4px, -17px, 0) scale(1.025); opacity: 1; }
+  25% { opacity: .25; }
+  55% { opacity: .7; }
+  85% { transform: translate3d(2px, -8px, 0) scale(.98); opacity: 1; }
   100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
 }
 .popParticles {

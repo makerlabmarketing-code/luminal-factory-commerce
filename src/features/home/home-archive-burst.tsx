@@ -37,7 +37,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     let wantsVisible = false;
     const popTimeouts = new Set<number>();
     const POP_BURST_MS = 460;
-    const POP_REFORM_MS = 930;
+    const POP_REFORM_MS = 1800;
     const clearPopTimeouts = () => {
       popTimeouts.forEach((id) => window.clearTimeout(id));
       popTimeouts.clear();
