@@ -106,7 +106,11 @@ test("Made at Luminal gives all four cards independent sticky ceilings without s
   assert.match(stack, /\{step\.number\} \/ \{step\.title\}/);
   assert.match(stack, /collapsedStripPx/);
   assert.match(stack, /nextTop <= currentTop \+ collapsedStripPx/);
-  assert.doesNotMatch(stack, /--process-release-y|header\.style\.translate|terminalTargetTop/);
+  assert.doesNotMatch(stack, /--process-release-y|terminalTargetTop/);
+  assert.match(stack, /const finalCard = itemRefs\.current\[steps\.length - 1\]/);
+  assert.match(stack, /const release = Math\.max\(0, ceiling - finalCard\.getBoundingClientRect\(\)\.top\)/);
+  assert.match(stack, /header\.style\.translate = release > 0/);
+  assert.doesNotMatch(stack, /list\.style\.setProperty\("--process-release-y"/);
   assert.doesNotMatch(stack, /isLast \? "md:relative" : "md:sticky"/);
   assert.match(stack, /rounded-\[1\.75rem\] border border-white\/25/);
 });
