@@ -93,35 +93,33 @@ test("mobile Hero reserves a lower safe stage then fades and zooms out before Br
   assert.match(global, /home-hero-object-corridor[\s\S]*min-height: 36svh/);
 });
 
-test("Made at Luminal exits the sticky chrome together with terminal Step 04", () => {
+test("Made at Luminal gives all four cards independent sticky ceilings without shared scroll translation", () => {
   const home = read("src/features/home/home-page.tsx");
   const stack = read("src/features/home/made-at-luminal-stack.tsx");
   assert.match(home, /MadeAtLuminalStack/);
-  assert.match(home, /<MadeAtLuminalStack steps=\{content\.process\} \/>/);
   assert.match(home, /data-made-at-luminal-header="true"/);
-  assert.match(home, /md:z-30/);
-  assert.match(home, /md:pb-0/);
-  assert.doesNotMatch(stack, /data-process-title-rail="true"/);
+  assert.match(stack, /STICKY_STEP_REM = 2\.35/);
+  assert.match(stack, /md:sticky motion-reduce:static/);
+  assert.match(stack, /top: `calc\(var\(--process-stack-top, 15rem\) \+ \$\{index \* STICKY_STEP_REM\}rem\)`/);
+  assert.match(stack, /md:pb-\[65svh\]/);
   assert.match(stack, /data-process-collapsed-label=\{step\.number\}/);
+  assert.match(stack, /\{step\.number\} \/ \{step\.title\}/);
   assert.match(stack, /collapsedStripPx/);
   assert.match(stack, /nextTop <= currentTop \+ collapsedStripPx/);
-  assert.match(stack, /\{step\.number\} \/ \{step\.title\}/);
-  assert.match(stack, /data-process-terminal=\{isLast \? "true" : undefined\}/);
-  assert.match(stack, /isLast \? "md:relative" : "md:sticky"/);
-  assert.match(stack, /top: isLast \? undefined/);
-  assert.match(stack, /terminalTargetTop/);
-  assert.match(stack, /border border-white\/25/);
-  assert.match(stack, /releaseDistance = Math\.max\(0, terminalTargetTop - terminalTop\)/);
-  assert.match(stack, /--process-release-y/);
-  assert.match(stack, /header\.style\.translate/);
-  assert.match(stack, /translate: isLast \? undefined : "0 var\(--process-release-y, 0px\)"/);
-  assert.match(stack, /md:pb-0/);
-  assert.match(stack, /--process-stack-top/);
-  assert.match(stack, /HEADER_STICKY_TOP_REM/);
-  assert.match(stack, /HEADER_STACK_GAP_REM/);
-  assert.match(stack, /var\(--process-stack-top, 15rem\)/);
-  assert.match(stack, /md:min-h-\[60svh\]/);
-  assert.doesNotMatch(stack, /100svh-12rem/);
+  assert.doesNotMatch(stack, /--process-release-y|header\.style\.translate|terminalTargetTop/);
+  assert.doesNotMatch(stack, /isLast \? "md:relative" : "md:sticky"/);
+  assert.match(stack, /rounded-\[1\.75rem\] border border-white\/25/);
+});
+
+test("Hero emits model-boundary intersection and scroll direction while retaining scroll-driven GLB travel", () => {
+  const immersive = read("src/features/home/home-immersive-experience.tsx");
+  const bubble = read("src/features/home/home-archive-burst.tsx");
+  assert.match(immersive, /const heroContactY = modelBounds\.top \+ modelBounds\.height \* 0\.22/);
+  assert.match(immersive, /featuredBoundaryTop, heroContactY, scrollingUp/);
+  assert.match(immersive, /scrollingUp = scrollY < previousScrollY/);
+  assert.match(bubble, /featuredBoundaryTop >= detail\.heroContactY/);
+  assert.match(bubble, /returningAcrossSection/);
+  assert.doesNotMatch(bubble, /RETRACT_AT = /);
 });
 
 test("immersive Home remains bounded by raffle, mobile and reduced-motion priorities", () => {
