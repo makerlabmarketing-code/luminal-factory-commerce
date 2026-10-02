@@ -16,7 +16,7 @@ function clamp01(value: number) {
 
 export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
-  const bubbleRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const bubbleRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const copyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,6 +35,16 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     let elapsed = 0;
     let duration = 1;
     let wantsVisible = false;
+    const popTimeouts = new Set<number>();
+    const POP_BURST_MS = 460;
+    const POP_REFORM_MS = 930;
+    const clearPopTimeouts = () => {
+      popTimeouts.forEach((id) => window.clearTimeout(id));
+      popTimeouts.clear();
+    };
+    const clearPopStates = () => bubbleRefs.current.forEach((bubble) => {
+      if (bubble) delete bubble.dataset.popPhase;
+    });
 
     // Actual eased Hero location triggers once; wheel travel never scrubs
     // individual bubble frames. Hysteresis prevents repeated trigger flapping.
@@ -55,6 +65,8 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
           x: originX - bubble.offsetLeft - bubble.offsetWidth * 0.5,
           y: originY - bubble.offsetTop - bubble.offsetHeight * 0.5,
         };
+        bubble.style.setProperty("--bubble-launch-x", BUBBLE_FLIGHT[index].x.toFixed(1) + "px");
+        bubble.style.setProperty("--bubble-launch-y", BUBBLE_FLIGHT[index].y.toFixed(1) + "px");
       });
     };
 
@@ -102,6 +114,10 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
 
     const transitionTo = (visible: boolean) => {
       if (wantsVisible === visible) return;
+      if (!visible) {
+        clearPopTimeouts();
+        clearPopStates();
+      }
       wantsVisible = visible;
       phase = visible ? "revealing" : "hiding";
       startProgress = progress; // Reversals preserve the in-flight visual state.
@@ -119,15 +135,36 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       else if ((phase === "visible" || phase === "revealing") && arrival <= RETRACT_AT) transitionTo(false);
     };
 
+    const onBubbleClick = (event: Event) => {
+      const bubble = event.currentTarget as HTMLButtonElement;
+      if (!wantsVisible || bubble.dataset.landed !== "true" || bubble.dataset.popPhase) return;
+      bubble.dataset.popPhase = "burst";
+      const burstTimer = window.setTimeout(() => {
+        popTimeouts.delete(burstTimer);
+        if (!wantsVisible || bubble.dataset.popPhase !== "burst") return;
+        bubble.dataset.popPhase = "reform";
+        const reformTimer = window.setTimeout(() => {
+          popTimeouts.delete(reformTimer);
+          delete bubble.dataset.popPhase;
+        }, POP_REFORM_MS);
+        popTimeouts.add(reformTimer);
+      }, POP_BURST_MS);
+      popTimeouts.add(burstTimer);
+    };
+
     const resize = () => { measureFlight(); draw(); };
     measureFlight();
     draw();
     // The immersive stage may mount before this listener.
     const initialArrival = Number(document.documentElement.dataset.luminalHeroFeaturedArrival);
     if (Number.isFinite(initialArrival) && initialArrival >= REVEAL_AT) transitionTo(true);
+    bubbleRefs.current.forEach((bubble) => bubble?.addEventListener("click", onBubbleClick));
     window.addEventListener("luminal:hero-featured-arrival", onHeroArrival);
     window.addEventListener("resize", resize);
     return () => {
+      clearPopTimeouts();
+      clearPopStates();
+      bubbleRefs.current.forEach((bubble) => bubble?.removeEventListener("click", onBubbleClick));
       if (frame !== null) window.cancelAnimationFrame(frame);
       window.removeEventListener("luminal:hero-featured-arrival", onHeroArrival);
       window.removeEventListener("resize", resize);
@@ -139,12 +176,13 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       <div className={styles.spotlight} aria-hidden="true" />
       <div className={styles.field} aria-label="Ba colorway Meowhe trước đây">
         {colorways.map((colorway, index) => (
-          <Link
-            href="/archive"
+          <button
+            type="button"
             className={`${styles.bubble} ${styles[`bubble${index + 1}`]}`}
             key={colorway.id}
             ref={(node) => { bubbleRefs.current[index] = node; }}
-            aria-label={`Xem colorway ${colorway.colorway} trong archive`}
+            aria-label={`Làm vỡ bong bóng ${colorway.colorway}`}
+            title={`Chạm để làm vỡ bong bóng ${colorway.colorway}`}
           >
             <span className={styles.floatBody}>
               <span className={styles.imageShell}>
@@ -152,7 +190,10 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
               </span>
               <span className={styles.bubbleLabel}>{colorway.colorway}</span>
             </span>
-          </Link>
+            <span className={styles.popParticles} aria-hidden="true">
+              {Array.from({ length: 8 }, (_, particle) => <span key={particle} />)}
+            </span>
+          </button>
         ))}
       </div>
 
