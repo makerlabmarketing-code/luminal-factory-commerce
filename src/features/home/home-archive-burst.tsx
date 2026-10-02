@@ -90,7 +90,8 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       elapsed += Math.min(48, Math.max(0, now - lastTime));
       lastTime = now;
       const fraction = clamp01(elapsed / duration);
-      progress = startProgress + (endProgress - startProgress) * easeOut(fraction);
+      const timelineEase = fraction * fraction * (3 - 2 * fraction);
+      progress = startProgress + (endProgress - startProgress) * timelineEase;
       draw();
       if (fraction < 1) frame = window.requestAnimationFrame(animate);
       else {
