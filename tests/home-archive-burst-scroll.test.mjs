@@ -116,7 +116,7 @@ test("hysteresis ignores a minor Hero movement and lets the timeline finish auto
   scene.tick(400);
   const halfway = scene.snapshot();
   assert.ok(halfway.light > 0 && halfway.light < 1);
-  scene.arrival(0.85); // inside hysteresis band: not a hide trigger
+  scene.arrival(0.91); // inside the narrower hysteresis band: not a hide trigger
   scene.scroll(-240);
   scene.tick(1500);
   assert.equal(scene.snapshot().light, 1);
@@ -130,10 +130,10 @@ test("retraction begins only when the Hero recedes past the return trigger", () 
   const scene = mountScene();
   scene.arrival(0.96);
   scene.tick(1800);
-  scene.arrival(0.83);
+  scene.arrival(0.91);
   scene.tick(800);
   assert.equal(scene.snapshot().copy, 1);
-  scene.arrival(0.79);
+  scene.arrival(0.895); // reverse begins as soon as Hero leaves its featured pose
   scene.tick(1120);
   assert.equal(scene.snapshot().light, 0);
   assert.equal(scene.snapshot().copy, 0);
@@ -147,7 +147,7 @@ test("reversing a mid-flight bubble is continuous without position or opacity sn
   scene.tick(760);
   const forward = scene.snapshot();
   assert.ok(forward.bubbleOpacity[1] > 0);
-  scene.arrival(0.78);
+  scene.arrival(0.895);
   // Event merely changes direction, not the last rendered frame.
   assert.deepEqual(scene.snapshot(), forward);
   scene.tick(64);
@@ -233,4 +233,26 @@ test("POP uses CSS-only particles, honors reduced motion, and leaves archive nav
   assert.match(css, /bubble-pop-reform/);
   assert.match(css, /\.bubble\[data-landed="true"\]:not\(\[data-pop-phase\]\)/);
   assert.match(css, /prefers-reduced-motion: reduce/);
+});
+
+test("Hero reverse moves each bubble back toward its original launch point before disappearing", () => {
+  const scene = mountScene();
+  scene.arrival(0.95);
+  scene.tick(1850);
+  const bubble = scene.bubbles[1];
+  const landedTransform = bubble.style.transform;
+  assert.equal(bubble.dataset.landed, "true");
+
+  // A small backward movement past the return threshold should start the
+  // autonomous reverse timeline without immediately hiding the bubble.
+  scene.arrival(0.895);
+  scene.tick(420);
+  assert.notEqual(bubble.style.transform, landedTransform);
+  assert.equal(bubble.style.visibility, "visible");
+  assert.equal(bubble.dataset.landed, "false");
+
+  scene.tick(820);
+  assert.equal(bubble.style.visibility, "hidden");
+  assert.equal(bubble.style.opacity, "0.000");
+  scene.cleanup();
 });
