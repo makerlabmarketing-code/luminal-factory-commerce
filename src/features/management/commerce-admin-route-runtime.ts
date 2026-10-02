@@ -182,7 +182,18 @@ export async function authorizeCommerceAdminRoute(
   ).catch(() => null);
 
   if (!verification) {
-    return commerceAdminFailure(requestId, 401, "AUTHENTICATION_FAILED", "Commerce Admin request authentication failed.");
+    // A rejected HMAC returns {ok:false}. An exception instead means the
+    // verifier or its replay/nonce persistence was unavailable. Do not
+    // mislabel an infrastructure failure as an invalid signature or disclose
+    // verification internals to the client.
+    console.error("[commerce-admin-auth]", { code: "VERIFICATION_UNAVAILABLE" });
+    return commerceAdminFailure(
+      requestId,
+      503,
+      "VERIFICATION_UNAVAILABLE",
+      "Commerce Admin verification temporarily unavailable.",
+      true,
+    );
   }
   if (!verification.ok) {
     // Unverified headers never become audit identity or a database key.
