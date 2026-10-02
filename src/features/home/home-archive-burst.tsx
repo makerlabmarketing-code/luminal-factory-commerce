@@ -25,24 +25,30 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (!scene || !copy || reducedMotion.matches) return;
 
+    type ContentPhase = "hidden" | "revealing" | "visible" | "hiding";
+    let phase: ContentPhase = "hidden";
     let frame: number | null = null;
-    let previousTime: number | null = null;
+    let lastTime: number | null = null;
     let progress = 0;
-    let target = 0;
+    let startProgress = 0;
+    let endProgress = 0;
+    let elapsed = 0;
+    let duration = 1;
+    let wantsVisible = false;
 
-    // The section scroll boundary controls WHEN the bubbles return, not WHERE
-    // they fly from. No model position/DOM layout measurements in this loop.
-    const REVEAL_VIEWPORT_START = 0.29;
-    const REVEAL_VIEWPORT_SPAN = 0.29;
-    const FLIGHT_EASING_PER_SECOND = 16;
-    // The launch point sits beside Meowhe's left-side silhouette, independent
-    // from live GLB geometry or scroll transforms. Measure the scene only at
-    // mount/resize so the flight arc is stable and responsive.
+    // Actual eased Hero location triggers once; wheel travel never scrubs
+    // individual bubble frames. Hysteresis prevents repeated trigger flapping.
+    const REVEAL_AT = 0.92;
+    const RETRACT_AT = 0.80;
+    const REVEAL_MS = 1550;
+    const RETRACT_MS = 980;
+
+    // Independent launch point near Meowhe, calculated at mount/resize only.
     const BUBBLE_FLIGHT: Array<{ x: number; y: number }> = [];
     const measureFlight = () => {
       const rect = scene.getBoundingClientRect();
       const originX = rect.width * 0.29;
-      const originY = rect.height * 0.50;
+      const originY = rect.height * 0.5;
       bubbleRefs.current.forEach((bubble, index) => {
         if (!bubble) return;
         BUBBLE_FLIGHT[index] = {
@@ -51,58 +57,78 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
         };
       });
     };
-    measureFlight();
 
-    const render = (now: number) => {
-      frame = null;
-      const seconds = previousTime === null ? 0.016 : Math.min(0.064, (now - previousTime) / 1000);
-      previousTime = now;
-      const easing = 1 - Math.exp(-FLIGHT_EASING_PER_SECOND * seconds);
-      progress += (target - progress) * easing;
-      if (Math.abs(target - progress) < 0.001) progress = target;
-
-      const lightProgress = clamp01(progress);
-      scene.style.setProperty("--stage-light", lightProgress.toFixed(3));
+    const easeOut = (value: number) => 1 - (1 - value) ** 3;
+    const draw = () => {
+      scene.style.setProperty("--stage-light", clamp01(progress * 1.35).toFixed(3));
       bubbleRefs.current.forEach((bubble, index) => {
         if (!bubble) return;
-        const arrival = clamp01((progress - index * 0.06) / 0.79);
-        const eased = 1 - Math.pow(1 - arrival, 3);
-        const flight = BUBBLE_FLIGHT[index] ?? { x: -120, y: 80 };
-        bubble.dataset.landed = arrival >= 0.999 ? "true" : "false";
+        // Staggered curved flight with a buoyant arc, reversible mid-flight.
+        const arrival = clamp01((progress - index * 0.075) / (0.86 - index * 0.075));
+        const eased = easeOut(arrival);
+        const flight = BUBBLE_FLIGHT[index] ?? { x: -120, y: 60 };
         const drift = 1 - eased;
-        const arc = Math.sin(arrival * Math.PI) * (index === 2 ? 20 : -16);
-        bubble.style.transform = `translate3d(${(flight.x * drift).toFixed(1)}px, ${(flight.y * drift + arc).toFixed(1)}px, 0) scale(${(0.08 + eased * 0.92).toFixed(3)})`;
-        bubble.style.opacity = clamp01(arrival * 4).toFixed(3);
+        const arc = -Math.sin(arrival * Math.PI) * (43 + index * 13);
+        const sway = Math.sin(arrival * Math.PI * 2 + index * 1.4) * 14 * Math.sin(arrival * Math.PI);
+        const scale = 0.55 + eased * 0.45 + Math.sin(arrival * Math.PI) * 0.035;
+        bubble.style.transform = "translate3d(" + (flight.x * drift + sway).toFixed(1) + "px, " + (flight.y * drift + arc).toFixed(1) + "px, 0) scale(" + scale.toFixed(3) + ")";
+        bubble.style.opacity = clamp01(arrival / 0.22).toFixed(3);
         bubble.style.visibility = arrival > 0 ? "visible" : "hidden";
+        bubble.tabIndex = arrival > 0 ? 0 : -1;
+        bubble.dataset.landed = arrival >= 0.999 ? "true" : "false";
       });
-
-      const copyProgress = clamp01((progress - 0.16) / 0.38);
-      copy.style.opacity = copyProgress.toFixed(3);
-      copy.style.transform = `translate3d(0, ${((1 - copyProgress) * 20).toFixed(1)}px, 0)`;
+      const copyProgress = clamp01((progress - 0.17) / 0.62);
+      const copyEased = easeOut(copyProgress);
+      copy.style.opacity = copyEased.toFixed(3);
+      copy.style.transform = "translate3d(0, " + ((1 - copyEased) * 22).toFixed(1) + "px, 0)";
       copy.style.visibility = copyProgress > 0 ? "visible" : "hidden";
-
-      if (Math.abs(target - progress) > 0.001) {
-        frame = window.requestAnimationFrame(render);
-      } else previousTime = null;
     };
 
-    const schedule = () => {
-      const section = scene.closest<HTMLElement>("[data-home-3d-section='featured']");
-      if (!section) return;
-      const top = section.getBoundingClientRect().top;
-      target = clamp01(
-        (window.innerHeight * REVEAL_VIEWPORT_START - top)
-          / (window.innerHeight * REVEAL_VIEWPORT_SPAN),
-      );
-      if (frame === null) frame = window.requestAnimationFrame(render);
+    const animate = (now: number) => {
+      frame = null;
+      if (lastTime === null) lastTime = now;
+      elapsed += Math.min(48, Math.max(0, now - lastTime));
+      lastTime = now;
+      const fraction = clamp01(elapsed / duration);
+      progress = startProgress + (endProgress - startProgress) * easeOut(fraction);
+      draw();
+      if (fraction < 1) frame = window.requestAnimationFrame(animate);
+      else {
+        phase = wantsVisible ? "visible" : "hidden";
+        lastTime = null;
+      }
     };
-    const resize = () => { measureFlight(); schedule(); };
-    schedule();
-    window.addEventListener("scroll", schedule, { passive: true });
+
+    const transitionTo = (visible: boolean) => {
+      if (wantsVisible === visible) return;
+      wantsVisible = visible;
+      phase = visible ? "revealing" : "hiding";
+      startProgress = progress; // Reversals preserve the in-flight visual state.
+      endProgress = visible ? 1 : 0;
+      elapsed = 0;
+      duration = Math.max(180, (visible ? REVEAL_MS : RETRACT_MS) * Math.abs(endProgress - startProgress));
+      lastTime = null;
+      if (frame === null) frame = window.requestAnimationFrame(animate);
+    };
+
+    const onHeroArrival = (event: Event) => {
+      const arrival = (event as CustomEvent<{ progress?: number }>).detail?.progress;
+      if (typeof arrival !== "number" || !Number.isFinite(arrival)) return;
+      if (!wantsVisible && arrival >= REVEAL_AT) transitionTo(true);
+      else if (wantsVisible && arrival <= RETRACT_AT) transitionTo(false);
+    };
+
+    const resize = () => { measureFlight(); draw(); };
+    measureFlight();
+    draw();
+    // The immersive stage may mount before this listener.
+    const initialArrival = Number(document.documentElement.dataset.luminalHeroFeaturedArrival);
+    if (Number.isFinite(initialArrival) && initialArrival >= REVEAL_AT) transitionTo(true);
+    window.addEventListener("luminal:hero-featured-arrival", onHeroArrival);
     window.addEventListener("resize", resize);
     return () => {
       if (frame !== null) window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("luminal:hero-featured-arrival", onHeroArrival);
       window.removeEventListener("resize", resize);
     };
   }, []);
