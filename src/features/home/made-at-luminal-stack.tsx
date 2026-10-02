@@ -41,6 +41,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       const header = document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']");
       if (!desktop.matches || reducedMotion.matches) {
         list?.style.removeProperty("--process-stack-top");
+        list?.style.removeProperty("--process-stack-release");
         header?.style.removeProperty("translate");
         setCollapsed((previous) => {
           const next = steps.map(() => false);
@@ -61,17 +62,17 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
         list.style.setProperty("--process-stack-top", `${Math.round(stackTopPx)}px`);
       }
 
-      // Once the final card reaches the bottom of the stack's containing
-      // block, native sticky releases it upward. Release ONLY the heading by
-      // the same distance, so it serves as a ceiling for all four panels and
-      // exits with Finish instead of covering the folders while they leave.
-      // Never translate the list or the other three cards.
+      // All ceilings leave together as soon as Finish reaches its rail.
+      // Measuring the containing block (not an already-sticky card) keeps
+      // this independent of the previous frame's release offset.
       const finalCard = itemRefs.current[steps.length - 1];
-      if (header && finalCard && stackTopPx > 0) {
+      if (list && header && finalCard && stackTopPx > 0) {
         const ceiling = stackTopPx + (steps.length - 1) * STICKY_STEP_REM * rootFontSize;
-        const release = Math.max(0, ceiling - finalCard.getBoundingClientRect().top);
+        const release = Math.max(0, ceiling + finalCard.getBoundingClientRect().height - list.getBoundingClientRect().bottom);
+        list.style.setProperty("--process-stack-release", `${release}px`);
         header.style.translate = release > 0 ? `0 -${Math.round(release)}px` : "";
       } else {
+        list?.style.removeProperty("--process-stack-release");
         header?.style.removeProperty("translate");
       }
 
@@ -109,12 +110,13 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       desktop.removeEventListener("change", scheduleMeasure);
       reducedMotion.removeEventListener("change", scheduleMeasure);
       document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']")?.style.removeProperty("translate");
+      listRef.current?.style.removeProperty("--process-stack-release");
     };
   }, [steps]);
 
   return (
     <div ref={listRef} className="relative">
-      <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh] md:pb-[65svh]">
+      <ol className="m-0 grid list-none gap-[18vh] p-0 pb-[14vh] md:gap-[26vh] md:pb-0">
         {steps.map((step, index) => {
           const isLast = index === steps.length - 1;
           return (
@@ -124,9 +126,8 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
               }}
               className={`relative min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-white/25 bg-[#0d0d0e] p-6 shadow-[0_2rem_7rem_rgba(0,0,0,0.38)] md:min-h-[60svh] md:p-10 md:sticky motion-reduce:static`}
               style={{
-                // Each panel is bounded by its own sticky ceiling. CSS releases
-                // the entire stack at the end of its parent naturally.
-                top: `calc(var(--process-stack-top, 15rem) + ${index * STICKY_STEP_REM}rem)`,
+                // Preserve every title rail through the shared exit.
+                top: `calc(var(--process-stack-top, 15rem) + ${index * STICKY_STEP_REM}rem - var(--process-stack-release, 0px))`,
                 zIndex: index + 1,
               }}
               key={step.number}

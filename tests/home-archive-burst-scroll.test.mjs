@@ -16,13 +16,14 @@ function mountScene(initialArrival = "") {
   let modelQueries = 0;
   let timerId = 0;
   const timers = new Map();
+  const timerDurations = [];
   const viewport = {
     innerHeight: 1000,
     scrollY: 1000,
     matchMedia: () => ({ matches: false }),
     requestAnimationFrame: (callback) => { frames.set(++frameId, callback); return frameId; },
     cancelAnimationFrame: (id) => frames.delete(id),
-    setTimeout: (callback) => { timers.set(++timerId, callback); return timerId; },
+    setTimeout: (callback, duration) => { timerDurations.push(duration); timers.set(++timerId, callback); return timerId; },
     clearTimeout: (id) => timers.delete(id),
     addEventListener: (name, callback) => listeners.set(name, callback),
     removeEventListener: (name) => listeners.delete(name),
@@ -93,7 +94,7 @@ function mountScene(initialArrival = "") {
   });
   return {
     viewport, bubbles, copy, frames, listeners, cleanup, arrival, scroll, tick, flushTimers, timers,
-    snapshot, modelQueries: () => modelQueries, geometryMeasurements: () => geometryMeasurements,
+    snapshot, timerDurations, modelQueries: () => modelQueries, geometryMeasurements: () => geometryMeasurements,
   };
 }
 
@@ -290,4 +291,21 @@ test("section boundary contact retracts bubbles even when horizontal Hero progre
   scene.tick(1900);
   assert.equal(bubble.dataset.landed, "true", "Downward return permits a new independent reveal");
   scene.cleanup();
+});
+
+ test("popped bubble reforms gradually over the complete slower CSS flight", () => {
+  const scene = mountScene();
+  scene.arrival(1);
+  scene.tick(1900);
+  scene.bubbles[0].click();
+  scene.flushTimers();
+  assert.equal(scene.bubbles[0].dataset.popPhase, "reform");
+  const css = readFileSync("src/features/home/home-archive-burst.module.css", "utf8");
+  const cssDuration = Number(css.match(/animation: bubble-pop-reform (\d+)ms/)[1]);
+  assert.equal(scene.timerDurations.at(-1), cssDuration, "JS does not clear the visual phase before the CSS flight finishes");
+  assert.ok(cssDuration >= 1800, "Reform has time to emerge and drift to its destination");
+  assert.match(css, /25% \{ opacity: \.25; \}/);
+  assert.match(css, /55% \{ opacity: \.7; \}/);
+  scene.cleanup();
+  assert.equal(scene.timers.size, 0);
 });
