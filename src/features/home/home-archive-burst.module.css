@@ -33,6 +33,18 @@
 .bubble2 { left: 79%; top: 7%; }
 .bubble3 { left: 64%; top: 68%; }
 
+.floatBody { display: block; transform: translate3d(0, 0, 0); }
+.bubble[data-landed="true"] .floatBody {
+  animation: colorway-gentle-float 5.6s ease-in-out infinite alternate;
+}
+.bubble2[data-landed="true"] .floatBody { animation-delay: -1.9s; animation-duration: 6.2s; }
+.bubble3[data-landed="true"] .floatBody { animation-delay: -3.3s; animation-duration: 5.9s; }
+
+@keyframes colorway-gentle-float {
+  from { transform: translate3d(-2px, 3px, 0) rotate(-1deg); }
+  to { transform: translate3d(3px, -7px, 0) rotate(1deg); }
+}
+
 .imageShell {
   position: relative;
   display: block;
@@ -74,7 +86,7 @@
 
 .copy h2 {
   max-width: none;
-  margin: 0.8rem 0 1rem;
+  margin: 0 0 1rem;
   font-size: clamp(2.8rem, 4.4vw, 5.4rem);
   font-weight: 400;
   letter-spacing: -0.06em;
@@ -102,4 +114,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .bubble { will-change: auto; }
+  .bubble[data-landed="true"] .floatBody { animation: none; }
 }
