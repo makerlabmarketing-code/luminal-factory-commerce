@@ -310,6 +310,17 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         `translate3d(${state.xVw.toFixed(3)}vw, calc(${state.yVh.toFixed(3)}vh + ${releaseY.toFixed(1)}px), 0) scale(${state.scale.toFixed(4)}) rotate(${state.rotationDeg.toFixed(3)}deg)`;
       layer.style.opacity = state.opacity.toFixed(4);
 
+      // The actual, eased 3D position is the only signal that arms Meowhe's
+      // content. Bubbles own their animation clock after this signal fires.
+      const featuredDestination = motionStates.findLast((step) => step.section === "featured")?.state;
+      const heroArrival = featuredDestination && featuredDestination.xVw !== 0
+        ? clamp01(state.xVw / featuredDestination.xVw)
+        : 0;
+      document.documentElement.dataset.luminalHeroFeaturedArrival = heroArrival.toFixed(4);
+      window.dispatchEvent(new CustomEvent("luminal:hero-featured-arrival", {
+        detail: { progress: heroArrival },
+      }));
+
       // Normalize the section transition independently of the actual orbit
       // degrees: the 2nd section mirrors the angle configured in ERP.
       const finalOrbitDeg = motionStates[motionStates.length - 1]?.state.orbitDeg ?? -32;
@@ -387,6 +398,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       layer.style.pointerEvents = "";
       layer.style.transform = "";
       layer.style.opacity = "";
+      delete document.documentElement.dataset.luminalHeroFeaturedArrival;
     };
   }, [
     enabled,

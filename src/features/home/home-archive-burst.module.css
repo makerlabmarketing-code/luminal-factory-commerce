@@ -5,7 +5,7 @@
   height: calc(100svh - 5.5rem);
   min-height: 38rem;
   margin-inline: auto;
-  --stage-light: 1;
+  --stage-light: 0;
 }
 
 .field { position: absolute; inset: 0; }
@@ -28,21 +28,26 @@
   display: block;
   transform-origin: center;
   will-change: transform, opacity;
+  opacity: 0;
+  visibility: hidden;
 }
 .bubble1 { left: 47%; top: 3%; }
 .bubble2 { left: 79%; top: 7%; }
 .bubble3 { left: 64%; top: 68%; }
 
-.floatBody { display: block; transform: translate3d(0, 0, 0); }
-.bubble[data-landed="true"] .floatBody {
-  animation: colorway-gentle-float 5.6s ease-in-out infinite alternate;
+.floatBody {
+  display: block;
+  transform: translate3d(0, 0, 0);
+  /* Float runs on a nested transform independent of the reveal timeline.
+     It keeps its phase when the outer bubble begins returning. */
+  animation: colorway-soap-float 5.1s ease-in-out infinite alternate;
 }
-.bubble2[data-landed="true"] .floatBody { animation-delay: -1.9s; animation-duration: 6.2s; }
-.bubble3[data-landed="true"] .floatBody { animation-delay: -3.3s; animation-duration: 5.9s; }
+.bubble2 .floatBody { animation-delay: -1.8s; animation-duration: 6.3s; }
+.bubble3 .floatBody { animation-delay: -3.4s; animation-duration: 5.7s; }
 
-@keyframes colorway-gentle-float {
-  from { transform: translate3d(-2px, 3px, 0) rotate(-1deg); }
-  to { transform: translate3d(3px, -7px, 0) rotate(1deg); }
+@keyframes colorway-soap-float {
+  from { transform: translate3d(-5px, 8px, 0) rotate(-1.4deg); }
+  to { transform: translate3d(6px, -13px, 0) rotate(1.4deg); }
 }
 
 .imageShell {
@@ -82,6 +87,8 @@
   width: 40%;
   z-index: 3;
   max-width: 34rem;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .copy h2 {
@@ -113,6 +120,8 @@
   .spotlight { background: radial-gradient(ellipse at 50% 52%, rgba(255,232,189,.11), transparent 65%); }
 }
 @media (prefers-reduced-motion: reduce) {
+  .scene { --stage-light: 1 !important; }
+  .bubble, .copy { opacity: 1 !important; visibility: visible !important; transform: none !important; }
   .bubble { will-change: auto; }
-  .bubble[data-landed="true"] .floatBody { animation: none; }
+  .floatBody { animation: none !important; }
 }
