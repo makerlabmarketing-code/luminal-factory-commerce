@@ -46,13 +46,10 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       if (bubble) delete bubble.dataset.popPhase;
     });
 
-    // Actual eased Hero location triggers once; wheel travel never scrubs
-    // individual bubble frames. Hysteresis prevents repeated trigger flapping.
+    // Arrival starts the independent animation; returning across the actual
+    // first/featured section seam reverses it. Wheel movement never scrubs
+    // individual bubble frames or drives their per-frame paths.
     const REVEAL_AT = 0.92;
-    // Start the return while Meowhe is still close to its featured position.
-    // The short gap from REVEAL_AT preserves hysteresis without leaving
-    // bubbles stranded when the user starts scrolling upward.
-    const RETRACT_AT = 0.90;
     const REVEAL_MS = 1550;
     const RETRACT_MS = 980;
 
@@ -132,10 +129,31 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     };
 
     const onHeroArrival = (event: Event) => {
-      const arrival = (event as CustomEvent<{ progress?: number }>).detail?.progress;
+      const detail = (event as CustomEvent<{
+        progress?: number;
+        featuredBoundaryTop?: number;
+        heroContactY?: number;
+        scrollingUp?: boolean;
+      }>).detail;
+      const arrival = detail?.progress;
       if (typeof arrival !== "number" || !Number.isFinite(arrival)) return;
-      if ((phase === "hidden" || phase === "hiding") && arrival >= REVEAL_AT) transitionTo(true);
-      else if ((phase === "visible" || phase === "revealing") && arrival <= RETRACT_AT) transitionTo(false);
+      const returningAcrossSection =
+        detail.scrollingUp === true &&
+        typeof detail.featuredBoundaryTop === "number" &&
+        typeof detail.heroContactY === "number" &&
+        detail.featuredBoundaryTop >= detail.heroContactY;
+
+      // The contact between Meowhe and the section-1 boundary is the return
+      // trigger. A percentage of horizontal movement cannot locate it.
+      if ((phase === "visible" || phase === "revealing") && returningAcrossSection) {
+        transitionTo(false);
+      } else if (
+        (phase === "hidden" || phase === "hiding") &&
+        detail.scrollingUp !== true &&
+        arrival >= REVEAL_AT
+      ) {
+        transitionTo(true);
+      }
     };
 
     const onBubbleClick = (event: Event) => {
