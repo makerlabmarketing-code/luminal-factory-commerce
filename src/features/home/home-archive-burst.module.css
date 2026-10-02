@@ -30,6 +30,12 @@
   will-change: transform, opacity;
   opacity: 0;
   visibility: hidden;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: inherit;
 }
 .bubble1 { left: 47%; top: 3%; }
 .bubble2 { left: 79%; top: 7%; }
@@ -40,14 +46,69 @@
   transform: translate3d(0, 0, 0);
   /* Float runs on a nested transform independent of the reveal timeline.
      It keeps its phase when the outer bubble begins returning. */
-  animation: colorway-soap-float 5.1s ease-in-out infinite alternate;
 }
-.bubble2 .floatBody { animation-delay: -1.8s; animation-duration: 6.3s; }
-.bubble3 .floatBody { animation-delay: -3.4s; animation-duration: 5.7s; }
+.bubble[data-landed="true"]:not([data-pop-phase]) .floatBody { animation: colorway-soap-float 5.1s ease-in-out infinite alternate; }
+.bubble2[data-landed="true"]:not([data-pop-phase]) .floatBody { animation-delay: -1.8s; animation-duration: 6.3s; }
+.bubble3[data-landed="true"]:not([data-pop-phase]) .floatBody { animation-delay: -3.4s; animation-duration: 5.7s; }
 
 @keyframes colorway-soap-float {
   from { transform: translate3d(-5px, 8px, 0) rotate(-1.4deg); }
   to { transform: translate3d(6px, -13px, 0) rotate(1.4deg); }
+}
+
+/* Pop is composited on the bubble's inner layer. The outer layer remains
+   owned by the Hero-triggered arrival/return timeline. No canvas or physics. */
+.bubble[data-pop-phase="burst"] .floatBody {
+  animation: bubble-pop-collapse 460ms cubic-bezier(.2,.68,.1,1) both;
+}
+.bubble[data-pop-phase="reform"] .floatBody {
+  animation: bubble-pop-reform 930ms cubic-bezier(.19,.74,.18,1) both;
+}
+@keyframes bubble-pop-collapse {
+  0% { transform: scale(1); opacity: 1; }
+  28% { transform: scale(1.065); opacity: 1; }
+  100% { transform: scale(.72); opacity: 0; }
+}
+@keyframes bubble-pop-reform {
+  0% { transform: translate3d(var(--bubble-launch-x, -120px), var(--bubble-launch-y, 60px), 0) scale(.42); opacity: 0; }
+  30% { opacity: .75; }
+  70% { transform: translate3d(4px, -17px, 0) scale(1.025); opacity: 1; }
+  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+}
+.popParticles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0;
+}
+.bubble[data-pop-phase="burst"] .popParticles { opacity: 1; }
+.popParticles span {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(203, 236, 255, .85);
+  box-shadow: 0 0 8px rgba(203, 236, 255, .3);
+  opacity: 0;
+  --spark-angle: 0deg;
+}
+.popParticles span:nth-child(2) { --spark-angle: 45deg; }
+.popParticles span:nth-child(3) { --spark-angle: 90deg; }
+.popParticles span:nth-child(4) { --spark-angle: 135deg; }
+.popParticles span:nth-child(5) { --spark-angle: 180deg; }
+.popParticles span:nth-child(6) { --spark-angle: 225deg; }
+.popParticles span:nth-child(7) { --spark-angle: 270deg; }
+.popParticles span:nth-child(8) { --spark-angle: 315deg; }
+.bubble[data-pop-phase="burst"] .popParticles span {
+  animation: bubble-pop-spark 460ms ease-out both;
+}
+@keyframes bubble-pop-spark {
+  0%, 22% { opacity: 0; transform: rotate(var(--spark-angle)) translateX(12px) scale(.65); }
+  35% { opacity: .8; }
+  100% { opacity: 0; transform: rotate(var(--spark-angle)) translateX(60px) scale(.25); }
 }
 
 .imageShell {
@@ -123,5 +184,7 @@
   .scene { --stage-light: 1 !important; }
   .bubble, .copy { opacity: 1 !important; visibility: visible !important; transform: none !important; }
   .bubble { will-change: auto; }
-  .floatBody { animation: none !important; }
+  .floatBody, .bubble[data-pop-phase="burst"] .floatBody,
+  .bubble[data-pop-phase="reform"] .floatBody { animation: none !important; }
+  .popParticles { display: none !important; }
 }

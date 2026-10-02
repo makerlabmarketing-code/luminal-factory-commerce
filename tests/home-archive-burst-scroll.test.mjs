@@ -14,12 +14,16 @@ function mountScene(initialArrival = "") {
   let frameId = 0;
   let geometryMeasurements = 0;
   let modelQueries = 0;
+  let timerId = 0;
+  const timers = new Map();
   const viewport = {
     innerHeight: 1000,
     scrollY: 1000,
     matchMedia: () => ({ matches: false }),
     requestAnimationFrame: (callback) => { frames.set(++frameId, callback); return frameId; },
     cancelAnimationFrame: (id) => frames.delete(id),
+    setTimeout: (callback) => { timers.set(++timerId, callback); return timerId; },
+    clearTimeout: (id) => timers.delete(id),
     addEventListener: (name, callback) => listeners.set(name, callback),
     removeEventListener: (name) => listeners.delete(name),
   };
@@ -31,10 +35,18 @@ function mountScene(initialArrival = "") {
     },
     style: { setProperty: (key, value) => sceneStyles.set(key, value) },
   };
-  const bubbles = [0, 1, 2].map((index) => ({
-    offsetLeft: 600 + index * 200, offsetTop: 100,
-    offsetWidth: 200, offsetHeight: 200, style: {}, dataset: {}, tabIndex: -1,
-  }));
+  const bubbles = [0, 1, 2].map((index) => {
+    const clickListeners = new Set();
+    return {
+      offsetLeft: 600 + index * 200, offsetTop: 100,
+      offsetWidth: 200, offsetHeight: 200,
+      style: { setProperty: () => {} }, dataset: {}, tabIndex: -1,
+      addEventListener: (type, fn) => { if (type === "click") clickListeners.add(fn); },
+      removeEventListener: (type, fn) => { if (type === "click") clickListeners.delete(fn); },
+      click: function () { for (const fn of clickListeners) fn({ currentTarget: this }); },
+      clickListenerCount: () => clickListeners.size,
+    };
+  });
   const copy = { style: {} };
   const code = ts.transpileModule("const effect = () => {" + effect + "}; effect();", {
     compilerOptions: { target: ts.ScriptTarget.ES2022 },
@@ -57,6 +69,11 @@ function mountScene(initialArrival = "") {
     }
   };
   const arrival = (value) => listeners.get("luminal:hero-featured-arrival")({ detail: { progress: value } });
+  const flushTimers = () => {
+    const pending = [...timers.values()];
+    timers.clear();
+    pending.forEach((callback) => callback());
+  };
   const scroll = (distance) => {
     viewport.scrollY += distance;
     listeners.get("scroll")?.();
@@ -68,7 +85,7 @@ function mountScene(initialArrival = "") {
     bubbleScale: bubbles.map((bubble) => Number(bubble.style.transform.match(/scale\(([^)]+)\)/)[1])),
   });
   return {
-    viewport, bubbles, copy, frames, listeners, cleanup, arrival, scroll, tick,
+    viewport, bubbles, copy, frames, listeners, cleanup, arrival, scroll, tick, flushTimers, timers,
     snapshot, modelQueries: () => modelQueries, geometryMeasurements: () => geometryMeasurements,
   };
 }
@@ -170,4 +187,50 @@ test("bubbles use a fixed Hero-side origin, curved flight, persistent float and 
   assert.match(css, /prefers-reduced-motion: reduce/);
   assert.match(hero, /luminal:hero-featured-arrival/);
   assert.match(hero, /state\.xVw \/ featuredDestination\.xVw/);
+});
+
+test("clicking a landed bubble pops only that colorway, then reforms from the shared Hero-side origin", () => {
+  const scene = mountScene();
+  scene.arrival(0.96);
+  scene.tick(1900);
+  assert.equal(scene.bubbles[0].clickListenerCount(), 1);
+  scene.bubbles[0].click();
+  assert.equal(scene.bubbles[0].dataset.popPhase, "burst");
+  assert.equal(scene.bubbles[1].dataset.popPhase, undefined);
+  assert.equal(scene.timers.size, 1);
+  scene.bubbles[0].click();
+  assert.equal(scene.timers.size, 1, "repeated clicks cannot create duplicate timers");
+  scene.flushTimers();
+  assert.equal(scene.bubbles[0].dataset.popPhase, "reform");
+  scene.flushTimers();
+  assert.equal(scene.bubbles[0].dataset.popPhase, undefined);
+  scene.cleanup();
+  assert.equal(scene.bubbles[0].clickListenerCount(), 0);
+});
+
+test("scroll retraction cancels in-flight POP timers so hidden bubbles do not reappear", () => {
+  const scene = mountScene();
+  scene.arrival(0.96);
+  scene.tick(1900);
+  scene.bubbles[2].click();
+  assert.equal(scene.bubbles[2].dataset.popPhase, "burst");
+  scene.arrival(0.78);
+  assert.equal(scene.bubbles[2].dataset.popPhase, undefined);
+  assert.equal(scene.timers.size, 0);
+  scene.tick(1050);
+  assert.equal(scene.bubbles[2].style.visibility, "hidden");
+  scene.cleanup();
+});
+
+test("POP uses CSS-only particles, honors reduced motion, and leaves archive navigation in the copy", () => {
+  const source = readFileSync("src/features/home/home-archive-burst.tsx", "utf8");
+  const css = readFileSync("src/features/home/home-archive-burst.module.css", "utf8");
+  assert.match(source, /aria-label=\{`Làm vỡ bong bóng/);
+  assert.match(source, /Array\.from\(\{ length: 8 \}/);
+  assert.match(source, /Explore the full archive/);
+  assert.match(css, /bubble-pop-collapse/);
+  assert.match(css, /bubble-pop-spark/);
+  assert.match(css, /bubble-pop-reform/);
+  assert.match(css, /\.bubble\[data-landed="true"\]:not\(\[data-pop-phase\]\)/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
 });

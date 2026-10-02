@@ -149,6 +149,10 @@ export function HeroObjectStage({
     let draggingPointerId: number | null = null;
     let dragX = 0;
     let dragY = 0;
+    const releaseTextSelection = () => {
+      if (draggingPointerId !== null) return;
+      delete document.documentElement.dataset.heroDragging;
+    };
 
     const applyPointerOrbit = () => {
       const viewer = viewerRef.current;
@@ -217,7 +221,7 @@ export function HeroObjectStage({
     const handlePointerDown = (event: PointerEvent) => {
       if (event.button !== 0 || !finePointer || reducedMotion) return;
       if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
-      if (event.target instanceof Element && event.target.closest("a, button, input, textarea, select, [role='button']")) return;
+      if (event.target instanceof Element && event.target.closest("a, button, input, textarea, select, h1, h2, h3, p, [role='button']")) return;
       const stageBounds = stage.getBoundingClientRect();
       const featured = document.querySelector<HTMLElement>('[data-home-3d-section="featured"]');
       const hero = document.querySelector<HTMLElement>('[data-home-3d-section="hero"]');
@@ -227,6 +231,9 @@ export function HeroObjectStage({
         return event.clientY >= rect.top && event.clientY <= rect.bottom;
       });
       if (!inSection || event.clientX < stageBounds.left || event.clientX > stageBounds.right || event.clientY < stageBounds.top || event.clientY > stageBounds.bottom) return;
+      // Prevent native text selection while dragging across the headline.
+      event.preventDefault();
+      document.documentElement.dataset.heroDragging = "true";
       draggingPointerId = event.pointerId;
       dragX = event.clientX;
       dragY = event.clientY;
@@ -237,6 +244,15 @@ export function HeroObjectStage({
     const handlePointerUp = (event: PointerEvent) => {
       if (draggingPointerId !== event.pointerId) return;
       draggingPointerId = null;
+      releaseTextSelection();
+      if (presentation.autoRotate && !reducedMotion) viewerRef.current?.setAttribute("auto-rotate", "");
+      startPointerTilt();
+    };
+
+    const handleWindowBlur = () => {
+      if (draggingPointerId === null) return;
+      draggingPointerId = null;
+      releaseTextSelection();
       if (presentation.autoRotate && !reducedMotion) viewerRef.current?.setAttribute("auto-rotate", "");
       startPointerTilt();
     };
@@ -301,6 +317,7 @@ export function HeroObjectStage({
           window.addEventListener("pointerdown", handlePointerDown);
           window.addEventListener("pointerup", handlePointerUp);
           window.addEventListener("pointercancel", handlePointerUp);
+          window.addEventListener("blur", handleWindowBlur);
         }
         window.addEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
@@ -376,6 +393,9 @@ export function HeroObjectStage({
       window.removeEventListener("pointerdown", handlePointerDown);
       window.removeEventListener("pointerup", handlePointerUp);
       window.removeEventListener("pointercancel", handlePointerUp);
+      window.removeEventListener("blur", handleWindowBlur);
+      draggingPointerId = null;
+      releaseTextSelection();
       window.removeEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
       viewerRef.current = null;

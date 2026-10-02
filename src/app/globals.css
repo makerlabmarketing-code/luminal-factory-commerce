@@ -674,3 +674,11 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
     opacity: 0.42;
   }
 }
+
+/* Only while a desktop pointer is actively rotating the Hero.
+   Stops the drag from selecting overlapping heading and body text. */
+html[data-hero-dragging="true"],
+html[data-hero-dragging="true"] * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
