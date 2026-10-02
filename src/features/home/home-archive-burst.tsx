@@ -114,8 +114,8 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     const onHeroArrival = (event: Event) => {
       const arrival = (event as CustomEvent<{ progress?: number }>).detail?.progress;
       if (typeof arrival !== "number" || !Number.isFinite(arrival)) return;
-      if (!wantsVisible && arrival >= REVEAL_AT) transitionTo(true);
-      else if (wantsVisible && arrival <= RETRACT_AT) transitionTo(false);
+      if ((phase === "hidden" || phase === "hiding") && arrival >= REVEAL_AT) transitionTo(true);
+      else if ((phase === "visible" || phase === "revealing") && arrival <= RETRACT_AT) transitionTo(false);
     };
 
     const resize = () => { measureFlight(); draw(); };
