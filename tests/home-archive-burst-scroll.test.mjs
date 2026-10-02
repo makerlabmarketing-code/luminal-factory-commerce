@@ -68,7 +68,14 @@ function mountScene(initialArrival = "") {
       callbacks.forEach((callback) => callback(now));
     }
   };
-  const arrival = (value) => listeners.get("luminal:hero-featured-arrival")({ detail: { progress: value } });
+  const arrival = (value, options = {}) => listeners.get("luminal:hero-featured-arrival")({
+    detail: {
+      progress: value,
+      featuredBoundaryTop: options.boundaryTop ?? -1000,
+      heroContactY: options.contactY ?? 380,
+      scrollingUp: options.scrollingUp ?? false,
+    },
+  });
   const flushTimers = () => {
     const pending = [...timers.values()];
     timers.clear();
@@ -116,7 +123,7 @@ test("hysteresis ignores a minor Hero movement and lets the timeline finish auto
   scene.tick(400);
   const halfway = scene.snapshot();
   assert.ok(halfway.light > 0 && halfway.light < 1);
-  scene.arrival(0.91); // inside the narrower hysteresis band: not a hide trigger
+  scene.arrival(0.91, { scrollingUp: true, boundaryTop: 370 }); // Before model contact: keep revealing.
   scene.scroll(-240);
   scene.tick(1500);
   assert.equal(scene.snapshot().light, 1);
@@ -133,7 +140,7 @@ test("retraction begins only when the Hero recedes past the return trigger", () 
   scene.arrival(0.91);
   scene.tick(800);
   assert.equal(scene.snapshot().copy, 1);
-  scene.arrival(0.895); // reverse begins as soon as Hero leaves its featured pose
+  scene.arrival(0.94, { scrollingUp: true, boundaryTop: 380 }); // Section boundary now touches the model.
   scene.tick(1120);
   assert.equal(scene.snapshot().light, 0);
   assert.equal(scene.snapshot().copy, 0);
@@ -147,7 +154,7 @@ test("reversing a mid-flight bubble is continuous without position or opacity sn
   scene.tick(760);
   const forward = scene.snapshot();
   assert.ok(forward.bubbleOpacity[1] > 0);
-  scene.arrival(0.895);
+  scene.arrival(0.95, { scrollingUp: true, boundaryTop: 382 });
   // Event merely changes direction, not the last rendered frame.
   assert.deepEqual(scene.snapshot(), forward);
   scene.tick(64);
@@ -214,7 +221,7 @@ test("scroll retraction cancels in-flight POP timers so hidden bubbles do not re
   scene.tick(1900);
   scene.bubbles[2].click();
   assert.equal(scene.bubbles[2].dataset.popPhase, "burst");
-  scene.arrival(0.78);
+  scene.arrival(0.96, { scrollingUp: true, boundaryTop: 385 });
   assert.equal(scene.bubbles[2].dataset.popPhase, undefined);
   assert.equal(scene.timers.size, 0);
   scene.tick(1050);
@@ -245,7 +252,7 @@ test("Hero reverse moves each bubble back toward its original launch point befor
 
   // A small backward movement past the return threshold should start the
   // autonomous reverse timeline without immediately hiding the bubble.
-  scene.arrival(0.895);
+  scene.arrival(0.95, { scrollingUp: true, boundaryTop: 382 });
   scene.tick(420);
   assert.notEqual(bubble.style.transform, landedTransform);
   assert.equal(bubble.style.visibility, "visible");
@@ -254,5 +261,33 @@ test("Hero reverse moves each bubble back toward its original launch point befor
   scene.tick(820);
   assert.equal(bubble.style.visibility, "hidden");
   assert.equal(bubble.style.opacity, "0.000");
+  scene.cleanup();
+});
+
+test("section boundary contact retracts bubbles even when horizontal Hero progress remains at 100%", () => {
+  const scene = mountScene();
+  scene.arrival(1);
+  scene.tick(1900);
+  const bubble = scene.bubbles[0];
+  const original = bubble.style.transform;
+
+  scene.arrival(1, { scrollingUp: true, boundaryTop: 370, contactY: 380 });
+  scene.tick(100);
+  assert.equal(bubble.style.transform, original, "No return before the boundary touches the model");
+
+  scene.arrival(1, { scrollingUp: true, boundaryTop: 380, contactY: 380 });
+  scene.tick(430);
+  assert.notEqual(bubble.style.transform, original, "Return starts at contact without waiting for Hero to reach section 1");
+  assert.equal(bubble.dataset.landed, "false");
+  scene.tick(900);
+  assert.equal(bubble.style.visibility, "hidden");
+
+  scene.arrival(1, { scrollingUp: true, boundaryTop: 400, contactY: 380 });
+  scene.tick(1900);
+  assert.equal(bubble.style.visibility, "hidden", "Upward scroll cannot instantly retrigger reveal");
+
+  scene.arrival(1, { scrollingUp: false, boundaryTop: 350, contactY: 380 });
+  scene.tick(1900);
+  assert.equal(bubble.dataset.landed, "true", "Downward return permits a new independent reveal");
   scene.cleanup();
 });
