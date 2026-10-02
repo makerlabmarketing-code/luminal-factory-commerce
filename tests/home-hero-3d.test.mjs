@@ -113,3 +113,15 @@ test("Hero mirrors ERP yaw at Meet Meowhe without changing vertical angle or dra
   assert.match(heroSource, /presentation\.camera\.phiDeg \+ dragOffset\.phiDeg/);
   assert.doesNotMatch(heroSource, /scrollOrbitOffsetDeg/);
 });
+
+test("dragging the Hero across page text cannot highlight it and always restores selection", () => {
+  assert.match(heroSource, /event\.preventDefault\(\)/);
+  assert.match(heroSource, /document\.documentElement\.dataset\.heroDragging = "true"/);
+  assert.match(heroSource, /delete document\.documentElement\.dataset\.heroDragging/);
+  assert.match(heroSource, /releaseTextSelection\(\)/);
+  assert.match(heroSource, /window\.addEventListener\("blur", handleWindowBlur\)/);
+  assert.match(heroSource, /window\.removeEventListener\("blur", handleWindowBlur\)/);
+  assert.match(heroSource, /event\.target\.closest\("a, button, input, textarea, select, h1, h2, h3, p/);
+  assert.match(globalStyles, /html\[data-hero-dragging="true"\]/);
+  assert.match(globalStyles, /user-select: none !important/);
+});
