@@ -49,7 +49,10 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
     // Actual eased Hero location triggers once; wheel travel never scrubs
     // individual bubble frames. Hysteresis prevents repeated trigger flapping.
     const REVEAL_AT = 0.92;
-    const RETRACT_AT = 0.80;
+    // Start the return while Meowhe is still close to its featured position.
+    // The short gap from REVEAL_AT preserves hysteresis without leaving
+    // bubbles stranded when the user starts scrolling upward.
+    const RETRACT_AT = 0.90;
     const REVEAL_MS = 1550;
     const RETRACT_MS = 980;
 

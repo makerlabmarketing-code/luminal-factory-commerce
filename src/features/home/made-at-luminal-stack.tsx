@@ -14,7 +14,9 @@ type MadeAtLuminalStackProps = Readonly<{
 
 const HEADER_STICKY_TOP_REM = 5;
 const HEADER_STACK_GAP_REM = 0.75;
-const STICKY_STEP_REM = 1.1;
+// A full-sized 2-line-safe rail prevents the next sticky card from clipping
+// the preceding folder title as the four cards stack.
+const STICKY_STEP_REM = 2.35;
 const DESKTOP_MEDIA = "(min-width: 768px)";
 const REDUCED_MOTION_MEDIA = "(prefers-reduced-motion: reduce)";
 
@@ -134,7 +136,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
               {!isLast ? (
                 <div
                   aria-hidden="true"
-                  className={`pointer-events-none absolute inset-x-6 top-1 z-10 hidden h-[1.1rem] items-center bg-[#0d0d0e] font-mono text-[0.6rem] uppercase leading-none tracking-[0.18em] text-white/55 transition-opacity duration-150 md:flex md:inset-x-10 ${
+                  className={`pointer-events-none absolute inset-x-6 top-[0.55rem] z-10 hidden h-[1.5rem] items-center bg-[#0d0d0e] font-mono text-[0.78rem] font-semibold uppercase leading-none tracking-[0.12em] text-white/80 transition-opacity duration-150 md:flex md:inset-x-10 ${
                     collapsed[index] ? "opacity-100" : "opacity-0"
                   }`}
                   data-process-collapsed-label={step.number}
