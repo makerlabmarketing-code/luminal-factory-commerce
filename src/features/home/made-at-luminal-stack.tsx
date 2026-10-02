@@ -32,6 +32,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
 
   useEffect(() => {
     const desktop = window.matchMedia(DESKTOP_MEDIA);
+    const mountedList = listRef.current;
     const reducedMotion = window.matchMedia(REDUCED_MOTION_MEDIA);
 
     const measure = () => {
@@ -110,7 +111,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       desktop.removeEventListener("change", scheduleMeasure);
       reducedMotion.removeEventListener("change", scheduleMeasure);
       document.querySelector<HTMLElement>("[data-made-at-luminal-header='true']")?.style.removeProperty("translate");
-      listRef.current?.style.removeProperty("--process-stack-release");
+      mountedList?.style.removeProperty("--process-stack-release");
     };
   }, [steps]);
 

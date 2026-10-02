@@ -93,22 +93,22 @@ test("mobile Hero reserves a lower safe stage then fades and zooms out before Br
   assert.match(global, /home-hero-object-corridor[\s\S]*min-height: 36svh/);
 });
 
-test("Made at Luminal gives all four cards independent sticky ceilings without shared scroll translation", () => {
+test("Made at Luminal gives all four cards independent title rails and a shared exit without extra scroll hold", () => {
   const home = read("src/features/home/home-page.tsx");
   const stack = read("src/features/home/made-at-luminal-stack.tsx");
   assert.match(home, /MadeAtLuminalStack/);
   assert.match(home, /data-made-at-luminal-header="true"/);
   assert.match(stack, /STICKY_STEP_REM = 2\.35/);
   assert.match(stack, /md:sticky motion-reduce:static/);
-  assert.match(stack, /top: `calc\(var\(--process-stack-top, 15rem\) \+ \$\{index \* STICKY_STEP_REM\}rem\)`/);
-  assert.match(stack, /md:pb-\[65svh\]/);
+  assert.match(stack, /- var\(--process-stack-release, 0px\)/);
+  assert.match(stack, /md:pb-0/);
   assert.match(stack, /data-process-collapsed-label=\{step\.number\}/);
   assert.match(stack, /\{step\.number\} \/ \{step\.title\}/);
   assert.match(stack, /collapsedStripPx/);
   assert.match(stack, /nextTop <= currentTop \+ collapsedStripPx/);
   assert.doesNotMatch(stack, /--process-release-y|terminalTargetTop/);
   assert.match(stack, /const finalCard = itemRefs\.current\[steps\.length - 1\]/);
-  assert.match(stack, /const release = Math\.max\(0, ceiling - finalCard\.getBoundingClientRect\(\)\.top\)/);
+  assert.match(stack, /ceiling \+ finalCard\.getBoundingClientRect\(\)\.height - list\.getBoundingClientRect\(\)\.bottom/);
   assert.match(stack, /header\.style\.translate = release > 0/);
   assert.doesNotMatch(stack, /list\.style\.setProperty\("--process-release-y"/);
   assert.doesNotMatch(stack, /isLast \? "md:relative" : "md:sticky"/);
