@@ -19,6 +19,10 @@ test("folder tiers use real consistent card outlines without detached overlay se
   assert.match(stack, /md:sticky motion-reduce:static/);
   assert.match(stack, /md:pb-\[65svh\]/);
   assert.doesNotMatch(stack, /--process-release-y/);
+  assert.match(stack, /header\.style\.translate = release > 0/);
+  assert.match(stack, /header\?\.style\.removeProperty\("translate"\)/);
+  assert.match(stack, /ceiling - finalCard\.getBoundingClientRect\(\)\.top/);
+  assert.doesNotMatch(stack, /list\.style\.translate/);
   assert.doesNotMatch(stack, /key=\{`separator-\$\{step\.number\}\`\}/);
 });
 
