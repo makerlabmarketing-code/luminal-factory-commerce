@@ -302,6 +302,8 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     let frameHandle: number | null = null;
     let current: MotionState = motionStates[0].state;
     let target: MotionState = current;
+    let previousScrollY = window.scrollY;
+    let scrollingUp = false;
 
     const apply = (state: MotionState) => {
       const featuredSection = document.querySelector<HTMLElement>('[data-home-3d-section="featured"]');
@@ -317,8 +319,14 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         ? clamp01(state.xVw / featuredDestination.xVw)
         : 0;
       document.documentElement.dataset.luminalHeroFeaturedArrival = heroArrival.toFixed(4);
+      // Compare the moving first/featured-section seam against an actual
+      // contact point on the eased 3D stage, not the Hero's horizontal orbit.
+      // The stage is measured once per travel frame, never by the bubbles.
+      const featuredBoundaryTop = featuredSection?.getBoundingClientRect().top ?? Number.NEGATIVE_INFINITY;
+      const modelBounds = layer.getBoundingClientRect();
+      const heroContactY = modelBounds.top + modelBounds.height * 0.22;
       window.dispatchEvent(new CustomEvent("luminal:hero-featured-arrival", {
-        detail: { progress: heroArrival },
+        detail: { progress: heroArrival, featuredBoundaryTop, heroContactY, scrollingUp },
       }));
 
       // Normalize the section transition independently of the actual orbit
@@ -370,7 +378,10 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     };
 
     const schedule = () => {
-      target = readMotionState(window.scrollY, keyframes);
+      const scrollY = window.scrollY;
+      if (scrollY !== previousScrollY) scrollingUp = scrollY < previousScrollY;
+      previousScrollY = scrollY;
+      target = readMotionState(scrollY, keyframes);
       // The pointer is tracked globally by HeroObjectStage only within Hero/Meet.
       // The floating 3D layer must not intercept archive links and buttons.
       layer.style.pointerEvents = "none";
