@@ -10,6 +10,11 @@ test("folder tiers use real consistent card outlines without detached overlay se
   assert.doesNotMatch(stack, /data-process-title-rail/);
   assert.doesNotMatch(stack, /md:border-transparent md:shadow-none/);
   assert.match(stack, /data-process-collapsed-label=\{step\.number\}/);
+  assert.match(stack, /STICKY_STEP_REM = 2\.35/);
+  assert.match(stack, /top-\[0\.55rem\]/);
+  assert.match(stack, /h-\[1\.5rem\]/);
+  assert.match(stack, /text-\[0\.78rem\] font-semibold/);
+  assert.match(stack, /text-white\/80/);
   assert.match(stack, /collapsed\[index\] \? "opacity-100" : "opacity-0"/);
   assert.match(stack, /translate: isLast \? undefined : "0 var\(--process-release-y, 0px\)"/);
   assert.doesNotMatch(stack, /key=\{`separator-\$\{step\.number\}\`\}/);
