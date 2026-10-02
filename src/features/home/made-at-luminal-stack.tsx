@@ -40,7 +40,7 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
       const list = listRef.current;
       if (!desktop.matches || reducedMotion.matches) {
         list?.style.removeProperty("--process-stack-top");
-         setCollapsed((previous) => {
+        setCollapsed((previous) => {
           const next = steps.map(() => false);
           return statesEqual(previous, next) ? previous : next;
         });
@@ -58,7 +58,6 @@ export function MadeAtLuminalStack({ steps }: MadeAtLuminalStackProps) {
           + HEADER_STACK_GAP_REM * rootFontSize
         );
         list.style.setProperty("--process-stack-top", `${Math.round(stackTopPx)}px`);
-
       }
 
       const collapsedStripPx = STICKY_STEP_REM * rootFontSize + 2;
