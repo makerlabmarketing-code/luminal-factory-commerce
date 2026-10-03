@@ -42,7 +42,7 @@ Operator visual retest remains required.
 Rollback: revert this application/dependency batch.
 
 
-This is the authoritative task roadmap. Status vocabulary: `NOT_STARTED`, `IN_PROGRESS`, `CODE_COMPLETE`, `MERGED`, `DEPLOYED`, `OPERATOR_RETEST_REQUIRED`, `LIVE_APPROVAL_REQUIRED`, `BLOCKED`, `COMPLETED`. A code change in a PR is `CODE_COMPLETE`; it is not `MERGED` or `DEPLOYED` without external evidence.
+The shared coordination Sheet is authoritative for execution and approval across ERP and Commerce; this file mirrors technical tasks and evidence. Status vocabulary: `NOT_STARTED`, `IN_PROGRESS`, `CODE_COMPLETE`, `MERGED`, `DEPLOYED`, `OPERATOR_RETEST_REQUIRED`, `LIVE_APPROVAL_REQUIRED`, `BLOCKED`, `COMPLETED`. A code change in a PR is `CODE_COMPLETE`; it is not `MERGED` or `DEPLOYED` without external evidence.
 
 ## 2026-09-30 Homepage Hero continuation — I-006 preparation
 
@@ -394,3 +394,18 @@ Escalate only when a decision has material system-wide consequences, introduces 
 - **Raffle priority:** When a featured raffle is active, current raffle-first Home presentation remains authoritative. The immersive object traversal is disabled until a dedicated raffle-model integration is approved.
 - **Production gate:** `APPROVED_2026-09-23`. Owner approved promotion after correcting the Meet Meowhe orbit to the left-facing direction.
 - **Validation target:** Vercel Preview build, first-load/repeat-load, slow/failing GLB, backward/forward scroll, resize, menu keyboard behavior, mobile and reduced-motion review.
+
+## 2026-10-03 — E-006 catalog translation package
+
+Continue from [the shared Sheet](https://docs.google.com/spreadsheets/d/1R9HKuFyYe4xrYbvVD-6abV1Br-_c6Jia6G9O0geKCxY/edit),
+row E-006; C-038 UI EN/VI is already deployed.
+Prepared signed translation draft routes for Product/Colorway and reviewed-snapshot
+public reader, locale-aware catalog memoization and translated SEO fields.
+No duplicate Products or changes to slug, prices, stock, release or source copy.
+
+[Contract, rollout and rollback](../specs/i18n/catalog-translations.md).
+Forward/validation/preflight/rollback stay in `supabase/drafts/translations`;
+public reader is default-off. No publish endpoint or Production mutation.
+Exact SQL review, native two-session and hosted RLS preflight, controlled editor
+smoke precede deployment Commerce then ERP. E-005 #110/#222 remains separate;
+Colorway editor follows it. Search remains source-based.
