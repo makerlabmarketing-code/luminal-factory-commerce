@@ -65,7 +65,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const tr = await getTranslator();
   const locale = await getLocale();
   const rawSearchParams = await searchParams;
-  const catalog = await getShopCatalog(rawSearchParams);
+  const catalog = await getShopCatalog(rawSearchParams, locale);
   const isLiveCatalog = catalog.source === "commerce-catalog";
   const hasActiveQuery = Boolean(catalog.query.q || catalog.query.type || catalog.query.release || catalog.query.page > 1);
 

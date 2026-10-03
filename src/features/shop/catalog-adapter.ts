@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { Locale } from "@/lib/i18n/locale";
+import { localizeCatalogEntries } from "./catalog-translations";
 import { cache } from "react";
 import { z } from "zod";
 import {
@@ -296,6 +298,7 @@ function filterFixtureEntries(query: ShopCatalogQuery): readonly ShopPresentatio
 
 export async function getShopCatalog(
   input: Readonly<Record<string, string | string[] | undefined>> = {},
+  locale: Locale = "en",
 ): Promise<ShopCatalogResult> {
   const query = normalizeShopCatalogQuery(input);
   const rows = await requestProducts({ query });
@@ -304,15 +307,15 @@ export async function getShopCatalog(
   const hasNextPage = resolvedRows.length > SHOP_PAGE_SIZE;
 
   return {
-    entries: resolvedRows.slice(0, SHOP_PAGE_SIZE),
+    entries: await localizeCatalogEntries(resolvedRows.slice(0, SHOP_PAGE_SIZE), locale, getCatalogConfig()),
     source,
     query,
     hasNextPage,
   };
 }
 
-export const getShopCatalogEntryBySlug = cache(async (slug: string): Promise<ShopPresentationEntry | undefined> => {
+export const getShopCatalogEntryBySlug = cache(async (slug: string, locale: Locale = "en"): Promise<ShopPresentationEntry | undefined> => {
   const rows = await requestProducts({ slug });
   if (rows === null) return getFixtureShopEntryBySlug(slug);
-  return rows[0] ? mapProduct(rows[0]) : undefined;
+  return rows[0] ? (await localizeCatalogEntries([mapProduct(rows[0])], locale, getCatalogConfig()))[0] : undefined;
 });
