@@ -394,3 +394,15 @@ Escalate only when a decision has material system-wide consequences, introduces 
 - **Raffle priority:** When a featured raffle is active, current raffle-first Home presentation remains authoritative. The immersive object traversal is disabled until a dedicated raffle-model integration is approved.
 - **Production gate:** `APPROVED_2026-09-23`. Owner approved promotion after correcting the Meet Meowhe orbit to the left-facing direction.
 - **Validation target:** Vercel Preview build, first-load/repeat-load, slow/failing GLB, backward/forward scroll, resize, menu keyboard behavior, mobile and reduced-motion review.
+
+
+## E-005 — application checks and isolated SQL smoke passed (2026-10-03)
+
+The coordination sheet owns the shared roadmap. Bounded API/contract and
+RPC/rollback package are prepared: `specs/commerce/colorway-draft-management.md`.
+Full `npm run check` passes (346 tests, security, audit and build). Isolated
+PostgreSQL smoke passes, including actual grants/RLS and rollback retention;
+read-only Production preflight passes. Two-session and owner UI verification
+remain separate gates. Exact SQL approval precedes live changes; deploy
+Commerce before ERP. Existing published Lolipop remains untouched. No live
+data, migration, credentials or flags changed; no merge/deploy yet.

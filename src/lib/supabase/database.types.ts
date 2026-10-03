@@ -1083,6 +1083,11 @@ export type Database = {
       }
     }
     Functions: {
+      manage_catalog_colorway: {
+        Args: { p_operation_id: string; p_client_id: string; p_action: string; p_product_id: string; p_target_id: string; p_request_fingerprint: string; p_colorway: Json }
+        Returns: Json
+      }
+
       consume_commerce_admin_nonce: {
         Args: { p_key_id: string; p_nonce: string; p_request_id: string }
         Returns: boolean
