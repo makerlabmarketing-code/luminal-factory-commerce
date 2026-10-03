@@ -1,4 +1,6 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -27,6 +29,7 @@ function buildColumns(items: readonly HomeGalleryMedia[]) {
 }
 
 export function HomeDriftWall({ items }: HomeDriftWallProps) {
+  const tr = useTranslator();
   const rootRef = useRef<HTMLDivElement>(null);
   const wallRef = useRef<HTMLDivElement>(null);
   const [supportsDrift, setSupportsDrift] = useState(false);
@@ -154,10 +157,10 @@ export function HomeDriftWall({ items }: HomeDriftWallProps) {
             ))}
           </div>
           <div className={styles.edgeVeil} aria-hidden="true" />
-          <p className={styles.hint} aria-hidden="true">Move to explore · Select an image to enlarge</p>
+          <p className={styles.hint} aria-hidden="true">{tr("Move to explore · Select an image to enlarge")}</p>
         </div>
       ) : (
-        <div className={styles.strip} aria-label="Meowhe colorway gallery">
+        <div className={styles.strip} aria-label={tr("Meowhe colorway gallery")}>
           {items.map((item, index) => (
             <button className={styles.stripCard} key={item.id} onClick={() => setSelectedItem(item)} type="button">
               <span className={styles.stripMedia}>
@@ -171,7 +174,7 @@ export function HomeDriftWall({ items }: HomeDriftWallProps) {
                 />
                 <i aria-hidden="true">{String(index + 1).padStart(2, "0")}</i>
               </span>
-              <span className={styles.stripCaption}>{item.colorway}<i>Color study</i></span>
+              <span className={styles.stripCaption}>{item.colorway}<i>{tr("Color study")}</i></span>
             </button>
           ))}
         </div>
@@ -187,7 +190,7 @@ export function HomeDriftWall({ items }: HomeDriftWallProps) {
           }}
           role="dialog"
         >
-          <button autoFocus className={styles.closeButton} onClick={() => setSelectedItem(null)} type="button">Close</button>
+          <button autoFocus className={styles.closeButton} onClick={() => setSelectedItem(null)} type="button">{tr("Close")}</button>
           <figure>
             <div className={styles.lightboxMedia}>
               <Image

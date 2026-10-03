@@ -229,6 +229,8 @@
   inset: 0;
   z-index: -1;
   display: none;
+  grid-template-rows: max-content max-content;
+  overflow-y: auto;
   align-items: start;
   padding: 5.8rem 0.8rem 1rem;
   opacity: 0;
@@ -358,3 +360,6 @@
     animation: none !important;
   }
 }
+
+.languageDock { opacity: 0; pointer-events: none; margin-left: .5rem; transition: opacity 300ms ease 650ms; }
+.header[data-stage="revealed"] .languageDock { opacity: 1; pointer-events: auto; }

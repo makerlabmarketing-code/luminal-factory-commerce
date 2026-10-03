@@ -1,4 +1,6 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
@@ -78,6 +80,7 @@ export function HeroObjectStage({
   allowTouch3d = false,
   mobileOnly = false,
 }: HeroObjectStageProps) {
+  const tr = useTranslator();
   const stageRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
@@ -429,7 +432,7 @@ export function HeroObjectStage({
             <Image
               className="home-product-image hero-product-image"
               src={media.src}
-              alt={media.alt}
+              alt={tr(media.alt)}
               fill
               preload
               sizes={media.sizes}
@@ -451,12 +454,12 @@ export function HeroObjectStage({
                 <span className="absolute inset-[9px] rounded-full border border-white/15 motion-safe:animate-pulse" />
                 <span className="absolute inset-[21px] rounded-full bg-white/75 shadow-[0_0_18px_rgba(255,255,255,0.35)]" />
               </div>
-              <span className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-white/45">Loading 3D object</span>
+              <span className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-white/45">{tr("Loading 3D object")}</span>
             </div>
           </div>
 
           <div ref={errorRef} className="pointer-events-none absolute inset-0 z-[4] flex items-center justify-center opacity-0 transition-opacity duration-300" role="status">
-            <span className="rounded-full border border-white/10 bg-black/55 px-3 py-2 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-white/55 backdrop-blur-sm">3D preview unavailable</span>
+            <span className="rounded-full border border-white/10 bg-black/55 px-3 py-2 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-white/55 backdrop-blur-sm">{tr("3D preview unavailable")}</span>
           </div>
 
           <div ref={modelMountRef} className="absolute -inset-x-[9%] -inset-y-[4%] z-[2] opacity-0 transition-opacity duration-[620ms]" />
@@ -464,7 +467,7 @@ export function HeroObjectStage({
       ) : (
         <>
           <span className="hero-object-silhouette" aria-hidden="true" />
-          <p className="home-media-pending">{media.alt}<br /><span>Approved product media pending sync</span></p>
+          <p className="home-media-pending">{tr(media.alt)}<br /><span>{tr("Approved product media pending sync")}</span></p>
         </>
       )}
       <div className="hero-object-vignette pointer-events-none z-[3]" aria-hidden="true" />

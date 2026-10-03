@@ -1,4 +1,6 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 
 import Image from "next/image";
 import { useState } from "react";
@@ -10,6 +12,7 @@ type ShopMediaProps = Readonly<{
 }>;
 
 export function ShopMedia({ media, priority = false }: ShopMediaProps) {
+  const tr = useTranslator();
   const [hasLoadError, setHasLoadError] = useState(false);
   const hasCatalogAsset = media.source === "commerce-catalog" && media.productionApproved && !hasLoadError;
 
@@ -23,7 +26,7 @@ export function ShopMedia({ media, priority = false }: ShopMediaProps) {
         <Image
           className="shop-media-asset"
           src={media.src}
-          alt={media.alt}
+          alt={tr(media.alt)}
           fill
           sizes="(max-width: 900px) 100vw, 33vw"
           priority={priority}
@@ -35,7 +38,7 @@ export function ShopMedia({ media, priority = false }: ShopMediaProps) {
         <video
           className="shop-media-asset"
           src={media.src}
-          aria-label={media.alt}
+          aria-label={tr(media.alt)}
           controls
           muted
           playsInline

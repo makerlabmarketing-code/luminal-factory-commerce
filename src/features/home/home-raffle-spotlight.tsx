@@ -1,7 +1,9 @@
 "use client";
+import { useTranslator, useLocale } from "@/lib/i18n/client";
+
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/lib/i18n/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -37,8 +39,8 @@ function getCountdown(target: string, now: number): CountdownParts {
   };
 }
 
-function formatOpening(value: string): string {
-  return new Intl.DateTimeFormat("vi-VN", {
+function formatOpening(value: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-US", {
     dateStyle: "long",
     timeStyle: "short",
     timeZone: "Asia/Ho_Chi_Minh",
@@ -46,6 +48,8 @@ function formatOpening(value: string): string {
 }
 
 function Countdown({ opensAt, onComplete }: Readonly<{ opensAt: string; onComplete(): void }>) {
+  const tr = useTranslator();
+  const locale = useLocale();
   const [now, setNow] = useState(() => Date.now());
   const completedRef = useRef(false);
   const countdown = useMemo(() => getCountdown(opensAt, now), [now, opensAt]);
@@ -70,21 +74,23 @@ function Countdown({ opensAt, onComplete }: Readonly<{ opensAt: string; onComple
 
   return (
     <>
-      <p className={styles.countdownLabel}>Opening countdown</p>
+      <p className={styles.countdownLabel}>{tr("Opening countdown")}</p>
       <div className={styles.countdown} aria-hidden="true">
         {cells.map(([unit, value]) => (
-          <div className={styles.timeCell} key={unit}>
+          <div className={styles.timeCell} key={tr(unit)}>
             <span className={styles.timeValue}>{String(value).padStart(2, "0")}</span>
-            <span className={styles.timeUnit}>{unit}</span>
+            <span className={styles.timeUnit}>{tr(unit)}</span>
           </div>
         ))}
       </div>
-      <p className="sr-only">Raffle dự kiến mở lúc {formatOpening(opensAt)}.</p>
+      <p className="sr-only">{tr("Raffle dự kiến mở lúc")}{" "}{formatOpening(opensAt, locale)}.</p>
     </>
   );
 }
 
 export function HomeRaffleSpotlight({ raffle }: Readonly<{ raffle: HomeFeaturedRaffle }>) {
+  const tr = useTranslator();
+  const locale = useLocale();
   const router = useRouter();
   const refreshCountRef = useRef(0);
   const refreshTimerRef = useRef<number | null>(null);
@@ -116,7 +122,7 @@ export function HomeRaffleSpotlight({ raffle }: Readonly<{ raffle: HomeFeaturedR
       <Container className={styles.grid}>
         <div className={styles.copy}>
           <p className={styles.eyebrow}>
-            {isOpen ? "Current raffle · Open" : "Upcoming raffle · Sealed"}
+            {isOpen ? tr("Current raffle · Open") : tr("Upcoming raffle · Sealed")}
           </p>
           <h2 className={styles.title} id="home-raffle-title">{raffle.title}</h2>
           {raffle.summary ? <p className={styles.summary}>{raffle.summary}</p> : null}
@@ -124,9 +130,9 @@ export function HomeRaffleSpotlight({ raffle }: Readonly<{ raffle: HomeFeaturedR
           <div className={styles.timing}>
             {isOpen ? (
               <>
-                <p className={styles.openLabel}>The window is open</p>
+                <p className={styles.openLabel}>{tr("The window is open")}</p>
                 {raffle.closesAt ? (
-                  <p className={styles.summary}>Đóng lúc {formatOpening(raffle.closesAt)}.</p>
+                  <p className={styles.summary}>{tr("Đóng lúc")}{" "}{formatOpening(raffle.closesAt, locale)}.</p>
                 ) : null}
               </>
             ) : (
@@ -135,15 +141,15 @@ export function HomeRaffleSpotlight({ raffle }: Readonly<{ raffle: HomeFeaturedR
           </div>
 
           <div className={styles.actions}>
-            {canEnter ? <ButtonLink href={detailHref}>Enter raffle</ButtonLink> : null}
-            <Link className="text-link" href={detailHref}>View raffle details <span aria-hidden="true">↗</span></Link>
+            {canEnter ? <ButtonLink href={detailHref}>{tr("Enter raffle")}</ButtonLink> : null}
+            <Link className="text-link" href={detailHref}>{tr("View raffle details")}<span aria-hidden="true">↗</span></Link>
           </div>
 
           {!isOpen && isAwaitingOpenState ? (
-            <p className={styles.pending} role="status">Đang đồng bộ trạng thái mở raffle từ máy chủ…</p>
+            <p className={styles.pending} role="status">{tr("Đang đồng bộ trạng thái mở raffle từ máy chủ…")}</p>
           ) : null}
           {isOpen && !raffle.entryPresentationEnabled ? (
-            <p className={styles.pending} role="status">Raffle đã mở, kênh nhận entry đang chờ kích hoạt.</p>
+            <p className={styles.pending} role="status">{tr("Raffle đã mở, kênh nhận entry đang chờ kích hoạt.")}</p>
           ) : null}
         </div>
 
@@ -166,7 +172,7 @@ export function HomeRaffleSpotlight({ raffle }: Readonly<{ raffle: HomeFeaturedR
             )}
           </div>
           <span className={styles.stageMeta} aria-hidden="true">
-            {isOpen ? "Object revealed" : "Luminal sealed object"}
+            {isOpen ? tr("Object revealed") : tr("Luminal sealed object")}
           </span>
         </div>
       </Container>

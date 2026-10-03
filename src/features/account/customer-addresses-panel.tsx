@@ -1,4 +1,6 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { CustomerAddress, CustomerAddressInput } from "@/features/account/customer-address-contract";
 
@@ -31,6 +33,7 @@ const fields: ReadonlyArray<readonly [AddressFieldName, string, number, string]>
 ];
 
 export function CustomerAddressesPanel() {
+  const tr = useTranslator();
   const [addresses, setAddresses] = useState<CustomerAddress[]>([]);
   const [form, setForm] = useState<AddressForm>(emptyAddress);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -76,7 +79,7 @@ export function CustomerAddressesPanel() {
 
   function edit(address?: CustomerAddress) {
     if (!address && addresses.length >= MAX_SAVED_ADDRESSES) {
-      setError(`Bạn chỉ có thể lưu tối đa ${MAX_SAVED_ADDRESSES} địa chỉ.`);
+      setError(tr("You can save up to {count} addresses.").replace("{count}", String(MAX_SAVED_ADDRESSES)));
       return;
     }
     setEditingId(address?.id ?? null);
@@ -110,24 +113,23 @@ export function CustomerAddressesPanel() {
     <section className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-5 md:p-8" aria-labelledby="saved-addresses-title">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="eyebrow">Private account</p>
-          <h2 id="saved-addresses-title" className="mt-3 text-2xl">Địa chỉ đã lưu</h2>
-          <p className="mt-2 text-sm text-white/50">Chỉ bạn mới có thể quản lý địa chỉ của mình. Tối đa {MAX_SAVED_ADDRESSES} địa chỉ.</p>
+          <p className="eyebrow">{tr("Private account")}</p>
+          <h2 id="saved-addresses-title" className="mt-3 text-2xl">{tr("Địa chỉ đã lưu")}</h2>
+          <p className="mt-2 text-sm text-white/50">{tr("Chỉ bạn mới có thể quản lý địa chỉ của mình. Tối đa")}{" "}{MAX_SAVED_ADDRESSES} {tr("địa chỉ.")}</p>
         </div>
         {!isEditing && (
           <button type="button" className="button-link" onClick={() => edit()} disabled={busy || addresses.length >= MAX_SAVED_ADDRESSES}>
-            Thêm địa chỉ
-          </button>
+            {tr("Thêm địa chỉ")}</button>
         )}
       </div>
 
       <div className="mt-6 grid gap-3">
-        {!isEditing && addresses.length === 0 && <p className="text-white/50">Bạn chưa lưu địa chỉ nào.</p>}
+        {!isEditing && addresses.length === 0 && <p className="text-white/50">{tr("Bạn chưa lưu địa chỉ nào.")}</p>}
         {!isEditing && addresses.map((address) => (
           <article key={address.id} className="rounded-2xl border border-white/10 p-5">
             <div className="flex flex-wrap items-center gap-3">
               <h3 className="font-medium">{address.label}</h3>
-              {address.is_default && <span className="rounded-full border border-white/20 px-2 py-1 text-xs">Mặc định</span>}
+              {address.is_default && <span className="rounded-full border border-white/20 px-2 py-1 text-xs">{tr("Mặc định")}</span>}
             </div>
             <p className="mt-3 text-sm">{address.recipient_name} · {address.phone}</p>
             <p className="mt-2 text-sm leading-6 text-white/60">
@@ -136,11 +138,10 @@ export function CustomerAddressesPanel() {
             <div className="mt-4 flex flex-wrap gap-4">
               {!address.is_default && (
                 <button type="button" className="account-text-button" disabled={busy} onClick={() => void mutate({ action: "set_default", id: address.id }, "Đã đặt địa chỉ mặc định.")}>
-                  Đặt mặc định
-                </button>
+                  {tr("Đặt mặc định")}</button>
               )}
-              <button type="button" className="account-text-button" disabled={busy} onClick={() => edit(address)}>Chỉnh sửa</button>
-              <button type="button" className="account-text-button" disabled={busy} onClick={() => { if (window.confirm("Xóa địa chỉ này?")) void mutate({ action: "delete", id: address.id }, "Đã xóa địa chỉ."); }}>Xóa</button>
+              <button type="button" className="account-text-button" disabled={busy} onClick={() => edit(address)}>{tr("Chỉnh sửa")}</button>
+              <button type="button" className="account-text-button" disabled={busy} onClick={() => { if (window.confirm(tr("Xóa địa chỉ này?"))) void mutate({ action: "delete", id: address.id }, "Đã xóa địa chỉ."); }}>{tr("Xóa")}</button>
             </div>
           </article>
         ))}
@@ -150,7 +151,7 @@ export function CustomerAddressesPanel() {
         <form className="mt-6 grid gap-4 md:grid-cols-2" onSubmit={submit}>
           {fields.map(([name, label, max, autoComplete]) => (
             <label key={name} className="account-field">
-              <span>{label}</span>
+              <span>{tr(label)}</span>
               <input
                 name={name}
                 value={form[name]}
@@ -164,18 +165,17 @@ export function CustomerAddressesPanel() {
           ))}
           <label className="md:col-span-2 flex items-center gap-3 text-sm text-white/70">
             <input type="checkbox" checked={form.is_default} onChange={(event) => setForm((current) => ({ ...current, is_default: event.target.checked }))} />
-            Dùng làm địa chỉ mặc định
-          </label>
+            {tr("Dùng làm địa chỉ mặc định")}</label>
           <div className="md:col-span-2 flex flex-wrap gap-3">
-            <button className="button-link" type="submit" disabled={busy}>{busy ? "Đang lưu…" : "Lưu địa chỉ"}</button>
-            <button className="account-text-button" type="button" disabled={busy} onClick={() => setIsEditing(false)}>Hủy</button>
+            <button className="button-link" type="submit" disabled={busy}>{busy ? tr("Đang lưu…") : tr("Lưu địa chỉ")}</button>
+            <button className="account-text-button" type="button" disabled={busy} onClick={() => setIsEditing(false)}>{tr("Hủy")}</button>
           </div>
         </form>
       )}
 
       <div className="mt-4" aria-live="polite">
-        {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
-        {message && <p className="text-sm text-white/60" role="status">{message}</p>}
+        {error && <p className="text-sm text-red-300" role="alert">{tr(error)}</p>}
+        {message && <p className="text-sm text-white/60" role="status">{tr(message)}</p>}
       </div>
     </section>
   );

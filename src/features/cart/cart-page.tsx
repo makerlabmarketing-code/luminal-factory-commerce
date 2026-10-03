@@ -1,58 +1,60 @@
-import Link from "next/link";
+
+import { getTranslator } from "@/lib/i18n/server";
+import Link from "@/lib/i18n/link";
 import type { CartPageView } from "./cart-page-contract";
 import { CartLineControls } from "./cart-line-controls";
 import { CartMedia } from "./cart-media";
 import { CartSyncControl } from "./cart-sync-control";
 
-function CartEmpty() {
+async function CartEmpty() {
+  const tr = await getTranslator();
   return (
     <section className="cart-feedback-panel" aria-labelledby="cart-empty-title">
-      <p className="eyebrow">No selections</p>
-      <h2 id="cart-empty-title">Giỏ hàng đang trống.</h2>
-      <p>Những object direct-shop bạn chọn sẽ được giữ ở đây dưới dạng ý định mua, không phải đặt trước hàng.</p>
+      <p className="eyebrow">{tr("No selections")}</p>
+      <h2 id="cart-empty-title">{tr("Giỏ hàng đang trống.")}</h2>
+      <p>{tr("Những object direct-shop bạn chọn sẽ được giữ ở đây dưới dạng ý định mua, không phải đặt trước hàng.")}</p>
       <div className="actions">
-        <Link className="button-link" href="/shop">Xem Shop <span aria-hidden="true">↗</span></Link>
-        <Link className="button-link button-secondary" href="/archive">Xem Archive <span aria-hidden="true">↗</span></Link>
+        <Link className="button-link" href="/shop">{tr("Xem Shop")}<span aria-hidden="true">↗</span></Link>
+        <Link className="button-link button-secondary" href="/archive">{tr("Xem Archive")}<span aria-hidden="true">↗</span></Link>
       </div>
     </section>
   );
 }
 
-function CartUnavailable() {
+async function CartUnavailable() {
+  const tr = await getTranslator();
   return (
     <section className="cart-feedback-panel" aria-labelledby="cart-unavailable-title">
-      <p className="eyebrow">Private runtime gate</p>
-      <h2 id="cart-unavailable-title">Giỏ hàng chưa được mở trên môi trường này.</h2>
-      <p>Trang giữ trạng thái an toàn cho đến khi runtime Cart được bật và kiểm tra bằng một quy trình riêng.</p>
-      <Link className="text-link" href="/shop">Tiếp tục xem Shop <span aria-hidden="true">↗</span></Link>
+      <p className="eyebrow">{tr("Private runtime gate")}</p>
+      <h2 id="cart-unavailable-title">{tr("Giỏ hàng chưa được mở trên môi trường này.")}</h2>
+      <p>{tr("Trang giữ trạng thái an toàn cho đến khi runtime Cart được bật và kiểm tra bằng một quy trình riêng.")}</p>
+      <Link className="text-link" href="/shop">{tr("Tiếp tục xem Shop")}<span aria-hidden="true">↗</span></Link>
     </section>
   );
 }
 
-function CartSyncRequired() {
+async function CartSyncRequired() {
+  const tr = await getTranslator();
   return (
     <section className="cart-feedback-panel" aria-labelledby="cart-sync-title">
-      <p className="eyebrow">Verified account · pending sync</p>
-      <h2 id="cart-sync-title">Hoàn tất đồng bộ giỏ hàng.</h2>
+      <p className="eyebrow">{tr("Verified account · pending sync")}</p>
+      <h2 id="cart-sync-title">{tr("Hoàn tất đồng bộ giỏ hàng.")}</h2>
       <p>
-        Tài khoản đã được xác minh nhưng lựa chọn trên thiết bị này chưa gắn xong.
-        Hệ thống sẽ giữ nguyên dữ liệu cũ nếu đồng bộ chưa thành công.
-      </p>
+        {tr("Tài khoản đã được xác minh nhưng lựa chọn trên thiết bị này chưa gắn xong. Hệ thống sẽ giữ nguyên dữ liệu cũ nếu đồng bộ chưa thành công.")}</p>
       <CartSyncControl />
     </section>
   );
 }
 
-export function CartPage({ view }: Readonly<{ view: CartPageView }>) {
+export async function CartPage({ view }: Readonly<{ view: CartPageView }>) {
+  const tr = await getTranslator();
   return (
     <div className="cart-page-grid">
       <header className="cart-page-heading">
-        <p className="eyebrow">Luminal selection desk · Phase 6</p>
-        <h1>Giỏ hàng</h1>
+        <p className="eyebrow">{tr("Luminal selection desk · Phase 6")}</p>
+        <h1>{tr("Giỏ hàng")}</h1>
         <p>
-          Một nơi yên tĩnh để xem lại object direct-shop. Giá và khả dụng luôn được đọc lại từ catalog;
-          giỏ hàng không khóa giá hoặc giữ hàng.
-        </p>
+          {tr("Một nơi yên tĩnh để xem lại object direct-shop. Giá và khả dụng luôn được đọc lại từ catalog; giỏ hàng không khóa giá hoặc giữ hàng.")}</p>
       </header>
 
       {view.state === "empty" ? <CartEmpty /> : null}
@@ -63,16 +65,16 @@ export function CartPage({ view }: Readonly<{ view: CartPageView }>) {
           <section className="cart-lines" aria-labelledby="cart-lines-title">
             <div className="cart-section-heading">
               <div>
-                <p className="eyebrow">Current selections</p>
-                <h2 id="cart-lines-title">{view.lines.length} object đang khả dụng</h2>
+                <p className="eyebrow">{tr("Current selections")}</p>
+                <h2 id="cart-lines-title">{view.lines.length} {tr("object đang khả dụng")}</h2>
               </div>
-              <p>Requested quantity · chưa giữ hàng</p>
+              <p>{tr("Requested quantity · chưa giữ hàng")}</p>
             </div>
 
             {view.unavailableLineCount > 0 ? (
               <div className="cart-stale-notice" role="status">
-                <strong>{view.unavailableLineCount} lựa chọn không còn khả dụng.</strong>
-                <span>Chúng đã được bỏ khỏi phần ước tính và không hiển thị bằng dữ liệu cũ.</span>
+                <strong>{view.unavailableLineCount} {tr("lựa chọn không còn khả dụng.")}</strong>
+                <span>{tr("Chúng đã được bỏ khỏi phần ước tính và không hiển thị bằng dữ liệu cũ.")}</span>
               </div>
             ) : null}
 
@@ -82,11 +84,11 @@ export function CartPage({ view }: Readonly<{ view: CartPageView }>) {
                   <li className="cart-line" key={`${line.productId}:${line.variantId ?? "base"}`}>
                     <CartMedia media={line.media} />
                     <div className="cart-line-copy">
-                      <p className="cart-line-kicker">{line.variantLabel ?? "Base object"}</p>
+                      <p className="cart-line-kicker">{line.variantLabel ?? tr("Base object")}</p>
                       <h3><Link href={`/shop/${line.slug}`}>{line.title}</Link></h3>
                       <dl>
-                        <div><dt>Giá hiện tại</dt><dd>{line.unitPriceLabel ?? "Chưa công bố"}</dd></div>
-                        <div><dt>Tạm tính dòng</dt><dd>{line.lineEstimateLabel ?? "Chưa thể tính"}</dd></div>
+                        <div><dt>{tr("Giá hiện tại")}</dt><dd>{line.unitPriceLabel ?? tr("Chưa công bố")}</dd></div>
+                        <div><dt>{tr("Tạm tính dòng")}</dt><dd>{line.lineEstimateLabel ?? tr("Chưa thể tính")}</dd></div>
                       </dl>
                       <CartLineControls
                         key={line.requestedQuantity}
@@ -101,28 +103,28 @@ export function CartPage({ view }: Readonly<{ view: CartPageView }>) {
               </ol>
             ) : (
               <div className="cart-lines-empty">
-                <p>Không còn object khả dụng để hiển thị.</p>
-                <Link className="text-link" href="/shop">Quay lại Shop <span aria-hidden="true">↗</span></Link>
+                <p>{tr("Không còn object khả dụng để hiển thị.")}</p>
+                <Link className="text-link" href="/shop">{tr("Quay lại Shop")}<span aria-hidden="true">↗</span></Link>
               </div>
             )}
           </section>
 
           <aside className="cart-summary" aria-labelledby="cart-summary-title">
-            <p className="eyebrow">Current estimate</p>
-            <h2 id="cart-summary-title">Ước tính hiện tại</h2>
+            <p className="eyebrow">{tr("Current estimate")}</p>
+            <h2 id="cart-summary-title">{tr("Ước tính hiện tại")}</h2>
             <div className="cart-summary-total">
-              <span>Tạm tính</span>
-              <strong>{view.estimateStatus === "complete" ? view.subtotalLabel : "Chưa thể tính"}</strong>
+              <span>{tr("Tạm tính")}</span>
+              <strong>{view.estimateStatus === "complete" ? view.subtotalLabel : tr("Chưa thể tính")}</strong>
             </div>
             {view.estimateStatus === "incomplete" ? (
-              <p role="status">Ít nhất một object chưa có giá USD rõ ràng, nên hệ thống không cộng tạm tính một phần.</p>
+              <p role="status">{tr("Ít nhất một object chưa có giá USD rõ ràng, nên hệ thống không cộng tạm tính một phần.")}</p>
             ) : null}
-            <p>Checkout sau này sẽ xác nhận lại giá và khả dụng. Phí vận chuyển, thuế và giảm giá chưa được tính.</p>
+            <p>{tr("Checkout sau này sẽ xác nhận lại giá và khả dụng. Phí vận chuyển, thuế và giảm giá chưa được tính.")}</p>
             <div className="cart-checkout-boundary">
-              <strong>Thanh toán đang được chuẩn bị</strong>
-              <span>Chưa có order hoặc payment nào được tạo từ trang này.</span>
+              <strong>{tr("Thanh toán đang được chuẩn bị")}</strong>
+              <span>{tr("Chưa có order hoặc payment nào được tạo từ trang này.")}</span>
             </div>
-            <Link className="button-link button-secondary" href="/shop">Tiếp tục xem Shop <span aria-hidden="true">↗</span></Link>
+            <Link className="button-link button-secondary" href="/shop">{tr("Tiếp tục xem Shop")}<span aria-hidden="true">↗</span></Link>
           </aside>
         </>
       ) : null}

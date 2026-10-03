@@ -1,4 +1,7 @@
-import Link from "next/link";
+import { localizePresentation } from "@/lib/i18n/presentation";
+
+import { getTranslator, getLocale } from "@/lib/i18n/server";
+import Link from "@/lib/i18n/link";
 import type { CommissionPresentation } from "./commission-content";
 import { CommissionInquiryForm } from "./commission-inquiry-form";
 
@@ -7,7 +10,9 @@ type CommissionDiscoveryProps = Readonly<{
   inquiryEnabled: boolean;
 }>;
 
-export function CommissionDiscovery({ content, inquiryEnabled }: CommissionDiscoveryProps) {
+export async function CommissionDiscovery({ content: originalContent, inquiryEnabled }: CommissionDiscoveryProps) {
+  const tr = await getTranslator();
+  const content = localizePresentation(originalContent, await getLocale());
   return (
     <>
       <section className="section" aria-labelledby="commission-title">
@@ -18,10 +23,10 @@ export function CommissionDiscovery({ content, inquiryEnabled }: CommissionDisco
             <p className="lede">{content.summary}</p>
           </div>
           <div>
-            <span className="status-badge">{inquiryEnabled ? "Commission inquiry đang mở" : content.availabilityLabel}</span>
+            <span className="status-badge">{inquiryEnabled ? tr("Commission inquiry đang mở") : content.availabilityLabel}</span>
             <p className="lede">
               {inquiryEnabled
-                ? "Bạn có thể gửi context để studio review. Inquiry không tạo order, quote, payment hoặc giữ production slot."
+                ? tr("Bạn có thể gửi context để studio review. Inquiry không tạo order, quote, payment hoặc giữ production slot.")
                 : content.availabilityDescription}
             </p>
           </div>
@@ -30,9 +35,9 @@ export function CommissionDiscovery({ content, inquiryEnabled }: CommissionDisco
 
       <section className="section section-surface" aria-labelledby="commission-categories-title">
         <div className="section-heading">
-          <p className="eyebrow">Commission scope</p>
-          <h2 id="commission-categories-title">Những hướng có thể bắt đầu một cuộc trao đổi.</h2>
-          <p>Đây là phạm vi trình bày ban đầu, không phải cam kết về giá, vật liệu, MOQ hay thời gian thực hiện.</p>
+          <p className="eyebrow">{tr("Commission scope")}</p>
+          <h2 id="commission-categories-title">{tr("Những hướng có thể bắt đầu một cuộc trao đổi.")}</h2>
+          <p>{tr("Đây là phạm vi trình bày ban đầu, không phải cam kết về giá, vật liệu, MOQ hay thời gian thực hiện.")}</p>
         </div>
         <div className="card-grid">
           {content.categories.map((category) => (
@@ -46,9 +51,9 @@ export function CommissionDiscovery({ content, inquiryEnabled }: CommissionDisco
 
       <section className="section" aria-labelledby="commission-process-title">
         <div className="section-heading">
-          <p className="eyebrow">Collaboration process</p>
-          <h2 id="commission-process-title">Từ ý tưởng đến một scope có thể thực hiện.</h2>
-          <p>Request chỉ mở đầu cho review. Nó không tự động tạo order hoặc production slot.</p>
+          <p className="eyebrow">{tr("Collaboration process")}</p>
+          <h2 id="commission-process-title">{tr("Từ ý tưởng đến một scope có thể thực hiện.")}</h2>
+          <p>{tr("Request chỉ mở đầu cho review. Nó không tự động tạo order hoặc production slot.")}</p>
         </div>
         <ol className="steps-grid">
           {content.processSteps.map((step) => (
@@ -63,9 +68,9 @@ export function CommissionDiscovery({ content, inquiryEnabled }: CommissionDisco
 
       <section className="section section-surface" aria-labelledby="commission-prepare-title">
         <div className="section-heading">
-          <p className="eyebrow">Prepare</p>
-          <h2 id="commission-prepare-title">Những thông tin hữu ích trước khi gửi inquiry.</h2>
-          <p>First inquiry slice không có file upload. Reference URL có thể dùng để chia sẻ context bạn có quyền chia sẻ.</p>
+          <p className="eyebrow">{tr("Prepare")}</p>
+          <h2 id="commission-prepare-title">{tr("Những thông tin hữu ích trước khi gửi inquiry.")}</h2>
+          <p>{tr("First inquiry slice không có file upload. Reference URL có thể dùng để chia sẻ context bạn có quyền chia sẻ.")}</p>
         </div>
         <ol className="process-list">
           {content.preparationItems.map((item, index) => (
@@ -79,9 +84,9 @@ export function CommissionDiscovery({ content, inquiryEnabled }: CommissionDisco
 
       <section className="section" aria-labelledby="commission-expectations-title">
         <div className="section-heading">
-          <p className="eyebrow">Expectations</p>
-          <h2 id="commission-expectations-title">Rõ ràng trước khi bắt đầu.</h2>
-          <p>Commission là một quy trình review và thỏa thuận riêng, không phải luồng mua hàng trực tiếp.</p>
+          <p className="eyebrow">{tr("Expectations")}</p>
+          <h2 id="commission-expectations-title">{tr("Rõ ràng trước khi bắt đầu.")}</h2>
+          <p>{tr("Commission là một quy trình review và thỏa thuận riêng, không phải luồng mua hàng trực tiếp.")}</p>
         </div>
         <ul className="process-list">
           {content.expectationItems.map((item, index) => (
@@ -97,12 +102,12 @@ export function CommissionDiscovery({ content, inquiryEnabled }: CommissionDisco
 
       <section className="section" aria-labelledby="commission-next-title">
         <div className="contact-panel">
-          <p className="eyebrow">Explore further</p>
-          <h2 id="commission-next-title">Xem thêm ngôn ngữ object của Luminal.</h2>
-          <p>Archive lưu các object study theo hướng editorial, còn Shop trình bày các object discovery trực tiếp. Inquiry vẫn là một luồng review riêng.</p>
+          <p className="eyebrow">{tr("Explore further")}</p>
+          <h2 id="commission-next-title">{tr("Xem thêm ngôn ngữ object của Luminal.")}</h2>
+          <p>{tr("Archive lưu các object study theo hướng editorial, còn Shop trình bày các object discovery trực tiếp. Inquiry vẫn là một luồng review riêng.")}</p>
           <div className="actions">
-            <Link className="button-link" href="/archive">Xem Archive</Link>
-            <Link className="button-link button-secondary" href="/shop">Xem Shop</Link>
+            <Link className="button-link" href="/archive">{tr("Xem Archive")}</Link>
+            <Link className="button-link button-secondary" href="/shop">{tr("Xem Shop")}</Link>
           </div>
         </div>
       </section>

@@ -5,13 +5,13 @@ import test from "node:test";
 const read = (path) => readFileSync(path, "utf8");
 
 test("Account route is dynamic, private-search and default-off", () => {
-  const page = read("src/app/account/page.tsx");
+  const page = read("src/app/[locale]/account/page.tsx");
   assert.match(page, /dynamic = "force-dynamic"/);
   assert.match(page, /robots: \{ index: false, follow: false \}/);
   assert.match(page, /getCustomerAuthEnvironment/);
   assert.match(page, /Account chưa được mở trên môi trường này/);
   assert.match(page, /environment\.ready && siteKey/);
-  assert.equal(existsSync("src/app/account/loading.tsx"), true);
+  assert.equal(existsSync("src/app/[locale]/account/loading.tsx"), true);
 });
 
 test("Account OTP form uses explicit Turnstile and accessible staged controls", () => {
@@ -36,7 +36,7 @@ test("Account OTP form uses explicit Turnstile and accessible staged controls", 
 test("Account session refresh is limited to Account routes and remains runtime-gated", () => {
   const proxyEntry = read("src/proxy.ts");
   const proxyService = read("src/lib/supabase/customer-auth-proxy.ts");
-  assert.match(proxyEntry, /"\/account\/:path\*"/);
+  assert.match(proxyEntry, /routePath.startsWith\("\/account"\)/);
   assert.match(proxyEntry, /"\/api\/account\/:path\*"/);
   assert.match(proxyService, /COMMERCE_CUSTOMER_AUTH_ENABLED/);
   assert.match(proxyService, /request\.cookies\.set/);

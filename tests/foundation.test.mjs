@@ -9,7 +9,7 @@ const walk = (directory) => readdirSync(directory).flatMap((name) => { const pat
 const src = () => walk("src").filter((path) => /\.(ts|tsx|css)$/.test(path)).map(read).join("\n");
 
 test("homepage has the semantic Wave 1 hero and Archive-first CTA", () => {
-  const page = read("src/app/page.tsx");
+  const page = read("src/app/[locale]/page.tsx");
   const home = read("src/features/home/home-page.tsx");
   const content = read("src/content/homepage.ts");
   assert.equal((home.match(/<main/g) ?? []).length, 1);
@@ -43,10 +43,10 @@ test("home follows the owner-approved Wave 1 editorial hierarchy", () => {
 });
 
 test("archive and shop routes keep one h1 while Shop advances to the Phase 5 catalog adapter", () => {
-  assert.ok(existsSync("src/app/archive/page.tsx"));
-  assert.ok(existsSync("src/app/shop/page.tsx"));
-  const archivePage = read("src/app/archive/page.tsx");
-  const shopPage = read("src/app/shop/page.tsx");
+  assert.ok(existsSync("src/app/[locale]/archive/page.tsx"));
+  assert.ok(existsSync("src/app/[locale]/shop/page.tsx"));
+  const archivePage = read("src/app/[locale]/archive/page.tsx");
+  const shopPage = read("src/app/[locale]/shop/page.tsx");
   assert.equal((archivePage.match(/<h1\b/g) ?? []).length, 1);
   assert.equal((shopPage.match(/<h1\b/g) ?? []).length, 1);
   assert.match(archivePage, /getCuratedArchiveEntries/);
@@ -72,9 +72,9 @@ test("navigation follows approved order with real storefront routes", () => {
 
 test("Archive stays static while Phase 5 Shop catalog reads remain non-transactional", () => {
   const productionSource = src();
-  const archiveSource = read("src/app/archive/page.tsx") + read("src/features/archive/archive-content.ts");
+  const archiveSource = read("src/app/[locale]/archive/page.tsx") + read("src/features/archive/archive-content.ts");
   const catalogAdapter = read("src/features/shop/catalog-adapter.ts");
-  const shopSurface = read("src/app/shop/page.tsx") + read("src/app/shop/[slug]/page.tsx") + read("src/features/shop/shop-product-detail.tsx");
+  const shopSurface = read("src/app/[locale]/shop/page.tsx") + read("src/app/[locale]/shop/[slug]/page.tsx") + read("src/features/shop/shop-product-detail.tsx");
 
   assert.match(productionSource, /Curated placeholder|curated placeholder|PLACEHOLDER MEDIA/);
   assert.doesNotMatch(archiveSource, /NEXT_PUBLIC_SUPABASE|rest\/v1|supabase\./i);
@@ -133,7 +133,7 @@ test("approved local Luminal logo is integrated accessibly without changing navi
   const sharedHeader = read("src/features/home/home-arrival-header.tsx");
   const brandSurfaces = sharedHeader + read("src/components/layout/footer.tsx");
   assert.match(read("src/components/layout/header.tsx"), /<HomeArrivalHeader immersive=\{false\}/);
-  assert.match(brandSurfaces, /aria-label="Luminal Factory"/);
+  assert.match(brandSurfaces, /aria-label=\{tr\("Luminal Factory"\)\}/);
   assert.match(sharedHeader, /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png"/);
   assert.match(read("src/components/layout/footer.tsx"), /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png"/);
   assert.equal((brandSurfaces.match(/href="\/"/g) ?? []).length, 2);

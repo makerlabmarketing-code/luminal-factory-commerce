@@ -187,7 +187,7 @@ test("verified Cart reads customer state and creates nothing for an empty cart",
 });
 
 test("Cart route is private, noindex, default-off and absent from global navigation", () => {
-  const route = readFileSync("src/app/cart/page.tsx", "utf8");
+  const route = readFileSync("src/app/[locale]/cart/page.tsx", "utf8");
   const proxy = readFileSync("src/proxy.ts", "utf8");
   const nextConfig = readFileSync("next.config.ts", "utf8");
   const service = readFileSync("src/features/cart/cart-page-service.ts", "utf8");
@@ -199,7 +199,7 @@ test("Cart route is private, noindex, default-off and absent from global navigat
   assert.match(route, /dynamic\s*=\s*["']force-dynamic["']/);
   assert.match(route, /robots:\s*\{\s*index:\s*false,\s*follow:\s*false/);
   assert.match(proxy, /private, no-store, max-age=0/);
-  assert.match(nextConfig, /source:\s*["']\/cart["']/);
+  assert.match(nextConfig, /source:\s*["']\/:locale\(en\|vi\)\?\/cart["']/);
   assert.match(nextConfig, /private, no-store, max-age=0/);
   assert.match(service, /COMMERCE_GUEST_CART_ENABLED/);
   assert.match(controls, /X-Luminal-Cart-Request|GUEST_CART_REQUEST_HEADER/);

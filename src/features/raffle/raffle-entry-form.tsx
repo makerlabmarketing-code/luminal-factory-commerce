@@ -1,4 +1,6 @@
 "use client";
+import { useTranslator, useLocale } from "@/lib/i18n/client";
+
 
 import Script from "next/script";
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
@@ -30,6 +32,8 @@ type RaffleEntryFormProps = Readonly<{
 }>;
 
 export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: RaffleEntryFormProps) {
+  const tr = useTranslator();
+  const locale = useLocale();
   const emailId = useId();
   const nameId = useId();
   const recipientNameId = useId();
@@ -57,7 +61,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
     turnstileWidgetIdRef.current = turnstile.render(container, {
       sitekey: siteKey,
       theme: "dark",
-      language: "vi",
+      language: locale,
       size: "flexible",
       action: "raffle_entry",
       callback: (token: string) => {
@@ -72,7 +76,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
         return true;
       },
     });
-  }, [enabled, siteKey]);
+  }, [enabled, siteKey, locale]);
 
   useEffect(() => {
     renderTurnstile();
@@ -147,14 +151,14 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
       setMessage("Email này đã có một entry cho raffle. Không có entry mới được tạo thêm.");
       return;
     }
-    setMessage(`Entry đã được ghi nhận. Mã tham chiếu: ${response.entryReference}`);
+    setMessage(tr("Entry recorded. Reference: {reference}").replace("{reference}", response.entryReference));
     form.reset();
   }
 
   if (!enabled) {
     return (
       <div className="feedback-state" role="status">
-        <p>Entry đang tạm đóng. Trang này chỉ hiển thị thông tin raffle đã được công bố.</p>
+        <p>{tr("Entry đang tạm đóng. Trang này chỉ hiển thị thông tin raffle đã được công bố.")}</p>
       </div>
     );
   }
@@ -168,78 +172,78 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
         onReady={renderTurnstile}
       />
       <div>
-        <p className="eyebrow">Guest entry</p>
-        <h2>Gửi một entry cho raffle này.</h2>
-        <p>Entry không phải order, không tạo nghĩa vụ thanh toán và không đảm bảo quyền mua.</p>
+        <p className="eyebrow">{tr("Guest entry")}</p>
+        <h2>{tr("Gửi một entry cho raffle này.")}</h2>
+        <p>{tr("Entry không phải order, không tạo nghĩa vụ thanh toán và không đảm bảo quyền mua.")}</p>
       </div>
 
       {!isComplete ? (
         <form className="account-form" onSubmit={handleSubmit}>
           <div className="account-field">
-            <label htmlFor={nameId}>Tên hiển thị</label>
+            <label htmlFor={nameId}>{tr("Tên hiển thị")}</label>
             <input id={nameId} name="displayName" autoComplete="name" minLength={2} maxLength={120} required />
           </div>
           <div className="account-field">
-            <label htmlFor={emailId}>Email</label>
+            <label htmlFor={emailId}>{tr("Email")}</label>
             <input id={emailId} name="email" type="email" inputMode="email" autoComplete="email" maxLength={254} required />
-            <span>Dùng để quản lý entry, liên hệ winner và lịch sử khách hàng theo chính sách của Luminal.</span>
+            <span>{tr("Dùng để quản lý entry, liên hệ winner và lịch sử khách hàng theo chính sách của Luminal.")}</span>
           </div>
 
           <div className="raffle-entry-shipping">
             <div>
-              <p className="eyebrow">Shipping information</p>
-              <h3>Thông tin giao hàng</h3>
-              <p>Thông tin này được lưu riêng khỏi entry công khai và chỉ dùng cho vận hành raffle, fulfillment và hồ sơ khách hàng được phép.</p>
+              <p className="eyebrow">{tr("Shipping information")}</p>
+              <h3>{tr("Thông tin giao hàng")}</h3>
+              <p>{tr("Thông tin này được lưu riêng khỏi entry công khai và chỉ dùng cho vận hành raffle, fulfillment và hồ sơ khách hàng được phép.")}</p>
             </div>
             <div className="account-field">
-              <label htmlFor={recipientNameId}>Tên người nhận</label>
+              <label htmlFor={recipientNameId}>{tr("Tên người nhận")}</label>
               <input id={recipientNameId} name="recipientName" autoComplete="shipping name" minLength={2} maxLength={120} required />
             </div>
             <div className="account-field">
-              <label htmlFor={addressLine1Id}>Địa chỉ</label>
+              <label htmlFor={addressLine1Id}>{tr("Địa chỉ")}</label>
               <input id={addressLine1Id} name="addressLine1" autoComplete="shipping address-line1" minLength={3} maxLength={240} required />
             </div>
             <div className="account-field">
-              <label htmlFor={addressLine2Id}>Địa chỉ bổ sung</label>
+              <label htmlFor={addressLine2Id}>{tr("Địa chỉ bổ sung")}</label>
               <input id={addressLine2Id} name="addressLine2" autoComplete="shipping address-line2" maxLength={240} />
             </div>
             <div className="account-field">
-              <label htmlFor={cityId}>Thành phố / Quận huyện</label>
+              <label htmlFor={cityId}>{tr("Thành phố / Quận huyện")}</label>
               <input id={cityId} name="city" autoComplete="shipping address-level2" maxLength={120} required />
             </div>
             <div className="account-field">
-              <label htmlFor={stateProvinceId}>Tỉnh / Bang / Khu vực</label>
+              <label htmlFor={stateProvinceId}>{tr("Tỉnh / Bang / Khu vực")}</label>
               <input id={stateProvinceId} name="stateProvince" autoComplete="shipping address-level1" maxLength={120} required />
             </div>
             <div className="account-field">
-              <label htmlFor={postalCodeId}>Postal code</label>
+              <label htmlFor={postalCodeId}>{tr("Postal code")}</label>
               <input id={postalCodeId} name="postalCode" autoComplete="shipping postal-code" maxLength={32} />
             </div>
             <div className="account-field">
-              <label htmlFor={countryCodeId}>Mã quốc gia</label>
-              <input id={countryCodeId} name="countryCode" autoComplete="shipping country" inputMode="text" minLength={2} maxLength={2} placeholder="VN" required />
-              <span>Dùng mã ISO 2 ký tự, ví dụ VN, US, JP.</span>
+              <label htmlFor={countryCodeId}>{tr("Mã quốc gia")}</label>
+              <input id={countryCodeId} name="countryCode" autoComplete="shipping country" inputMode="text" minLength={2} maxLength={2} placeholder={tr("VN")} required />
+              <span>{tr("Dùng mã ISO 2 ký tự, ví dụ VN, US, JP.")}</span>
             </div>
             <div className="account-field">
-              <label htmlFor={phoneId}>Số điện thoại</label>
+              <label htmlFor={phoneId}>{tr("Số điện thoại")}</label>
               <input id={phoneId} name="phone" type="tel" autoComplete="shipping tel" maxLength={32} />
             </div>
           </div>
 
           <label className="raffle-entry-consent">
             <input type="checkbox" name="rulesAccepted" required />
-            <span>Tôi đồng ý với rules phiên bản {rulesVersion} và xác nhận thông tin trên là chính xác.</span>
+            <span>{tr("Tôi đồng ý với rules phiên bản")}{" "}{rulesVersion} {tr("và xác nhận thông tin trên là chính xác.")}</span>
           </label>
-          <div className="account-turnstile" ref={turnstileContainerRef} aria-label="Xác minh bảo mật" />
+          <div className="account-turnstile" ref={turnstileContainerRef} aria-label={tr("Xác minh bảo mật")} />
           <button className="button-link account-submit" type="submit" disabled={isPending || !captchaToken}>
-            {isPending ? "Đang gửi entry…" : "Gửi entry"}
+            {isPending ? tr("Đang gửi entry…") : tr("Gửi entry")}
           </button>
         </form>
       ) : null}
 
       <div className="account-feedback" aria-live="polite" aria-atomic="true">
-        {message ? <p className="account-message">{message}</p> : null}
-        {error ? <p className="account-error" role="alert">{error}</p> : null}
+        {message ? <p className="account-message">{tr(message)}</p> : null}
+        {error ? <p className="account-error" role="alert">{tr(error)}</p> : null}
       </div>
     </div>
   );
