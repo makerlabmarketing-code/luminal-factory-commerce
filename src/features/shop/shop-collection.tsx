@@ -41,7 +41,7 @@ export async function ShopCollection({ entries, source }: ShopCollectionProps) {
             <ShopMedia media={entry.media} />
             <div className="shop-route-copy">
               <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-              <p>{entry.collection} · {entry.type}</p>
+              <p>{tr(entry.collection)} · {tr(entry.type)}</p>
               <h3><Link href={entry.href}>{entry.title}</Link></h3>
               <p>{entry.description}</p>
               <dl>

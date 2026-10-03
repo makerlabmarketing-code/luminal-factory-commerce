@@ -45,7 +45,9 @@ async function HomeMediaFrame({ media, className, imageClassName, placeholderCla
 
 export async function HomePage() {
   const tr = await getTranslator();
-  const content = localizePresentation(homePageContent, await getLocale());
+  const locale = await getLocale();
+  const content = localizePresentation(homePageContent, locale);
+  const media = localizePresentation(homePageMedia, locale);
   const [heroPresentation, featuredRaffle] = await Promise.all([
     getHeroModelPresentation(),
     getHomeFeaturedRaffle(),
@@ -57,7 +59,7 @@ export async function HomePage() {
     <>
       <HomeArrivalHeader immersive={immersive} />
       <HomeImmersiveExperience
-        media={homePageMedia.hero}
+        media={media.hero}
         presentation={heroPresentation}
         enabled={immersive}
       />
@@ -87,7 +89,7 @@ export async function HomePage() {
 
             <div className="home-hero-object-corridor relative min-w-0 lg:-mr-[min(7vw,7rem)] lg:pt-6">
               {featuredRaffle ? (
-                <HeroObjectStage media={homePageMedia.hero} presentation={heroPresentation} />
+                <HeroObjectStage media={media.hero} presentation={heroPresentation} />
               ) : null}
             </div>
 
@@ -100,10 +102,10 @@ export async function HomePage() {
           aria-labelledby="featured-title"
           data-home-3d-section="featured"
         >
-          {immersive ? <HomeArchiveBurst colorways={homePageMedia.gallery.slice(0, 3)} /> : (
+          {immersive ? <HomeArchiveBurst colorways={media.gallery.slice(0, 3)} /> : (
             <Container className="featured-object-grid">
               <HomeMediaFrame
-                media={homePageMedia.featured}
+                media={media.featured}
                 className="featured-object-media border border-white/10 shadow-[0_3rem_9rem_rgba(0,0,0,0.28)]"
                 imageClassName="home-product-image featured-product-image"
                 placeholderClassName="featured-object-form"
@@ -162,7 +164,7 @@ export async function HomePage() {
               <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("One character.")}<br />{tr("Three moods.")}</h2></div>
               <p>{tr("A closer look at the colorful Lolipop, death-inspired Mictlán, and monochrome finishes from the studio archive.")}</p>
             </header>
-            <HomeDriftWall items={homePageMedia.gallery} />
+            <HomeDriftWall items={media.gallery} />
           </Container>
         </section>
 

@@ -1,7 +1,7 @@
 import type { Locale } from './locale';
 import { translator } from './translations';
 // For repository-owned presentation fixtures only; never run on persisted catalog rows.
-const textKeys = new Set(['eyebrow','title','description','label','copy','story','collection','summary','statusLabel','statusDescription','releaseTitle','releaseStory','materialNote','availabilityLabel','availabilityDescription','trustNotes','preparationItems','expectationItems']);
+const textKeys = new Set(['brandLine','alt','eyebrow','title','description','label','copy','story','collection','summary','statusLabel','statusDescription','releaseTitle','releaseStory','materialNote','availabilityLabel','availabilityDescription','trustNotes','preparationItems','expectationItems']);
 export function localizePresentation<T extends object>(value: T, locale: Locale): T {
   const tr = translator(locale);
   function visit(item: unknown, key = ''): unknown {

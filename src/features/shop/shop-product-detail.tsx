@@ -16,7 +16,7 @@ export async function ShopProductDetail({ entry }: ShopProductDetailProps) {
   return (
     <>
       <section className="shop-route-hero" aria-labelledby="shop-detail-title">
-        <p className="eyebrow">{entry.collection} · {entry.type}</p>
+        <p className="eyebrow">{tr(entry.collection)} · {tr(entry.type)}</p>
         <h1 id="shop-detail-title">{entry.title}</h1>
         <p>{entry.description}</p>
         {entry.priceLabel ? <p className="quiet-label">{tr("Published price ·")}{" "}{entry.priceLabel}</p> : null}
@@ -32,7 +32,7 @@ export async function ShopProductDetail({ entry }: ShopProductDetailProps) {
             <h2 id="shop-object-title">{tr("Object story")}</h2>
             <p>{entry.story}</p>
             <dl>
-              <div><dt>{tr("Material note")}</dt><dd>{entry.materialNote}</dd></div>
+              <div><dt>{tr("Material note")}</dt><dd>{tr(entry.materialNote)}</dd></div>
               <div><dt>{tr("Presentation status")}</dt><dd>{tr(entry.presentationStatus)}</dd></div>
               <div><dt>{tr("Data authority")}</dt><dd>{isCatalogEntry ? tr("Luminal Factory Commerce catalog") : shopPlaceholderNotice}</dd></div>
             </dl>
@@ -51,7 +51,7 @@ export async function ShopProductDetail({ entry }: ShopProductDetailProps) {
             <li key={note}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{tr("Object note")}</h3>
-              <p>{note}</p>
+              <p>{tr(note)}</p>
             </li>
           ))}
         </ol>
@@ -67,7 +67,7 @@ export async function ShopProductDetail({ entry }: ShopProductDetailProps) {
           {entry.facts.map((fact, index) => (
             <div key={tr(fact.label)}>
               <dt><span>{String(index + 1).padStart(2, "0")}</span> {tr(fact.label)}</dt>
-              <dd>{fact.value}</dd>
+              <dd>{tr(fact.value)}</dd>
             </div>
           ))}
         </dl>
