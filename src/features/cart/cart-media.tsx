@@ -15,7 +15,7 @@ export function CartMedia({ media }: Readonly<{ media: CartPageLine["media"] }>)
     <div
       className={`cart-line-media cart-line-media-${media.tone}`}
       role={hasCatalogAsset ? undefined : "img"}
-      aria-label={hasCatalogAsset ? undefined : media.alt}
+      aria-label={hasCatalogAsset ? undefined : tr(media.alt)}
     >
       {hasCatalogAsset ? (
         <Image
@@ -30,7 +30,7 @@ export function CartMedia({ media }: Readonly<{ media: CartPageLine["media"] }>)
       ) : (
         <span aria-hidden="true" />
       )}
-      <em>{hasLoadError ? media.placeholderFallback : media.label}</em>
+      <em>{hasLoadError ? tr("Object image unavailable") : tr(media.label)}</em>
     </div>
   );
 }

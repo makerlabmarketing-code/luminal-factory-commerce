@@ -12,9 +12,8 @@ type ShopProductDetailPageProps = Readonly<{
   params: Promise<{ slug: string }>;
 }>;
 
-export function generateStaticParams() {
-  return [];
-}
+// Catalog configuration can differ between build and runtime. Always resolve live slugs at request time.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: ShopProductDetailPageProps): Promise<Metadata> {
   const locale = await getLocale();

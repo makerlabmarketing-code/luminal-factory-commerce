@@ -73,3 +73,20 @@ test('proxy respects explicit language, English default, preference cookie and p
   for (const path of ['/en/account', '/vi/account']) await proxy(request(path));
   assert.equal(refreshes, 5);
 });
+
+test('Production metadata and sitemap have an absolute verified origin even without an environment override', () => {
+  const origin = loadModule('src/lib/site-url.ts', {}).publicSiteUrl;
+  assert.ok(new URL(origin).origin.startsWith('https://'));
+  assert.match(readFileSync('src/app/[locale]/layout.tsx', 'utf8'), /metadataBase: new URL\(publicSiteUrl\)/);
+  const previous = process.env.VERCEL_ENV;
+  try {
+    process.env.VERCEL_ENV = 'production';
+    const { default: sitemap } = loadModule('src/app/sitemap.ts', { '@/lib/site-url': { publicSiteUrl: 'https://luminalfactory.com' }, '@/lib/i18n/locale': { locales: ['en','vi'], localeHref } });
+    const entries = sitemap();
+    assert.equal(entries.length, 12);
+    assert.ok(entries.every(entry => entry.url.startsWith('https://luminalfactory.com/') && Object.values(entry.alternates.languages).every(url => url.startsWith('https://luminalfactory.com/'))));
+    assert.ok(entries.every(entry => !/account|cart|test|object-study/.test(entry.url)));
+    process.env.VERCEL_ENV = 'preview';
+    assert.deepEqual(sitemap(), []);
+  } finally { if (previous === undefined) delete process.env.VERCEL_ENV; else process.env.VERCEL_ENV = previous; }
+});

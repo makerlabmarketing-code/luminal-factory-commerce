@@ -20,7 +20,7 @@ export function ShopMedia({ media, priority = false }: ShopMediaProps) {
     <div
       className={`shop-media shop-media-${media.tone}`}
       role={hasCatalogAsset ? undefined : "img"}
-      aria-label={hasCatalogAsset ? undefined : media.alt}
+      aria-label={hasCatalogAsset ? undefined : tr(media.alt)}
     >
       {hasCatalogAsset && media.type === "image" ? (
         <Image
@@ -47,7 +47,7 @@ export function ShopMedia({ media, priority = false }: ShopMediaProps) {
         />
       ) : null}
       {!hasCatalogAsset ? <span aria-hidden="true" /> : null}
-      <em>{hasLoadError ? media.placeholderFallback : media.label}</em>
+      <em>{hasLoadError ? tr("Object image unavailable") : tr(media.label)}</em>
     </div>
   );
 }

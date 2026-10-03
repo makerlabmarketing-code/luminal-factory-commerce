@@ -75,7 +75,7 @@ test("catalog image and video media render with a recoverable presentation fallb
   assert.match(shopMedia, /media\.productionApproved/);
   assert.match(shopMedia, /controls/);
   assert.match(shopMedia, /onError=\{\(\) => setHasLoadError\(true\)\}/);
-  assert.match(shopMedia, /media\.placeholderFallback/);
+  assert.match(shopMedia, /Object image unavailable/);
 });
 
 test("Shop listing and detail route through the adapter", () => {

@@ -7,7 +7,8 @@ const read = (path) => readFileSync(path, "utf8");
 test("shop detail route exists and resolves catalog slugs with notFound", () => {
   assert.equal(existsSync("src/app/[locale]/shop/[slug]/page.tsx"), true);
   const route = read("src/app/[locale]/shop/[slug]/page.tsx");
-  assert.match(route, /generateStaticParams/);
+  assert.match(route, /dynamic = "force-dynamic"/);
+  assert.doesNotMatch(route, /generateStaticParams/);
   assert.match(route, /getShopCatalogEntryBySlug/);
   assert.match(route, /notFound\(\)/);
   assert.match(route, /generateMetadata/);
