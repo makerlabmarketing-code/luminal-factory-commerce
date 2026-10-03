@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-const layout = fs.readFileSync("src/app/layout.tsx", "utf8");
+const layout = fs.readFileSync("src/app/[locale]/layout.tsx", "utf8");
 const motionLayer = fs.readFileSync("src/components/motion/luminal-motion-layer.tsx", "utf8");
 const bentoCss = fs.readFileSync("src/components/motion/luminal-bento.module.css", "utf8");
 const globals = fs.readFileSync("src/app/globals.css", "utf8");

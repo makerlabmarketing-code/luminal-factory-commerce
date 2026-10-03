@@ -1,10 +1,13 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 
 import Image from "next/image";
 import { useState } from "react";
 import type { CartPageLine } from "./cart-page-contract";
 
 export function CartMedia({ media }: Readonly<{ media: CartPageLine["media"] }>) {
+  const tr = useTranslator();
   const [hasLoadError, setHasLoadError] = useState(false);
   const hasCatalogAsset = media.source === "commerce-catalog" && media.productionApproved && !hasLoadError;
 
@@ -18,7 +21,7 @@ export function CartMedia({ media }: Readonly<{ media: CartPageLine["media"] }>)
         <Image
           className="cart-line-media-asset"
           src={media.src}
-          alt={media.alt}
+          alt={tr(media.alt)}
           fill
           sizes="(max-width: 600px) 35vw, 11rem"
           onError={() => setHasLoadError(true)}

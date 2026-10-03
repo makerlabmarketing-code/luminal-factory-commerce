@@ -5,7 +5,7 @@ import test from "node:test";
 const contentPath = new URL("../src/features/archive/archive-content.ts", import.meta.url);
 const collectionPath = new URL("../src/features/archive/archive-collection.tsx", import.meta.url);
 const detailPath = new URL("../src/features/archive/archive-detail.tsx", import.meta.url);
-const routePath = new URL("../src/app/archive/[slug]/page.tsx", import.meta.url);
+const routePath = new URL("../src/app/[locale]/archive/[slug]/page.tsx", import.meta.url);
 
 async function source(path) {
   return readFile(path, "utf8");

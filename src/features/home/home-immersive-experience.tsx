@@ -1,4 +1,6 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -162,6 +164,7 @@ function stateDistance(left: MotionState, right: MotionState) {
 }
 
 export function HomeImmersiveExperience({ media, presentation, enabled }: HomeImmersiveExperienceProps) {
+  const tr = useTranslator();
   const modelLayerRef = useRef<HTMLDivElement>(null);
   const travelBrandRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<IntroPhase>(() => enabled ? "loading" : "done");
@@ -437,7 +440,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
             <i className={styles.diamondOne} />
             <i className={styles.diamondTwo} />
           </div>
-          <p className={styles.loadingCopy} role="status" aria-live="polite">Preparing the object</p>
+          <p className={styles.loadingCopy} role="status" aria-live="polite">{tr("Preparing the object")}</p>
         </div>
 
         <div ref={travelBrandRef} className={styles.travelBrand} aria-hidden="true">

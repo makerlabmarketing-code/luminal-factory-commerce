@@ -1,13 +1,13 @@
 # C-038 — Bản nháp nội dung storefront
 
-Ngày: 03/10/2026. Trạng thái: đề xuất để review, chưa áp dụng lên trang.
-Sheet điều phối là nguồn trạng thái chính; cột Quyết định C-038 vẫn Chưa duyệt.
+Ngày: 03/10/2026. Trạng thái: owner đã duyệt EN/VI và English mặc định; đang áp dụng copy công khai.
+Sheet điều phối là nguồn trạng thái chính; cột Quyết định C-038 là Cho phép.
 
 ## Hướng ngôn ngữ đề xuất
 
 Tiếng Anh làm ngôn ngữ chính cho storefront, giữ tên Product/Colorway nguyên bản.
-Bản tiếng Việt bên cạnh giúp chủ studio duyệt ý và có thể dùng cho bản dịch sau.
-Đây là đề xuất; chưa thêm bộ chuyển ngôn ngữ hoặc tự đổi toàn bộ website.
+Bản tiếng Việt được dùng cho phiên bản /vi; tiếng Anh dùng cho /en.
+Triển khai hiện tại và phần nội dung ERP còn lại được ghi tại specs/i18n/en-vi-storefront.md.
 ERP tiếp tục dùng tiếng Việt theo quy tắc hiện có.
 
 Copy giới thiệu nói về sản phẩm và trải nghiệm của người xem. Trạng thái raffle,

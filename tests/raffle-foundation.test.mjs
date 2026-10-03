@@ -5,11 +5,11 @@ import test from "node:test";
 const read = (path) => readFileSync(path, "utf8");
 
 test("raffle route foundation exists with one h1 and typed presentation boundary", () => {
-  assert.equal(existsSync("src/app/raffle/page.tsx"), true);
+  assert.equal(existsSync("src/app/[locale]/raffle/page.tsx"), true);
   assert.equal(existsSync("src/features/raffle/raffle-content.ts"), true);
   assert.equal(existsSync("src/features/raffle/raffle-discovery.tsx"), true);
 
-  const route = read("src/app/raffle/page.tsx");
+  const route = read("src/app/[locale]/raffle/page.tsx");
   const discovery = read("src/features/raffle/raffle-discovery.tsx");
   const content = read("src/features/raffle/raffle-content.ts");
 
@@ -29,7 +29,7 @@ test("raffle navigation is a real route and keeps raffle first", () => {
 
 test("raffle first slice stays truthful, static, and non-transactional", () => {
   const source = [
-    read("src/app/raffle/page.tsx"),
+    read("src/app/[locale]/raffle/page.tsx"),
     read("src/features/raffle/raffle-content.ts"),
     read("src/features/raffle/raffle-discovery.tsx"),
   ].join("\n");

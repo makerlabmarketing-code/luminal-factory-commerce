@@ -5,7 +5,7 @@ import test from "node:test";
 const read = (path) => readFileSync(path, "utf8");
 
 test("About route uses typed presentation content and one page h1", () => {
-  const page = read("src/app/about/page.tsx");
+  const page = read("src/app/[locale]/about/page.tsx");
   const presentation = read("src/features/about/about-presentation.tsx");
   const content = read("src/features/about/about-content.ts");
 
@@ -34,7 +34,7 @@ test("Footer uses the approved Luminal brand line and retires the legacy slogan"
 
 test("About foundation remains static and non-operational", () => {
   const combined = [
-    read("src/app/about/page.tsx"),
+    read("src/app/[locale]/about/page.tsx"),
     read("src/features/about/about-content.ts"),
     read("src/features/about/about-presentation.tsx"),
   ].join("\n");

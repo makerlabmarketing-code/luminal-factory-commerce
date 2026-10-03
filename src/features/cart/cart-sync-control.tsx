@@ -1,4 +1,6 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -9,6 +11,7 @@ const CART_REQUEST_HEADER_VALUE = "1";
 type SyncState = "idle" | "syncing" | "error";
 
 export function CartSyncControl() {
+  const tr = useTranslator();
   const router = useRouter();
   const [state, setState] = useState<SyncState>("idle");
   const [message, setMessage] = useState("");
@@ -48,10 +51,10 @@ export function CartSyncControl() {
   return (
     <div className="cart-sync-control">
       <button type="button" disabled={isBusy} onClick={() => void retryMerge()}>
-        {isBusy ? "Đang đồng bộ" : "Đồng bộ giỏ hàng"}
+        {isBusy ? tr("Đang đồng bộ") : tr("Đồng bộ giỏ hàng")}
       </button>
       <p className={state === "error" ? "cart-line-status-error" : ""} aria-live="polite">
-        {message}
+        {tr(message)}
       </p>
     </div>
   );

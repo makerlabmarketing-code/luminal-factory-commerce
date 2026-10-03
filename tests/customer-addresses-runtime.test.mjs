@@ -9,7 +9,7 @@ const service = read("src/features/account/customer-address-server.ts");
 const request = read("src/features/account/customer-address-request.ts");
 const panel = read("src/features/account/customer-addresses-panel.tsx");
 const route = read("src/app/api/account/addresses/route.ts");
-const page = read("src/app/account/page.tsx");
+const page = read("src/app/[locale]/account/page.tsx");
 
 test("saved addresses remain behind an independent default-off gate", () => {
   assert.match(service, /COMMERCE_SAVED_ADDRESSES_ENABLED !== "true"/);

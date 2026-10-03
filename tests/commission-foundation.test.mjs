@@ -5,11 +5,11 @@ import test from "node:test";
 const read = (path) => readFileSync(path, "utf8");
 
 test("commission route foundation exists with one h1 and typed content boundary", () => {
-  assert.equal(existsSync("src/app/commission/page.tsx"), true);
+  assert.equal(existsSync("src/app/[locale]/commission/page.tsx"), true);
   assert.equal(existsSync("src/features/commission/commission-content.ts"), true);
   assert.equal(existsSync("src/features/commission/commission-discovery.tsx"), true);
 
-  const route = read("src/app/commission/page.tsx");
+  const route = read("src/app/[locale]/commission/page.tsx");
   const discovery = read("src/features/commission/commission-discovery.tsx");
   const content = read("src/features/commission/commission-content.ts");
 
@@ -28,7 +28,7 @@ test("commission navigation is real and keeps approved raffle-first order", () =
 
 test("commission first slice stays discovery-only and non-transactional", () => {
   const source = [
-    read("src/app/commission/page.tsx"),
+    read("src/app/[locale]/commission/page.tsx"),
     read("src/features/commission/commission-content.ts"),
     read("src/features/commission/commission-discovery.tsx"),
   ].join("\n");

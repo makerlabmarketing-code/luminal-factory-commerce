@@ -358,3 +358,6 @@
     animation: none !important;
   }
 }
+
+.languageDock { opacity: 0; pointer-events: none; margin-left: .5rem; transition: opacity 300ms ease 650ms; }
+.header[data-stage="revealed"] .languageDock { opacity: 1; pointer-events: auto; }

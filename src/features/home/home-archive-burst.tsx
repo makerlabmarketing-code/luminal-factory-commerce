@@ -1,7 +1,9 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/lib/i18n/link";
 import { useEffect, useRef } from "react";
 import type { HomeGalleryMedia } from "@/content/homepage-media";
 import styles from "./home-archive-burst.module.css";
@@ -15,6 +17,7 @@ function clamp01(value: number) {
 }
 
 export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
+  const tr = useTranslator();
   const sceneRef = useRef<HTMLDivElement>(null);
   const bubbleRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const copyRef = useRef<HTMLDivElement>(null);
@@ -195,7 +198,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
   return (
     <div ref={sceneRef} className={styles.scene}>
       <div className={styles.spotlight} aria-hidden="true" />
-      <div className={styles.field} aria-label="Ba colorway Meowhe trước đây">
+      <div className={styles.field} aria-label={tr("Ba colorway Meowhe trước đây")}>
         {colorways.map((colorway, index) => (
           <button
             type="button"
@@ -219,9 +222,9 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       </div>
 
       <div ref={copyRef} className={styles.copy}>
-        <h2 id="featured-title">Meet Meowhe.</h2>
-        <p>A character with a past. Explore three earlier colorways: Lolipop, Mictlán, and Mono.</p>
-        <Link className="text-link" href="/archive">Explore the full archive <span aria-hidden="true">↗</span></Link>
+        <h2 id="featured-title">{tr("Meet Meowhe.")}</h2>
+        <p>{tr("A character with a past. Explore three earlier colorways: Lolipop, Mictlán, and Mono.")}</p>
+        <Link className="text-link" href="/archive">{tr("Explore the full archive")}<span aria-hidden="true">↗</span></Link>
       </div>
     </div>
   );
