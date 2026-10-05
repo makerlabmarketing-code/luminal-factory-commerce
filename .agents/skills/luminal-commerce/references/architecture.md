@@ -290,3 +290,11 @@ Do not migrate to this structure without:
 3. Identifying shared domain contracts.
 4. Creating a migration plan.
 5. Validating both applications independently.
+
+## Storefront language boundary
+
+The owner approved EN/VI with English default on 2026-10-03. Read
+`specs/i18n/en-vi-storefront.md` before changing locale routing, content translation,
+metadata or language controls. UI routes live below `src/app/[locale]`; API paths
+and shared Product/Colorway identity remain language-independent. ERP translation
+editing and schema work are a separate contract delivery, not duplicate Products.

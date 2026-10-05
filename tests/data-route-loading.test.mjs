@@ -5,8 +5,8 @@ import test from "node:test";
 const read = (path) => readFileSync(path, "utf8");
 
 test("data-backed Shop routes expose a shared loading boundary", () => {
-  assert.equal(existsSync("src/app/shop/loading.tsx"), true);
-  const boundary = read("src/app/shop/loading.tsx");
+  assert.equal(existsSync("src/app/[locale]/shop/loading.tsx"), true);
+  const boundary = read("src/app/[locale]/shop/loading.tsx");
   assert.match(boundary, /DataRouteLoading/);
   assert.match(boundary, /<Header \/>/);
   assert.match(boundary, /<Footer \/>/);

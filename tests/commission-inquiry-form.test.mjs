@@ -4,7 +4,7 @@ import test from "node:test";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
-const page = read("src/app/commission/page.tsx");
+const page = read("src/app/[locale]/commission/page.tsx");
 const discovery = read("src/features/commission/commission-discovery.tsx");
 const form = read("src/features/commission/commission-inquiry-form.tsx");
 const schema = read("src/features/commission/commission-inquiry-schema.ts");

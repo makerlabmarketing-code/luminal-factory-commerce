@@ -1,4 +1,7 @@
-export function DataRouteLoading() {
+
+import { getTranslator } from "@/lib/i18n/server";
+export async function DataRouteLoading() {
+  const tr = await getTranslator();
   return (
     <main
       id="main-content"
@@ -13,8 +16,8 @@ export function DataRouteLoading() {
           <span className="data-route-loading-orbit data-route-loading-orbit-three" />
           <span className="data-route-loading-core" />
         </span>
-        <span className="data-route-loading-label">Đang tải nội dung</span>
-        <span className="data-route-loading-caption">Luminal Factory</span>
+        <span className="data-route-loading-label">{tr("Đang tải nội dung")}</span>
+        <span className="data-route-loading-caption">{tr("Luminal Factory")}</span>
       </div>
     </main>
   );

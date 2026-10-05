@@ -1,10 +1,13 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 
 import Image from "next/image";
 import { useState } from "react";
 import type { CartPageLine } from "./cart-page-contract";
 
 export function CartMedia({ media }: Readonly<{ media: CartPageLine["media"] }>) {
+  const tr = useTranslator();
   const [hasLoadError, setHasLoadError] = useState(false);
   const hasCatalogAsset = media.source === "commerce-catalog" && media.productionApproved && !hasLoadError;
 
@@ -12,13 +15,13 @@ export function CartMedia({ media }: Readonly<{ media: CartPageLine["media"] }>)
     <div
       className={`cart-line-media cart-line-media-${media.tone}`}
       role={hasCatalogAsset ? undefined : "img"}
-      aria-label={hasCatalogAsset ? undefined : media.alt}
+      aria-label={hasCatalogAsset ? undefined : tr(media.alt)}
     >
       {hasCatalogAsset ? (
         <Image
           className="cart-line-media-asset"
           src={media.src}
-          alt={media.alt}
+          alt={tr(media.alt)}
           fill
           sizes="(max-width: 600px) 35vw, 11rem"
           onError={() => setHasLoadError(true)}
@@ -27,7 +30,7 @@ export function CartMedia({ media }: Readonly<{ media: CartPageLine["media"] }>)
       ) : (
         <span aria-hidden="true" />
       )}
-      <em>{hasLoadError ? media.placeholderFallback : media.label}</em>
+      <em>{hasLoadError ? tr("Object image unavailable") : tr(media.label)}</em>
     </div>
   );
 }

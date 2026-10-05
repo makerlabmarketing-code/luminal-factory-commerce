@@ -5,7 +5,7 @@ import test from "node:test";
 const read = (path) => readFileSync(path, "utf8");
 
 test("raffle detail route stays thin, dynamic and server-rendered", () => {
-  const routePath = "src/app/raffle/[slug]/page.tsx";
+  const routePath = "src/app/[locale]/raffle/[slug]/page.tsx";
   assert.equal(existsSync(routePath), true);
   const route = read(routePath);
   assert.match(route, /params: Promise<\{ slug: string \}>/);
@@ -73,7 +73,8 @@ test("raffle form communicates non-transactional and duplicate semantics", () =>
   const detail = read("src/features/raffle/raffle-detail.tsx");
   assert.match(form, /Entry không phải order/);
   assert.match(form, /already_entered/);
-  assert.match(form, /Mã tham chiếu/);
+  assert.match(form, /Entry recorded. Reference: \{reference\}/);
+  assert.match(readFileSync("src/lib/i18n/copy.json", "utf8"), /Mã tham chiếu/);
   assert.match(form, /rulesAccepted/);
   assert.match(form, /aria-live="polite"/);
   assert.match(detail, /Máy chủ và database quyết định/);

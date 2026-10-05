@@ -1,4 +1,6 @@
 "use client";
+import { useTranslator } from "@/lib/i18n/client";
+
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -24,6 +26,7 @@ function mutationMessage(status: number): string {
 }
 
 export function CartLineControls({ productId, variantId, productName, requestedQuantity }: CartLineControlsProps) {
+  const tr = useTranslator();
   const router = useRouter();
   const [quantity, setQuantity] = useState(requestedQuantity);
   const [requestState, setRequestState] = useState<RequestState>("idle");
@@ -62,7 +65,7 @@ export function CartLineControls({ productId, variantId, productName, requestedQ
   return (
     <div className="cart-line-controls">
       <div className="cart-quantity-field">
-        <label htmlFor={`quantity-${productId}-${variantId ?? "base"}`}>Số lượng</label>
+        <label htmlFor={`quantity-${productId}-${variantId ?? "base"}`}>{tr("Số lượng")}</label>
         <div>
           <input
             id={`quantity-${productId}-${variantId ?? "base"}`}
@@ -81,7 +84,7 @@ export function CartLineControls({ productId, variantId, productName, requestedQ
             disabled={isBusy || quantity === requestedQuantity}
             onClick={() => void mutateCart({ action: "set_line", productId, variantId, requestedQuantity: quantity }, "saving")}
           >
-            {requestState === "saving" ? "Đang lưu" : "Cập nhật"}
+            {requestState === "saving" ? tr("Đang lưu") : tr("Cập nhật")}
           </button>
         </div>
       </div>
@@ -92,14 +95,14 @@ export function CartLineControls({ productId, variantId, productName, requestedQ
         aria-label={`Xóa ${productName} khỏi giỏ hàng`}
         onClick={() => void mutateCart({ action: "remove_line", productId, variantId }, "removing")}
       >
-        {requestState === "removing" ? "Đang xóa" : "Xóa khỏi giỏ"}
+        {requestState === "removing" ? tr("Đang xóa") : tr("Xóa khỏi giỏ")}
       </button>
       <p
         id={`cart-status-${productId}-${variantId ?? "base"}`}
         className={requestState === "error" ? "cart-line-status cart-line-status-error" : "cart-line-status"}
         aria-live="polite"
       >
-        {message}
+        {tr(message)}
       </p>
     </div>
   );

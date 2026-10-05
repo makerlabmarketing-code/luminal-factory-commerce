@@ -1,4 +1,6 @@
 "use client";
+import { useTranslator, useLocale } from "@/lib/i18n/client";
+
 
 import Script from "next/script";
 import { useRouter } from "next/navigation";
@@ -37,6 +39,8 @@ type CustomerAccountPanelProps = Readonly<{
 }>;
 
 export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountPanelProps) {
+  const tr = useTranslator();
+  const locale = useLocale();
   const router = useRouter();
   const emailId = useId();
   const otpId = useId();
@@ -61,7 +65,7 @@ export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountP
     turnstileWidgetIdRef.current = turnstile.render(container, {
       sitekey: siteKey,
       theme: "dark",
-      language: "vi",
+      language: locale,
       size: "flexible",
       action: "request_otp",
       callback: (token: string) => {
@@ -76,7 +80,7 @@ export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountP
         return true;
       },
     });
-  }, [siteKey, stage]);
+  }, [siteKey, stage, locale]);
 
   useEffect(() => {
     renderTurnstile();
@@ -171,21 +175,21 @@ export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountP
       />
 
       <div className="account-panel-heading">
-        <p className="eyebrow">Secure customer access</p>
+        <p className="eyebrow">{tr("Secure customer access")}</p>
         <h2 id="account-panel-title">
-          {stage === "authenticated" ? "Phiên của bạn đã sẵn sàng." : "Đăng nhập không cần mật khẩu."}
+          {stage === "authenticated" ? tr("Phiên của bạn đã sẵn sàng.") : tr("Đăng nhập không cần mật khẩu.")}
         </h2>
         <p>
           {stage === "authenticated"
-            ? "Account hiện chỉ xác nhận danh tính. Đơn hàng, địa chỉ đã lưu và cart merge chưa được mở trong slice này."
-            : "Nhận mã dùng một lần qua email. Luminal Factory không yêu cầu bạn tạo hoặc ghi nhớ mật khẩu."}
+            ? tr("Account hiện chỉ xác nhận danh tính. Đơn hàng, địa chỉ đã lưu và cart merge chưa được mở trong slice này.")
+            : tr("Nhận mã dùng một lần qua email. Luminal Factory không yêu cầu bạn tạo hoặc ghi nhớ mật khẩu.")}
         </p>
       </div>
 
       {stage === "email" ? (
         <form className="account-form" onSubmit={handleRequestOtp}>
           <div className="account-field">
-            <label htmlFor={emailId}>Email</label>
+            <label htmlFor={emailId}>{tr("Email")}</label>
             <input
               id={emailId}
               type="email"
@@ -197,11 +201,11 @@ export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountP
               onChange={(event) => setEmail(event.target.value)}
               aria-describedby={`${emailId}-hint`}
             />
-            <span id={`${emailId}-hint`}>Chúng tôi sẽ gửi một mã gồm 6 chữ số tới địa chỉ này.</span>
+            <span id={`${emailId}-hint`}>{tr("Chúng tôi sẽ gửi một mã gồm 6 chữ số tới địa chỉ này.")}</span>
           </div>
-          <div className="account-turnstile" ref={turnstileContainerRef} aria-label="Xác minh bảo mật" />
+          <div className="account-turnstile" ref={turnstileContainerRef} aria-label={tr("Xác minh bảo mật")} />
           <button className="button-link account-submit" type="submit" disabled={isPending || !captchaToken}>
-            {isPending ? "Đang gửi mã…" : "Gửi mã đăng nhập"}
+            {isPending ? tr("Đang gửi mã…") : tr("Gửi mã đăng nhập")}
           </button>
         </form>
       ) : null}
@@ -209,7 +213,7 @@ export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountP
       {stage === "otp" ? (
         <form className="account-form" onSubmit={handleVerifyOtp}>
           <div className="account-field">
-            <label htmlFor={otpId}>Mã đăng nhập</label>
+            <label htmlFor={otpId}>{tr("Mã đăng nhập")}</label>
             <input
               ref={otpInputRef}
               id={otpId}
@@ -224,15 +228,14 @@ export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountP
               onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
               aria-describedby={`${otpId}-hint`}
             />
-            <span id={`${otpId}-hint`}>Mã được gửi tới {email}. Mã chỉ có hiệu lực trong thời gian giới hạn.</span>
+            <span id={`${otpId}-hint`}>{tr("Mã được gửi tới")}{" "}{email}{tr(". Mã chỉ có hiệu lực trong thời gian giới hạn.")}</span>
           </div>
           <div className="account-form-actions">
             <button className="button-link account-submit" type="submit" disabled={isPending || otp.length !== 6}>
-              {isPending ? "Đang xác thực…" : "Xác thực mã"}
+              {isPending ? tr("Đang xác thực…") : tr("Xác thực mã")}
             </button>
             <button className="account-text-button" type="button" onClick={changeEmail} disabled={isPending}>
-              Dùng email khác
-            </button>
+              {tr("Dùng email khác")}</button>
           </div>
         </form>
       ) : null}
@@ -240,18 +243,18 @@ export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountP
       {stage === "authenticated" ? (
         <div className="account-session">
           <dl>
-            <div><dt>Trạng thái</dt><dd>Đã xác thực</dd></div>
-            <div><dt>Email</dt><dd>{email}</dd></div>
+            <div><dt>{tr("Trạng thái")}</dt><dd>{tr("Đã xác thực")}</dd></div>
+            <div><dt>{tr("Email")}</dt><dd>{email}</dd></div>
           </dl>
           <button className="button-link button-secondary account-submit" type="button" onClick={handleSignOut} disabled={isPending}>
-            {isPending ? "Đang đăng xuất…" : "Đăng xuất"}
+            {isPending ? tr("Đang đăng xuất…") : tr("Đăng xuất")}
           </button>
         </div>
       ) : null}
 
       <div className="account-feedback" aria-live="polite" aria-atomic="true">
-        {message ? <p className="account-message">{message}</p> : null}
-        {error ? <p className="account-error" role="alert">{error}</p> : null}
+        {message ? <p className="account-message">{tr(message)}</p> : null}
+        {error ? <p className="account-error" role="alert">{tr(error)}</p> : null}
       </div>
     </section>
   );

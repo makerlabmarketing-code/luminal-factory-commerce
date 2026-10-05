@@ -5,9 +5,10 @@ import test from "node:test";
 const read = (path) => readFileSync(path, "utf8");
 
 test("shop detail route exists and resolves catalog slugs with notFound", () => {
-  assert.equal(existsSync("src/app/shop/[slug]/page.tsx"), true);
-  const route = read("src/app/shop/[slug]/page.tsx");
-  assert.match(route, /generateStaticParams/);
+  assert.equal(existsSync("src/app/[locale]/shop/[slug]/page.tsx"), true);
+  const route = read("src/app/[locale]/shop/[slug]/page.tsx");
+  assert.match(route, /dynamic = "force-dynamic"/);
+  assert.doesNotMatch(route, /generateStaticParams/);
   assert.match(route, /getShopCatalogEntryBySlug/);
   assert.match(route, /notFound\(\)/);
   assert.match(route, /generateMetadata/);
@@ -31,7 +32,7 @@ test("shop index links to detail routes and exposes catalog source", () => {
 
 test("shop detail presentation has one h1 and no transactional controls", () => {
   const detail = read("src/features/shop/shop-product-detail.tsx");
-  const route = read("src/app/shop/[slug]/page.tsx");
+  const route = read("src/app/[locale]/shop/[slug]/page.tsx");
   const source = `${detail}\n${route}`;
 
   assert.equal((detail.match(/<h1\b/g) ?? []).length, 1);

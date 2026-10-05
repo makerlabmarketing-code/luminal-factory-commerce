@@ -90,3 +90,17 @@ ordered Commerce→ERP rollout and owner UI create/reload/edit smoke. Owner
 manual testing is deferred until available and does not block independent
 content draft preparation. Types declare the proposed RPC; they do not
 assert that the RPC already exists in Production.
+
+## Continuation — 05 October 2026
+
+Merged current EN/VI `master` into the existing E-005 feature branch; its existing
+PR is retained. No production branch push, migration or catalog write.
+Fresh read-only Production preflight: duplicate colorway slug groups=0, new RPC
+absent, Variant RLS enabled, anon INSERT/authenticated UPDATE denied. Two draft
+Products and one published Product remain; the existing Variant remains intact.
+`catalog-colorways-sql.yml` runs the exact draft SQL on a fresh PostgreSQL 17
+service and observes real two-session lock waits for idempotent retry, changed
+fingerprint, duplicate slug, activation/save and publish/save races. Rollback
+must retain Variant rows and receipts. The runner uses only a fixed local test
+database and rejects nonempty/non-17 databases. CI results are recorded after
+completion. Exact Production SQL approval and owner UI smoke remain separate.

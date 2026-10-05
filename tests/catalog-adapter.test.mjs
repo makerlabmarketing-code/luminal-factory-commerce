@@ -3,8 +3,8 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const adapter = readFileSync("src/features/shop/catalog-adapter.ts", "utf8");
-const shopPage = readFileSync("src/app/shop/page.tsx", "utf8");
-const detailPage = readFileSync("src/app/shop/[slug]/page.tsx", "utf8");
+const shopPage = readFileSync("src/app/[locale]/shop/page.tsx", "utf8");
+const detailPage = readFileSync("src/app/[locale]/shop/[slug]/page.tsx", "utf8");
 const shopMedia = readFileSync("src/features/shop/shop-media.tsx", "utf8");
 const nextConfig = readFileSync("next.config.ts", "utf8");
 
@@ -75,7 +75,7 @@ test("catalog image and video media render with a recoverable presentation fallb
   assert.match(shopMedia, /media\.productionApproved/);
   assert.match(shopMedia, /controls/);
   assert.match(shopMedia, /onError=\{\(\) => setHasLoadError\(true\)\}/);
-  assert.match(shopMedia, /media\.placeholderFallback/);
+  assert.match(shopMedia, /Object image unavailable/);
 });
 
 test("Shop listing and detail route through the adapter", () => {
@@ -86,18 +86,18 @@ test("Shop listing and detail route through the adapter", () => {
 });
 
 test("Shop controls use GET URLs and preserve pagination state", () => {
-  assert.match(shopPage, /<form action="\/shop" method="get">/);
+  assert.match(shopPage, /<form action=\{localeHref\("\/shop", locale\)\} method="get">/);
   assert.match(shopPage, /name="q"/);
   assert.match(shopPage, /name="type"/);
   assert.match(shopPage, /name="release"/);
   assert.match(shopPage, /pageHref/);
-  assert.match(shopPage, /aria-label="Phân trang Shop"/);
+  assert.match(shopPage, /aria-label=\{tr\("Phân trang Shop"\)\}/);
 });
 
 test("Shop metadata canonicalizes query pages and keeps filtered URLs out of the index", () => {
-  assert.match(shopPage, /alternates: \{ canonical: "\/shop" \}/);
+  assert.match(shopPage, /alternates: languageAlternates\("\/shop", locale\)/);
   assert.match(shopPage, /robots: hasActiveQuery \? \{ index: false, follow: true \}/);
-  assert.match(detailPage, /alternates: \{ canonical: canonicalPath \}/);
+  assert.match(detailPage, /alternates: languageAlternates\(canonicalPath, locale\)/);
   assert.match(detailPage, /entry\.media\.source === "commerce-catalog"/);
   assert.match(adapter, /cache\(async \(slug: string\)/);
 });

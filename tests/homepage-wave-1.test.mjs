@@ -33,7 +33,7 @@ test("Homepage gallery uses a compact, motion-safe Drift Wall with a touch fallb
   const media = read("src/content/homepage-media.ts");
   const galleryMedia = media.slice(media.indexOf("gallery: ["));
 
-  assert.match(home, /<HomeDriftWall items={homePageMedia\.gallery}/);
+  assert.match(home, /<HomeDriftWall items={media\.gallery}/);
   assert.equal((galleryMedia.match(/colorway: "Lolipop"/g) ?? []).length, 3);
   assert.equal((galleryMedia.match(/colorway: "Mictlán"/g) ?? []).length, 3);
   assert.equal((galleryMedia.match(/colorway: "Mono"/g) ?? []).length, 3);
@@ -62,7 +62,7 @@ test("Homepage gallery uses a compact, motion-safe Drift Wall with a touch fallb
 });
 
 test("Wave 1 keeps the route thin and uses a server component feature boundary", () => {
-  const route = read("src/app/page.tsx");
+  const route = read("src/app/[locale]/page.tsx");
   const home = read("src/features/home/home-page.tsx");
   assert.match(route, /<HomePage \/>/);
   assert.doesNotMatch(route + home, /["']use client["']/);

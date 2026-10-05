@@ -24,6 +24,6 @@ test("homepage Hero still fails safely to the bundled presentation", () => {
 });
 
 test("homepage is request-rendered so deployments never bake a stale published Hero", () => {
-  const page = readFileSync("src/app/page.tsx", "utf8");
+  const page = readFileSync("src/app/[locale]/page.tsx", "utf8");
   assert.match(page, /export const dynamic = "force-dynamic"/);
 });

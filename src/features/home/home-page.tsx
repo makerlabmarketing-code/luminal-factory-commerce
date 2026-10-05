@@ -1,5 +1,8 @@
+import { localizePresentation } from "@/lib/i18n/presentation";
+
+import { getTranslator, getLocale } from "@/lib/i18n/server";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/lib/i18n/link";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
@@ -24,15 +27,16 @@ type HomeMediaFrameProps = Readonly<{
   motionSpotlight?: boolean;
 }>;
 
-function HomeMediaFrame({ media, className, imageClassName, placeholderClassName, motionReveal, motionSpotlight = false }: HomeMediaFrameProps) {
+async function HomeMediaFrame({ media, className, imageClassName, placeholderClassName, motionReveal, motionSpotlight = false }: HomeMediaFrameProps) {
+  const tr = await getTranslator();
   return (
     <div className={className} data-luminal-reveal={motionReveal} data-luminal-spotlight={motionSpotlight ? "true" : undefined}>
       {media.availability === "available" ? (
-        <Image className={imageClassName} src={media.src} alt={media.alt} fill sizes={media.sizes} style={{ objectPosition: media.objectPosition }} />
+        <Image className={imageClassName} src={media.src} alt={tr(media.alt)} fill sizes={media.sizes} style={{ objectPosition: media.objectPosition }} />
       ) : (
         <>
           <span className={placeholderClassName} aria-hidden="true" />
-          <p className="home-media-pending">{media.alt}<br /><span>Approved product media pending sync</span></p>
+          <p className="home-media-pending">{tr(media.alt)}<br /><span>{tr("Approved product media pending sync")}</span></p>
         </>
       )}
     </div>
@@ -40,7 +44,10 @@ function HomeMediaFrame({ media, className, imageClassName, placeholderClassName
 }
 
 export async function HomePage() {
-  const content = homePageContent;
+  const tr = await getTranslator();
+  const locale = await getLocale();
+  const content = localizePresentation(homePageContent, locale);
+  const media = localizePresentation(homePageMedia, locale);
   const [heroPresentation, featuredRaffle] = await Promise.all([
     getHeroModelPresentation(),
     getHomeFeaturedRaffle(),
@@ -52,7 +59,7 @@ export async function HomePage() {
     <>
       <HomeArrivalHeader immersive={immersive} />
       <HomeImmersiveExperience
-        media={homePageMedia.hero}
+        media={media.hero}
         presentation={heroPresentation}
         enabled={immersive}
       />
@@ -82,11 +89,11 @@ export async function HomePage() {
 
             <div className="home-hero-object-corridor relative min-w-0 lg:-mr-[min(7vw,7rem)] lg:pt-6">
               {featuredRaffle ? (
-                <HeroObjectStage media={homePageMedia.hero} presentation={heroPresentation} />
+                <HeroObjectStage media={media.hero} presentation={heroPresentation} />
               ) : null}
             </div>
 
-            <p className="hero-scroll-note" aria-hidden="true">Scroll to follow the object <span>↓</span></p>
+            <p className="hero-scroll-note" aria-hidden="true">{tr("Scroll to follow the object")}<span>↓</span></p>
           </Container>
         </section>
 
@@ -95,10 +102,10 @@ export async function HomePage() {
           aria-labelledby="featured-title"
           data-home-3d-section="featured"
         >
-          {immersive ? <HomeArchiveBurst colorways={homePageMedia.gallery.slice(0, 3)} /> : (
+          {immersive ? <HomeArchiveBurst colorways={media.gallery.slice(0, 3)} /> : (
             <Container className="featured-object-grid">
               <HomeMediaFrame
-                media={homePageMedia.featured}
+                media={media.featured}
                 className="featured-object-media border border-white/10 shadow-[0_3rem_9rem_rgba(0,0,0,0.28)]"
                 imageClassName="home-product-image featured-product-image"
                 placeholderClassName="featured-object-form"
@@ -110,7 +117,7 @@ export async function HomePage() {
                 <h2 id="featured-title">{content.featured.title}</h2>
                 <p className="object-provenance">{content.featured.collection}</p>
                 <p className="featured-story">{content.featured.story}</p>
-                <Link className="text-link" href="/archive">View object record <span aria-hidden="true">↗</span></Link>
+                <Link className="text-link" href="/archive">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
               </div>
             </Container>
           )}
@@ -118,17 +125,17 @@ export async function HomePage() {
 
         <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title" data-home-3d-section="revival">
           <Container>
-            <p className="eyebrow" data-luminal-reveal="copy">A studio in transition</p>
-            <h2 id="revival-title" data-luminal-reveal="copy"><span>Lazy Factory</span><i aria-hidden="true">→</i>Luminal Factory</h2>
-            <p data-luminal-reveal="copy">Formerly Lazy Factory. The same independent hands, now with a clearer focus on light, material, and collectible character.</p>
+            <p className="eyebrow" data-luminal-reveal="copy">{tr("A studio in transition")}</p>
+            <h2 id="revival-title" data-luminal-reveal="copy"><span>{tr("Lazy Factory")}</span><i aria-hidden="true">→</i>{tr("Luminal Factory")}</h2>
+            <p data-luminal-reveal="copy">{tr("Formerly Lazy Factory. The same independent hands, now with a clearer focus on light, material, and collectible character.")}</p>
           </Container>
         </section>
 
         {!immersive ? <section className="selected-archive section [content-visibility:auto] [contain-intrinsic-size:auto_1500px]" aria-labelledby="archive-title" data-home-3d-section="archive">
           <Container>
             <header className="editorial-heading" data-luminal-reveal="copy">
-              <div><p className="eyebrow">Selected archive</p><h2 id="archive-title">Objects with a past.</h2></div>
-              <p>A small index of forms, characters, and finishes that shaped the studio.</p>
+              <div><p className="eyebrow">{tr("Selected archive")}</p><h2 id="archive-title">{tr("Objects with a past.")}</h2></div>
+              <p>{tr("A small index of forms, characters, and finishes that shaped the studio.")}</p>
             </header>
             <div className="archive-editorial-grid">
               {content.archive.map((object, index) => (
@@ -147,33 +154,33 @@ export async function HomePage() {
                 </Link>
               ))}
             </div>
-            <Link className="text-link archive-link" href="/archive">Explore the full archive <span aria-hidden="true">↗</span></Link>
+            <Link className="text-link archive-link" href="/archive">{tr("Explore the full archive")}<span aria-hidden="true">↗</span></Link>
           </Container>
         </section> : null}
 
         <section className="home-gallery section border-t border-white/10 bg-[#070707] [content-visibility:auto] [contain-intrinsic-size:auto_980px]" aria-labelledby="gallery-title" data-home-3d-section="gallery">
           <Container>
             <header className="editorial-heading" data-luminal-reveal="copy">
-              <div><p className="eyebrow">Colorway studies</p><h2 id="gallery-title">One character.<br />Three moods.</h2></div>
-              <p>A closer look at the colorful Lolipop, death-inspired Mictlán, and monochrome finishes from the studio archive.</p>
+              <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("One character.")}<br />{tr("Three moods.")}</h2></div>
+              <p>{tr("A closer look at the colorful Lolipop, death-inspired Mictlán, and monochrome finishes from the studio archive.")}</p>
             </header>
-            <HomeDriftWall items={homePageMedia.gallery} />
+            <HomeDriftWall items={media.gallery} />
           </Container>
         </section>
 
         <section className="made-at-luminal section overflow-visible md:pb-0" aria-labelledby="making-title">
           <Container>
             <header className="editorial-heading md:sticky md:top-20 md:z-30 md:bg-[#0a0a0a] md:pb-8" data-luminal-reveal="copy" data-made-at-luminal-header="true">
-              <div><p className="eyebrow">Made at Luminal</p><h2 id="making-title">From thought<br />to artifact.</h2></div>
-              <p>Four measured movements. Digital tools support the process; the final character still comes from the hand.</p>
+              <div><p className="eyebrow">{tr("Made at Luminal")}</p><h2 id="making-title">{tr("From thought")}<br />{tr("to artifact.")}</h2></div>
+              <p>{tr("Four measured movements. Digital tools support the process; the final character still comes from the hand.")}</p>
             </header>
             <MadeAtLuminalStack steps={content.process} />
           </Container>
         </section>
 
-        <section className="commerce-split [content-visibility:auto] [contain-intrinsic-size:auto_700px]" aria-label="Shop and commission">
-          <Link href="/shop" className="commerce-door commerce-door-shop overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-spotlight="true"><span className="eyebrow">Available objects</span><h2>Shop</h2><p>Small-batch pieces and studio editions.</p><i aria-hidden="true">↗</i></Link>
-          <Link href="/commission" className="commerce-door commerce-door-commission overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-delay="1" data-luminal-spotlight="true"><span className="eyebrow">Made for you</span><h2>Commission</h2><p>Begin a conversation about a custom object.</p><i aria-hidden="true">↗</i></Link>
+        <section className="commerce-split [content-visibility:auto] [contain-intrinsic-size:auto_700px]" aria-label={tr("Shop and commission")}>
+          <Link href="/shop" className="commerce-door commerce-door-shop overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-spotlight="true"><span className="eyebrow">{tr("Available objects")}</span><h2>{tr("Shop")}</h2><p>{tr("Small-batch pieces and studio editions.")}</p><i aria-hidden="true">↗</i></Link>
+          <Link href="/commission" className="commerce-door commerce-door-commission overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-delay="1" data-luminal-spotlight="true"><span className="eyebrow">{tr("Made for you")}</span><h2>{tr("Commission")}</h2><p>{tr("Begin a conversation about a custom object.")}</p><i aria-hidden="true">↗</i></Link>
         </section>
       </main>
     </>
