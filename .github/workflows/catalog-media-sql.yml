@@ -1,0 +1,35 @@
+name: Catalog Media PostgreSQL 17
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'supabase/drafts/catalog-media/**'
+      - 'scripts/verify-catalog-sql-native.mjs'
+      - '.github/workflows/catalog-media-sql.yml'
+permissions:
+  contents: read
+jobs:
+  media-concurrency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: luminal_sql_test
+          POSTGRES_PASSWORD: luminal-local-fixture
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Native concurrency and rollback
+        env:
+          CATALOG_SQL_TEST: DISPOSABLE_LOCAL_DATABASE
+        run: node scripts/verify-catalog-sql-native.mjs media

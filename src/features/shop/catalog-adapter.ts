@@ -25,6 +25,8 @@ const catalogPriceRowSchema = z.object({
 });
 
 const catalogMediaRowSchema = z.object({
+  variant_id: z.uuid().nullable().optional(),
+  product_variants: z.object({ id: z.uuid(), name: z.string().max(160), is_active: z.boolean() }).nullable().optional(),
   media_type: z.enum(["image", "video"]),
   storage_path: z.string().trim().min(1).max(2048),
   alt_text: z.string().max(500).nullable(),
@@ -73,7 +75,7 @@ const PRODUCT_SELECT = [
   "release_type",
   "published_at",
   "product_prices(currency,amount_minor)",
-  "product_media(media_type,storage_path,alt_text,sort_order,is_primary)",
+  "product_media(media_type,storage_path,alt_text,sort_order,is_primary,variant_id,product_variants(id,name,is_active))",
 ].join(",");
 
 function getFirstParam(value: string | string[] | undefined): string {
@@ -175,10 +177,12 @@ function directMediaSource(media: CatalogMediaRow | undefined): string | null {
 function mapProduct(row: CatalogProductRow): ShopPresentationEntry {
   const price = row.product_prices?.[0];
   const priceLabel = formatPrice(price);
-  const primaryMedia = [...(row.product_media ?? [])].sort((a, b) => {
+  const approvedMedia = (row.product_media ?? []).filter(media => !media.variant_id || media.product_variants?.id === media.variant_id && media.product_variants.is_active);
+  const orderedMedia = [...approvedMedia].sort((a, b) => {
     if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
     return a.sort_order - b.sort_order;
-  })[0];
+  });
+  const primaryMedia = orderedMedia.find(media => !media.variant_id) ?? orderedMedia[0];
   const catalogMediaSrc = directMediaSource(primaryMedia);
   const tone = toneForSlug(row.slug);
   const description = row.description?.trim() || "Mô tả chi tiết cho object này chưa được công bố trong catalog.";
@@ -197,7 +201,7 @@ function mapProduct(row: CatalogProductRow): ShopPresentationEntry {
         ? "Catalog preorder đã publish · checkout chưa mở"
         : "Catalog đã publish · chỉ hiển thị thông tin";
 
-  return {
+  const entry: ShopPresentationEntry = {
     id: row.id,
     slug: row.slug,
     presentationKey: `catalog-${row.slug}`,
@@ -241,6 +245,13 @@ function mapProduct(row: CatalogProductRow): ShopPresentationEntry {
     isPlaceholder: false,
     dataSource: "commerce-catalog",
   };
+  const gallery = orderedMedia.flatMap(media => {
+    const src = directMediaSource(media);
+    if (!src || media.media_type !== 'image') return [];
+    return [{ key: `${media.variant_id ?? 'product'}:${src}`, variantId: media.variant_id ?? null, variantName: media.product_variants?.name ?? null,
+      media: { ...entry.media, type: 'image' as const, src, alt: media.alt_text?.trim() || row.name, source: 'commerce-catalog' as const, productionApproved: true } }];
+  });
+  return { ...entry, gallery: gallery.filter((a,i) => gallery.findIndex(b => b.key === a.key) === i).sort((a,b) => Number(b.media.src === entry.media.src) - Number(a.media.src === entry.media.src)).slice(0,60) };
 }
 
 async function requestProducts(options?: {

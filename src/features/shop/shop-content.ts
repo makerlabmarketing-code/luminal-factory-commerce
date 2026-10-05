@@ -23,6 +23,7 @@ export type ShopPresentationEntry = Readonly<{
     label: string;
     tone: ShopMediaTone;
   }>;
+  gallery?: readonly { key: string; variantId: string | null; variantName: string | null; media: ShopPresentationEntry['media'] }[];
   presentationStatus: ShopPresentationStatus;
   availabilityLabel: string;
   priceLabel?: string;

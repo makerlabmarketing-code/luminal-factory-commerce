@@ -3,7 +3,7 @@ import { getTranslator } from "@/lib/i18n/server";
 import Link from "@/lib/i18n/link";
 import type { ShopPresentationEntry } from "./shop-content";
 import { shopPlaceholderNotice } from "./shop-content";
-import { ShopMedia } from "./shop-media";
+import { ShopGallery } from "./shop-gallery";
 
 type ShopProductDetailProps = Readonly<{
   entry: ShopPresentationEntry;
@@ -26,7 +26,7 @@ export async function ShopProductDetail({ entry }: ShopProductDetailProps) {
 
       <section className="shop-route-section" aria-labelledby="shop-object-title">
         <div className="shop-route-card">
-          <ShopMedia media={entry.media} priority />
+          <ShopGallery entry={entry} />
           <div className="shop-route-copy">
             <p className="eyebrow">{tr("Object")}</p>
             <h2 id="shop-object-title">{tr("Object story")}</h2>
