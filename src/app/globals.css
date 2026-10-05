@@ -692,3 +692,12 @@ html[data-hero-dragging="true"] * {
 html[lang="vi"] {--font-sans:Arial,"Segoe UI",sans-serif}
 html[lang="vi"] .wave-home h1 {font-size:clamp(2.6rem,6vw,6.5rem);line-height:1.08}
 html[lang="vi"] .wave-home h2 {overflow-wrap:break-word}
+
+.shop-gallery { min-width: 0; display: grid; gap: 0.75rem; }
+.shop-gallery label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+.shop-gallery select { color: inherit; background: var(--color-background, #101016); border: 1px solid #52525b; padding: 0.5rem; border-radius: 0.4rem; }
+.shop-gallery-thumbnails { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.25rem; }
+.shop-gallery-thumbnails button { flex: 0 0 112px; border: 1px solid #52525b; border-radius: 0.4rem; padding: 0.25rem; background: transparent; }
+.shop-gallery-thumbnails button[aria-pressed="true"] { border-color: #d3b77c; outline: 1px solid #d3b77c; }
+.shop-gallery-thumbnails button:focus-visible { outline: 2px solid #eee; outline-offset: 2px; }
+.shop-gallery-thumbnails img { width: 100%; height: 84px; object-fit: cover; border-radius: 0.25rem; }

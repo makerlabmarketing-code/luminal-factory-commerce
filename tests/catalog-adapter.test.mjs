@@ -17,7 +17,7 @@ test("catalog adapter uses the publishable API-key boundary", () => {
 
 test("catalog adapter selects only public catalog relations", () => {
   assert.match(adapter, /product_prices\(currency,amount_minor\)/);
-  assert.match(adapter, /product_media\(media_type,storage_path,alt_text,sort_order,is_primary\)/);
+  assert.match(adapter, /product_media\(media_type,storage_path,alt_text,sort_order,is_primary,variant_id,product_variants\(id,name,is_active\)\)/);
   assert.match(adapter, /rest\/v1\/products/);
 
   for (const forbidden of ["inventory_items", "customers", "orders", "order_items", "payments", "refunds", "commerce_events", "raffles"]) {

@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const suite = process.argv[2];
-assert.ok(['colorways', 'translations'].includes(suite), 'Choose colorways or translations.');
+assert.ok(['colorways', 'translations', 'media'].includes(suite), 'Choose colorways, translations or media.');
 assert.equal(process.env.CATALOG_SQL_TEST, 'DISPOSABLE_LOCAL_DATABASE');
 const port = process.env.CATALOG_SQL_TEST_PORT ?? '5432';
 assert.match(port, /^\d{1,5}$/);
@@ -86,7 +86,8 @@ let setup = `create role anon; create role authenticated; create role service_ro
   grant select on public.products,public.product_variants to anon,authenticated;
   grant all on public.products,public.product_variants to service_role;
   ${core.slice(core.indexOf('create policy "published products are public"'), core.indexOf('create policy "media for published products is public"'))}`;
-const root = suite === 'colorways' ? 'supabase/drafts/colorway-management' : 'supabase/drafts/translations';
+const root = suite === 'colorways' ? 'supabase/drafts/colorway-management' : suite === 'media' ? 'supabase/drafts/catalog-media' : 'supabase/drafts/translations';
+if (suite === 'media') setup += `create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]); create unique index media_variant_parent_idx on public.product_variants(product_id,id);`;
 if (suite === 'colorways') {
   const receipts = read('supabase/migrations/20260912150000_add_commerce_admin_hero_idempotency.sql');
   setup += receipts.slice(receipts.indexOf('create table private.commerce_admin_idempotency_receipts'), receipts.indexOf('create function public.manage_homepage_hero'));
@@ -97,7 +98,22 @@ await sql(read(`${root}/validation.sql`));
 assert.equal(await sql('select count(*) from public.products'), '0', 'Validation fixture must roll back.');
 await sql(`insert into public.products(id,slug,name,product_type,release_type) values('${parent}','native-fixture','Source unchanged','artisan_keycap','informational');
   insert into public.product_variants(id,product_id,name,is_active) values('${variant}','${parent}','Variant source',false);`);
-if (suite === 'colorways') {
+if (suite === 'media') {
+  const firstId=uuid();
+  const asset=(id,variantId=null) => ({id,path:`${parent}/${variantId ?? 'product'}/${id}.webp`,fileName:'Fixture.webp',sizeBytes:100,width:100,height:100,alt:'Photo',removed:false});
+  const append=(op,revision,id,variantId=null) => `select public.save_catalog_media_draft('${parent}',${variantId ? quote(variantId) : 'null'},'append','${op}','native-test','${fingerprint}',${revision},${quote(JSON.stringify({asset:asset(id,variantId)}))}::jsonb)`;
+  const sameOp=uuid(); const replay=await race(append(sameOp,0,firstId),append(sameOp,0,firstId));assert.deepEqual(replay.held,replay.next);
+  await race(append(uuid(),1,uuid()),append(uuid(),1,uuid()),'40001');
+  const conflictOp=uuid();await race(append(conflictOp,2,uuid()),append(conflictOp,2,uuid()),'22023');
+  assert.equal(await sql(`select revision from public.catalog_media_drafts where product_id='${parent}' and variant_id is null`),'3');
+  const independent=await race(append(uuid(),3,uuid()),append(uuid(),0,uuid(),variant));assert.equal(independent.next.variantId,variant);
+  await race(`update public.product_variants set is_active=true where id='${variant}'`,append(uuid(),1,uuid(),variant),'22023');
+  await race(`update public.products set status='published',published_at=now() where id='${parent}'`,append(uuid(),4,uuid()),'22023');
+  for(const role of ['anon','authenticated']) await assert.rejects(sql(`set role ${role}; select public.read_catalog_media_draft('${parent}',null);`),e=>e.message.includes('42501'));
+  const before=await sql('select count(*) from public.catalog_media_drafts');await sql(read(`${root}/rollback.sql`));assert.equal(await sql('select count(*) from public.catalog_media_drafts'),before);
+  await assert.rejects(sql(`set role service_role;select public.read_catalog_media_draft('${parent}',null);`),e=>e.message.includes('42501'));
+  console.log('PASS PostgreSQL 17: immutable media replay, stale writes, changed-operation conflict, parent/variant isolation, activation/publish races, browser denial and data-preserving rollback.');
+} else if (suite === 'colorways') {
   const op = uuid();
   const replay = await race(createColorway(op, 'same-op'), createColorway(op, 'same-op'));
   assert.deepEqual(replay.next, replay.held);
