@@ -97,3 +97,14 @@ payload conflict, entity/locale isolation and archive/save races, plus rollback.
 The runner accepts only fixed localhost/disposable database credentials and
 refuses nonempty or non-17 databases. CI evidence is recorded after completion;
 it does not substitute for authenticated hosted editor create/reload/edit.
+
+## Owner approval and rollout — 2026-10-05
+
+Owner approved the exact reviewed SQL plus bounded persistence smoke.
+Both forward packages are now applied on Commerce Production; approved copies
+are tracked in `supabase/migrations` using actual remote migration versions
+20261005024245 and 20261005024254. Rollback/validation packages remain separate.
+Postflight browser denial, RLS and service-only invoker checks pass. Application
+rollout uses the combined Commerce #112 then ERP #223. No public snapshot or
+reader activation is authorized by this draft-editor delivery. Owner UI testing
+is the next step; no authenticated UI result is claimed by SQL-only checks.

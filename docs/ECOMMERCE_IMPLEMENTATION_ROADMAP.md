@@ -418,3 +418,15 @@ live mutation, followed by controlled editor smoke and Commerce-before-ERP
 deployment. The translation public reader stays default-off, with no publish
 endpoint. No duplicate Products, public copy, slug, prices, stock, media,
 release, credentials or flags changed. Search remains source-based.
+
+## 2026-10-05 — approved E-005/E-006 Production rollout
+
+Owner approved both exact SQL packages and bounded persistence verification.
+Applied once through the connected Commerce Supabase migration API as
+`20261005024245_add_catalog_colorway_draft_management` and
+`20261005024254_add_catalog_translation_drafts`. Repository files match the
+reviewed forward SQL byte-for-byte; CLI-generated files were aligned to the
+actual recorded remote versions. RLS/service-only invoker and zero public
+snapshot postflight pass. No existing catalog source rows or runtime flags
+changed. The combined application rollout is Commerce #112 before ERP #223;
+these branches include the E-005 dependencies. UI owner testing follows rollout.
