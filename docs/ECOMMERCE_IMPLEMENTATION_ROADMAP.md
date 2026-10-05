@@ -42,7 +42,7 @@ Operator visual retest remains required.
 Rollback: revert this application/dependency batch.
 
 
-This is the authoritative task roadmap. Status vocabulary: `NOT_STARTED`, `IN_PROGRESS`, `CODE_COMPLETE`, `MERGED`, `DEPLOYED`, `OPERATOR_RETEST_REQUIRED`, `LIVE_APPROVAL_REQUIRED`, `BLOCKED`, `COMPLETED`. A code change in a PR is `CODE_COMPLETE`; it is not `MERGED` or `DEPLOYED` without external evidence.
+The shared coordination Sheet is authoritative for execution and approval across ERP and Commerce; this file mirrors technical tasks and evidence. Status vocabulary: `NOT_STARTED`, `IN_PROGRESS`, `CODE_COMPLETE`, `MERGED`, `DEPLOYED`, `OPERATOR_RETEST_REQUIRED`, `LIVE_APPROVAL_REQUIRED`, `BLOCKED`, `COMPLETED`. A code change in a PR is `CODE_COMPLETE`; it is not `MERGED` or `DEPLOYED` without external evidence.
 
 ## 2026-09-30 Homepage Hero continuation — I-006 preparation
 
@@ -394,3 +394,39 @@ Escalate only when a decision has material system-wide consequences, introduces 
 - **Raffle priority:** When a featured raffle is active, current raffle-first Home presentation remains authoritative. The immersive object traversal is disabled until a dedicated raffle-model integration is approved.
 - **Production gate:** `APPROVED_2026-09-23`. Owner approved promotion after correcting the Meet Meowhe orbit to the left-facing direction.
 - **Validation target:** Vercel Preview build, first-load/repeat-load, slow/failing GLB, backward/forward scroll, resize, menu keyboard behavior, mobile and reduced-motion review.
+
+## 2026-10-05 — E-005 Colorway and E-006 translation draft packages
+
+[The shared Sheet](https://docs.google.com/spreadsheets/d/1R9HKuFyYe4xrYbvVD-6abV1Br-_c6Jia6G9O0geKCxY/edit)
+owns the roadmap. C-038 UI EN/VI is deployed. E-005 prepares signed Colorway
+CRUD for draft Products and inactive variants; E-006 prepares signed Product
+and Colorway translation drafts, reviewed snapshots, locale-aware memoization
+and translated SEO fields. The E-006 branch includes E-005 so the combined
+API, types and ERP editor can be verified before ordered rollout.
+
+Native PostgreSQL 17 two-session checks pass for both packages, including
+replay, stale writes, operation conflicts, parent status races, entity/locale
+isolation, denied browser roles and data-preserving rollback. Read-only
+Production preflight passes. Hosted authenticated editor persistence and
+owner UI verification remain separate gates.
+
+[Colorway contract](../specs/commerce/colorway-draft-management.md) and
+[translation rollout/rollback](../specs/i18n/catalog-translations.md).
+SQL remains under `supabase/drafts/colorway-management` and
+`supabase/drafts/translations`. Exact Production SQL approval precedes any
+live mutation, followed by controlled editor smoke and Commerce-before-ERP
+deployment. The translation public reader stays default-off, with no publish
+endpoint. No duplicate Products, public copy, slug, prices, stock, media,
+release, credentials or flags changed. Search remains source-based.
+
+## 2026-10-05 — approved E-005/E-006 Production rollout
+
+Owner approved both exact SQL packages and bounded persistence verification.
+Applied once through the connected Commerce Supabase migration API as
+`20261005024245_add_catalog_colorway_draft_management` and
+`20261005024254_add_catalog_translation_drafts`. Repository files match the
+reviewed forward SQL byte-for-byte; CLI-generated files were aligned to the
+actual recorded remote versions. RLS/service-only invoker and zero public
+snapshot postflight pass. No existing catalog source rows or runtime flags
+changed. The combined application rollout is Commerce #112 before ERP #223;
+these branches include the E-005 dependencies. UI owner testing follows rollout.

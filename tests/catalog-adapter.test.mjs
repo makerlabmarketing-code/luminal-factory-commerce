@@ -79,9 +79,9 @@ test("catalog image and video media render with a recoverable presentation fallb
 });
 
 test("Shop listing and detail route through the adapter", () => {
-  assert.match(shopPage, /await getShopCatalog\(rawSearchParams\)/);
+  assert.match(shopPage, /await getShopCatalog\(rawSearchParams, locale\)/);
   assert.match(shopPage, /searchParams: Promise/);
-  assert.match(detailPage, /await getShopCatalogEntryBySlug\(slug\)/);
+  assert.match(detailPage, /await getShopCatalogEntryBySlug\(slug, locale\)/);
   assert.match(detailPage, /notFound\(\)/);
 });
 
@@ -99,7 +99,7 @@ test("Shop metadata canonicalizes query pages and keeps filtered URLs out of the
   assert.match(shopPage, /robots: hasActiveQuery \? \{ index: false, follow: true \}/);
   assert.match(detailPage, /alternates: languageAlternates\(canonicalPath, locale\)/);
   assert.match(detailPage, /entry\.media\.source === "commerce-catalog"/);
-  assert.match(adapter, /cache\(async \(slug: string\)/);
+  assert.match(adapter, /cache\(async \(slug: string, locale: Locale/);
 });
 
 test("Phase 5 remains read-only and non-transactional", () => {

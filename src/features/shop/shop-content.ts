@@ -10,6 +10,8 @@ export type ShopPresentationEntry = Readonly<{
   slug: string;
   presentationKey: string;
   title: string;
+  seoTitle?: string;
+  seoDescription?: string;
   collection: string;
   type: string;
   description: string;

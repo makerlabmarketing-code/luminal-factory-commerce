@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: ShopProductDetailPageProps): 
   const locale = await getLocale();
   const tr = await getTranslator();
   const { slug } = await params;
-  const entry = await getShopCatalogEntryBySlug(slug);
+  const entry = await getShopCatalogEntryBySlug(slug, locale);
 
   if (!entry || entry.dataSource !== "commerce-catalog") {
     return {
@@ -35,13 +35,13 @@ export async function generateMetadata({ params }: ShopProductDetailPageProps): 
     : undefined;
 
   return {
-    title: entry.title,
-    description: entry.description,
+    title: entry.seoTitle || entry.title,
+    description: entry.seoDescription || entry.description,
     alternates: languageAlternates(canonicalPath, locale),
     openGraph: {
       type: "website",
-      title: entry.title,
-      description: entry.description,
+      title: entry.seoTitle || entry.title,
+      description: entry.seoDescription || entry.description,
       url: localeHref(canonicalPath, locale),
       images: catalogImage,
     },
@@ -49,8 +49,9 @@ export async function generateMetadata({ params }: ShopProductDetailPageProps): 
 }
 
 export default async function ShopProductDetailPage({ params }: ShopProductDetailPageProps) {
+  const locale = await getLocale();
   const { slug } = await params;
-  const entry = await getShopCatalogEntryBySlug(slug);
+  const entry = await getShopCatalogEntryBySlug(slug, locale);
 
   if (!entry || entry.dataSource !== "commerce-catalog") {
     notFound();
