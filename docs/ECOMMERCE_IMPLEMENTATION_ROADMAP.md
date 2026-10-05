@@ -395,17 +395,26 @@ Escalate only when a decision has material system-wide consequences, introduces 
 - **Production gate:** `APPROVED_2026-09-23`. Owner approved promotion after correcting the Meet Meowhe orbit to the left-facing direction.
 - **Validation target:** Vercel Preview build, first-load/repeat-load, slow/failing GLB, backward/forward scroll, resize, menu keyboard behavior, mobile and reduced-motion review.
 
-## 2026-10-03 — E-006 catalog translation package
+## 2026-10-05 — E-005 Colorway and E-006 translation draft packages
 
-Continue from [the shared Sheet](https://docs.google.com/spreadsheets/d/1R9HKuFyYe4xrYbvVD-6abV1Br-_c6Jia6G9O0geKCxY/edit),
-row E-006; C-038 UI EN/VI is already deployed.
-Prepared signed translation draft routes for Product/Colorway and reviewed-snapshot
-public reader, locale-aware catalog memoization and translated SEO fields.
-No duplicate Products or changes to slug, prices, stock, release or source copy.
+[The shared Sheet](https://docs.google.com/spreadsheets/d/1R9HKuFyYe4xrYbvVD-6abV1Br-_c6Jia6G9O0geKCxY/edit)
+owns the roadmap. C-038 UI EN/VI is deployed. E-005 prepares signed Colorway
+CRUD for draft Products and inactive variants; E-006 prepares signed Product
+and Colorway translation drafts, reviewed snapshots, locale-aware memoization
+and translated SEO fields. The E-006 branch includes E-005 so the combined
+API, types and ERP editor can be verified before ordered rollout.
 
-[Contract, rollout and rollback](../specs/i18n/catalog-translations.md).
-Forward/validation/preflight/rollback stay in `supabase/drafts/translations`;
-public reader is default-off. No publish endpoint or Production mutation.
-Exact SQL review, native two-session and hosted RLS preflight, controlled editor
-smoke precede deployment Commerce then ERP. E-005 #110/#222 remains separate;
-Colorway editor follows it. Search remains source-based.
+Native PostgreSQL 17 two-session checks pass for both packages, including
+replay, stale writes, operation conflicts, parent status races, entity/locale
+isolation, denied browser roles and data-preserving rollback. Read-only
+Production preflight passes. Hosted authenticated editor persistence and
+owner UI verification remain separate gates.
+
+[Colorway contract](../specs/commerce/colorway-draft-management.md) and
+[translation rollout/rollback](../specs/i18n/catalog-translations.md).
+SQL remains under `supabase/drafts/colorway-management` and
+`supabase/drafts/translations`. Exact Production SQL approval precedes any
+live mutation, followed by controlled editor smoke and Commerce-before-ERP
+deployment. The translation public reader stays default-off, with no publish
+endpoint. No duplicate Products, public copy, slug, prices, stock, media,
+release, credentials or flags changed. Search remains source-based.
