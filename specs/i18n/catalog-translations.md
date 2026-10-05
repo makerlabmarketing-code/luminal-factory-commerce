@@ -51,7 +51,9 @@ Search remains on source name/description; translated search is a later contract
 Forward/preflight/validation/rollback SQL stay under `supabase/drafts/translations`.
 Rollback revokes execution and public reads, preserving translation rows/receipts;
 no destructive table removal. ERP Product editor is independent of E-005; nested
-Colorway API is prepared, but Colorway editor wiring waits for E-005 rollout.
+Colorway API and ERP selector/editor wiring are prepared on the E-006 branch,
+including E-005 application dependencies. Production rollout still waits for
+the E-005 SQL and API deployment; draft readiness never publishes a snapshot.
 
 ## Delivery gate and verification
 
@@ -83,3 +85,15 @@ a separately reviewed export/data-loss decision.
   shared slug/price and translation-service failure fallback PASS.
 - Hosted preflight, native two-session concurrency and authenticated owner editor
   smoke remain unperformed. No Production SQL/runtime/secrets/data changed.
+
+## Continuation — 2026-10-05
+
+Read-only hosted preflight confirms drafts/snapshots/receipts are absent, Variant
+RLS is enabled and browser insert/update denied. The exact public policy now
+qualifies the outer Product/Variant columns. No source content or grants changed.
+`catalog-translations-sql.yml` runs the exact draft SQL against a fresh PostgreSQL
+17 service, then proves observed lock contention for same-ID retry, stale write,
+payload conflict, entity/locale isolation and archive/save races, plus rollback.
+The runner accepts only fixed localhost/disposable database credentials and
+refuses nonempty or non-17 databases. CI evidence is recorded after completion;
+it does not substitute for authenticated hosted editor create/reload/edit.

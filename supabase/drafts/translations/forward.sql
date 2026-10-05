@@ -63,7 +63,7 @@ grant all on public.catalog_translation_drafts,public.catalog_translation_public
 grant select(product_id,variant_id,locale,content) on public.catalog_translation_public to anon,authenticated;
 create policy "approved translations for public catalog" on public.catalog_translation_public for select to anon,authenticated
 using (exists(select 1 from public.products p where p.id=catalog_translation_public.product_id and p.status='published')
-  and (variant_id is null or exists(select 1 from public.product_variants v where v.id=variant_id and v.product_id=product_id and v.is_active)));
+  and (variant_id is null or exists(select 1 from public.product_variants v where v.id=catalog_translation_public.variant_id and v.product_id=catalog_translation_public.product_id and v.is_active)));
 
 create function public.read_catalog_translation_draft(p_product_id uuid,p_variant_id uuid,p_locale text)
 returns jsonb language plpgsql security invoker set search_path = '' as $$
