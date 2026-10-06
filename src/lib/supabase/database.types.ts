@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      catalog_media_drafts: {
+        Row: {
+          assets: Json
+          primary_id: string | null
+          product_id: string
+          revision: number
+          target_key: string
+          updated_at: string
+          variant_id: string | null
+        }
+        Insert: {
+          assets?: Json
+          primary_id?: string | null
+          product_id: string
+          revision?: number
+          target_key?: string
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Update: {
+          assets?: Json
+          primary_id?: string | null
+          product_id?: string
+          revision?: number
+          target_key?: string
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_media_drafts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalog_media_drafts_product_id_variant_id_fkey"
+            columns: ["product_id", "variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["product_id", "id"]
+          },
+        ]
+      }
       cart_items: {
         Row: {
           cart_id: string
@@ -1083,6 +1128,23 @@ export type Database = {
       }
     }
     Functions: {
+      read_catalog_media_draft: {
+        Args: { p_product_id: string; p_variant_id: string }
+        Returns: Json
+      }
+      save_catalog_media_draft: {
+        Args: {
+          p_action: string
+          p_client_id: string
+          p_expected_revision: number
+          p_operation_id: string
+          p_payload: Json
+          p_product_id: string
+          p_request_fingerprint: string
+          p_variant_id: string
+        }
+        Returns: Json
+      }
       manage_catalog_colorway: {
         Args: { p_operation_id: string; p_client_id: string; p_action: string; p_product_id: string; p_target_id: string; p_request_fingerprint: string; p_colorway: Json }
         Returns: Json

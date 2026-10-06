@@ -430,3 +430,28 @@ actual recorded remote versions. RLS/service-only invoker and zero public
 snapshot postflight pass. No existing catalog source rows or runtime flags
 changed. The combined application rollout is Commerce #112 before ERP #223;
 these branches include the E-005 dependencies. UI owner testing follows rollout.
+
+## 2026-10-06 — E-007 activation and C-040 review package
+
+Owner approved exact E-007 SQL, bounded private upload smoke and ERP activation.
+Migration `20261006031652_catalog_media_drafts` matches the approved forward
+bytes and hosted migration history. Bucket/RLS/invoker/browser-role postflight
+passes. ERP `6a8410af` redeployment `dpl_8iGKZmmtTfwYTMw7QrEM6UautwaS`
+is READY with `COMMERCE_CATALOG_MEDIA_ENABLED=true` for Production.
+Authenticated Product two-file upload, cover/order/alt save/reload, recoverable
+removal and restoration pass; owner acceptance remains separate. No draft image
+is published to `product_media`.
+
+Generated live media table/RPC types are recorded without replacing unrelated
+schema types. The release check found GHSA-68fv-2mgg-jv7q in transitive
+`source-map-js`; the lockfile updates only 1.2.1 to patched 1.2.2. Full check
+passes: 360 tests, lint, TypeScript, static security, zero audit vulnerabilities
+and clean build. A stale Turbopack persistence cache caused the first build
+attempt to panic; rebuilding with fresh generated output passed.
+
+C-040 proceeds to a concrete Product/Colorway experience and contract review:
+[PRODUCT-COLORWAY-DETAIL-01](page-scripts/product-colorway-detail-01.md).
+The package defines 1440/390 hierarchy, gallery isolation, one sculpt with
+parent-bound Colorways, factual-content omissions, verified release actions,
+compatibility and tasks. Full-page implementation awaits script approval;
+private-media publication and legacy Product consolidation have separate gates.
