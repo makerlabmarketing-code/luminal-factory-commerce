@@ -33,8 +33,8 @@ accessible; main media errors use the existing fallback.
 
 ## Data and approval boundary
 
-Current Production: product_media exists with one published record; no draft
-media table/bucket exists. Storage objects have no browser policies. Parent FK
+Production preflight on 2026-10-06: product_media had one published record; no
+draft media table/bucket existed. Storage objects had no browser policies. Parent FK
 index catalog_translation_variant_parent_idx exists from the approved E-006 SQL.
 
 Proposed reviewed forward package is supabase/drafts/catalog-media/forward.sql:
@@ -46,8 +46,11 @@ Proposed reviewed forward package is supabase/drafts/catalog-media/forward.sql:
 - Product FK and composite Product/Colorway FK, no existing column changes;
 - no browser grants/policies, no public bucket, no existing data backfill.
 
-No new production SQL is authorized by approval of earlier E-005/E-006 packages.
-Keep this package outside supabase/migrations until this exact SQL is approved.
+Earlier E-005/E-006 approval did not authorize this package. The owner separately
+approved the exact E-007 SQL, bounded private upload smoke and ERP activation on
+2026-10-06. Applied once as `20261006031652_catalog_media_drafts`; the committed
+migration matches forward SHA256
+`367b8c337bf7a311ef586ccc9e952957acba3f2d9773250f185d9544f5d895a4`.
 Application code can merge/deploy with ERP COMMERCE_CATALOG_MEDIA_ENABLED absent
 or false. This flag is server-only and defaults off. Enable only after forward
 SQL + validation succeed and authenticated private-upload smoke is authorized.
@@ -67,5 +70,10 @@ published guard and public gallery tests; offline PGlite SQL validation; native
 PostgreSQL17 CI with two real sessions for replay, stale writes, operation conflicts,
 activation/publish races and role denial. Rollback is checked to preserve rows.
 
-Production upload acceptance remains pending exact SQL approval and bounded smoke.
-Toast/English entry and public gallery can be verified independently after deploy.
+SQL postflight passes private bucket, RLS, invoker and browser-role denial checks.
+ERP Production deployment `dpl_8iGKZmmtTfwYTMw7QrEM6UautwaS` at `6a8410af`
+is READY with the server-only media flag enabled. Authenticated bounded Product
+smoke passed two-file upload, cover/order/alt save and reload, soft removal and
+restoration. Fixture `e007-media-qa-20261006` is isolated from real catalog data;
+the final handoff records its archive state and Colorway verification. Public
+publication remains a separate gate; owner manual acceptance remains open.
