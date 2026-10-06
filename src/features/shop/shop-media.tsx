@@ -9,9 +9,10 @@ import type { ShopPresentationEntry } from "./shop-content";
 type ShopMediaProps = Readonly<{
   media: ShopPresentationEntry["media"];
   priority?: boolean;
+  sizes?: string;
 }>;
 
-export function ShopMedia({ media, priority = false }: ShopMediaProps) {
+export function ShopMedia({ media, priority = false, sizes = "(max-width: 900px) 100vw, 33vw" }: ShopMediaProps) {
   const tr = useTranslator();
   const [hasLoadError, setHasLoadError] = useState(false);
   const hasCatalogAsset = media.source === "commerce-catalog" && media.productionApproved && !hasLoadError;
@@ -28,7 +29,7 @@ export function ShopMedia({ media, priority = false }: ShopMediaProps) {
           src={media.src}
           alt={tr(media.alt)}
           fill
-          sizes="(max-width: 900px) 100vw, 33vw"
+          sizes={sizes}
           priority={priority}
           onError={() => setHasLoadError(true)}
           style={{ objectFit: "cover", objectPosition: media.objectPosition }}

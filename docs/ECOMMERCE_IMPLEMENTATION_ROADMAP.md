@@ -455,3 +455,14 @@ The package defines 1440/390 hierarchy, gallery isolation, one sculpt with
 parent-bound Colorways, factual-content omissions, verified release actions,
 compatibility and tasks. Full-page implementation awaits script approval;
 private-media publication and legacy Product consolidation have separate gates.
+
+## 2026-10-06 — C-040 approved detail implementation
+
+Owner approved PRODUCT-COLORWAY-DETAIL-01 in chat. Implemented gallery/content
+60/40 with stacked mobile order, one story, explicit public Colorway selection,
+missing-image isolation, verified release links and omission of unknown facts.
+Public variant identities are read independently from photo rows and bound to
+published parent Products. Read errors use a retry boundary rather than a fake
+not-found or unrelated fixture. Private-media publication and legacy consolidation
+remain separate; no migration, live data or runtime flag changes are included.
+Formal scope/technical/verification package: specs/shop/product-colorway-detail-01.md.

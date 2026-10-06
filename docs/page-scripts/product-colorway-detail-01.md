@@ -1,6 +1,6 @@
 # PRODUCT-COLORWAY-DETAIL-01 — C-040
 
-Status: `DRAFT_FOR_OWNER_REVIEW`, 2026-10-06.
+Status: `OWNER_APPROVED`, 2026-10-06.
 Canonical roadmap: shared coordination Sheet, C-040 (row 58).
 This is an experience/contract review package, not approval to publish media,
 activate variants, migrate existing Products or enable transactions.
@@ -87,3 +87,5 @@ Approve the section order and the proposed desktop/mobile hierarchy before a
 full-page implementation. Supply factual details and approved photos separately;
 unknown facts stay hidden. Private-media publication and any legacy Product
 consolidation remain independent concrete approval packages.
+
+Owner approved this exact section order and desktop/mobile hierarchy in chat on 2026-10-06. Application deployment is authorized; publication of private media and legacy data migration remain separate.
