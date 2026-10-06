@@ -44,6 +44,7 @@ const catalogProductRowSchema = z.object({
   published_at: z.string().nullable(),
   product_prices: z.array(catalogPriceRowSchema).nullable(),
   product_media: z.array(catalogMediaRowSchema).nullable(),
+  product_variants: z.array(z.object({ id: z.uuid(), product_id: z.uuid(), name: z.string().trim().min(1).max(160), is_active: z.boolean() })).nullable().optional(),
 });
 
 const catalogProductRowsSchema = z.array(catalogProductRowSchema);
@@ -75,6 +76,7 @@ const PRODUCT_SELECT = [
   "release_type",
   "published_at",
   "product_prices(currency,amount_minor)",
+  "product_variants(id,product_id,name,is_active)",
   "product_media(media_type,storage_path,alt_text,sort_order,is_primary,variant_id,product_variants(id,name,is_active))",
 ].join(",");
 
@@ -177,7 +179,8 @@ function directMediaSource(media: CatalogMediaRow | undefined): string | null {
 function mapProduct(row: CatalogProductRow): ShopPresentationEntry {
   const price = row.product_prices?.[0];
   const priceLabel = formatPrice(price);
-  const approvedMedia = (row.product_media ?? []).filter(media => !media.variant_id || media.product_variants?.id === media.variant_id && media.product_variants.is_active);
+  const colorways = (row.product_variants ?? []).filter(variant => variant.product_id === row.id && variant.is_active).map(variant => ({ id: variant.id, productId: row.id, name: variant.name }));
+  const approvedMedia = (row.product_media ?? []).filter(media => !media.variant_id || media.product_variants?.id === media.variant_id && media.product_variants.is_active && (!row.product_variants || colorways.some(variant => variant.id === media.variant_id)));
   const orderedMedia = [...approvedMedia].sort((a, b) => {
     if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
     return a.sort_order - b.sort_order;
@@ -251,7 +254,7 @@ function mapProduct(row: CatalogProductRow): ShopPresentationEntry {
     return [{ key: `${media.variant_id ?? 'product'}:${src}`, variantId: media.variant_id ?? null, variantName: media.product_variants?.name ?? null,
       media: { ...entry.media, type: 'image' as const, src, alt: media.alt_text?.trim() || row.name, source: 'commerce-catalog' as const, productionApproved: true } }];
   });
-  return { ...entry, gallery: gallery.filter((a,i) => gallery.findIndex(b => b.key === a.key) === i).sort((a,b) => Number(b.media.src === entry.media.src) - Number(a.media.src === entry.media.src)).slice(0,60) };
+  return { ...entry, colorways, objectFacts: [], gallery: gallery.filter((a,i) => gallery.findIndex(b => b.key === a.key) === i).sort((a,b) => Number(b.media.src === entry.media.src) - Number(a.media.src === entry.media.src)).slice(0,60) };
 }
 
 async function requestProducts(options?: {
@@ -327,6 +330,9 @@ export async function getShopCatalog(
 
 export const getShopCatalogEntryBySlug = cache(async (slug: string, locale: Locale = "en"): Promise<ShopPresentationEntry | undefined> => {
   const rows = await requestProducts({ slug });
-  if (rows === null) return getFixtureShopEntryBySlug(slug);
+  if (rows === null) {
+    if (getCatalogConfig()) throw new Error("Published catalog could not be loaded");
+    return getFixtureShopEntryBySlug(slug);
+  }
   return rows[0] ? (await localizeCatalogEntries([mapProduct(rows[0])], locale, getCatalogConfig()))[0] : undefined;
 });

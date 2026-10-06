@@ -37,8 +37,9 @@ test("shop detail presentation has one h1 and no transactional controls", () => 
 
   assert.equal((detail.match(/<h1\b/g) ?? []).length, 1);
   assert.match(detail, /Object story/);
-  assert.match(detail, /Published facts/);
-  assert.match(detail, /Purchase flow chưa được mở trong Phase 5/);
+  assert.match(detail, /Object facts/);
+  assert.match(detail, /No release is available at the moment/);
+  assert.doesNotMatch(detail, /Phase 5|Data authority|craftNotes/);
   assert.doesNotMatch(source, /<form|onSubmit=|addToCart|createOrder|checkoutSession|paymentIntent|supabase\.|from\(["'`]/i);
 });
 
