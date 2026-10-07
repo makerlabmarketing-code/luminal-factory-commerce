@@ -527,3 +527,7 @@ No schema/data/flags changed. Mobile hardware visual acceptance remains pending.
 ### 2026-10-07 — Updated logo and logo-led rim
 
 Owner requested fresh gold-rim logo and matching website borders. Exact Drive original read, transparent 1024px runtime PNG prepared; versioned Header/intro/Footer URL. Shared champagne bevel tokens applied to gallery/Header/CTA/panels; controls/separators muted, ice-blue focus and semantic states retained. Validation and Production smoke recorded at delivery; mobile visual acceptance remains pending.
+
+### 2026-10-07 — Border focus fix and resin reflection
+
+Owner screenshots identified a blue outer focus ring duplicating the gallery gold rim, and disliked the bronze/violet moving reflection on the process stack. Removed GlowCard container focus-within outline; child keyboard focus remains. Process/local spotlights now use centralized cyan/blue resin colors, softer fill and 2px localized edge. Gallery reflection blue; gold static rim retained. Validate and smoke exact deployed batch.

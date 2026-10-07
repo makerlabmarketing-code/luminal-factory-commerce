@@ -31,11 +31,11 @@ test("Luminal Magic Bento activates only the topmost sticky card and keeps proxi
   assert.match(motionLayer, /--luminal-bento-y/);
   assert.match(motionLayer, /--luminal-bento-intensity/);
   assert.match(motionLayer, /Math\.hypot/);
-  assert.match(bentoCss, /--luminal-bento-bronze: 176, 122, 63/);
-  assert.match(bentoCss, /rgba\(var\(--luminal-bento-bronze\)/);
-  assert.match(bentoCss, /rgba\(114, 89, 184/);
-  assert.match(bentoCss, /padding: 4px/);
-  assert.match(bentoCss, /border-color: rgba\(var\(--luminal-bento-bronze\), 0\.42\)/);
+  assert.match(bentoCss, /--luminal-bento-resin: var\(--resin-cyan-rgb\)/);
+  assert.match(bentoCss, /rgba\(var\(--luminal-bento-resin\)/);
+  assert.match(bentoCss, /rgba\(var\(--resin-blue-rgb\)/);
+  assert.match(bentoCss, /padding: 2px/);
+  assert.match(bentoCss, /border-color: var\(--border\)/);
   assert.match(bentoCss, /font-size: clamp\(3\.25rem, 8\.3vw, 8\.5rem\)/);
   assert.match(bentoCss, /mask-composite: exclude/);
   assert.doesNotMatch(bentoCss, /214, 179, 90/);

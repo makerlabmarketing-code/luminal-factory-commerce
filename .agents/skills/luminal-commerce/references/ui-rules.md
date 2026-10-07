@@ -385,3 +385,7 @@ Do not introduce:
 ## Owner-approved gold rim — 2026-10-07
 
 The updated Luminal logo uses champagne-gold beveled edges around blue liquid resin. The owner requested this rim as the border language. Centralize its gold/highlight/shadow stops in global rim tokens; use a thin static gradient rim on main frames and subdued gold edges on controls/separators. Keep blue resin accents and accessible ice-blue focus outlines. Do not add continuous shine, clip interactive targets into the cube silhouette, or apply the full gold treatment to error/destructive states.
+
+### Owner refinement — 2026-10-07
+
+Moving reflections use the logo resin's cyan/blue, not the bronze/violet palette. Gold remains the static metal rim. Made-at-Luminal highlights stay localized and restrained (2px masked edge); do not draw an additional container-wide focus ring when a child control receives focus. Preserve each keyboard target's visible focus indicator.

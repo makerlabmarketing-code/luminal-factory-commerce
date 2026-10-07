@@ -21,6 +21,8 @@
   --foreground: #f2f2f0;
   --muted-foreground: #9a9a96;
   --border: rgba(197, 155, 78, 0.2);
+  --resin-cyan-rgb: 73, 204, 242;
+  --resin-blue-rgb: 46, 112, 232;
   --rim-gold: #c59b4e;
   --rim-highlight: #f7e6a8;
   --rim-shadow: #6b4524;
@@ -452,7 +454,7 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
   z-index: 3;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(22rem circle at var(--luminal-spot-x) var(--luminal-spot-y), rgba(214,179,90,.11), rgba(114,89,184,.035) 38%, transparent 70%);
+  background: radial-gradient(22rem circle at var(--luminal-spot-x) var(--luminal-spot-y), rgba(var(--resin-cyan-rgb),.09), rgba(var(--resin-blue-rgb),.035) 38%, transparent 70%);
   transition: opacity 280ms ease;
 }
 
