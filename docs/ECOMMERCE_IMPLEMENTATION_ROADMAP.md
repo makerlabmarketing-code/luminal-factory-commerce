@@ -466,3 +466,27 @@ published parent Products. Read errors use a retry boundary rather than a fake
 not-found or unrelated fixture. Private-media publication and legacy consolidation
 remain separate; no migration, live data or runtime flag changes are included.
 Formal scope/technical/verification package: specs/shop/product-colorway-detail-01.md.
+
+## 2026-10-07 — C-041 independent preparation; C-040 reference pending
+
+Owner requested continuation while collecting component/layout references.
+C-040 composition changes wait for those references. Correct the current
+gallery's responsive image hint independently: square images cover a 4:5 frame,
+so required source width is 1.25 times the frame width; the desktop hint becomes
+960px rather than 750px. This selects larger optimized derivatives without
+changing approved crops, source assets, or publishing private media. The existing
+1200px original still limits detail on high-density displays.
+
+C-041 prepares a bounded, server-only public raffle list reader and validated
+presentation model over the existing schema. It distinguishes disabled, read
+failure, verified empty and ready; excludes draft/test/unpublished/future rows,
+enforces valid time windows, and sorts open then nearest upcoming before history.
+Expired OPEN is closed to participation; stale SCHEDULED is never promoted.
+No entry eligibility, winner, price, payment or order behavior changes. Reader
+remains behind COMMERCE_RAFFLE_DETAIL_ENABLED and has no route consumer yet.
+
+Reviewable experience, technical tasks and gates:
+[RAFFLE-DISCOVERY-02](page-scripts/raffle-discovery-02.md). Full page implementation
+awaits script approval and actual release assets/rules; it is not blocked on the
+Product layout reference for this independent preparation. No migration,
+configuration, credential, source catalog or Production data mutation is included.

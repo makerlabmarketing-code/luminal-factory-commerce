@@ -26,7 +26,7 @@ export function ShopGallery({ entry, identity, children }: ShopGalleryProps) {
   return <article className={identity ? 'product-detail-grid' : 'shop-gallery'}>
     {identity && <header className="product-detail-identity">{identity}<p className="product-colorway-name" aria-live="polite">{selectedVariant?.name ?? tr('The object')}</p></header>}
     <div className="product-detail-gallery shop-gallery" aria-label={tr('Product images')}>
-      <ShopMedia key={current?.key ?? `${variantId ?? 'product'}-fallback`} media={current?.media ?? fallback} priority sizes="(max-width: 900px) calc(100vw - 40px), 750px" />
+      <ShopMedia key={current?.key ?? `${variantId ?? 'product'}-fallback`} media={current?.media ?? fallback} priority sizes="(max-width: 900px) calc(125vw - 50px), 960px" />
       {visible.length > 1 && <div className="shop-gallery-thumbnails" aria-label={tr('Product images')}>{visible.map((asset, index) => <button key={asset.key} type="button" aria-label={`${tr('View image')} ${index + 1}: ${asset.media.alt}`} aria-pressed={current?.key === asset.key} onClick={() => setSelected(asset.key)}><Image src={asset.media.src} alt={asset.media.alt} width={112} height={84} sizes="112px" /></button>)}</div>}
     </div>
     {variants.length > 0 && <div className="product-detail-colorways"><label htmlFor={`colorway-${entry.id}`}>{tr('Choose a colorway')}</label><select id={`colorway-${entry.id}`} value={variantId ?? ''} onChange={event => choose(event.target.value || null)}><option value="">{tr('Product photos')}</option>{variants.map(variant => <option key={variant.id} value={variant.id}>{variant.name}</option>)}</select></div>}
