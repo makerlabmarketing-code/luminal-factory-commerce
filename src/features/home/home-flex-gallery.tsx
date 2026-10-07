@@ -39,7 +39,7 @@ export function HomeFlexGallery({ items }: Readonly<{ items: readonly HomeGaller
   if (!items.length) return null;
   const showEngine = enhanced && !failed;
   return <div ref={rootRef} data-gallery-mode={showEngine ? "flex-carousel" : "compact-strip"}>
-    <GlowCard customSize glowColor="blue" className={styles.frame}>
+    <GlowCard customSize glowColor="orange" className={styles.frame}>
       {showEngine && <div className={styles.engine} data-ready={ready}>
         <FlexCarousel items={items.map(item => ({ src: item.src, alt: item.alt, title: item.colorway }))}
           preset="liquid" intro="rise" fit="natural" radius={16} cardHeight={0.56}

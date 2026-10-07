@@ -29,14 +29,14 @@ test("legacy decorative Hero watermark stays out of the Homepage", () => {
 
 test("small header branding keeps source geometry without competing with the product Hero preload", () => {
   assert.match(header, /<HomeArrivalHeader immersive=\{false\}/);
-  assert.match(arrivalHeader, /width=\{4000\}/);
-  assert.match(arrivalHeader, /height=\{4000\}/);
+  assert.match(arrivalHeader, /width=\{1024\}/);
+  assert.match(arrivalHeader, /height=\{1024\}/);
   assert.match(arrivalHeader, /sizes="56px"/);
   assert.match(arrivalHeader, /priority=\{immersive\}/);
 });
 
 test("footer branding declares its rendered width instead of requesting an oversized source", () => {
-  assert.match(footer, /src="\/brand\/luminal-factory-logo-primary\.png"/);
+  assert.match(footer, /src="\/brand\/luminal-factory-logo-primary\.png\?v=gold-20261007"/);
   assert.match(footer, /sizes="72px"/);
   assert.doesNotMatch(footer, /loading="eager"|\bpriority\b|\bpreload\b/);
 });

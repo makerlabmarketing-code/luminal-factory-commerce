@@ -70,10 +70,10 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
           data-home-logo-dock="true"
         >
           <Image
-            src="/brand/luminal-factory-logo-primary.png"
+            src="/brand/luminal-factory-logo-primary.png?v=gold-20261007"
             alt=""
-            width={4000}
-            height={4000}
+            width={1024}
+            height={1024}
             sizes="56px"
             priority={immersive}
           />

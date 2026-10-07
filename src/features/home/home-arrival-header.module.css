@@ -363,3 +363,9 @@
 
 .languageDock { opacity: 0; pointer-events: none; margin-left: .5rem; transition: opacity 300ms ease 650ms; }
 .header[data-stage="revealed"] .languageDock { opacity: 1; pointer-events: auto; }
+
+/* Reflect the owner's gold rim without adding a second animation. */
+.rail { border-color: transparent; background: linear-gradient(90deg, #11100de8, #050505ed) padding-box, var(--rim-gradient) border-box; box-shadow: var(--rim-bevel), 0 .75rem 3rem #0006; }
+.logoDock, .menuButton { border-color: transparent; background: linear-gradient(#0b0b0a, #070707) padding-box, var(--rim-gradient) border-box; box-shadow: var(--rim-bevel), 0 .85rem 2.8rem #0005; }
+.navBubble, .mobilePanel a { border-color: var(--border); box-shadow: var(--rim-bevel), 0 .35rem 1.6rem #0003; }
+.navBubble:hover { border-color: var(--rim-gold); }

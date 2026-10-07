@@ -12,10 +12,10 @@ export async function Footer() {
         <div>
           <Link className="footer-mark" href="/" aria-label={tr("Luminal Factory")}>
             <Image
-              src="/brand/luminal-factory-logo-primary.png"
+              src="/brand/luminal-factory-logo-primary.png?v=gold-20261007"
               alt=""
-              width={4000}
-              height={4000}
+              width={1024}
+              height={1024}
               sizes="72px"
             />
           </Link>

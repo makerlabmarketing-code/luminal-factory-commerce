@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
   // in Next 16.3. Keep standalone artifacts only for self-hosted builds.
   output: process.env.VERCEL ? undefined : "standalone",
   images: {
+    localPatterns: [
+      { pathname: "/brand/luminal-factory-logo-primary.png", search: "?v=gold-20261007" },
+      { pathname: "/**", search: "" },
+    ],
     remotePatterns: supabaseHostname
       ? [{ protocol: "https", hostname: supabaseHostname, pathname: "/storage/v1/object/public/**" }]
       : [],

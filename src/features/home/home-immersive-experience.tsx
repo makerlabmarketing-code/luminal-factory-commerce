@@ -445,10 +445,10 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
         <div ref={travelBrandRef} className={styles.travelBrand} aria-hidden="true">
           <Image
-            src="/brand/luminal-factory-logo-primary.png"
+            src="/brand/luminal-factory-logo-primary.png?v=gold-20261007"
             alt=""
-            width={4000}
-            height={4000}
+            width={1024}
+            height={1024}
             priority
             sizes="(max-width: 899px) 104px, 152px"
           />

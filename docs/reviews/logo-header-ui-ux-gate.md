@@ -38,3 +38,9 @@ No browser executable or browser automation is available in this environment. Vi
 - Approve a simplified small-size mark before changing the favicon.
 - Consider a dedicated horizontal wordmark only in a separate approved brand slice if browser review finds the primary mark too quiet.
 - Create dedicated OG artwork only in a separately scoped metadata task.
+
+## Superseding asset and rim update — 2026-10-07
+
+Owner requested the newly updated LOGO LUMINAL.png and logo-led borders. Exact Drive source was freshly resolved/read: 4000×4000 RGBA, 2,742,387 bytes. The runtime PNG is a transparent 1024×1024 downsample (765,141 bytes), SHA-256 `059681ae9208db00062e8084ac1699bdacde6d5576e8d8a1e210cb0ca1c310c1`; no recoloring/cropping. It supersedes the binary contract above. Header, intro and Footer use a versioned image URL to avoid the old optimized cache. Source original remains unchanged.
+
+Champagne metal border tokens provide static bright/dark bevels for Header rail/dock, Spotlight gallery, dialog, secondary CTA and bounded commerce panels; smaller controls/separators use muted gold. Spotlight uses a warm reflection, keyboard focus stays ice blue, semantic destructive/error styles are preserved. No new rendering loop or dependency. Production visual review follows deployment; device/mobile acceptance remains separate.

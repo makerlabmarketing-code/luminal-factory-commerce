@@ -20,7 +20,12 @@
   --surface-elevated: #111111;
   --foreground: #f2f2f0;
   --muted-foreground: #9a9a96;
-  --border: rgba(255, 255, 255, 0.1);
+  --border: rgba(197, 155, 78, 0.2);
+  --rim-gold: #c59b4e;
+  --rim-highlight: #f7e6a8;
+  --rim-shadow: #6b4524;
+  --rim-gradient: linear-gradient(135deg, #8f6531 0%, #e8c574 16%, #fbefb5 24%, #ba8740 38%, #654222 51%, #d4aa58 67%, #f4dfa0 79%, #936432 100%);
+  --rim-bevel: inset 0 1px 0 rgba(247, 230, 168, .14), inset 0 -1px 0 rgba(107, 69, 36, .3);
   --ice: #b9e9ff;
   --rose: #f3c9e8;
   --lavender: #c8c4ff;
@@ -737,3 +742,16 @@ html[lang="vi"] .wave-home h2 {overflow-wrap:break-word}
 @media (prefers-reduced-motion: reduce) { .product-detail-gallery .shop-media-asset { animation: none; } }
 
 @keyframes product-photo-enter { from { opacity: .35; } to { opacity: 1; } }
+
+/* Logo-led champagne metal: static bevel, restrained dark controls, blue resin focus. */
+:is(.button-secondary, .cart-summary, .account-panel, .contact-panel, .cart-lines-empty, .raffle-entry-panel) {
+  border-color: transparent;
+  background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--rim-gradient) border-box;
+  box-shadow: var(--rim-bevel), 0 1.5rem 4rem #0004;
+}
+:is(.language-switcher a, .account-field input, .cart-quantity-field input, .cart-quantity-field button, .product-detail-colorways select, .product-related button) {
+  border-color: var(--border);
+  box-shadow: var(--rim-bevel);
+}
+.language-switcher a[aria-current] { border-color: var(--rim-gold); }
+.button-secondary:hover { background: linear-gradient(#18140e, #0c0b09) padding-box, var(--rim-gradient) border-box; color: var(--rim-highlight); }

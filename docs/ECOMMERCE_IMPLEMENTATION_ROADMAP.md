@@ -523,3 +523,7 @@ is src/app/globals.css; component CSS is scoped beside its owner. Component alia
 page/domain modules. Validation: 372 tests, lint (two existing warnings), strict
 consumer typecheck, static security, audit zero and Production build pass.
 No schema/data/flags changed. Mobile hardware visual acceptance remains pending.
+
+### 2026-10-07 — Updated logo and logo-led rim
+
+Owner requested fresh gold-rim logo and matching website borders. Exact Drive original read, transparent 1024px runtime PNG prepared; versioned Header/intro/Footer URL. Shared champagne bevel tokens applied to gallery/Header/CTA/panels; controls/separators muted, ice-blue focus and semantic states retained. Validation and Production smoke recorded at delivery; mobile visual acceptance remains pending.

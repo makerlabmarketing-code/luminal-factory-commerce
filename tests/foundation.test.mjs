@@ -134,12 +134,12 @@ test("approved local Luminal logo is integrated accessibly without changing navi
   const brandSurfaces = sharedHeader + read("src/components/layout/footer.tsx");
   assert.match(read("src/components/layout/header.tsx"), /<HomeArrivalHeader immersive=\{false\}/);
   assert.match(brandSurfaces, /aria-label=\{tr\("Luminal Factory"\)\}/);
-  assert.match(sharedHeader, /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png"/);
-  assert.match(read("src/components/layout/footer.tsx"), /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png"/);
+  assert.match(sharedHeader, /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png\?v=gold-20261007"/);
+  assert.match(read("src/components/layout/footer.tsx"), /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png\?v=gold-20261007"/);
   assert.equal((brandSurfaces.match(/href="\/"/g) ?? []).length, 2);
   assert.match(brandSurfaces, /next\/image/);
-  assert.equal((brandSurfaces.match(/width=\{4000\}/g) ?? []).length, 2);
-  assert.equal((brandSurfaces.match(/height=\{4000\}/g) ?? []).length, 2);
+  assert.equal((brandSurfaces.match(/width=\{1024\}/g) ?? []).length, 2);
+  assert.equal((brandSurfaces.match(/height=\{1024\}/g) ?? []).length, 2);
   assert.doesNotMatch(brandSurfaces, /drive\.google|googleusercontent|hostingersite/i);
   assert.equal(existsSync(join("public", "brand", "luminal-factory-logo-primary.png")), true);
   const assetDocuments = [
@@ -158,14 +158,14 @@ test("approved Luminal logo binary keeps its validated PNG contract", () => {
   const logo = readFileSync(logoPath);
 
   assert.ok(logo.byteLength > 0);
-  assert.equal(logo.byteLength, 6_036_257);
+  assert.equal(logo.byteLength, 765_141);
   assert.deepEqual([...logo.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
   assert.equal(logo.subarray(12, 16).toString("ascii"), "IHDR");
-  assert.equal(logo.readUInt32BE(16), 4000);
-  assert.equal(logo.readUInt32BE(20), 4000);
+  assert.equal(logo.readUInt32BE(16), 1024);
+  assert.equal(logo.readUInt32BE(20), 1024);
   assert.equal(logo[24], 8);
   assert.equal(logo[25], 6); // PNG truecolor with alpha; do not flatten the approved source.
-  assert.equal(createHash("sha256").update(logo).digest("hex"), "758397de87097ed08d8cff0945dd27f9a4e6b36be2b267b138d5759ce68da5ee");
+  assert.equal(createHash("sha256").update(logo).digest("hex"), "059681ae9208db00062e8084ac1699bdacde6d5576e8d8a1e210cb0ca1c310c1");
 });
 
 test("logo review gate preserves favicon, OG, and bounded commerce scope", () => {

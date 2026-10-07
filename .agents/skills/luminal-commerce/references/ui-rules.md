@@ -381,3 +381,7 @@ Do not introduce:
 - neon borders on all controls
 - animated backgrounds without purpose
 - multiple competing hero effects
+
+## Owner-approved gold rim — 2026-10-07
+
+The updated Luminal logo uses champagne-gold beveled edges around blue liquid resin. The owner requested this rim as the border language. Centralize its gold/highlight/shadow stops in global rim tokens; use a thin static gradient rim on main frames and subdued gold edges on controls/separators. Keep blue resin accents and accessible ice-blue focus outlines. Do not add continuous shine, clip interactive targets into the cube silhouette, or apply the full gold treatment to error/destructive states.

@@ -17,3 +17,5 @@
 .dialog figcaption { margin-top:1rem; }
 @media (max-width:768px) { .frame { height:auto; } .strip { padding:1rem; } }
 @media (prefers-reduced-motion:reduce) { .strip { scroll-behavior:auto; } }
+
+.dialog { border-color: transparent; background: linear-gradient(#090909,#090909) padding-box, var(--rim-gradient) border-box; box-shadow: var(--rim-bevel); }

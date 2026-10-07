@@ -1,4 +1,4 @@
-.card { position: relative; isolation: isolate; min-width: 0; border: 1px solid rgba(255,255,255,.14); border-radius: 1rem; background: #090909; box-shadow: 0 1rem 2rem -1rem #000; touch-action: pan-y; }
+.card { position: relative; isolation: isolate; min-width: 0; border: 1px solid transparent; border-radius: 1rem; background: linear-gradient(#090909,#090909) padding-box, var(--rim-gradient) border-box; box-shadow: var(--rim-bevel), 0 1rem 2rem -1rem #000; touch-action: pan-y; }
 .content { position: relative; z-index: 1; height: 100%; min-width: 0; border-radius: inherit; }
 .card::before, .card::after { content: ""; position: absolute; pointer-events: none; border-radius: inherit; opacity: 0; transition: opacity 250ms ease; }
 .card::before { inset: -1px; padding: 2px; background: radial-gradient(230px circle at var(--glow-x,50%) var(--glow-y,50%), hsl(var(--glow-hue) 80% 78% / .9), transparent 75%); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite: exclude; z-index: 2; }
