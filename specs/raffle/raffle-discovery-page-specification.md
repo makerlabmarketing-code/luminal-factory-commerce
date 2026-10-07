@@ -293,3 +293,18 @@ The transactional `/raffle/[slug]` and guest-email entry flow remain a separate
 default-off slice governed by
 `specs/raffle/raffle-detail-entry-data-specification.md` and its reviewed
 schema/RLS technical plan.
+
+## C-041 bounded list continuation — 2026-10-07
+
+Owner continuation authorizes RAFFLE-DISCOVERY-02 list foundation: one title,
+server-read list, truthful disabled/unavailable/empty states, localized navigation
+and published detail links. This supersedes the static preparing claim.
+Use existing editorial section/grid styles; no new motion. Cards are text-first
+until approved media resolution is delivered. Exact dates use semantic time and
+Asia/Ho_Chi_Minh (UTC+7). Persisted title/summary retain source fallback.
+Entry rules, entry activation, payment, public media and final art direction remain
+separately gated. A list status is not an eligibility decision.
+
+Plan/tasks: consume existing server-only adapter in the thin route, render typed
+result in the feature, add dictionary copy, verify rendered EN/VI state boundaries,
+run repository gate and verify the deployed route. No schema/data/flag mutation.

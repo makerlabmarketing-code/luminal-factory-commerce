@@ -1,6 +1,8 @@
 # RAFFLE-DISCOVERY-02 — C-041
 
-Status: PROPOSED_FOR_OWNER_REVIEW. The new public page composition is not approved.
+Status: APPROVED_BOUNDED_LIST_FOUNDATION — owner continuation on 2026-10-07.
+Scope: existing route, public list states and navigation only. Final art direction,
+public media, entry rules and payment activation remain separate gates.
 Owner requested roadmap continuation while collecting Product layout references
 on 2026-10-07. Implement independent read/state preparation; keep C-040 redesign
 pending references. No entry/payment activation, live DDL or new published data.
@@ -42,8 +44,8 @@ later approved, must not grant eligibility or promote stale states by client tim
    explicit fields and filters, bounded 30-row snapshot, no-store, 8-second timeout.
 2. Validated response model separates disabled/unavailable/empty/ready; validates
    publication, non-test, safe identity, release time and lifecycle.
-3. Wire list to existing route and localize consumer copy only after script and
-   formal presentation approval. Preserve current route during this preparation.
+3. Wire list to existing route with canonical EN/VI consumer copy. Use text-first
+   release cards until approved public media binding is available.
 4. Asset resolution must bind to published parent Product and selected Colorway;
    private E-007 uploads are not a public source. Follow C-040 gallery isolation.
 5. Verify both locales, mobile/desktop, headings, links, errors and all state

@@ -490,3 +490,18 @@ Reviewable experience, technical tasks and gates:
 awaits script approval and actual release assets/rules; it is not blocked on the
 Product layout reference for this independent preparation. No migration,
 configuration, credential, source catalog or Production data mutation is included.
+
+### 2026-10-07 — C-041 public list consumer
+
+Owner continuation approved the bounded RAFFLE-DISCOVERY-02 foundation. The
+existing localized Raffle route now consumes the prepared public reader. It
+renders disabled/unavailable/verified-empty/ready separately, text-first published
+release cards, localized statuses and UTC+7 semantic dates, detail-only links and
+Archive/Shop navigation. Persisted identity/summary remain source content.
+Responsive cards use two columns then one at 900px; narrow date rows stack.
+No schema/data/flag changes or entry/payment activation. Public media, detail
+art direction and approved eligibility/selection/payment/shipping/FAQ remain.
+C-040 still waits for owner references. Validation: 370 tests, lint (two existing
+warnings), TypeScript, security static gate, audit zero and Production build pass.
+Rendered EN/VI state tests cover no false empty/retry navigation/escaping/dates.
+Mobile visual and live populated-list acceptance remain separate checks.
