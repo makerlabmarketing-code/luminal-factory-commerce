@@ -1,28 +1,27 @@
 import { z } from "zod";
 
-export const productDraftMutationSchema = z
-  .object({
-    operationId: z.uuid(),
-    draft: z
-      .object({
-        slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120),
-        name: z.string().trim().min(1).max(160),
-        description: z.string().trim().max(5000).nullable().optional(),
-        productType: z.enum(["artisan_keycap", "collectible_object", "custom_object", "other"]),
-        releaseType: z.enum(["direct", "preorder", "informational"]),
-      })
-      .strict()
-      .superRefine((value, context) => {
-        if (value.productType === "artisan_keycap" && value.releaseType !== "informational") {
-          context.addIssue({
-            code: "custom",
-            path: ["releaseType"],
-            message: "Artisan keycaps must use informational product release type and sell through Raffle.",
-          });
-        }
-      }),
-  })
-  .strict();
+const productInformationSchema = z.object({
+  slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120),
+  name: z.string().trim().min(1).max(160),
+  description: z.string().trim().max(5000).nullable().optional(),
+  productType: z.enum(["artisan_keycap", "collectible_object", "custom_object", "other"]),
+  releaseType: z.enum(["direct", "preorder", "informational"]),
+}).strict();
+
+// PATCH preserves existing legacy release metadata; the RPC restricts non-draft
+// edits to name/description and enforces the raffle-only rule for draft edits.
+export const productUpdateMutationSchema = z.object({
+  operationId: z.uuid(), draft: productInformationSchema,
+}).strict();
+export const productDraftMutationSchema = z.object({
+  operationId: z.uuid(),
+  draft: productInformationSchema.superRefine((value, context) => {
+    if (value.productType === "artisan_keycap" && value.releaseType !== "informational") {
+      context.addIssue({ code: "custom", path: ["releaseType"],
+        message: "Artisan keycaps must use informational product release type and sell through Raffle." });
+    }
+  }),
+}).strict();
 
 export const productStateMutationSchema = z.object({ operationId: z.uuid() }).strict();
 

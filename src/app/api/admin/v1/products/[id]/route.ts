@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { productDraftMutationSchema, productStateMutationSchema } from "@/features/management/catalog-raffle-admin-contract";
+import { productUpdateMutationSchema, productStateMutationSchema } from "@/features/management/catalog-raffle-admin-contract";
 import {
   archiveManagedProduct,
   CatalogRaffleAdminServiceError,
@@ -30,9 +30,9 @@ export async function PATCH(request: Request, { params }: ProductRouteProps) {
   const id = await parseProductId(params);
   if (!id.success) return commerceAdminFailure(context.identity.requestId, 400, "REQUEST_INVALID", "Product id không hợp lệ.");
 
-  let parsed: ReturnType<typeof productDraftMutationSchema.safeParse>;
+  let parsed: ReturnType<typeof productUpdateMutationSchema.safeParse>;
   try {
-    parsed = productDraftMutationSchema.safeParse(parseCommerceAdminJson(context.rawBodyText));
+    parsed = productUpdateMutationSchema.safeParse(parseCommerceAdminJson(context.rawBodyText));
   } catch {
     parsed = { success: false, error: null } as never;
   }

@@ -75,6 +75,7 @@ begin
   elsif p_action = 'update_draft' then
     if p_product->>'product_type' = 'artisan_keycap'
       and p_product->>'release_type' <> 'informational'
+      and exists (select 1 from public.products where id = p_target_id and status = 'draft')
     then
       raise exception 'artisan keycaps must use informational product release type and sell through Raffle'
         using errcode = '22023';

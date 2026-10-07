@@ -3,7 +3,9 @@
 Prepared for the owner's 07/10 ERP correction. No automatic migration is added.
 Current live RPC definition was read and matches the original draft-only branch.
 
-Only the `update_draft` WHERE predicate and missing/protected-field error change.
+The `update_draft` WHERE predicate, missing/protected-field error and legacy
+release guard change. Existing non-draft metadata is preserved; draft edits
+still enforce raffle-only keycaps.
 Draft editing is retained. Published and archived products allow name/description
 updates only when slug, product_type and release_type match the existing row.
 Status and published_at are not assigned by this action. No price, inventory,
@@ -16,7 +18,7 @@ original function without deleting later information edits.
 
 ## Validation completed
 
-- ERP: 911 tests, lint, TypeScript, build with throwaway public build configuration.
+- ERP: 913 tests, lint, TypeScript, build with throwaway public build configuration.
 - Commerce: complete `npm run check` passed.
 - Disposable embedded PostgreSQL via PGlite 0.5.8: three status updates, lifecycle
   and published_at preservation, protected fields, keycap sale rule, identical
