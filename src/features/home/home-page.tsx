@@ -12,7 +12,7 @@ import { HeroObjectStage } from "./hero-object-stage";
 import { HomeArrivalHeader } from "./home-arrival-header";
 import { HomeImmersiveExperience } from "./home-immersive-experience";
 import { HeroTextMotionController } from "./hero-copy-motion";
-import { HomeDriftWall } from "./home-drift-wall";
+import { HomeFlexGallery } from "./home-flex-gallery";
 import { HomeArchiveBurst } from "./home-archive-burst";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
 import { MadeAtLuminalStack } from "./made-at-luminal-stack";
@@ -164,7 +164,7 @@ export async function HomePage() {
               <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("One character.")}<br />{tr("Three moods.")}</h2></div>
               <p>{tr("A closer look at the colorful Lolipop, death-inspired Mictlán, and monochrome finishes from the studio archive.")}</p>
             </header>
-            <HomeDriftWall items={media.gallery} />
+            <HomeFlexGallery items={media.gallery} />
           </Container>
         </section>
 

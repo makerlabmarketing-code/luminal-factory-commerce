@@ -505,3 +505,21 @@ C-040 still waits for owner references. Validation: 370 tests, lint (two existin
 warnings), TypeScript, security static gate, audit zero and Production build pass.
 Rendered EN/VI state tests cover no false empty/retry navigation/escaping/dates.
 Mobile visual and live populated-list acceptance remain separate checks.
+
+### 2026-10-07 — owner Home gallery component request
+
+Replace Home Drift Wall with the supplied FlexCarousel liquid shader and add
+Spotlight Card frame. Existing nine Luminal images are the source; no stock
+placeholder images. Added reusable GlowCard at src/components/ui with custom
+sizing, scoped border glow, local pointer coordinates and reduced-motion/touch
+behavior. Added a demo and typed declaration for the supplied JSX carousel.
+Desktop enhancement is loaded near the viewport; touch/reduced-motion/WebGL or
+image/context failure retains native scroll-snap gallery and modal preview.
+Autoplay, vertical wheel interception and lens cursor-follow are disabled.
+OGL 1.0.11 is pinned solely for the supplied refraction shader. Existing shadcn,
+Tailwind 4 and TypeScript setup requires no reinitialization. Global style entry
+is src/app/globals.css; component CSS is scoped beside its owner. Component alias
+@/components/ui resolves src/components/ui and keeps reusable primitives out of
+page/domain modules. Validation: 372 tests, lint (two existing warnings), strict
+consumer typecheck, static security, audit zero and Production build pass.
+No schema/data/flags changed. Mobile hardware visual acceptance remains pending.

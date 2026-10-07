@@ -1,0 +1,8 @@
+.card { position: relative; isolation: isolate; min-width: 0; border: 1px solid rgba(255,255,255,.14); border-radius: 1rem; background: #090909; box-shadow: 0 1rem 2rem -1rem #000; touch-action: pan-y; }
+.content { position: relative; z-index: 1; height: 100%; min-width: 0; border-radius: inherit; }
+.card::before, .card::after { content: ""; position: absolute; pointer-events: none; border-radius: inherit; opacity: 0; transition: opacity 250ms ease; }
+.card::before { inset: -1px; padding: 2px; background: radial-gradient(230px circle at var(--glow-x,50%) var(--glow-y,50%), hsl(var(--glow-hue) 80% 78% / .9), transparent 75%); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite: exclude; z-index: 2; }
+.card::after { inset: 0; background: radial-gradient(250px circle at var(--glow-x,50%) var(--glow-y,50%), hsl(var(--glow-hue) 70% 70% / .08), transparent 80%); }
+.card[data-active="true"]::before, .card[data-active="true"]::after { opacity: 1; }
+.card:focus-within { outline: 2px solid var(--ice); outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) { .card::before, .card::after { display: none; transition: none; } }

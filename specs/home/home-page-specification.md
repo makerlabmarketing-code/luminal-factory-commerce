@@ -532,3 +532,19 @@ No additional continuous particle, cursor-trail or background animation is intro
 - Loader exit accepts 3D ready, poster ready, or bounded error fallback.
 - No manufacturing/STL asset is exposed.
 - Scroll choreography uses transforms/opacity only and cleans up listeners/animation frames on unmount.
+
+## Owner-approved gallery replacement — 2026-10-07
+
+Gallery uses supplied FlexCarousel liquid refraction and a Spotlight Card frame;
+see the Home experience script update. Existing colorway source identity, gallery
+position and all surrounding 3D/folder behavior are preserved. No autoplay or
+vertical wheel interception. Mobile/reduced motion/error states remain native
+image navigation. The Spotlight Card primitive lives at src/components/ui with
+scoped CSS; TypeScript consumers have explicit props. Supplied JSX shader engine
+has a typed declaration boundary and is lazily imported through a TSX feature.
+OGL 1.0.11 owns the supplied 2D refraction shader; existing motion dependencies do
+not render that shader. No additional providers/assets/icons are required.
+
+Plan/tasks: add primitive/demo and source adapter; connect HomeGalleryMedia;
+translate controls; verify interaction/failure/cleanup and repository gate;
+deploy to master and verify the live gallery. Rollback by reverting this batch.

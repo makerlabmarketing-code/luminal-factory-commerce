@@ -15,7 +15,9 @@ test("Luminal Magic Bento adaptation stays registry-free and retires GlowCursor"
   assert.match(bentoCss, /--luminal-bento-intensity/);
   assert.doesNotMatch(motionLayer + bentoCss, /REACTBITS_LICENSE_KEY|@reactbits|GlowCursor|glow-trail/i);
   assert.doesNotMatch(motionLayer, /from ["']gsap["']|gsap\./);
-  assert.equal(packageJson.dependencies?.ogl, undefined);
+  // OGL is approved for the owner-supplied Home FlexCarousel, never for Bento.
+  assert.doesNotMatch(motionLayer + bentoCss, /from ["']ogl["']|FlexCarousel/);
+  assert.equal(packageJson.dependencies?.ogl, "1.0.11");
 
   const serialized = JSON.stringify(components);
   assert.doesNotMatch(serialized, /reactbits|REACTBITS_LICENSE_KEY|Bearer rb_[A-Za-z0-9_-]+/i);

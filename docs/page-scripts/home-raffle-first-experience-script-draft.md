@@ -295,3 +295,15 @@ Approval needed:
 4. Approved: account/cart links remain hidden until commerce contracts exist.
 5. Approved: first implementation slice may proceed after the formal spec and technical plan.
 6. Approved: 3D is not required and must not be added for the first hero slice.
+
+## Owner gallery reference update — 2026-10-07
+
+Owner explicitly supplied Spotlight Card and FlexCarousel source and requested
+replacement of the Home image gallery. Preserve the existing gallery position,
+Luminal colorway assets and captions; replace Drift Wall with the supplied liquid
+carousel. Add one restrained blue spotlight border around its frame. No new
+release facts or stock imagery. Drag/arrows/keyboard select and enlarge images;
+vertical page scroll remains available. No autoplay/cursor-following lens. Fine
+pointer desktop gets WebGL enhancement, loaded only near the viewport. Touch,
+reduced motion, unavailable WebGL/context/image failure use native scroll-snap
+images and an accessible modal. Cleanup observers/listeners/RAF/GPU on departure.
