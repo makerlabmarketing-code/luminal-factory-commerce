@@ -17,6 +17,7 @@ new Function('require', 'module', 'exports', code)(name => {
   if (name === '@/lib/i18n/locale') return { localeHref: href => `/${locale}${href}` };
   if (name === '@/lib/i18n/link') return { default: ({ href, children, ...props }) => React.createElement('a', { ...props, href: `/${locale}${href}` }, children), __esModule: true };
   if (name.endsWith('.css')) return {};
+  if (name === './raffle-cover') return { RaffleCover: ({ src, alt }) => React.createElement('img', { src, alt }) };
   return require(name);
 }, mod, mod.exports);
 const render = async releases => renderToStaticMarkup(await mod.exports.RaffleDiscovery({ releases }));
@@ -49,4 +50,15 @@ test('published cards preserve source identity, escape content, show UTC+7 seman
     for (const entry of entries) assert.ok(html.includes(`href="/${locale}/raffle/${entry.slug}"`));
     assert.doesNotMatch(html, /<form|<script|Enter raffle|No announced releases/);
   }
+});
+
+test('cards show approved cover art only when supplied, retaining title and navigation when absent', async () => {
+  locale = 'vi';
+  const release = { id: 'release', slug: 'release', title: 'Meowhe', summary: null, state: 'open', opensAt: null, closesAt: null };
+  const absent = await render({ state: 'ready', entries: [release] });
+  assert.doesNotMatch(absent, /<img/);
+  const present = await render({ state: 'ready', entries: [{ ...release, media: { src: '/images/approved.webp', alt: 'Lolipop' } }] });
+  assert.match(present, /src="\/images\/approved.webp" alt="Lolipop"/);
+  assert.match(present, /href="\/vi\/raffle\/release"/);
+  assert.equal((present.match(/<h1\b/g) ?? []).length, 1);
 });

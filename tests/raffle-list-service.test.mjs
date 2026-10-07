@@ -67,3 +67,26 @@ test('reader is independently gated and uses bounded anonymous no-store reads; e
     assert.equal((await getPublishedRaffleList()).state, 'unavailable');
   } finally { global.fetch = originalFetch; names.forEach((n, i) => { if (old[i] === undefined) delete process.env[n]; else process.env[n] = old[i]; }); }
 });
+
+test('covers bind to a published parent and exact active colorway; common art is fallback only', () => {
+  const { resolveRaffleCover } = mod.exports;
+  const productId = '550e8400-e29b-41d4-a716-446655440001';
+  const variantId = '550e8400-e29b-41d4-a716-446655440002';
+  const otherId = '550e8400-e29b-41d4-a716-446655440003';
+  const image = (variant_id, storage_path, is_primary = false) => ({ variant_id, storage_path, is_primary, media_type: 'image', sort_order: 0, alt_text: 'Artwork' });
+  const product = { id: productId, status: 'published', published_at: base.published_at,
+    product_variants: [{ id: variantId, product_id: productId, is_active: true }],
+    product_media: [image(otherId, '/images/other.webp', true), image(null, '/images/common.webp', true), image(variantId, '/images/selected.webp')] };
+  const cover = (row = product, target = variantId) => resolveRaffleCover(row, productId, target, 'https://catalog.test', now);
+  assert.equal(cover().src, '/images/selected.webp');
+  assert.equal(cover(product, null).src, '/images/common.webp');
+  assert.equal(cover({ ...product, product_media: product.product_media.slice(0, 2) }).src, '/images/common.webp');
+  for (const change of [{ id: otherId }, { status: 'draft' }, { published_at: '2026-10-08T00:00:00Z' }, { product_variants: [] }, { product_variants: [{ id: variantId, product_id: otherId, is_active: true }] }, { product_variants: [{ id: variantId, product_id: productId, is_active: false }] }]) assert.equal(cover({ ...product, ...change }), null);
+  for (const path of ['//evil.test/photo.webp', '/api/private/photo', '/images/../api/private', '/images/photo?token=secret', 'https://evil.test/photo.webp', 'https://catalog.test/storage/v1/object/sign/private/photo?token=secret', 'https://catalog.test/storage/v1/object/public/catalog-media-drafts/photo.webp']) {
+    assert.equal(cover({ ...product, product_media: [image(variantId, path)] }), null);
+  }
+  assert.equal(cover({ ...product, product_media: [image(variantId, 'https://catalog.test/storage/v1/object/public/catalog/photo.webp')] }).src, 'https://catalog.test/storage/v1/object/public/catalog/photo.webp');
+  const result = resolveRaffleList([{ ...base, product_id: productId, variant_id: variantId, products: product }], now, 'https://catalog.test');
+  assert.equal(result.entries[0].media.src, '/images/selected.webp');
+  assert.equal(resolveRaffleList([{ ...base, products: { invalid: true } }], now).state, 'ready');
+});

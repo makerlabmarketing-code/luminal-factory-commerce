@@ -3,6 +3,7 @@ import { localeHref } from "@/lib/i18n/locale";
 import Link from "@/lib/i18n/link";
 import styles from "./raffle-discovery.module.css";
 import type { RaffleListEntry, RaffleListResult } from "./raffle-list-service";
+import { RaffleCover } from "./raffle-cover";
 
 const statusCopy: Record<RaffleListEntry["state"], string> = {
   open: "Entry window open", upcoming: "Upcoming", closed: "Entry window closed",
@@ -29,6 +30,7 @@ export async function RaffleDiscovery({ releases }: Readonly<{ releases: RaffleL
         <ul className={styles.list}>
           {releases.entries.map(release => (
             <li className={styles.card} key={release.slug}>
+              {release.media && <RaffleCover key={release.media.src} src={release.media.src} alt={release.media.alt || release.title} className={styles.cover} />}
               <span className="status-badge">{tr(statusCopy[release.state])}</span>
               <h2>{release.title}</h2>
               {release.summary && <p>{release.summary}</p>}

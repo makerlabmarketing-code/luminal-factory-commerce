@@ -6,5 +6,7 @@
 .card dt { color: var(--muted-foreground); }
 .card dd { margin: 0; }
 .navigation { margin-top: 2rem; }
+.cover { position: relative; aspect-ratio: 4 / 5; margin-bottom: 1.5rem; overflow: hidden; border: 1px solid var(--border); border-radius: .75rem; background: var(--surface); display: grid; place-items: center; }
+.cover p { padding: 1rem; }
 @media (max-width: 900px) { .list { grid-template-columns: 1fr; gap: 0; } }
 @media (max-width: 500px) { .card dl { grid-template-columns: 1fr; gap: .4rem; } .card dd { margin-bottom: .75rem; } }

@@ -531,3 +531,25 @@ Owner requested fresh gold-rim logo and matching website borders. Exact Drive or
 ### 2026-10-07 — Border focus fix and resin reflection
 
 Owner screenshots identified a blue outer focus ring duplicating the gallery gold rim, and disliked the bronze/violet moving reflection on the process stack. Removed GlowCard container focus-within outline; child keyboard focus remains. Process/local spotlights now use centralized cyan/blue resin colors, softer fill and 2px localized edge. Gallery reflection blue; gold static rim retained. Validate and smoke exact deployed batch.
+
+### 2026-10-07 — C-041 published raffle cover binding
+
+Continued from Điều phối row 59 while C-040 awaits owner component references.
+The bounded public list read embeds only Product identity/publication, active
+Colorway identities and public product_media. Covers require the exact published
+parent (not future-published), exact active parent-bound Colorway, and approved
+image source; selected Colorway art precedes common parent art, never another
+Colorway. Malformed/missing media preserves release text and navigation. Only
+/images local assets or same-project public Storage URLs are accepted; signed,
+private draft, foreign-host, query-token and unsafe local paths are excluded.
+One anonymous no-store request, 30 releases, 120 media/200 Colorway bounds.
+
+Client cover reserves 4:5 space, uses responsive Next Image and localized failure
+feedback. No new motion, dependencies, schema/data mutations or runtime activation.
+Rules/FAQ/payment/eligibility and full detail art direction still need owner input.
+Self-review: no open Commerce PRs; available source/tests used instead of hosted
+Codex review. 374 tests + full check PASS (two existing lint warnings, audit zero).
+Read-only real public-key adapter verification returns empty/0, matching SQL:
+there are no published non-test raffles. Populated-list visual acceptance remains
+pending an approved release; do not create a fictitious release to satisfy it.
+Rollback: revert these list/cover files; no database rollback.
