@@ -1,0 +1,5 @@
+.heading { display:block; margin-bottom:2rem; }
+.title { font-size:clamp(2.25rem,6vw,4.5rem); line-height:1.08; margin:.75rem 0; letter-spacing:-.04em; }
+.record { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-rows:auto; }
+.record > div:last-child { padding:clamp(1.25rem,4vw,3rem); }
+@media (max-width:800px) { .record { grid-template-columns:1fr; } }

@@ -1,3 +1,4 @@
+import styles from "./archive-detail.module.css";
 import { ArchiveMedia } from "./archive-media";
 
 import { getTranslator } from "@/lib/i18n/server";
@@ -12,16 +13,16 @@ export async function ArchiveDetail({ entry }: ArchiveDetailProps) {
   const tr = await getTranslator();
   return (
     <article className="archive-route-section" aria-labelledby="archive-detail-title">
-      <div className="archive-route-heading">
+      <div className={`archive-route-heading ${styles.heading}`}>
         <p className="eyebrow">{tr("Studio archive")}{entry.year ? ` · ${entry.year}` : ""}</p>
         <div>
-          <h1 id="archive-detail-title">{entry.title}</h1>
+          <h1 className={styles.title} id="archive-detail-title">{entry.title}</h1>
           <p>{tr(entry.collection)}</p>
         </div>
         <p>{tr(entry.description)}</p>
       </div>
 
-      <div className="archive-route-card archive-record-layout">
+      <div className={`archive-route-card ${styles.record}`}>
         <ArchiveMedia entry={entry} sizes="(max-width: 800px) calc(100vw - 2rem), 50vw" />
         <div className="archive-route-card-copy">
           <p className="eyebrow">{tr("Historical editorial record")}</p>
