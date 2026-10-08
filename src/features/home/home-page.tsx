@@ -17,6 +17,7 @@ import { HomeArchiveBurst } from "./home-archive-burst";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
 import { MadeAtLuminalStack } from "./made-at-luminal-stack";
 import { getHomeFeaturedRaffle } from "@/features/raffle/raffle-home-service";
+import { CollectorGuide } from "@/features/studio/studio-editorial";
 
 type HomeMediaFrameProps = Readonly<{
   media: HomeMediaContract;
@@ -178,6 +179,7 @@ export async function HomePage() {
           </Container>
         </section>
 
+        <Container><CollectorGuide /></Container>
         <section className="commerce-split [content-visibility:auto] [contain-intrinsic-size:auto_700px]" aria-label={tr("Shop and commission")}>
           <Link href="/shop" className="commerce-door commerce-door-shop overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-spotlight="true"><span className="eyebrow">{tr("Available objects")}</span><h2>{tr("Shop")}</h2><p>{tr("Small-batch pieces and studio editions.")}</p><i aria-hidden="true">↗</i></Link>
           <Link href="/commission" className="commerce-door commerce-door-commission overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-delay="1" data-luminal-spotlight="true"><span className="eyebrow">{tr("Made for you")}</span><h2>{tr("Commission")}</h2><p>{tr("Begin a conversation about a custom object.")}</p><i aria-hidden="true">↗</i></Link>

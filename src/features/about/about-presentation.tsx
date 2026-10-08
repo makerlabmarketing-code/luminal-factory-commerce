@@ -3,12 +3,15 @@ import { localizePresentation } from "@/lib/i18n/presentation";
 import { getTranslator, getLocale } from "@/lib/i18n/server";
 import Link from "@/lib/i18n/link";
 import type { AboutPresentation as AboutContent } from "./about-content";
+import { StudioStory } from "@/features/studio/studio-editorial";
+import { getStudioCopy } from "@/features/studio/studio-copy";
 
 type AboutPresentationProps = Readonly<{ content: AboutContent }>;
 
 export async function AboutPresentation({ content: originalContent }: AboutPresentationProps) {
   const tr = await getTranslator();
   const content = localizePresentation(originalContent, await getLocale());
+  const copy = getStudioCopy(await getLocale());
   return (
     <>
       <section className="section" aria-labelledby="about-page-title">
@@ -22,11 +25,12 @@ export async function AboutPresentation({ content: originalContent }: AboutPrese
         </div>
       </section>
 
+      <StudioStory />
       <section className="section section-surface" aria-labelledby="about-objects-title">
         <div className="section-heading">
           <p className="eyebrow">{tr("What we make")}</p>
-          <h2 id="about-objects-title">{tr("Object trước, category sau.")}</h2>
-          <p>{tr("Ba hướng public dưới đây mô tả phạm vi hiện tại mà không biến chúng thành lời hứa về stock, capacity hay timing.")}</p>
+          <h2 id="about-objects-title">{copy.objectsTitle}</h2>
+          <p>{copy.objectsIntro}</p>
         </div>
         <div className="card-grid">
           {content.objectCategories.map((category) => (
@@ -42,7 +46,7 @@ export async function AboutPresentation({ content: originalContent }: AboutPrese
         <div className="section-heading">
           <p className="eyebrow">{tr("Studio process")}</p>
           <h2 id="about-process-title">{tr("Từ hình dung đến một vật thể có thật.")}</h2>
-          <p>{tr("Đây là ngữ cảnh editorial về cách công việc có thể di chuyển trong studio, không phải production SLA.")}</p>
+          <p>{copy.processIntro}</p>
         </div>
         <ol className="steps-grid">
           {content.processSteps.map((step) => (
@@ -58,7 +62,7 @@ export async function AboutPresentation({ content: originalContent }: AboutPrese
       <section className="section section-surface" aria-labelledby="about-principles-title">
         <div className="section-heading">
           <p className="eyebrow">{tr("Studio principles")}</p>
-          <h2 id="about-principles-title">{tr("Ít lời hứa hơn, nhiều sự chú ý hơn vào object.")}</h2>
+          <h2 id="about-principles-title">{copy.principlesTitle}</h2>
         </div>
         <ul className="process-list">
           {content.principles.map((principle, index) => (
@@ -76,7 +80,7 @@ export async function AboutPresentation({ content: originalContent }: AboutPrese
       <section className="section" aria-labelledby="about-explore-title">
         <div className="section-heading">
           <p className="eyebrow">{tr("Explore Luminal")}</p>
-          <h2 id="about-explore-title">{tr("Mỗi surface có một vai trò riêng.")}</h2>
+          <h2 id="about-explore-title">{copy.exploreTitle}</h2>
         </div>
         <div className="card-grid">
           {content.routeBridges.map((bridge) => (
@@ -93,7 +97,7 @@ export async function AboutPresentation({ content: originalContent }: AboutPrese
         <div className="contact-panel">
           <p className="eyebrow">{tr("Custom object")}</p>
           <h2 id="about-commission-title">{tr("Có một ý tưởng cần studio review?")}</h2>
-          <p>{tr("About không tạo một contact form thứ hai. Commission giữ riêng inquiry context và các expectation liên quan.")}</p>
+          <p>{copy.contactIntro}</p>
           <div className="actions">
             <Link className="button-link" href="/commission">{tr("Đi tới Commission")}</Link>
           </div>

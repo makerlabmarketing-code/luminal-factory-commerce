@@ -4,6 +4,8 @@ import { getTranslator, getLocale } from "@/lib/i18n/server";
 import Link from "@/lib/i18n/link";
 import type { CommissionPresentation } from "./commission-content";
 import { CommissionInquiryForm } from "./commission-inquiry-form";
+import { CommissionExamples } from "@/features/studio/studio-editorial";
+import { getStudioCopy } from "@/features/studio/studio-copy";
 
 type CommissionDiscoveryProps = Readonly<{
   content: CommissionPresentation;
@@ -13,6 +15,7 @@ type CommissionDiscoveryProps = Readonly<{
 export async function CommissionDiscovery({ content: originalContent, inquiryEnabled }: CommissionDiscoveryProps) {
   const tr = await getTranslator();
   const content = localizePresentation(originalContent, await getLocale());
+  const copy = getStudioCopy(await getLocale());
   return (
     <>
       <section className="section" aria-labelledby="commission-title">
@@ -49,6 +52,7 @@ export async function CommissionDiscovery({ content: originalContent, inquiryEna
         </div>
       </section>
 
+      <CommissionExamples />
       <section className="section" aria-labelledby="commission-process-title">
         <div className="section-heading">
           <p className="eyebrow">{tr("Collaboration process")}</p>
@@ -70,7 +74,7 @@ export async function CommissionDiscovery({ content: originalContent, inquiryEna
         <div className="section-heading">
           <p className="eyebrow">{tr("Prepare")}</p>
           <h2 id="commission-prepare-title">{tr("Những thông tin hữu ích trước khi gửi inquiry.")}</h2>
-          <p>{tr("First inquiry slice không có file upload. Reference URL có thể dùng để chia sẻ context bạn có quyền chia sẻ.")}</p>
+          <p>{copy.prepareIntro}</p>
         </div>
         <ol className="process-list">
           {content.preparationItems.map((item, index) => (

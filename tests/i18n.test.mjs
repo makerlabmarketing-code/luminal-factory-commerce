@@ -83,7 +83,9 @@ test('Production metadata and sitemap have an absolute verified origin even with
     process.env.VERCEL_ENV = 'production';
     const { default: sitemap } = loadModule('src/app/sitemap.ts', { '@/lib/site-url': { publicSiteUrl: 'https://luminalfactory.com' }, '@/lib/i18n/locale': { locales: ['en','vi'], localeHref } });
     const entries = sitemap();
-    assert.equal(entries.length, 12);
+    assert.equal(entries.length, 14);
+    assert.ok(entries.some(entry => entry.url === 'https://luminalfactory.com/vi/support'));
+    assert.ok(entries.some(entry => entry.url === 'https://luminalfactory.com/en/support'));
     assert.ok(entries.every(entry => entry.url.startsWith('https://luminalfactory.com/') && Object.values(entry.alternates.languages).every(url => url.startsWith('https://luminalfactory.com/'))));
     assert.ok(entries.every(entry => !/account|cart|test|object-study/.test(entry.url)));
     process.env.VERCEL_ENV = 'preview';

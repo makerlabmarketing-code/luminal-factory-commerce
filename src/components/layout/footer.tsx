@@ -1,11 +1,13 @@
 
-import { getTranslator } from "@/lib/i18n/server";
+import { getLocale, getTranslator } from "@/lib/i18n/server";
+import { getStudioCopy } from "@/features/studio/studio-copy";
 import Image from "next/image";
 import Link from "@/lib/i18n/link";
 import { navigation } from "./navigation";
 
 export async function Footer() {
   const tr = await getTranslator();
+  const copy = getStudioCopy(await getLocale());
   return (
     <footer className="site-footer">
       <div className="footer-grid">
@@ -23,6 +25,8 @@ export async function Footer() {
         </div>
         <nav aria-label={tr("Điều hướng chân trang")}>
           {navigation.map((item) => <Link key={item.href} href={item.href}>{tr(item.label)}</Link>)}
+          <Link href="/support">{copy.support}</Link>
+          <Link href="/support#contact">{copy.contactTitle}</Link>
         </nav>
         <p>{tr("Artisan keycap, nhân vật 3D và những vật thể sưu tầm được tạo tác tại Luminal Factory.")}</p>
       </div>

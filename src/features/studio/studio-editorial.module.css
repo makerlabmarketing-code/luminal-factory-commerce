@@ -1,0 +1,26 @@
+.section { padding-block:clamp(2.5rem,6vw,5rem); }
+.heading { max-width:48rem; margin-bottom:2rem; }
+.heading h1, .heading h2, .story h2 { font-size:clamp(1.75rem,3vw,3rem); line-height:1.15; font-weight:430; letter-spacing:-.035em; margin:0 0 1rem; }
+.heading p, .story p, .cards p { color:var(--muted-foreground); line-height:1.7; }
+.story { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem); align-items:center; }
+.story figure { margin:0; }
+.image { position:relative; aspect-ratio:4/3; overflow:hidden; border-radius:var(--radius-large); border:1px solid var(--border); }
+.image img { object-fit:cover; }
+.caption { font-size:.875rem; line-height:1.5; color:var(--muted-foreground); margin-top:.75rem; }
+.note { border-left:2px solid var(--border); padding-left:1rem; margin-top:1.5rem; }
+.note h3 { font-size:1.125rem; font-weight:500; }
+.cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.5rem; }
+.cards h3 { font-size:1.25rem; line-height:1.35; font-weight:450; margin:1rem 0 .5rem; }
+.cards p { margin:.5rem 0; }
+.steps { padding:0; list-style:none; counter-reset:step; }
+.steps li { border-top:1px solid var(--border); padding-top:1.25rem; }
+.steps li::before { counter-increment:step; content:"0" counter(step); color:var(--muted-foreground); font: .875rem var(--font-mono); }
+.links { display:flex; flex-wrap:wrap; gap:.75rem 1.5rem; margin-top:1.5rem; }
+.links a { display:inline-flex; align-items:center; min-height:44px; }
+.faq { max-width:60rem; }
+.faq details { border-top:1px solid var(--border); padding:1rem 0; }
+.faq details:last-child { border-bottom:1px solid var(--border); }
+.faq summary { cursor:pointer; min-height:44px; display:list-item; align-content:center; font-size:1.125rem; line-height:1.5; }
+.faq p { color:var(--muted-foreground); max-width:65ch; line-height:1.7; }
+.section[id] { scroll-margin-top:6rem; }
+@media (max-width:800px) { .story { grid-template-columns:1fr; } .cards { grid-template-columns:1fr; } .cards .image { aspect-ratio:16/10; } }
