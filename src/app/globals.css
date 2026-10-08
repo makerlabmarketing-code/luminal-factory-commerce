@@ -760,7 +760,7 @@ html[lang="vi"] .wave-home h2 {overflow-wrap:break-word}
 
 /* Give the four process cards the same visible metal edge as the menu rail. */
 .made-at-luminal [data-process-collapsed] {
-  border-width: 1.5px;
+  border-width: 2px;
   border-color: transparent;
   background: linear-gradient(#0d0d0e, #0d0d0e) padding-box, var(--rim-gradient) border-box;
   box-shadow: var(--rim-bevel), 0 2rem 7rem rgba(0, 0, 0, .38);
