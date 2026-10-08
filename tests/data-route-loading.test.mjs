@@ -14,13 +14,14 @@ test("data-backed Shop routes expose a shared loading boundary", () => {
 
 test("loading presentation is accessible and stays dependency-free", () => {
   const loader = read("src/components/ui/data-route-loading.tsx");
-  const styles = read("src/app/globals.css");
+  const mark = read("src/components/ui/luminal-loading-mark.tsx");
+  const styles = read("src/components/ui/luminal-loading-mark.module.css");
 
   assert.match(loader, /role="status"/);
   assert.match(loader, /aria-live="polite"/);
   assert.match(loader, /aria-busy="true"/);
-  assert.match(loader, /aria-hidden="true"/);
-  assert.match(styles, /@keyframes data-route-loading-orbit/);
+  assert.match(mark, /aria-hidden="true"/);
+  assert.match(styles, /@keyframes luminal-resin-travel/);
   assert.match(styles, /prefers-reduced-motion: reduce/);
-  assert.doesNotMatch(`${loader}\n${styles}`, /lottiefiles|dotlottie|https?:\/\//i);
+  assert.doesNotMatch(`${loader}\n${mark}\n${styles}`, /lottiefiles|dotlottie|https?:\/\//i);
 });

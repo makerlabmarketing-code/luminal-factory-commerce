@@ -3,6 +3,7 @@ import { useTranslator } from "@/lib/i18n/client";
 
 
 import Image from "next/image";
+import { LuminalLoadingMark } from "@/components/ui/luminal-loading-mark";
 import { useEffect, useRef } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
 import { applyHeroMaterialTint, type HeroModelMaterial } from "./hero-model-materials";
@@ -448,12 +449,7 @@ export function HeroObjectStage({
 
           <div ref={loaderRef} className="absolute inset-0 z-[5] flex items-center justify-center opacity-0 transition-opacity duration-300" role="status" aria-live="polite">
             <div className="flex flex-col items-center gap-4">
-              <div className="relative size-14" aria-hidden="true">
-                <span className="absolute inset-0 rounded-full border border-white/10" />
-                <span className="absolute inset-0 animate-spin rounded-full border border-transparent border-t-white/80 border-r-white/25 motion-reduce:animate-none" />
-                <span className="absolute inset-[9px] rounded-full border border-white/15 motion-safe:animate-pulse" />
-                <span className="absolute inset-[21px] rounded-full bg-white/75 shadow-[0_0_18px_rgba(255,255,255,0.35)]" />
-              </div>
+              <LuminalLoadingMark compact />
               <span className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-white/45">{tr("Loading 3D object")}</span>
             </div>
           </div>
