@@ -4,7 +4,7 @@ import { useTranslator } from "@/lib/i18n/client";
 
 import Image from "next/image";
 import Link from "@/lib/i18n/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { navigation } from "@/components/layout/navigation";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import styles from "./home-arrival-header.module.css";
@@ -17,6 +17,9 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
   const tr = useTranslator();
   const [stage, setStage] = useState<HeaderStage>(immersive ? "waiting" : "revealed");
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!immersive) return;
@@ -45,15 +48,62 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
 
   useEffect(() => {
     if (!menuOpen) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
+    const header = headerRef.current;
+    const panel = menuRef.current;
+    const trigger = triggerRef.current;
+    if (!header || !panel || !trigger) return;
+    const previousOverflow = document.body.style.overflow;
+    const isolated = new Map<HTMLElement, boolean>();
+    // Isolate siblings along both branches, leaving the close trigger usable.
+    const isolateBranch = (element: HTMLElement, stop: HTMLElement) => {
+      let current = element;
+      while (current !== stop && current.parentElement) {
+        for (const sibling of Array.from(current.parentElement.children)) {
+          if (!(sibling instanceof HTMLElement) || sibling === current || sibling.contains(panel) || sibling.contains(trigger)) continue;
+          if (!isolated.has(sibling)) isolated.set(sibling, sibling.inert);
+          sibling.inert = true;
+        }
+        current = current.parentElement;
+      }
     };
+    isolateBranch(trigger, document.body);
+    isolateBranch(panel, document.body);
+    document.body.style.overflow = "hidden";
+    const items = () => [trigger, ...Array.from(panel.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), [tabindex="0"]'))]
+      .filter((element) => element.getClientRects().length > 0);
+    (items()[1] ?? trigger).focus();
+    const desktop = window.matchMedia("(min-width: 900px)");
+    const closeOnDesktop = () => { if (desktop.matches) setMenuOpen(false); };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); setMenuOpen(false); }
+      if (event.key !== "Tab") return;
+      const controls = items();
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (!first) return;
+      if (!controls.includes(document.activeElement as HTMLElement) || (event.shiftKey && document.activeElement === first)) {
+        event.preventDefault(); (event.shiftKey ? last : first).focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault(); first.focus();
+      }
+    };
+    desktop.addEventListener("change", closeOnDesktop);
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      desktop.removeEventListener("change", closeOnDesktop);
+      window.removeEventListener("keydown", handleKeyDown);
+      for (const [element, inert] of isolated) element.inert = inert;
+      document.body.style.overflow = previousOverflow;
+      if (trigger.isConnected && trigger.getClientRects().length > 0) trigger.focus();
+    };
   }, [menuOpen]);
 
   return (
     <header
+      ref={headerRef}
+      role={menuOpen ? "dialog" : undefined}
+      aria-modal={menuOpen ? true : undefined}
+      aria-label={menuOpen ? tr("Điều hướng chính trên di động") : undefined}
       className={styles.header}
       data-stage={immersive ? stage : "revealed"}
       data-menu-open={menuOpen ? "true" : "false"}
@@ -98,6 +148,7 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
 
         <button
           type="button"
+          ref={triggerRef}
           className={styles.menuButton}
           onClick={() => setMenuOpen((value) => !value)}
           aria-label={menuOpen ? tr("Đóng menu") : tr("Mở menu")}
@@ -110,6 +161,7 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
       </div>
 
       <nav
+        ref={menuRef}
         id="home-arrival-mobile-menu"
         className={styles.mobilePanel}
         aria-label={tr("Điều hướng chính trên di động")}
