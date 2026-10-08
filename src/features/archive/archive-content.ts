@@ -1,6 +1,7 @@
+import { homePageMedia } from "@/content/homepage-media";
 import type { PresentationMedia } from "@/types/media";
 
-export type ArchivePresentationStatus = "curated-placeholder";
+export type ArchivePresentationStatus = "curated-placeholder" | "studio-record";
 
 export type ArchivePresentationFact = Readonly<{
   label: string;
@@ -24,7 +25,7 @@ export type ArchivePresentationEntry = Readonly<{
   }>;
   status: ArchivePresentationStatus;
   href: `/archive/${string}`;
-  isPlaceholder: true;
+  isPlaceholder: boolean;
 }>;
 
 export const archivePlaceholderNotice = "Curated placeholder — pending production content approval";
@@ -146,10 +147,35 @@ export const curatedArchiveEntries = [
   },
 ] as const satisfies readonly ArchivePresentationEntry[];
 
+/** Public records reuse photographs already approved for the Homepage.
+ * No release date, edition size or availability is inferred from photography. */
+export const studioArchiveEntries = ([
+  { slug: "meowhe-lolipop", colorway: "Lolipop", tone: "ice", description: "A candy-inspired Meowhe colorway with a mischievous expression." },
+  { slug: "meowhe-mictlan", colorway: "Mictlán", tone: "violet", description: "A skull-inspired Meowhe colorway from the studio archive." },
+  { slug: "meowhe-mono", colorway: "Mono", tone: "smoke", description: "A monochrome Meowhe colorway in black and white." },
+] as const).map((record): ArchivePresentationEntry => {
+  const photo = homePageMedia.gallery.find((item) => item.colorway === record.colorway)!;
+  return {
+    id: `archive-${record.slug}`, slug: record.slug, title: `Meowhe ${record.colorway}`,
+    collection: "Meowhe colorways", year: "", description: record.description,
+    story: record.description,
+    materialNote: "Artisan resin keycap",
+    historicalNotes: ["Part of the studio's transition from Lazy Factory to Luminal Factory."],
+    facts: [{ label: "Character", value: "Meowhe" }, { label: "Colorway", value: record.colorway }],
+    media: {
+      type: "image", src: photo.src, alt: photo.alt, width: 1200, height: 1500,
+      aspectRatio: "4 / 5", credit: "Luminal Factory", source: "lazyfactory-historical-archive",
+      historicalBrand: true, productionApproved: true, objectPosition: photo.objectPosition ?? "center",
+      placeholderFallback: "", label: record.colorway, tone: record.tone,
+    },
+    status: "studio-record", href: `/archive/${record.slug}`, isPlaceholder: false,
+  };
+});
+
 export function getCuratedArchiveEntries(): readonly ArchivePresentationEntry[] {
-  return curatedArchiveEntries;
+  return studioArchiveEntries;
 }
 
 export function getArchiveEntryBySlug(slug: string): ArchivePresentationEntry | undefined {
-  return curatedArchiveEntries.find((entry) => entry.slug === slug);
+  return getCuratedArchiveEntries().find((entry) => entry.slug === slug);
 }

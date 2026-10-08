@@ -755,3 +755,7 @@ html[lang="vi"] .wave-home h2 {overflow-wrap:break-word}
   background: linear-gradient(#0d0d0e, #0d0d0e) padding-box, var(--rim-gradient) border-box;
   box-shadow: var(--rim-bevel), 0 2rem 7rem rgba(0, 0, 0, .38);
 }
+
+.archive-record-layout { grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-rows:auto; }
+.archive-record-layout > .archive-route-card-copy { padding:clamp(1.25rem,4vw,3rem); }
+@media (max-width:800px) { .archive-record-layout { grid-template-columns:1fr; } }

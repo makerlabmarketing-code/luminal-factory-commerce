@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: ArchiveDetailPageProps): Prom
   return {
     alternates: languageAlternates(`/archive/${entry.slug}`, locale),
     title: `${entry.title} | Archive | Luminal Factory`,
-    description: `${entry.description} ${entry.collection}, ${entry.year}.`,
+    description: [tr(entry.description), tr(entry.collection), entry.year].filter(Boolean).join(" · "),
   };
 }
 

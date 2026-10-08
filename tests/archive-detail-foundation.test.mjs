@@ -41,7 +41,7 @@ test("archive detail remains historical and non-transactional", async () => {
   const text = await source(detailPath);
 
   assert.match(text, /Historical editorial record/);
-  assert.match(text, /What this record can truthfully say/);
+  assert.match(text, /From Lazy Factory to Luminal Factory/);
   assert.match(text, /Quay lại Archive/);
   assert.doesNotMatch(text, /Add to Cart|Buy Now|checkout|payment provider|stock quantity/i);
 });

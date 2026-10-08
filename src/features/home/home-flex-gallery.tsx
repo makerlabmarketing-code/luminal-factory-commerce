@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "@/lib/i18n/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import type { HomeGalleryMedia } from "@/content/homepage-media";
@@ -55,6 +56,13 @@ export function HomeFlexGallery({ items }: Readonly<{ items: readonly HomeGaller
       </div>
     </GlowCard>
     <p className={styles.hint}>{tr(showEngine && ready ? "Drag to explore · Select an image to enlarge" : "Swipe to explore · Select an image to enlarge")}</p>
+    <nav className={styles.records} aria-label={tr("Explore colorway records")}>
+      <Link href="/archive/meowhe-lolipop">Lolipop <span aria-hidden="true">↗</span></Link>
+      <Link href="/archive/meowhe-mictlan">Mictlán <span aria-hidden="true">↗</span></Link>
+      <Link href="/archive/meowhe-mono">Mono <span aria-hidden="true">↗</span></Link>
+    </nav>
+    <p className={styles.hint}>{tr("Artisan keycaps are small sculpted resin objects for mechanical keyboards and collections.")}</p>
+    <p className={styles.hint}><Link className="text-link" href="/raffle">{tr("Explore announced releases")} <span aria-hidden="true">↗</span></Link></p>
     <dialog ref={dialogRef} className={styles.dialog} onClose={() => setSelected(null)} onClick={event => { if (event.target === event.currentTarget) setSelected(null); }} aria-label={tr("Image preview")}>
       <button autoFocus type="button" className="button-link button-secondary" onClick={() => setSelected(null)}>{tr("Close")}</button>
       {selected && <figure><div className={styles.preview}><Image src={selected.src} alt={selected.alt} fill sizes="(max-width: 900px) 88vw, 900px" /></div><figcaption>{selected.colorway}</figcaption></figure>}

@@ -28,7 +28,7 @@ export default async function ArchivePage() {
             <h1 id="archive-title">{tr("A quiet foundation for collectible memory.")}</h1>
             <p>
               {tr("Archive là historical showcase cho các collectible và release trước đây. Slice này chỉ dùng curated placeholder presentation data, chưa kết nối Supabase hoặc production content.")}</p>
-            <Link href="/#raffle">{tr("Quay về raffle discovery")}</Link>
+            <Link href="/raffle">{tr("Quay về raffle discovery")}</Link>
           </section>
           <ArchiveCollection entries={entries} />
         </Container>

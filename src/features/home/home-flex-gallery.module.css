@@ -19,3 +19,8 @@
 @media (prefers-reduced-motion:reduce) { .strip { scroll-behavior:auto; } }
 
 .dialog { border-color: transparent; background: linear-gradient(#090909,#090909) padding-box, var(--rim-gradient) border-box; box-shadow: var(--rim-bevel); }
+
+.records { display:flex; flex-wrap:wrap; justify-content:center; gap:.75rem; margin-top:1rem; }
+.records a { display:inline-flex; align-items:center; justify-content:space-between; gap:1.5rem; min-height:44px; padding:.5rem 1rem; border:1px solid var(--border); border-radius:999px; color:var(--foreground); }
+.records a:focus-visible { outline:2px solid var(--ice); outline-offset:4px; }
+.records a:hover { border-color:var(--ice); }
