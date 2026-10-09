@@ -15,6 +15,7 @@ type HeroObjectStageProps = Readonly<{
   preload?: boolean;
   allowTouch3d?: boolean;
   mobileOnly?: boolean;
+  showLoadingIndicator?: boolean;
 }>;
 
 type NetworkInformationLike = {
@@ -80,6 +81,7 @@ export function HeroObjectStage({
   preload = false,
   allowTouch3d = false,
   mobileOnly = false,
+  showLoadingIndicator = true,
 }: HeroObjectStageProps) {
   const tr = useTranslator();
   const stageRef = useRef<HTMLDivElement>(null);
@@ -447,12 +449,12 @@ export function HeroObjectStage({
             aria-hidden="true"
           />
 
-          <div ref={loaderRef} className="absolute inset-0 z-[5] flex items-center justify-center opacity-0 transition-opacity duration-300" role="status" aria-live="polite">
+          {showLoadingIndicator && <div ref={loaderRef} className="absolute inset-0 z-[5] flex items-center justify-center opacity-0 transition-opacity duration-300" role="status" aria-live="polite">
             <div className="flex flex-col items-center gap-4">
               <LuminalLoadingMark compact />
               <span className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-white/45">{tr("Loading 3D object")}</span>
             </div>
-          </div>
+          </div>}
 
           <div ref={errorRef} className="pointer-events-none absolute inset-0 z-[4] flex items-center justify-center opacity-0 transition-opacity duration-300" role="status">
             <span className="rounded-full border border-white/10 bg-black/55 px-3 py-2 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-white/55 backdrop-blur-sm">{tr("3D preview unavailable")}</span>

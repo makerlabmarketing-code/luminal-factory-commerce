@@ -426,7 +426,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
   return (
     <div className={styles.experience} data-home-immersive-experience="true">
       <div ref={modelLayerRef} className={styles.modelLayer} data-home-immersive-model="true">
-        <HeroObjectStage media={media} presentation={presentation} preload allowTouch3d />
+        <HeroObjectStage media={media} presentation={presentation} preload allowTouch3d showLoadingIndicator={false} />
       </div>
 
       <div className={styles.introRoot} data-phase={phase} aria-hidden={phase === "done" ? "true" : undefined}>
