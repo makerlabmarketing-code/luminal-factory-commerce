@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { after } from 'next/server';
+import { processRaffleConfirmation } from '@/lib/supabase/raffle-confirmation-server';
 import {
   getRaffleEntryEnvironment,
   getRaffleEntrySourceIdentifier,
@@ -30,11 +32,16 @@ export async function POST(request: NextRequest) {
     return createResponse(await handleRaffleEntryRequest(request, { environment }));
   }
 
-  return createResponse(await handleRaffleEntryRequest(request, {
+  const outcome=await handleRaffleEntryRequest(request, {
     environment,
     service: getServerRaffleEntryService(),
     rateLimiter: getServerRaffleEntryRateLimiter(),
     captchaVerifier: getServerRaffleEntryCaptchaVerifier(),
     sourceIdentifier: getRaffleEntrySourceIdentifier(request.headers),
-  }));
+  });
+  if(outcome.body.ok && outcome.body.state==='submitted') {
+    const entryId=outcome.body.entryReference;
+    after(async()=>{await processRaffleConfirmation(entryId);});
+  }
+  return createResponse(outcome);
 }
