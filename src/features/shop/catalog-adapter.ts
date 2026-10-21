@@ -190,17 +190,23 @@ function mapProduct(row: CatalogProductRow): ShopPresentationEntry {
   const tone = toneForSlug(row.slug);
   const description = row.description?.trim() || "Mô tả chi tiết cho object này chưa được công bố trong catalog.";
 
+  // Legacy catalog metadata cannot override the raffle-only keycap boundary.
+  const releaseType = row.product_type === "artisan_keycap" ? "informational" : row.release_type;
   const releaseLabel =
-    row.release_type === "direct"
+    row.product_type === "artisan_keycap"
+      ? "Raffle-only artisan keycap"
+      : releaseType === "direct"
       ? "Direct catalog"
-      : row.release_type === "preorder"
+      : releaseType === "preorder"
         ? "Preorder catalog"
         : "Catalog object";
 
   const availabilityLabel =
-    row.release_type === "direct"
+    row.product_type === "artisan_keycap"
+      ? "Artisan keycaps are released through raffles. See release details for availability."
+      : releaseType === "direct"
       ? "Catalog đã publish · purchase flow chưa mở"
-      : row.release_type === "preorder"
+      : releaseType === "preorder"
         ? "Catalog preorder đã publish · checkout chưa mở"
         : "Catalog đã publish · chỉ hiển thị thông tin";
 
@@ -221,7 +227,7 @@ function mapProduct(row: CatalogProductRow): ShopPresentationEntry {
     ],
     facts: [
       { label: "Product type", value: row.product_type },
-      { label: "Release type", value: row.release_type },
+      { label: "Release type", value: releaseType },
       ...(priceLabel ? [{ label: "Published price", value: priceLabel }] : []),
       { label: "Catalog authority", value: "Luminal Factory Commerce" },
     ],
@@ -279,7 +285,12 @@ async function requestProducts(options?: {
     endpoint.searchParams.set("offset", String((query.page - 1) * SHOP_PAGE_SIZE));
     if (query.q) endpoint.searchParams.set("or", `(name.ilike.*${query.q}*,description.ilike.*${query.q}*)`);
     if (query.type) endpoint.searchParams.set("product_type", `eq.${query.type}`);
-    if (query.release) endpoint.searchParams.set("release_type", `eq.${query.release}`);
+    if (query.release === "informational") {
+      endpoint.searchParams.set("and", "(or(release_type.eq.informational,product_type.eq.artisan_keycap))");
+    } else if (query.release) {
+      endpoint.searchParams.set("release_type", `eq.${query.release}`);
+      endpoint.searchParams.set("and", "(product_type.neq.artisan_keycap)");
+    }
   }
 
   try {

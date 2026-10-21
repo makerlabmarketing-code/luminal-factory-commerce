@@ -65,6 +65,9 @@ flow testing and is not public catalog content.
 ## Cart / raffle boundary
 
 - `artisan_keycap` is raffle-only.
+- Public Shop labels and release filters treat keycaps as informational / raffle-only,
+  including legacy rows marked direct or preorder. This presentation rule does not
+  change stored metadata or imply an open raffle.
 - Guest Cart and verified Customer Cart must reject `artisan_keycap`.
 - A future `CART-INTEGRATED-SMOKE-01` requires an approved published
   non-keycap toy / 3D model product.
