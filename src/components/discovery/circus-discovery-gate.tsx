@@ -52,6 +52,7 @@ export function CircusDiscoveryGate({ id, heading, invitation, actionLabel, bubb
           <span className={styles.roof} />
           <span className={styles.scallops} />
           <span className={styles.stageLight} />
+          <span className={styles.stageLamp} />
           <span className={`${styles.curtain} ${styles.curtainLeft}`} />
           <span className={`${styles.curtain} ${styles.curtainRight}`} />
           <span className={styles.floor} />

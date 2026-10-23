@@ -5,7 +5,8 @@
 .finial::after { content: ""; position: absolute; top: -.45rem; left: -.4rem; width: 1.55rem; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f6e2b7, #8d714e 55%, #3d2d22); }
 .roof { position: absolute; z-index: 2; top: 9%; left: 7%; width: 86%; height: 32%; clip-path: polygon(50% 0, 96% 75%, 100% 100%, 0 100%, 4% 75%); background: repeating-conic-gradient(from 240deg at 50% 0%, #301421 0 16deg, #621f35 16deg 31deg, #33131e 31deg 47deg); border-bottom: .35rem solid #9c7857; }
 .scallops { position: absolute; z-index: 4; top: 40%; left: 7%; width: 86%; height: 5%; background: radial-gradient(ellipse 6% 100% at 6% 0, #7c2942 98%, transparent 102%) 0 0 / 12.5% 100% repeat-x; filter: drop-shadow(0 .2rem 0 #ad9168); }
-.stageLight { position: absolute; top: 21%; left: 28%; width: 44%; height: 70%; clip-path: polygon(48% 0, 52% 0, 100% 100%, 0 100%); background: linear-gradient(180deg, rgba(252,235,196,.55), rgba(196,222,246,.18) 62%, transparent); opacity: .72; transition: opacity .55s ease, transform .55s ease; }
+.stageLight { position: absolute; z-index: 4; top: 21%; left: 28%; width: 44%; height: 70%; clip-path: polygon(48% 0, 52% 0, 100% 100%, 0 100%); background: linear-gradient(180deg, rgba(252,235,196,.42), rgba(196,222,246,.14) 62%, transparent); opacity: .72; mix-blend-mode: screen; transition: opacity .55s ease, transform .55s ease; }
+.stageLamp { position: absolute; z-index: 4; top: 42%; left: 50%; width: 2.4rem; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, #fff9dd 0 14%, #f4d9a0 25%, rgba(226,187,119,.38) 48%, transparent 72%); box-shadow: 0 0 1.5rem .5rem rgba(244,217,160,.28), 0 0 5rem 1rem rgba(244,217,160,.13); transition: box-shadow .55s ease; }
 .curtain { position: absolute; z-index: 3; top: 41%; height: 52%; width: 43%; background: repeating-linear-gradient(90deg, #381321 0 12%, #762944 19%, #4b192c 30%, #270d1a 43%); box-shadow: inset 0 0 2rem rgba(0,0,0,.65), 0 0 2rem rgba(0,0,0,.6); transition: transform .65s cubic-bezier(.22,.68,.17,1); }
 .curtainLeft { left: 7%; border-radius: 0 0 2rem .5rem; transform-origin: left top; }
 .curtainRight { right: 7%; border-radius: 0 0 .5rem 2rem; transform-origin: right top; }
@@ -15,6 +16,7 @@
 .tent:has(.hotspot:hover) .curtainLeft, .tent:focus-within .curtainLeft { transform: translateX(-9%); }
 .tent:has(.hotspot:hover) .curtainRight, .tent:focus-within .curtainRight { transform: translateX(9%); }
 .tent:has(.hotspot:hover) .stageLight, .tent:focus-within .stageLight { opacity: 1; transform: scale(1.07); }
+.tent:has(.hotspot:hover) .stageLamp, .tent:focus-within .stageLamp { box-shadow: 0 0 2rem 1rem rgba(244,217,160,.55), 0 0 7rem 2rem rgba(244,217,160,.23); }
 .tentCopy { position: relative; z-index: 5; width: min(90%, 35rem); margin-bottom: clamp(1.5rem, 4vh, 3rem); padding: 1.5rem 2rem; text-align: center; color: #f6f0e8; background: radial-gradient(ellipse at center, rgba(6,6,10,.92), rgba(6,6,10,.7) 65%, transparent); }
 .eyebrow { font: .7rem var(--font-mono), monospace; letter-spacing: .24em; color: #dfc9aa; }
 .tentCopy h2 { margin: .7rem 0; font-size: clamp(2.3rem, 4vw, 3.5rem); font-weight: 420; line-height: .98; letter-spacing: -.055em; }
@@ -35,4 +37,4 @@
 .bubbleField > *:nth-child(3) { animation-delay: .32s; }
 @keyframes bubble-arrive { 0% { opacity: 0; transform: translate3d(0, 5rem, 0) scale(.48); } 75% { opacity: 1; transform: translate3d(0, -.8rem, 0) scale(1.03); } 100% { opacity: 1; transform: none; } }
 @media (max-width: 700px) { .tent { min-height: 34rem; } .roof { left: 2%; width: 96%; } .scallops { left: 2%; width: 96%; } .curtainLeft { left: 2%; width: 48%; } .curtainRight { right: 2%; width: 48%; } .tentCopy { width: 96%; padding: 1.5rem .7rem; margin-bottom: 2rem; } .enter { background: #412439; opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .curtain, .stageLight, .enter { transition: none; } .flash { display: none; } .bubbleField > * { opacity: 1; animation: none; } }
+@media (prefers-reduced-motion: reduce) { .curtain, .stageLight, .stageLamp, .enter { transition: none; } .flash { display: none; } .bubbleField > * { opacity: 1; animation: none; } }
