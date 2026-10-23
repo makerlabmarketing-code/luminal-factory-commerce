@@ -8,12 +8,15 @@ import { Header } from "@/components/layout/header";
 import { Container } from "@/components/ui/container";
 import {
   getShopCatalog,
+  getLatestPublishedMeowhe,
   normalizeShopCatalogQuery,
   SHOP_PRODUCT_TYPES,
   SHOP_RELEASE_TYPES,
   type ShopCatalogQuery,
 } from "@/features/shop/catalog-adapter";
 import { ShopCollection } from "@/features/shop/shop-collection";
+import { CircusDiscoveryGate } from "@/components/discovery/circus-discovery-gate";
+import { CircusProductBubble } from "@/components/discovery/circus-product-bubble";
 
 type ShopPageProps = Readonly<{
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -65,7 +68,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const tr = await getTranslator();
   const locale = await getLocale();
   const rawSearchParams = await searchParams;
-  const catalog = await getShopCatalog(rawSearchParams, locale);
+  const [catalog, newestPublishedMeowhe] = await Promise.all([
+    getShopCatalog(rawSearchParams, locale),
+    getLatestPublishedMeowhe(locale),
+  ]);
   const isLiveCatalog = catalog.source === "commerce-catalog";
   const hasActiveQuery = Boolean(catalog.query.q || catalog.query.type || catalog.query.release || catalog.query.page > 1);
 
@@ -76,7 +82,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         <Container>
           <section className="shop-route-hero" aria-labelledby="shop-title">
             <p className="eyebrow">{tr("Luminal shop")}</p>
-            <h1 id="shop-title">{tr("Object catalog, presented without pretending checkout is already open.")}</h1>
+            <h1 id="shop-title">Shop</h1>
             <p>
               {isLiveCatalog
                 ? tr("Shop đang đọc các object đã publish từ Commerce catalog. Search, filter và pagination đều chạy server-side; cart, checkout, payment và order creation vẫn chưa mở trong Phase 5.")
@@ -84,6 +90,14 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </p>
           </section>
 
+          <CircusDiscoveryGate
+            id="shop-discovery-content"
+            heading={locale === "vi" ? "Bước vào thế giới Meowhe" : "Step into Meowhe's world"}
+            invitation={locale === "vi" ? "Ánh đèn đã bật. Vén màn để khám phá những vật thể được công bố." : "The lights are on. Part the curtain to discover published objects."}
+            actionLabel={locale === "vi" ? "Xem thêm" : "Show more"}
+            initiallyOpen={hasActiveQuery}
+            bubbles={newestPublishedMeowhe ? <CircusProductBubble entry={newestPublishedMeowhe} locale={locale} /> : undefined}
+          >
           <section className="shop-route-section" aria-labelledby="shop-filter-title">
             <div className="shop-route-heading">
               <p className="eyebrow">{tr("Catalog controls")}</p>
@@ -124,6 +138,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               {catalog.hasNextPage ? <Link href={pageHref(catalog.query, catalog.query.page + 1)}>{tr("Trang sau →")}</Link> : null}
             </nav>
           ) : null}
+          </CircusDiscoveryGate>
         </Container>
       </main>
       <Footer />

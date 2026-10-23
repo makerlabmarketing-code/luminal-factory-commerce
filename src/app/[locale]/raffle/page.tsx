@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/header";
 import { Container } from "@/components/ui/container";
 import { RaffleDiscovery } from "@/features/raffle/raffle-discovery";
 import { getPublishedRaffleList } from "@/features/raffle/raffle-list-service";
+import { getLatestPublishedMeowhe } from "@/features/shop/catalog-adapter";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -13,14 +14,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RafflePage() {
-  const releases = await getPublishedRaffleList();
+  const locale = await getLocale();
+  const [releases, newestPublishedMeowhe] = await Promise.all([
+    getPublishedRaffleList(),
+    getLatestPublishedMeowhe(locale),
+  ]);
 
   return (
     <>
       <Header />
       <main id="main-content">
         <Container>
-          <RaffleDiscovery releases={releases} />
+          <RaffleDiscovery releases={releases} featuredMeowhe={newestPublishedMeowhe} locale={locale} />
         </Container>
       </main>
       <Footer />

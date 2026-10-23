@@ -1,17 +1,23 @@
-import { getTranslator, getLocale } from "@/lib/i18n/server";
+import { getTranslator } from "@/lib/i18n/server";
 import { localeHref } from "@/lib/i18n/locale";
 import Link from "@/lib/i18n/link";
 import styles from "./raffle-discovery.module.css";
 import type { RaffleListEntry, RaffleListResult } from "./raffle-list-service";
 import { RaffleCover } from "./raffle-cover";
+import { CircusDiscoveryGate } from "@/components/discovery/circus-discovery-gate";
+import { CircusProductBubble } from "@/components/discovery/circus-product-bubble";
+import type { ShopPresentationEntry } from "@/features/shop/shop-content";
 
 const statusCopy: Record<RaffleListEntry["state"], string> = {
   open: "Entry window open", upcoming: "Upcoming", closed: "Entry window closed",
   completed: "Completed", cancelled: "Cancelled",
 };
 
-export async function RaffleDiscovery({ releases }: Readonly<{ releases: RaffleListResult }>) {
-  const locale = await getLocale();
+export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Readonly<{
+  releases: RaffleListResult;
+  featuredMeowhe?: ShopPresentationEntry;
+  locale: "vi" | "en";
+}>) {
   const tr = await getTranslator();
   const formatDate = new Intl.DateTimeFormat(locale, {
     dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh",
@@ -26,6 +32,13 @@ export async function RaffleDiscovery({ releases }: Readonly<{ releases: RaffleL
         </div>
         <p>{tr("View each release for its published information. Viewing a release does not submit an entry.")}</p>
       </div>
+      <CircusDiscoveryGate
+        id="raffle-discovery-content"
+        heading={locale === "vi" ? "Sau tấm màn là gì?" : "What is behind the curtain?"}
+        invitation={locale === "vi" ? "Bước vào rạp để xem các đợt phát hành đã công bố và gặp Meowhe." : "Enter the tent for announced releases and a closer look at Meowhe."}
+        actionLabel={locale === "vi" ? "Xem thêm" : "Show more"}
+        bubbles={featuredMeowhe ? <CircusProductBubble entry={featuredMeowhe} locale={locale} /> : undefined}
+      >
       {releases.state === "ready" ? (
         <ul className={styles.list}>
           {releases.entries.map(release => (
@@ -54,6 +67,7 @@ export async function RaffleDiscovery({ releases }: Readonly<{ releases: RaffleL
         <Link className="button-link button-secondary" href="/archive">{tr("Explore Archive")}</Link>
         <Link className="button-link button-secondary" href="/shop">{tr("Browse Shop")}</Link>
       </div>
+      </CircusDiscoveryGate>
     </section>
   );
 }

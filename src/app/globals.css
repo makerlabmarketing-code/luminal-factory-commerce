@@ -254,8 +254,10 @@ button { font: inherit; }
 .shop-preview-copy dt, .shop-route-copy dt { color: #deded8; text-transform: uppercase; letter-spacing: .08em; }
 .shop-preview-copy dd, .shop-route-copy dd { margin: .3rem 0 0; color: var(--muted-foreground); line-height: 1.55; }
 .shop-preview-action { display: flex; justify-content: flex-end; margin-top: 2rem; }
-.shop-route { padding-block: clamp(3rem, 6vw, 6rem); }
-.shop-route-hero { max-width: 64rem; padding-block: clamp(2rem, 5vw, 5rem); scroll-margin-top: 5rem; }
+.shop-route { padding-block: clamp(1.5rem, 3vw, 3rem) 6rem; }
+.shop-route-hero { max-width: 64rem; padding-block: .5rem 1rem; scroll-margin-top: 5rem; }
+.shop-route-hero h1 { font-size: clamp(2.5rem, 4.8vw, 4.5rem); }
+.shop-route-hero > p:last-child { max-width: 52rem; font-size: .8rem; }
 .shop-route-hero a { display: inline-flex; min-height: 2.75rem; align-items: center; margin-top: 1rem; color: var(--ice); text-decoration: underline; text-underline-offset: .25em; }
 .shop-route-section { padding-block: clamp(3rem, 7vw, 6rem); scroll-margin-top: 5rem; }
 .shop-route-list { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; padding: 0; margin: 0; }

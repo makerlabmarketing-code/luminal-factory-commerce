@@ -265,6 +265,7 @@ function mapProduct(row: CatalogProductRow): ShopPresentationEntry {
 
 async function requestProducts(options?: {
   slug?: string;
+  nameContains?: string;
   query?: ShopCatalogQuery;
 }): Promise<readonly CatalogProductRow[] | null> {
   const config = getCatalogConfig();
@@ -277,7 +278,11 @@ async function requestProducts(options?: {
   endpoint.searchParams.set("status", "eq.published");
   endpoint.searchParams.set("order", "published_at.desc");
 
-  if (slug) {
+  if (options?.nameContains) {
+    endpoint.searchParams.set("name", `ilike.*${options.nameContains}*`);
+    endpoint.searchParams.set("product_type", "eq.artisan_keycap");
+    endpoint.searchParams.set("limit", "1");
+  } else if (slug) {
     endpoint.searchParams.set("slug", `eq.${slug}`);
     endpoint.searchParams.set("limit", "1");
   } else {
@@ -309,6 +314,12 @@ async function requestProducts(options?: {
   } catch {
     return null;
   }
+}
+
+export async function getLatestPublishedMeowhe(locale: Locale = "en"): Promise<ShopPresentationEntry | undefined> {
+  const rows = await requestProducts({ nameContains: "Meowhe" });
+  if (!rows?.[0] || !rows[0].name.toLocaleLowerCase().includes("meowhe")) return undefined;
+  return (await localizeCatalogEntries([mapProduct(rows[0])], locale, getCatalogConfig()))[0];
 }
 
 function filterFixtureEntries(query: ShopCatalogQuery): readonly ShopPresentationEntry[] {

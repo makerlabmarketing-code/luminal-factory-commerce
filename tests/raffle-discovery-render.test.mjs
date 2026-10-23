@@ -16,11 +16,14 @@ new Function('require', 'module', 'exports', code)(name => {
   if (name === '@/lib/i18n/server') return { getLocale: async () => locale, getTranslator: async () => text => dictionary[text]?.[locale === 'vi' ? 1 : 0] ?? text };
   if (name === '@/lib/i18n/locale') return { localeHref: href => `/${locale}${href}` };
   if (name === '@/lib/i18n/link') return { default: ({ href, children, ...props }) => React.createElement('a', { ...props, href: `/${locale}${href}` }, children), __esModule: true };
+  if (name === '@/components/discovery/circus-discovery-gate') return { CircusDiscoveryGate: ({ children, bubbles, actionLabel }) => React.createElement('section', null,
+    React.createElement('button', { type: 'button' }, actionLabel), bubbles, children) };
+  if (name === '@/components/discovery/circus-product-bubble') return { CircusProductBubble: ({ entry }) => React.createElement('a', { href: `/${locale}${entry.href}` }, entry.title) };
   if (name.endsWith('.css')) return {};
   if (name === './raffle-cover') return { RaffleCover: ({ src, alt }) => React.createElement('img', { src, alt }) };
   return require(name);
 }, mod, mod.exports);
-const render = async releases => renderToStaticMarkup(await mod.exports.RaffleDiscovery({ releases }));
+const render = async releases => renderToStaticMarkup(await mod.exports.RaffleDiscovery({ releases, locale }));
 
 test('both locales distinguish unavailable/disabled from verified empty and localize retry/navigation', async () => {
   for (locale of ['en', 'vi']) {
@@ -32,7 +35,8 @@ test('both locales distinguish unavailable/disabled from verified empty and loca
       assert.equal(html.includes(`href="/${locale}/raffle"`), state === 'unavailable');
       assert.ok(html.includes(`href="/${locale}/archive"`));
       assert.ok(html.includes(`href="/${locale}/shop"`));
-      assert.doesNotMatch(html, /<form|<button|type="submit"/);
+      assert.match(html, /<button type="button">/);
+      assert.doesNotMatch(html, /<form|type="submit"/);
     }
   }
 });

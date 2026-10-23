@@ -1,5 +1,11 @@
 # Current Ecommerce operator handoff
 
+## 2026-10-23 Circus discovery entry
+
+- Shop and Raffle default discovery use a shared tent, spotlight hover/focus curtain preview, short flash, and revealed listing. The featured bubble is the newest published Meowhe artisan keycap by catalog publication order; no public catalog row means no bubble. Shop filtered URLs reveal results immediately; Raffle remains governed by published release records and its default-off state.
+- Next.js was updated from 16.3.8 to 16.4.3 for the October security advisories. `npm run check` passed: 383 tests, static security gate, zero production dependency vulnerabilities and production build; lint has two pre-existing warnings. Source and visual smoke evidence are to be recorded after deployment.
+- Next roadmap slice: review the live tent on desktop and mobile with the owner, then refine art direction or product grouping against actual published catalog content. Do not infer a raffle from a Shop product.
+
 ## 2026-09-30 I-006 handshake runner preparation
 
 - Current coordination sheet supersedes the old C-007-next / PR #207-open notes:

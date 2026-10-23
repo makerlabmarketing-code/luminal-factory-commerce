@@ -79,7 +79,7 @@ test("catalog image and video media render with a recoverable presentation fallb
 });
 
 test("Shop listing and detail route through the adapter", () => {
-  assert.match(shopPage, /await getShopCatalog\(rawSearchParams, locale\)/);
+  assert.match(shopPage, /getShopCatalog\(rawSearchParams, locale\)/);
   assert.match(shopPage, /searchParams: Promise/);
   assert.match(detailPage, /await getShopCatalogEntryBySlug\(slug, locale\)/);
   assert.match(detailPage, /notFound\(\)/);
