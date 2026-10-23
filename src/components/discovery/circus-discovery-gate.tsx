@@ -23,11 +23,16 @@ export function CircusDiscoveryGate({ id, heading, invitation, actionLabel, bubb
     if (timer.current !== null) window.clearTimeout(timer.current);
   }, []);
 
+  const focusReveal = () => window.requestAnimationFrame(() => {
+    content.current?.focus({ preventScroll: true });
+    content.current?.scrollIntoView({ block: "start", behavior: "auto" });
+  });
+
   const open = () => {
     if (revealed || flashing) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setRevealed(true);
-      window.requestAnimationFrame(() => content.current?.focus());
+      focusReveal();
       return;
     }
     setFlashing(true);
@@ -35,7 +40,7 @@ export function CircusDiscoveryGate({ id, heading, invitation, actionLabel, bubb
       setFlashing(false);
       setRevealed(true);
       timer.current = null;
-      window.requestAnimationFrame(() => content.current?.focus());
+      focusReveal();
     }, 420);
   };
 
