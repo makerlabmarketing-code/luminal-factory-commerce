@@ -51,11 +51,9 @@ export function CircusDiscoveryGate({ id, heading, invitation, actionLabel, stor
     <section className={styles.discovery} data-open={revealed} data-flashing={flashing} aria-label={heading}>
       {!revealed && <div className={styles.tent}>
         <div className={styles.canopy} aria-hidden="true">
-          <span className={styles.finial} />
           <span className={styles.roof} />
           <span className={styles.scallops} />
           <span className={styles.stageLight} />
-          <span className={styles.stageLamp} />
           <span className={`${styles.curtain} ${styles.curtainLeft}`} />
           <span className={`${styles.curtain} ${styles.curtainRight}`} />
           <span className={styles.floor} />
