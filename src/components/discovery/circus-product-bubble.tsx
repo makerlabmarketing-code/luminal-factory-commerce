@@ -10,7 +10,7 @@ export function CircusProductBubble({ entry, locale }: Readonly<{ entry: ShopPre
       <span className={styles.caption}>
         <span>{locale === "vi" ? "VẬT THỂ ĐÃ CÔNG BỐ" : "PUBLISHED OBJECT"}</span>
         <strong>{entry.title}</strong>
-        <span>{locale === "vi" ? "Khám phá sản phẩm ↗" : "Explore object ↗"}</span>
+        <span>{locale === "vi" ? "Xem câu chuyện sản phẩm ↗" : "Explore the object's story ↗"}</span>
       </span>
     </Link>
   );

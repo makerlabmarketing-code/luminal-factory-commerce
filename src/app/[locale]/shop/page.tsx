@@ -92,9 +92,12 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
           <CircusDiscoveryGate
             id="shop-discovery-content"
-            heading={locale === "vi" ? "Bước vào thế giới Meowhe" : "Step into Meowhe's world"}
-            invitation={locale === "vi" ? "Ánh đèn đã bật. Vén màn để khám phá những vật thể được công bố." : "The lights are on. Part the curtain to discover published objects."}
+            heading={locale === "vi" ? "Meowhe, dưới ánh đèn" : "Meowhe, in the spotlight"}
+            invitation={locale === "vi" ? "Giữa bóng tối, đôi mắt lệch và nụ cười tinh nghịch của Meowhe dần hiện ra. Mỗi phiên bản giữ một mảnh chuyện riêng." : "Out of the dark emerge Meowhe's mismatched eyes and mischievous grin. Every colorway holds another piece of the story."}
             actionLabel={locale === "vi" ? "Xem thêm" : "Show more"}
+            storyLabel={locale === "vi" ? "CÂU CHUYỆN / SẢN PHẨM" : "STORY / OBJECT"}
+            storyHeading={newestPublishedMeowhe?.title ?? "Meowhe"}
+            storyBody={newestPublishedMeowhe?.story || (locale === "vi" ? "Meowhe là nhân vật với một quá khứ và nhiều phiên bản màu sắc. Khám phá những vật thể đã công bố và câu chuyện của từng phiên bản." : "Meowhe is a character with a past and many colorways. Explore the published objects and the story behind each version.")}
             initiallyOpen={hasActiveQuery}
             bubbles={newestPublishedMeowhe ? <CircusProductBubble entry={newestPublishedMeowhe} locale={locale} /> : undefined}
           >

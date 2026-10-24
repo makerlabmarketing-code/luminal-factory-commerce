@@ -34,9 +34,12 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
       </div>
       <CircusDiscoveryGate
         id="raffle-discovery-content"
-        heading={locale === "vi" ? "Sau tấm màn là gì?" : "What is behind the curtain?"}
-        invitation={locale === "vi" ? "Bước vào rạp để xem các đợt phát hành đã công bố và gặp Meowhe." : "Enter the tent for announced releases and a closer look at Meowhe."}
+        heading={locale === "vi" ? "Meowhe, dưới ánh đèn" : "Meowhe, in the spotlight"}
+        invitation={locale === "vi" ? "Giữa bóng tối, đôi mắt lệch và nụ cười tinh nghịch của Meowhe dần hiện ra. Mỗi phiên bản giữ một mảnh chuyện riêng." : "Out of the dark emerge Meowhe's mismatched eyes and mischievous grin. Every colorway holds another piece of the story."}
         actionLabel={locale === "vi" ? "Xem thêm" : "Show more"}
+        storyLabel={locale === "vi" ? "CÂU CHUYỆN / SẢN PHẨM" : "STORY / OBJECT"}
+        storyHeading={featuredMeowhe?.title ?? "Meowhe"}
+        storyBody={featuredMeowhe?.story || (locale === "vi" ? "Meowhe là nhân vật với một quá khứ và nhiều phiên bản màu sắc. Khám phá các đợt phát hành đã công bố và câu chuyện của từng phiên bản." : "Meowhe is a character with a past and many colorways. Explore announced releases and the story behind each version.")}
         bubbles={featuredMeowhe ? <CircusProductBubble entry={featuredMeowhe} locale={locale} /> : undefined}
       >
       {releases.state === "ready" ? (

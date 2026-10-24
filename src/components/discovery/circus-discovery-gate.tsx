@@ -8,12 +8,15 @@ type CircusDiscoveryGateProps = Readonly<{
   heading: string;
   invitation: string;
   actionLabel: string;
+  storyLabel: string;
+  storyHeading: string;
+  storyBody: string;
   bubbles?: ReactNode;
   children: ReactNode;
   initiallyOpen?: boolean;
 }>;
 
-export function CircusDiscoveryGate({ id, heading, invitation, actionLabel, bubbles, children, initiallyOpen = false }: CircusDiscoveryGateProps) {
+export function CircusDiscoveryGate({ id, heading, invitation, actionLabel, storyLabel, storyHeading, storyBody, bubbles, children, initiallyOpen = false }: CircusDiscoveryGateProps) {
   const [revealed, setRevealed] = useState(initiallyOpen);
   const [flashing, setFlashing] = useState(false);
   const timer = useRef<number | null>(null);
@@ -59,7 +62,7 @@ export function CircusDiscoveryGate({ id, heading, invitation, actionLabel, bubb
         </div>
         <button type="button" className={styles.hotspot} onClick={open} disabled={flashing} aria-label={actionLabel} aria-expanded={false} aria-controls={id} />
         <div className={styles.tentCopy}>
-          <p className={styles.eyebrow}>LUMINAL FACTORY · THE SHOW</p>
+          <p className={styles.eyebrow}>LUMINAL FACTORY / MEOWHE</p>
           <h2>{heading}</h2>
           <p>{invitation}</p>
           <button type="button" className={styles.enter} aria-expanded={false} aria-controls={id} onClick={open} disabled={flashing}>
@@ -69,6 +72,11 @@ export function CircusDiscoveryGate({ id, heading, invitation, actionLabel, bubb
       </div>}
       <div className={styles.flash} aria-hidden="true" data-active={flashing} />
       <div id={id} className={styles.reveal} hidden={!revealed} ref={content} tabIndex={-1}>
+        <div className={styles.story}>
+          <p className={styles.eyebrow}>{storyLabel}</p>
+          <h2>{storyHeading}</h2>
+          <p>{storyBody}</p>
+        </div>
         {bubbles ? <div className={styles.bubbleField}>{bubbles}</div> : null}
         {children}
       </div>
