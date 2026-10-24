@@ -6,6 +6,7 @@ import type { RaffleListEntry, RaffleListResult } from "./raffle-list-service";
 import { RaffleCover } from "./raffle-cover";
 import { CircusDiscoveryGate } from "@/components/discovery/circus-discovery-gate";
 import { CircusProductBubble } from "@/components/discovery/circus-product-bubble";
+import { meowheDiscoveryStory } from "@/components/discovery/meowhe-story";
 import type { ShopPresentationEntry } from "@/features/shop/shop-content";
 
 const statusCopy: Record<RaffleListEntry["state"], string> = {
@@ -39,7 +40,7 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
         actionLabel={locale === "vi" ? "Xem thêm" : "Show more"}
         storyLabel={locale === "vi" ? "CÂU CHUYỆN / SẢN PHẨM" : "STORY / OBJECT"}
         storyHeading={featuredMeowhe?.title ?? "Meowhe"}
-        storyBody={featuredMeowhe?.story || (locale === "vi" ? "Meowhe là nhân vật với một quá khứ và nhiều phiên bản màu sắc. Khám phá các đợt phát hành đã công bố và câu chuyện của từng phiên bản." : "Meowhe is a character with a past and many colorways. Explore announced releases and the story behind each version.")}
+        storyBody={meowheDiscoveryStory(featuredMeowhe, locale, "raffle")}
         bubbles={featuredMeowhe ? <CircusProductBubble entry={featuredMeowhe} locale={locale} /> : undefined}
       >
       {releases.state === "ready" ? (

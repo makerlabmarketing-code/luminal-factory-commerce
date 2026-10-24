@@ -19,6 +19,7 @@ new Function('require', 'module', 'exports', code)(name => {
   if (name === '@/components/discovery/circus-discovery-gate') return { CircusDiscoveryGate: ({ children, bubbles, actionLabel }) => React.createElement('section', null,
     React.createElement('button', { type: 'button' }, actionLabel), bubbles, children) };
   if (name === '@/components/discovery/circus-product-bubble') return { CircusProductBubble: ({ entry }) => React.createElement('a', { href: `/${locale}${entry.href}` }, entry.title) };
+  if (name === '@/components/discovery/meowhe-story') return { meowheDiscoveryStory: () => 'Meowhe story' };
   if (name.endsWith('.css')) return {};
   if (name === './raffle-cover') return { RaffleCover: ({ src, alt }) => React.createElement('img', { src, alt }) };
   return require(name);

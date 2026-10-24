@@ -16,6 +16,7 @@ import {
 } from "@/features/shop/catalog-adapter";
 import { ShopCollection } from "@/features/shop/shop-collection";
 import { CircusDiscoveryGate } from "@/components/discovery/circus-discovery-gate";
+import { meowheDiscoveryStory } from "@/components/discovery/meowhe-story";
 import { CircusProductBubble } from "@/components/discovery/circus-product-bubble";
 
 type ShopPageProps = Readonly<{
@@ -97,7 +98,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             actionLabel={locale === "vi" ? "Xem thêm" : "Show more"}
             storyLabel={locale === "vi" ? "CÂU CHUYỆN / SẢN PHẨM" : "STORY / OBJECT"}
             storyHeading={newestPublishedMeowhe?.title ?? "Meowhe"}
-            storyBody={newestPublishedMeowhe?.story || (locale === "vi" ? "Meowhe là nhân vật với một quá khứ và nhiều phiên bản màu sắc. Khám phá những vật thể đã công bố và câu chuyện của từng phiên bản." : "Meowhe is a character with a past and many colorways. Explore the published objects and the story behind each version.")}
+            storyBody={meowheDiscoveryStory(newestPublishedMeowhe, locale, "shop")}
             initiallyOpen={hasActiveQuery}
             bubbles={newestPublishedMeowhe ? <CircusProductBubble entry={newestPublishedMeowhe} locale={locale} /> : undefined}
           >
