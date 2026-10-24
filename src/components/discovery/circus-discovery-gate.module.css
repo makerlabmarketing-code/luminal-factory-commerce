@@ -1,19 +1,13 @@
 .discovery { position: relative; margin-block: clamp(1rem, 4vw, 3rem) 4rem; isolation: isolate; }
-.tent { position: relative; min-height: clamp(34rem, 62vw, 43rem); overflow: hidden; border: 1px solid rgba(177,149,111,.14); border-radius: 1.25rem; background: radial-gradient(ellipse 31% 25% at 70% 69%, rgba(116,67,42,.17), transparent 88%), radial-gradient(ellipse 65% 60% at 73% 55%, #15111a 0, #0b0a10 57%, #07080b 100%); box-shadow: inset 0 0 7rem rgba(0,0,0,.66); }
-.tent::after { content: ""; position: absolute; z-index: 4; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 70% 54%, transparent 23%, rgba(4,5,8,.47) 80%); }
-.canopy { position: absolute; inset: 0; pointer-events: none; filter: drop-shadow(0 1rem 2.5rem rgba(0,0,0,.8)); }
-.roof { position: absolute; z-index: 2; top: 14%; left: 45%; width: 50%; height: 25%; clip-path: polygon(50% 0, 96% 76%, 100% 100%, 0 100%, 4% 76%); background: repeating-conic-gradient(from 241deg at 50% 0%, #15121a 0 16deg, #2b1c28 16deg 31deg, #1a131d 31deg 47deg); border-bottom: 2px solid #604632; }
-.scallops { position: absolute; z-index: 5; top: 38%; left: 45%; width: 50%; height: 3%; background: radial-gradient(ellipse 6% 100% at 6% 0, #34232c 98%, transparent 102%) 0 0 / 12.5% 100% repeat-x; filter: drop-shadow(0 1px 0 #73543b); }
-.stageLight { position: absolute; z-index: 2; top: 40%; left: 55%; width: 30%; height: 43%; clip-path: polygon(50% 0, 100% 100%, 0 100%); background: radial-gradient(ellipse at 50% 22%, rgba(255,228,167,.92), rgba(222,160,96,.58) 48%, rgba(150,83,54,.34) 100%); opacity: .85; mix-blend-mode: screen; transition: opacity .55s ease, transform .55s ease; }
-.curtain { position: absolute; z-index: 3; top: 40%; height: 43%; width: 25%; background: repeating-linear-gradient(90deg, #190e18 0 12%, #2b1b27 19%, #20131d 30%, #100b14 43%); filter: drop-shadow(0 0 1rem rgba(0,0,0,.6)); transition: transform .65s cubic-bezier(.22,.68,.17,1); }
-.curtainLeft { left: 45%; clip-path: polygon(0 0, 100% 0, 62% 100%, 0 100%); transform-origin: left top; }
-.curtainRight { right: 5%; clip-path: polygon(0 0, 100% 0, 100% 100%, 38% 100%); transform-origin: right top; }
-.floor { position: absolute; z-index: 4; left: 44%; bottom: 12%; width: 52%; height: 9%; border-top: 1px solid rgba(169,124,77,.42); background: linear-gradient(rgba(45,31,30,.74), rgba(8,8,12,.92)); transform: perspective(20rem) rotateX(39deg); }
-.hotspot { position: absolute; z-index: 6; top: 38%; left: 59%; width: 22%; height: 38%; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+.tent { position: relative; min-height: clamp(34rem, 62vw, 43rem); overflow: hidden; border: 1px solid rgba(177,149,111,.14); border-radius: 1.25rem; background: #0b0910; box-shadow: inset 0 0 7rem rgba(0,0,0,.66); }
+.tent::after { content: ""; position: absolute; z-index: 4; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(8,6,12,.3), transparent 47%), linear-gradient(0deg, rgba(8,6,12,.28), transparent 25%); }
+.canopy { position: absolute; inset: 0; pointer-events: none; }
+.sceneClosed, .sceneOpen { position: absolute; inset: 0; background-position: center; background-size: cover; background-repeat: no-repeat; }
+.sceneClosed { background-image: url("/images/discovery/meowhe-circus-closed.webp"); }
+.sceneOpen { background-image: url("/images/discovery/meowhe-circus-open.webp"); opacity: 0; transition: opacity .7s ease; }
+.hotspot { position: absolute; z-index: 6; top: 36%; left: 61%; width: 24%; height: 47%; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
 .hotspot:focus-visible, .enter:focus-visible { outline: 2px solid #c7dfe7; outline-offset: 4px; }
-.tent:has(.hotspot:hover) .curtainLeft, .tent:focus-within .curtainLeft { transform: translateX(-16%); }
-.tent:has(.hotspot:hover) .curtainRight, .tent:focus-within .curtainRight { transform: translateX(16%); }
-.tent:has(.hotspot:hover) .stageLight, .tent:focus-within .stageLight { opacity: 1; transform: scale(1.04); }
+.tent:has(.hotspot:hover) .sceneOpen, .tent:focus-within .sceneOpen { opacity: 1; }
 .tentCopy { position: absolute; z-index: 7; top: 50%; left: clamp(1.5rem, 6vw, 5.5rem); width: min(38%, 28rem); transform: translateY(-50%); color: #f0ebe5; }
 .eyebrow { font: .69rem var(--font-mono), monospace; letter-spacing: .2em; color: #c6a979; }
 .tentCopy h2, .story h2 { margin: 1rem 0; font-size: clamp(2.5rem, 4.4vw, 4.4rem); font-weight: 420; line-height: 1.03; letter-spacing: -.055em; }
@@ -36,18 +30,12 @@
 @keyframes bubble-arrive { 0% { opacity: 0; transform: translate3d(0, 5rem, 0) scale(.48); } 75% { opacity: 1; transform: translate3d(0, -.8rem, 0) scale(1.03); } 100% { opacity: 1; transform: none; } }
 @media (max-width: 700px) {
   .tent { min-height: 41rem; }
-  .tent::after { background: radial-gradient(ellipse at 50% 30%, transparent 18%, rgba(4,5,8,.45) 80%); }
-  .canopy { bottom: 32%; }
-  .roof { left: 10%; width: 80%; top: 13%; height: 27%; }
-  .scallops { left: 10%; width: 80%; top: 39%; }
-  .stageLight { left: 22%; width: 56%; top: 41%; height: 42%; }
-  .curtain { top: 41%; height: 42%; width: 40%; }
-  .curtainLeft { left: 10%; }
-  .curtainRight { right: 10%; }
-  .floor { left: 9%; width: 82%; bottom: 13%; }
-  .hotspot { top: 25%; left: 27%; width: 46%; height: 33%; }
+  .tent::after { background: linear-gradient(0deg, #0b0910 0, transparent 41%); }
+  .canopy { bottom: 32%; mask-image: linear-gradient(#000 0 80%, transparent 100%); }
+  .sceneClosed, .sceneOpen { background-size: auto 100%; background-position: 88% center; }
+  .hotspot { top: 17%; left: 27%; width: 46%; height: 36%; }
   .tentCopy { top: auto; left: 7%; bottom: 5%; width: 86%; transform: none; }
   .tentCopy h2 { font-size: clamp(2.35rem, 8vw, 3rem); }
   .tentCopy > p:not(.eyebrow) { margin: .8rem 0 1.2rem; line-height: 1.55; }
 }
-@media (prefers-reduced-motion: reduce) { .curtain, .stageLight, .enter { transition: none; } .flash { display: none; } .bubbleField > * { opacity: 1; animation: none; } }
+@media (prefers-reduced-motion: reduce) { .sceneOpen, .enter { transition: none; } .flash { display: none; } .bubbleField > * { opacity: 1; animation: none; } }

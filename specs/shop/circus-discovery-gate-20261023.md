@@ -6,6 +6,8 @@ Visual revision, 2026-10-24: The tent recedes into a near-black, plum stage. Its
 
 Curtain correction, 2026-10-24: The two curtain edges slope away from a shared apex to create a triangular entrance. A warm triangular stage glow fills that entrance behind the fabric. No bulb or glowing sphere appears outside the tent; the spotlight itself is the interactive target.
 
+Art direction refinement, 2026-10-24: The CSS tent illustration is replaced by two original Luminal scene assets, generated for this page after studying the *mood* of a broad Adobe Stock “creepy circus” search. The assets are not copied or licensed stock. Aged burgundy and bone fabric, cool fog, warm light inside the entrance and deep plum negative space give the scene material depth. The closed scene shows a narrow triangular slit; hovering or focusing the entrance crossfades to the wider opening. The click/flash/story/product behavior and catalog source remain the same. The separate closed/open WebP assets are stored under `public/images/discovery/` and total about 213 KB.
+
 Search, filter, and pagination URLs in Shop open the results directly. Raffle release status and links still come only from the published raffle source. The tent does not create a raffle entry, cart, order, or payment action.
 
 On touch screens the entry button is visible without hover. Keyboard focus can part the curtain; opening moves focus to the revealed region. Reduced-motion preferences skip the flash and bubble movement. Decorative shapes are hidden from assistive technology, and one route-level heading remains on each page.
