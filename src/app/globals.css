@@ -155,7 +155,7 @@ button { font: inherit; }
 .facet { position: absolute; width: 24%; aspect-ratio: .7; background: linear-gradient(140deg, #eef8ff88, #c8c4ff0d 48%, #000); clip-path: polygon(50% 0, 100% 28%, 75% 100%, 12% 84%, 0 24%); opacity: .55; }
 .facet-one { left: 10%; top: 10%; transform: rotate(-22deg); }.facet-two { right: 7%; bottom: 11%; transform: rotate(28deg) scale(.68); }
 .split-intro { display: grid; grid-template-columns: .5fr 1.35fr .8fr; gap: 3rem; align-items: start; }
-.split-intro h2, .section-heading h2, .drop-panel h2, .contact-panel h2, .site-footer h2 { margin: 0; font-size: clamp(2.4rem, 5vw, 5.2rem); font-weight: 430; line-height: .98; letter-spacing: -.05em; }
+.split-intro h2, .section-heading h1, .section-heading h2, .drop-panel h2, .contact-panel h2, .site-footer h2 { margin: 0; font-size: clamp(2.4rem, 5vw, 5.2rem); font-weight: 430; line-height: .98; letter-spacing: -.05em; }
 .split-intro > p:last-child, .section-heading > p:last-child { color: var(--muted-foreground); line-height: 1.65; }
 .section-heading { display: grid; grid-template-columns: .5fr 1.3fr .8fr; gap: 3rem; align-items: start; margin-bottom: clamp(3rem, 7vw, 6rem); }
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
