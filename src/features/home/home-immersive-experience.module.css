@@ -29,7 +29,7 @@
   border-radius: 50%;
   background: url("/images/home/gallery/lolipop-garden.webp") center 52% / cover;
   box-shadow: 0 2rem 7rem rgba(0, 0, 0, .55), 0 0 5rem rgba(185, 233, 255, .06);
-  opacity: .64;
+  opacity: var(--home-poster-opacity, .64);
   pointer-events: none;
 }
 

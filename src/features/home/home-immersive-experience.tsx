@@ -321,6 +321,9 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       const heroArrival = featuredDestination && featuredDestination.xVw !== 0
         ? clamp01(state.xVw / featuredDestination.xVw)
         : 0;
+      // The archival still supports browsers that report a ready 3D canvas
+      // without painting it. Let the three colorway bubbles take over here.
+      layer.style.setProperty("--home-poster-opacity", (0.64 * (1 - clamp01(heroArrival * 2))).toFixed(4));
       document.documentElement.dataset.luminalHeroFeaturedArrival = heroArrival.toFixed(4);
       // Compare the moving first/featured-section seam against an actual
       // contact point on the eased 3D stage, not the Hero's horizontal orbit.
