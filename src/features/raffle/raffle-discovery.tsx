@@ -4,7 +4,6 @@ import Link from "@/lib/i18n/link";
 import styles from "./raffle-discovery.module.css";
 import type { RaffleListEntry, RaffleListResult } from "./raffle-list-service";
 import { RaffleCover } from "./raffle-cover";
-import { CircusDiscoveryGate } from "@/components/discovery/circus-discovery-gate";
 import { CircusProductBubble } from "@/components/discovery/circus-product-bubble";
 import { meowheDiscoveryStory } from "@/components/discovery/meowhe-story";
 import type { ShopPresentationEntry } from "@/features/shop/shop-content";
@@ -33,16 +32,20 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
         </div>
         <p>{tr("View each release for its published information. Viewing a release does not submit an entry.")}</p>
       </div>
-      <CircusDiscoveryGate
-        id="raffle-discovery-content"
-        heading={locale === "vi" ? "Meowhe, dưới ánh đèn" : "Meowhe, in the spotlight"}
-        invitation={locale === "vi" ? "Giữa bóng tối, đôi mắt lệch và nụ cười tinh nghịch của Meowhe dần hiện ra. Mỗi phiên bản giữ một mảnh chuyện riêng." : "Out of the dark emerge Meowhe's mismatched eyes and mischievous grin. Every colorway holds another piece of the story."}
-        actionLabel={locale === "vi" ? "Xem thêm" : "Show more"}
-        storyLabel={locale === "vi" ? "CÂU CHUYỆN / SẢN PHẨM" : "STORY / OBJECT"}
-        storyHeading={featuredMeowhe?.title ?? "Meowhe"}
-        storyBody={meowheDiscoveryStory(featuredMeowhe, locale, "raffle")}
-        bubbles={featuredMeowhe ? <CircusProductBubble entry={featuredMeowhe} locale={locale} /> : undefined}
-      >
+      <div className={styles.program}>
+        <div className={styles.programCopy}>
+          <p className={styles.programEyebrow}>{locale === "vi" ? "LUMINAL / CHƯƠNG MEOWHE" : "LUMINAL / THE MEOWHE CHAPTER"}</p>
+          <h2>{featuredMeowhe?.title ?? "Meowhe"}</h2>
+          <p>{meowheDiscoveryStory(featuredMeowhe, locale, "raffle")}</p>
+          <span className={styles.programRule} aria-hidden="true" />
+          <p className={styles.programNote}>{locale === "vi" ? "Thông tin các đợt phát hành đã công bố nằm bên dưới." : "Published release information follows below."}</p>
+        </div>
+        {featuredMeowhe ? <div className={styles.programObject}><CircusProductBubble entry={featuredMeowhe} locale={locale} /></div> : <span className={styles.programMark} aria-hidden="true" />}
+      </div>
+      <div className={styles.programAfter}>
+        <p className={styles.programEyebrow}>{locale === "vi" ? "LỊCH PHÁT HÀNH / RAFFLE" : "RELEASE PROGRAM / RAFFLE"}</p>
+        <h2>{locale === "vi" ? "Những đợt đã công bố" : "Announced releases"}</h2>
+      </div>
       {releases.state === "ready" ? (
         <ul className={styles.list}>
           {releases.entries.map(release => (
@@ -71,7 +74,6 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
         <Link className="button-link button-secondary" href="/archive">{tr("Explore Archive")}</Link>
         <Link className="button-link button-secondary" href="/shop">{tr("Browse Shop")}</Link>
       </div>
-      </CircusDiscoveryGate>
     </section>
   );
 }

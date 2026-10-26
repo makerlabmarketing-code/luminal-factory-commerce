@@ -1,13 +1,14 @@
-.discovery { position: relative; margin-block: clamp(1rem, 4vw, 3rem) 4rem; isolation: isolate; }
+.discovery { position: relative; margin-block: clamp(1rem, 4vw, 3rem) 4rem; isolation: isolate; scroll-margin-top: 6rem; }
 .tent { position: relative; min-height: clamp(34rem, 62vw, 43rem); overflow: hidden; border: 1px solid rgba(177,149,111,.14); border-radius: 1.25rem; background: #0b0910; box-shadow: inset 0 0 7rem rgba(0,0,0,.66); }
 .tent::after { content: ""; position: absolute; z-index: 4; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(8,6,12,.3), transparent 47%), linear-gradient(0deg, rgba(8,6,12,.28), transparent 25%); }
+.tent[data-open="true"]::after { background: linear-gradient(90deg, rgba(8,6,12,.94), rgba(8,6,12,.76) 53%, rgba(8,6,12,.46)), linear-gradient(0deg, #0b0910, transparent 32%); }
 .canopy { position: absolute; inset: 0; pointer-events: none; }
 .sceneClosed, .sceneOpen { position: absolute; inset: 0; background-position: center; background-size: cover; background-repeat: no-repeat; }
 .sceneClosed { background-image: url("/images/discovery/meowhe-circus-closed.webp"); }
 .sceneOpen { background-image: url("/images/discovery/meowhe-circus-open.webp"); opacity: 0; transition: opacity .7s ease; }
 .hotspot { position: absolute; z-index: 6; top: 36%; left: 61%; width: 24%; height: 47%; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
 .hotspot:focus-visible, .enter:focus-visible { outline: 2px solid #c7dfe7; outline-offset: 4px; }
-.tent:has(.hotspot:hover) .sceneOpen, .tent:focus-within .sceneOpen { opacity: 1; }
+.tent:has(.hotspot:hover) .sceneOpen, .tent:focus-within .sceneOpen, .tent[data-open="true"] .sceneOpen { opacity: 1; }
 .tentCopy { position: absolute; z-index: 7; top: 50%; left: clamp(1.5rem, 6vw, 5.5rem); width: min(38%, 28rem); transform: translateY(-50%); color: #f0ebe5; }
 .eyebrow { font: .69rem var(--font-mono), monospace; letter-spacing: .2em; color: #c6a979; }
 .tentCopy h2, .story h2 { margin: 1rem 0; font-size: clamp(2.5rem, 4.4vw, 4.4rem); font-weight: 420; line-height: 1.03; letter-spacing: -.055em; }
@@ -19,7 +20,12 @@
 .flash[data-active="true"] { animation: stage-flash .42s ease-out both; }
 @keyframes stage-flash { 0% { opacity: 0; } 22% { opacity: .8; } 100% { opacity: 0; } }
 .reveal { outline: none; scroll-margin-top: 6rem; }
-.reveal[hidden] { display: none; }
+.stageReveal { position: relative; z-index: 7; min-height: clamp(34rem, 62vw, 43rem); display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(13rem, .8fr); align-items: center; gap: clamp(1rem, 4vw, 4rem); padding: clamp(2rem, 5vw, 5rem); outline: none; scroll-margin-top: 6rem; }
+.stageReveal[hidden], .results[hidden] { display: none; }
+.stageReveal .story { margin: 0; padding: 0; text-align: left; }
+.stageReveal .bubbleField { padding: 0; }
+.stageReveal .bubbleField > * { width: min(100%, 18rem); }
+.results { padding-top: clamp(2rem, 5vw, 4rem); border-top: 1px solid rgba(210,177,130,.2); background: linear-gradient(#140d13, transparent 17rem); }
 .story { max-width: 44rem; margin: clamp(2.5rem, 6vw, 5rem) auto 0; padding: 0 1.5rem; text-align: center; }
 .story h2 { font-size: clamp(2.1rem, 3.4vw, 3.4rem); color: #f2ede7; }
 .story > p:last-child { color: #c9c5c7; line-height: 1.75; font-size: clamp(1rem, 1.3vw, 1.14rem); white-space: pre-line; }
@@ -37,5 +43,9 @@
   .tentCopy { top: auto; left: 7%; bottom: 5%; width: 86%; transform: none; }
   .tentCopy h2 { font-size: clamp(2.35rem, 8vw, 3rem); }
   .tentCopy > p:not(.eyebrow) { margin: .8rem 0 1.2rem; line-height: 1.55; }
+  .stageReveal { min-height: 45rem; grid-template-columns: 1fr; align-content: center; gap: 1rem; padding: 3rem 7%; }
+  .stageReveal .story { padding-top: 2rem; }
+  .stageReveal .story h2 { font-size: clamp(2.2rem, 8vw, 3rem); }
+  .stageReveal .bubbleField > * { width: min(55vw, 13rem); }
 }
 @media (prefers-reduced-motion: reduce) { .sceneOpen, .enter { transition: none; } .flash { display: none; } .bubbleField > * { opacity: 1; animation: none; } }

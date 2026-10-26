@@ -18,6 +18,7 @@ import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
 import { MadeAtLuminalStack } from "./made-at-luminal-stack";
 import { getHomeFeaturedRaffle } from "@/features/raffle/raffle-home-service";
 import { CollectorGuide } from "@/features/studio/studio-editorial";
+import { StageInvitation } from "@/components/discovery/stage-invitation";
 
 type HomeMediaFrameProps = Readonly<{
   media: HomeMediaContract;
@@ -119,6 +120,7 @@ export async function HomePage() {
                 <p className="object-provenance">{content.featured.collection}</p>
                 <p className="featured-story">{content.featured.story}</p>
                 <Link className="text-link" href="/archive">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
+                <StageInvitation locale={locale} />
               </div>
             </Container>
           )}

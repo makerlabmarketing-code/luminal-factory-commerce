@@ -9,4 +9,18 @@
 .cover { position: relative; aspect-ratio: 4 / 5; margin-bottom: 1.5rem; overflow: hidden; border: 1px solid var(--border); border-radius: .75rem; background: var(--surface); display: grid; place-items: center; }
 .cover p { padding: 1rem; }
 @media (max-width: 900px) { .list { grid-template-columns: 1fr; gap: 0; } }
+@media (max-width: 700px) { .program { grid-template-columns: 1fr; min-height: 0; gap: 2rem; padding: 2.25rem 1.5rem; } .program::after { inset: 35% 0 0; mask-image: linear-gradient(transparent, #000); } .programObject { width: min(55vw, 13rem); } .programMark { width: 8rem; } }
 @media (max-width: 500px) { .card dl { grid-template-columns: 1fr; gap: .4rem; } .card dd { margin-bottom: .75rem; } }
+.program { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(13rem, .9fr); align-items: center; gap: clamp(2rem, 6vw, 6rem); min-height: 34rem; padding: clamp(2rem, 5vw, 5rem); margin-bottom: clamp(3rem, 7vw, 6rem); border: 1px solid rgba(195,163,123,.32); border-radius: 1.25rem; background: #100b11; }
+.program::before { content: ""; position: absolute; z-index: -2; inset: 0; background: radial-gradient(ellipse at 77% 50%, rgba(205,128,68,.26), transparent 46%), linear-gradient(108deg, #0c0911 15%, #1b0d16 52%, #100b11); }
+.program::after { content: ""; position: absolute; z-index: -1; inset: 0 0 0 55%; opacity: .38; background: repeating-linear-gradient(100deg, transparent 0 8%, rgba(102,34,47,.72) 11%, rgba(28,13,22,.6) 19%, transparent 24% 30%); mask-image: linear-gradient(90deg, transparent, #000 42%); pointer-events: none; }
+.programCopy { max-width: 39rem; }
+.programEyebrow { margin: 0; color: #c6a979; font: .66rem var(--font-mono), monospace; letter-spacing: .18em; }
+.programCopy h2 { margin: 1.4rem 0; color: #f2ece6; font-size: clamp(2.5rem, 5vw, 5rem); font-weight: 420; letter-spacing: -.055em; line-height: .99; }
+.programCopy > p:not(.programEyebrow) { max-width: 37rem; color: #c9c1bf; line-height: 1.75; white-space: pre-line; }
+.programRule { display: block; width: min(12rem, 50%); height: 1px; margin: 2rem 0 1.25rem; background: linear-gradient(90deg, #b98b60, transparent); }
+.programCopy .programNote { font-size: .85rem; }
+.programObject { width: min(100%, 17rem); margin-inline: auto; }
+.programMark { width: min(75%, 17rem); aspect-ratio: 1; margin-inline: auto; background: radial-gradient(ellipse at 50% 72%, rgba(255,210,144,.5), transparent 42%), linear-gradient(#d7ac76, #562c35); clip-path: polygon(50% 0, 100% 100%, 0 100%); opacity: .45; }
+.programAfter { margin: 0 0 2.5rem; }
+.programAfter h2 { margin: .7rem 0 0; color: #f2ede7; font-size: clamp(2.2rem, 4vw, 3.8rem); font-weight: 420; letter-spacing: -.05em; }

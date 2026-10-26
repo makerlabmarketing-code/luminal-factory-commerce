@@ -16,8 +16,6 @@ new Function('require', 'module', 'exports', code)(name => {
   if (name === '@/lib/i18n/server') return { getLocale: async () => locale, getTranslator: async () => text => dictionary[text]?.[locale === 'vi' ? 1 : 0] ?? text };
   if (name === '@/lib/i18n/locale') return { localeHref: href => `/${locale}${href}` };
   if (name === '@/lib/i18n/link') return { default: ({ href, children, ...props }) => React.createElement('a', { ...props, href: `/${locale}${href}` }, children), __esModule: true };
-  if (name === '@/components/discovery/circus-discovery-gate') return { CircusDiscoveryGate: ({ children, bubbles, actionLabel }) => React.createElement('section', null,
-    React.createElement('button', { type: 'button' }, actionLabel), bubbles, children) };
   if (name === '@/components/discovery/circus-product-bubble') return { CircusProductBubble: ({ entry }) => React.createElement('a', { href: `/${locale}${entry.href}` }, entry.title) };
   if (name === '@/components/discovery/meowhe-story') return { meowheDiscoveryStory: () => 'Meowhe story' };
   if (name.endsWith('.css')) return {};
@@ -36,7 +34,8 @@ test('both locales distinguish unavailable/disabled from verified empty and loca
       assert.equal(html.includes(`href="/${locale}/raffle"`), state === 'unavailable');
       assert.ok(html.includes(`href="/${locale}/archive"`));
       assert.ok(html.includes(`href="/${locale}/shop"`));
-      assert.match(html, /<button type="button">/);
+      assert.doesNotMatch(html, /Show more|Xem thêm/);
+      assert.match(html, /Meowhe story/);
       assert.doesNotMatch(html, /<form|type="submit"/);
     }
   }
@@ -47,7 +46,7 @@ test('published cards preserve source identity, escape content, show UTC+7 seman
     opensAt: state === 'cancelled' ? null : '2026-10-07T00:00:00Z', closesAt: state === 'cancelled' ? null : '2026-10-07T01:00:00Z' }));
   for (locale of ['en', 'vi']) {
     const html = await render({ state: 'ready', entries });
-    assert.equal((html.match(/<h2>/g) ?? []).length, 5);
+    assert.equal((html.match(/<h2>/g) ?? []).length, 7);
     assert.equal((html.match(/<time /g) ?? []).length, 8);
     assert.ok(html.includes('dateTime="2026-10-07T00:00:00Z"'));
     assert.ok(html.includes('Asia/Ho_Chi_Minh (UTC+7)'));

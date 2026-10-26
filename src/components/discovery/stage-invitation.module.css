@@ -1,0 +1,8 @@
+.invitation { display: inline-flex; align-items: center; gap: 1rem; max-width: 100%; margin-top: 1.5rem; padding: .55rem 1.2rem .55rem .6rem; color: #f2ede7; text-decoration: none; border: 1px solid rgba(190,159,121,.35); background: linear-gradient(110deg, rgba(123,181,212,.08), rgba(80,34,48,.2) 65%, rgba(210,159,98,.07)); transition: border-color .25s ease, background .25s ease; }
+.invitation:hover { border-color: rgba(225,188,135,.7); background: linear-gradient(110deg, rgba(123,181,212,.12), rgba(102,45,59,.28) 65%, rgba(210,159,98,.12)); }
+.invitation:focus-visible { outline: 2px solid #b9e9ff; outline-offset: 4px; }
+.threshold { position: relative; display: block; flex: none; width: 3.1rem; height: 3.4rem; background: linear-gradient(150deg, #311d29, #111016); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.threshold::after { content: ""; position: absolute; inset: 25% 31% 0; background: linear-gradient(#ffe1a0, #bd7144 65%, #39202a); clip-path: polygon(50% 0, 100% 100%, 0 100%); filter: drop-shadow(0 0 .4rem #d59a6e); }
+.invitation small { display: block; color: #c1a683; font: .6rem var(--font-mono), monospace; letter-spacing: .13em; }
+.invitation strong { display: block; margin-top: .3rem; font-size: .95rem; font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .invitation { transition: none; } }

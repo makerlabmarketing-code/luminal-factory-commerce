@@ -92,6 +92,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           </section>
 
           <CircusDiscoveryGate
+            stageId="meowhe-stage"
             id="shop-discovery-content"
             heading={locale === "vi" ? "Meowhe, dưới ánh đèn" : "Meowhe, in the spotlight"}
             invitation={locale === "vi" ? "Giữa bóng tối, đôi mắt lệch và nụ cười tinh nghịch của Meowhe dần hiện ra. Mỗi phiên bản giữ một mảnh chuyện riêng." : "Out of the dark emerge Meowhe's mismatched eyes and mischievous grin. Every colorway holds another piece of the story."}
