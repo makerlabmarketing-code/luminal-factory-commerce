@@ -17,6 +17,22 @@
   pointer-events: auto;
 }
 
+.modelLayer::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: clamp(11rem, 18vw, 17rem);
+  aspect-ratio: 1;
+  top: 30%;
+  left: 50%;
+  border: 1px solid rgba(222, 174, 132, .25);
+  border-radius: 50%;
+  background: url("/images/home/gallery/lolipop-garden.webp") center 52% / cover;
+  box-shadow: 0 2rem 7rem rgba(0, 0, 0, .55), 0 0 5rem rgba(185, 233, 255, .06);
+  opacity: .64;
+  pointer-events: none;
+}
+
 .modelLayer :global(.hero-object-stage) {
   height: 100%;
   min-height: 100% !important;
@@ -203,6 +219,7 @@
 /* Keep this query aligned with compactMotion. Touch alone must not select the
    lower mobile stage on landscape tablets with room for the desktop layout. */
 @media (max-width: 1023px), (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  .modelLayer::before { display: none; }
   .experience {
     position: fixed;
     inset: 0;

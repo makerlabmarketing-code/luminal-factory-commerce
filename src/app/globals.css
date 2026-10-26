@@ -555,24 +555,6 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
     linear-gradient(112deg, #050505 18%, #0e0910 74%, #050505);
 }
 
-.wave-home[data-home-immersive="true"] .hero-atmosphere::after {
-  content: "";
-  position: absolute;
-  width: clamp(11rem, 18vw, 17rem);
-  aspect-ratio: 1;
-  top: 34%;
-  right: 12%;
-  border: 1px solid rgba(222, 174, 132, .25);
-  border-radius: 50%;
-  background: url("/images/home/gallery/lolipop-garden.webp") center 52% / cover;
-  box-shadow: 0 2rem 7rem rgba(0, 0, 0, .55), 0 0 5rem rgba(185, 233, 255, .06);
-  opacity: .64;
-}
-
-@media (max-width: 899px) {
-  .wave-home[data-home-immersive="true"] .hero-atmosphere::after { display: none; }
-}
-
 .home-featured-links { display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; margin-top: 1.5rem; }
 
 .home-gallery { background: linear-gradient(180deg, #100a11 0%, #09070b 35%, #080808 100%); }
