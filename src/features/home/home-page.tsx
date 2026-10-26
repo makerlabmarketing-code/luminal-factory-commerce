@@ -119,19 +119,13 @@ export async function HomePage() {
                 <h2 id="featured-title">{content.featured.title}</h2>
                 <p className="object-provenance">{content.featured.collection}</p>
                 <p className="featured-story">{content.featured.story}</p>
-                <Link className="text-link" href="/archive">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
-                <StageInvitation locale={locale} />
+                <div className="home-featured-links">
+                  <StageInvitation locale={locale} />
+                  <Link className="text-link" href="/archive">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
+                </div>
               </div>
             </Container>
           )}
-        </section>
-
-        <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title" data-home-3d-section="revival">
-          <Container>
-            <p className="eyebrow" data-luminal-reveal="copy">{tr("A studio in transition")}</p>
-            <h2 id="revival-title" data-luminal-reveal="copy"><span>{tr("Lazy Factory")}</span><i aria-hidden="true">→</i>{tr("Luminal Factory")}</h2>
-            <p data-luminal-reveal="copy">{tr("Formerly Lazy Factory. The same independent hands, now with a clearer focus on light, material, and collectible character.")}</p>
-          </Container>
         </section>
 
         {!immersive ? <section className="selected-archive section [content-visibility:auto] [contain-intrinsic-size:auto_1500px]" aria-labelledby="archive-title" data-home-3d-section="archive">
@@ -161,13 +155,21 @@ export async function HomePage() {
           </Container>
         </section> : null}
 
-        <section className="home-gallery section border-t border-white/10 bg-[#070707] [content-visibility:auto] [contain-intrinsic-size:auto_980px]" aria-labelledby="gallery-title" data-home-3d-section="gallery">
+        <section className="home-gallery section border-t border-white/10 [content-visibility:auto] [contain-intrinsic-size:auto_980px]" aria-labelledby="gallery-title" data-home-3d-section="gallery">
           <Container>
             <header className="editorial-heading" data-luminal-reveal="copy">
               <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("One character.")}<br />{tr("Three moods.")}</h2></div>
               <p>{tr("A closer look at the colorful Lolipop, death-inspired Mictlán, and monochrome finishes from the studio archive.")}</p>
             </header>
             <HomeFlexGallery items={media.gallery} />
+          </Container>
+        </section>
+
+        <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title" data-home-3d-section="revival">
+          <Container>
+            <p className="eyebrow" data-luminal-reveal="copy">{tr("A studio in transition")}</p>
+            <h2 id="revival-title" data-luminal-reveal="copy"><span>{tr("Lazy Factory")}</span><i aria-hidden="true">→</i>{tr("Luminal Factory")}</h2>
+            <p data-luminal-reveal="copy">{tr("Formerly Lazy Factory. The same independent hands, now with a clearer focus on light, material, and collectible character.")}</p>
           </Container>
         </section>
 

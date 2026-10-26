@@ -39,7 +39,7 @@
 }
 .bubble1 { left: 47%; top: 3%; }
 .bubble2 { left: 79%; top: 7%; }
-.bubble3 { left: 64%; top: 68%; }
+.bubble3 { left: 34%; top: 72%; }
 
 .floatBody {
   display: block;
@@ -145,13 +145,23 @@
 .copy {
   position: absolute;
   left: 56%;
-  top: 39%;
+  top: 32%;
   width: 40%;
   z-index: 3;
   max-width: 34rem;
   opacity: 0;
   visibility: hidden;
 }
+
+.journeyLinks {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+  margin-top: 1.4rem;
+}
+
+.journeyLinks :global(.text-link) { align-self: flex-start; }
 
 .copy h2 {
   max-width: none;
@@ -174,10 +184,12 @@
   .bubble { width: clamp(7rem, 24vw, 11rem); }
   .bubble1 { left: 60%; top: 4%; }
   .bubble2 { left: 7%; top: 72%; }
-  .bubble3 { left: 65%; top: 72%; }
-  .copy { left: 7%; top: 46%; width: 86%; max-width: none; text-align: center; }
+  .bubble3 { left: 68%; top: 74%; }
+  .copy { left: 7%; top: 39%; width: 86%; max-width: none; text-align: center; }
   .copy h2 { font-size: clamp(2.8rem, 8vw, 4.2rem); }
   .copy > p:not(.eyebrow) { margin-inline: auto; }
+  .journeyLinks { align-items: center; }
+  .journeyLinks :global(.text-link) { align-self: center; }
   .bubbleLabel { font-size: .52rem; letter-spacing: .1em; }
   .spotlight { background: radial-gradient(ellipse at 50% 52%, rgba(255,232,189,.11), transparent 65%); }
 }

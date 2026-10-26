@@ -16,3 +16,7 @@ Primary motion is the Shop curtain and one-time flash. Home uses a static doorwa
 2. Keep the Shop stage mounted after opening. Move story and product bubble into the stage, put the catalog below, preserve focus transfer and filtered direct results.
 3. Replace Raffle's duplicate gate with a server-rendered program board and existing data-driven release list.
 4. Run full checks, inspect live Home/Shop/Raffle in VI/EN, verify truthful unavailable states and keyboard/focus, then keep mobile/iPad visual acceptance open until device review.
+
+## Home visual correction, 2026-10-26
+
+The owner reported a broken Home composition and discontinuity across the site. Keep Meowhe and its colorway gallery together, then reveal the Lazy Factory → Luminal Factory studio bridge before the process and collector guide. The Home entrance and Meowhe scene borrow the tent's plum and amber atmosphere at low intensity. Group the Shop invitation and Archive link vertically, keeping the invitation clear of the third bubble. Keep the established 3D interaction; the atmospheric tent image supports empty or constrained renders without pretending that a raffle is available.

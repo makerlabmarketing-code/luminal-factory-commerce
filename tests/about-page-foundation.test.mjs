@@ -21,7 +21,7 @@ test("About navigation remains a real route while Wave 1 keeps its approved sequ
 
   assert.match(navigation, /href: "\/about"/);
   assert.doesNotMatch(navigation, /href: "#about"/);
-  assert.match(home, /featured-object[\s\S]*brand-revival[\s\S]*selected-archive[\s\S]*made-at-luminal[\s\S]*commerce-split/);
+  assert.match(home, /featured-object[\s\S]*selected-archive[\s\S]*home-gallery[\s\S]*brand-revival[\s\S]*made-at-luminal[\s\S]*commerce-split/);
 });
 
 test("Footer uses the approved Luminal brand line and retires the legacy slogan", () => {

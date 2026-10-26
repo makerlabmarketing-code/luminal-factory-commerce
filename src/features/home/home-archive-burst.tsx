@@ -1,8 +1,6 @@
 "use client";
 import { useLocale, useTranslator } from "@/lib/i18n/client";
 import { StageInvitation } from "@/components/discovery/stage-invitation";
-
-
 import Image from "next/image";
 import Link from "@/lib/i18n/link";
 import { useEffect, useRef } from "react";
@@ -226,8 +224,10 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       <div ref={copyRef} className={styles.copy}>
         <h2 id="featured-title">{tr("Meet Meowhe.")}</h2>
         <p>{tr("A character with a past. Explore three earlier colorways: Lolipop, Mictlán, and Mono.")}</p>
-        <Link className="text-link" href="/archive">{tr("Explore the full archive")}<span aria-hidden="true">↗</span></Link>
-        <StageInvitation locale={locale} />
+        <div className={styles.journeyLinks}>
+          <StageInvitation locale={locale} />
+          <Link className="text-link" href="/archive">{tr("Explore the full archive")}<span aria-hidden="true">↗</span></Link>
+        </div>
       </div>
     </div>
   );

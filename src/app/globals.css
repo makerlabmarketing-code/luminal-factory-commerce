@@ -543,9 +543,21 @@ html.luminal-motion-ready [data-luminal-visible="true"] { opacity: 1; transform:
   padding-block: 0;
   overflow: visible;
   background:
-    radial-gradient(circle at 28% 48%, rgba(185, 233, 255, 0.045), transparent 28rem),
-    #080808;
+    linear-gradient(90deg, rgba(5, 5, 7, .78), rgba(15, 8, 15, .82)),
+    url("/images/discovery/meowhe-circus-closed.webp") 20% 46% / min(65rem, 85vw) auto no-repeat,
+    #080608;
 }
+
+.wave-home[data-home-immersive="true"] .hero-atmosphere {
+  background:
+    linear-gradient(90deg, #050505 17%, rgba(5, 5, 7, .82) 54%, rgba(9, 5, 10, .75)),
+    url("/images/discovery/meowhe-circus-closed.webp") 78% 49% / min(58rem, 65vw) auto no-repeat,
+    #050505;
+}
+
+.home-featured-links { display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; margin-top: 1.5rem; }
+
+.home-gallery { background: linear-gradient(180deg, #100a11 0%, #09070b 35%, #080808 100%); }
 
 .featured-object-immersive > div { z-index: 20; }
 

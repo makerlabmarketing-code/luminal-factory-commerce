@@ -9,9 +9,9 @@ test("Homepage follows the approved editorial sequence with the colorway gallery
   const order = [
     '<section className="revival-hero"',
     'aria-labelledby="featured-title"',
-    '<section className="brand-revival',
     '<section className="selected-archive',
     '<section className="home-gallery',
+    '<section className="brand-revival',
     '<section className="made-at-luminal',
     '<section className="commerce-split',
   ];

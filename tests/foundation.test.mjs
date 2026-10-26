@@ -25,9 +25,9 @@ test("home follows the owner-approved Wave 1 editorial hierarchy", () => {
   const sections = [
     '<section className="revival-hero"',
     'aria-labelledby="featured-title"',
-    '<section className="brand-revival',
     '<section className="selected-archive',
     '<section className="home-gallery',
+    '<section className="brand-revival',
     '<section className="made-at-luminal',
     '<section className="commerce-split',
   ];
