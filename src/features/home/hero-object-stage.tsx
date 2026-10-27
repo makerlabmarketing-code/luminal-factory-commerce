@@ -36,6 +36,7 @@ const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
+const HERO_MODEL_LOAD_TIMEOUT_MS = 6000;
 const HERO_DRAG_RETURN_RATE = 5.5;
 // The published ERP camera angle is the Hero resting pose. No hard-coded yaw addition.
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
@@ -47,6 +48,18 @@ const HERO_DRAG_DEG_PER_PIXEL = 0.18;
 
 function clamp(value: number, minimum: number, maximum: number) {
   return Math.min(Math.max(value, minimum), maximum);
+}
+
+function supportsWebGL() {
+  try {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("webgl2") || canvas.getContext("webgl");
+    if (!context) return false;
+    context.getExtension("WEBGL_lose_context")?.loseContext();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function ensureModelViewer() {
@@ -88,7 +101,6 @@ export function HeroObjectStage({
   const previewRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
-  const errorRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -107,7 +119,6 @@ export function HeroObjectStage({
       loaderRef.current.style.display = "none";
       loaderRef.current.style.opacity = "0";
     }
-    if (errorRef.current) errorRef.current.style.opacity = "0";
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -115,14 +126,15 @@ export function HeroObjectStage({
     const constrainedNetwork = connection?.saveData === true
       || connection?.effectiveType === "slow-2g"
       || connection?.effectiveType === "2g";
-    const posterOnly = constrainedNetwork || (!finePointer && !allowTouch3d);
+    const webGLAvailable = supportsWebGL();
+    const posterOnly = constrainedNetwork || (!finePointer && !allowTouch3d) || !webGLAvailable;
     const signalObjectReady = (mode: string) => {
       document.documentElement.dataset.luminalHeroObjectReady = mode;
       window.dispatchEvent(new CustomEvent("luminal:hero-object-ready", { detail: { mode } }));
     };
 
     if (posterOnly) {
-      stage.dataset.heroMode = !finePointer ? "poster-coarse-pointer" : "poster-constrained-network";
+      stage.dataset.heroMode = !webGLAvailable ? "poster-no-webgl" : !finePointer ? "poster-coarse-pointer" : "poster-constrained-network";
       mount.style.display = "none";
       if (preview) {
         preview.style.display = "block";
@@ -134,20 +146,13 @@ export function HeroObjectStage({
     }
 
     stage.dataset.heroMode = "pending-3d";
-    if (preview) {
-      preview.style.display = "none";
-      preview.style.visibility = "hidden";
-      preview.style.opacity = "0";
-    }
-    if (loaderRef.current) {
-      loaderRef.current.style.display = "flex";
-      loaderRef.current.style.opacity = "1";
-    }
+    // Keep the approved portrait visible until a 3D frame has loaded.
 
     let cancelled = false;
     let observer: IntersectionObserver | null = null;
     let idleHandle: number | null = null;
     let fallbackTimeout: number | null = null;
+    let modelLoadTimeout: number | null = null;
     let pointerAnimationFrame: number | null = null;
     let previousPointerFrameTime = performance.now();
     let scrollOrbitProgress = 0;
@@ -270,15 +275,16 @@ export function HeroObjectStage({
     };
 
     const showError = () => {
-      stage.dataset.heroMode = "3d-error";
+      if (cancelled || stage.dataset.heroMode === "poster-3d-unavailable") return;
+      stage.dataset.heroMode = "poster-3d-unavailable";
+      if (modelLoadTimeout !== null) window.clearTimeout(modelLoadTimeout);
       if (loaderRef.current) loaderRef.current.style.display = "none";
-      if (errorRef.current) errorRef.current.style.opacity = "1";
       mount.style.display = "none";
       if (preview) {
-        preview.style.display = "none";
-        preview.style.visibility = "hidden";
+        preview.style.visibility = "visible";
+        preview.style.opacity = "1";
       }
-      signalObjectReady("fallback-error");
+      signalObjectReady("poster");
     };
 
     const mountViewer = async () => {
@@ -328,6 +334,8 @@ export function HeroObjectStage({
         window.addEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
         viewer.addEventListener("load", () => {
+          if (cancelled) return;
+          if (modelLoadTimeout !== null) window.clearTimeout(modelLoadTimeout);
           applyHeroMaterialTint(viewer.model?.materials ?? [], presentation.tint);
           stage.dataset.heroMode = reducedMotion
             ? "enhanced-static"
@@ -340,14 +348,15 @@ export function HeroObjectStage({
               if (loaderRef.current) loaderRef.current.style.display = "none";
             }, 280);
           }
-          if (errorRef.current) errorRef.current.style.opacity = "0";
           mount.style.opacity = "1";
+          if (preview) preview.style.opacity = "0";
           signalObjectReady("3d");
         }, { once: true });
 
         viewer.addEventListener("error", showError, { once: true });
         mount.replaceChildren(viewer);
         viewerRef.current = viewer;
+        modelLoadTimeout = window.setTimeout(showError, HERO_MODEL_LOAD_TIMEOUT_MS);
         // Apply the resting text-facing angle immediately, even before any scroll event.
         applyPointerOrbit();
       } catch {
@@ -394,6 +403,7 @@ export function HeroObjectStage({
         idleWindow.cancelIdleCallback(idleHandle);
       }
       if (fallbackTimeout !== null) window.clearTimeout(fallbackTimeout);
+      if (modelLoadTimeout !== null) window.clearTimeout(modelLoadTimeout);
       if (pointerAnimationFrame !== null) window.cancelAnimationFrame(pointerAnimationFrame);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerdown", handlePointerDown);
@@ -424,9 +434,9 @@ export function HeroObjectStage({
         <>
           <div
             ref={previewRef}
-            className="absolute inset-0 z-[1] overflow-hidden opacity-100 md:hidden"
+            className="hero-object-poster absolute inset-[12%] z-[1] overflow-hidden opacity-100 transition-opacity duration-[620ms]"
             data-hero-product-image="true"
-            data-hero-poster-role="constrained-fallback"
+            data-hero-poster-role="loading-and-error-fallback"
             style={{
               WebkitMaskImage: "radial-gradient(ellipse 94% 86% at 54% 49%, #000 58%, transparent 100%)",
               maskImage: "radial-gradient(ellipse 94% 86% at 54% 49%, #000 58%, transparent 100%)",
@@ -455,10 +465,6 @@ export function HeroObjectStage({
               <span className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-white/45">{tr("Loading 3D object")}</span>
             </div>
           </div>}
-
-          <div ref={errorRef} className="pointer-events-none absolute inset-0 z-[4] flex items-center justify-center opacity-0 transition-opacity duration-300" role="status">
-            <span className="rounded-full border border-white/10 bg-black/55 px-3 py-2 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-white/55 backdrop-blur-sm">{tr("3D preview unavailable")}</span>
-          </div>
 
           <div ref={modelMountRef} className="absolute -inset-x-[9%] -inset-y-[4%] z-[2] opacity-0 transition-opacity duration-[620ms]" />
         </>

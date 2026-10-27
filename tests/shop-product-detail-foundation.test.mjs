@@ -22,11 +22,11 @@ test("shop presentation fallback keeps stable slugs and real detail hrefs", () =
   assert.match(content, /dataSource: "fixture-fallback"/);
 });
 
-test("shop index links to detail routes and exposes catalog source", () => {
+test("shop index links to detail routes without exposing implementation labels", () => {
   const collection = read("src/features/shop/shop-collection.tsx");
   assert.match(collection, /<Link href=\{entry\.href\}>\{entry\.title\}<\/Link>/);
   assert.match(collection, /Xem object detail/);
-  assert.match(collection, /Commerce catalog/);
+  assert.doesNotMatch(collection, /Data source|Commerce catalog/);
   assert.doesNotMatch(collection, /id=\{entry\.presentationKey\}/);
 });
 

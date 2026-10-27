@@ -12,7 +12,8 @@ test("HOME-3D-HANDOFF-02 uses a measured logo dock before revealing Home navigat
   assert.match(header, /data-home-logo-dock="true"/);
   assert.match(header, /luminal:brand-docked/);
   assert.match(immersive, /querySelector<HTMLElement>\("\[data-home-logo-dock\]"\)/);
-  assert.match(immersive, /LOGO_DOCK_MS = 1080/);
+  assert.match(immersive, /LOGO_DOCK_MS = 480/);
+  assert.match(immersive, /INTRO_MAXIMUM_MS = 1400/);
   assert.match(immersive, /luminal:brand-docked/);
 });
 

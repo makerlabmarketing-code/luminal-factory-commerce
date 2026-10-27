@@ -6,6 +6,10 @@ The owner moved the circus tent from Shop to Archive. This section supersedes th
 
 Shop is a compact product list with filters, thumbnails, title, availability and published price. Product pages retain the detailed story; the list makes no unverified release or sale claims. Raffle uses a Meowhe portrait from approved archive imagery as its thematic fallback when no published Commerce Meowhe can be shown. A six-hour sample countdown is explicitly labelled as a preview that restarts on visit and does not accept entries; the actual published release list remains authoritative. No commerce lifecycle or database contract changes.
 
+## Home hero recovery, 2026-10-27
+
+The owner observed a missing 3D hero and slow initial loading. The approved archival portrait must remain visible on desktop as well as mobile while the model loads, when WebGL is unavailable, or when the model errors/times out. Fade the portrait only after the actual model load event. Capability-check WebGL before downloading the external model-viewer runtime. The first-visit brand intro ends within a short bounded window independent of model readiness; it must not hide page content for several seconds. The existing 3D scroll journey remains when WebGL works.
+
 Status: owner approved the Home → tent → story → raffle program direction on 2026-10-26. Scope is public presentation only.
 
 ## Experience

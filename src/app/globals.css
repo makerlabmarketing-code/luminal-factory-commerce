@@ -56,6 +56,7 @@
 .hero-object-silhouette { width: min(64%, 24rem); aspect-ratio: .82; border-radius: 42% 58% 48% 52% / 34% 34% 66% 66%; background: radial-gradient(circle at 30% 18%, #dae9ef, #72919d 9%, #2b343b 28%, #0c0d0f 64%); box-shadow: inset -2rem -2rem 4rem #000, 0 4rem 8rem rgba(129,182,205,.13); transform: rotate(-7deg); clip-path: polygon(18% 3%, 77% 0, 100% 29%, 83% 91%, 47% 100%, 4% 76%, 0 25%); }
 .home-product-image { object-fit: cover; }
 .hero-product-image { filter: saturate(.84) contrast(1.04); }
+.hero-object-poster { border-radius: 48% 52% 50% 50% / 45% 47% 53% 55%; box-shadow: 0 2rem 6rem rgba(0,0,0,.48), 0 0 4rem rgba(228,173,104,.08); }
 .featured-product-image { filter: saturate(.88) contrast(1.03); }
 .hero-object-stage .home-media-pending, .featured-object-media .home-media-pending { position: absolute; z-index: 1; inset: auto 1.25rem 1.25rem; margin: 0; color: #c8cbc9; font: .66rem/1.7 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
 .home-media-pending span { color: var(--muted-foreground); font-size: .58rem; }

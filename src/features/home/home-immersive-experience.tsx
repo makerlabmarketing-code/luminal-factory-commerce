@@ -29,9 +29,9 @@ type MotionState = Readonly<{
 type MotionKeyframe = MotionState & Readonly<{ scrollY: number }>;
 
 const INTRO_SESSION_KEY = "luminal-home-intro-v1";
-const INTRO_MINIMUM_MS = 2100;
-const INTRO_MAXIMUM_MS = 4800;
-const LOGO_DOCK_MS = 1080;
+const INTRO_MINIMUM_MS = 550;
+const INTRO_MAXIMUM_MS = 1400;
+const LOGO_DOCK_MS = 480;
 const MOTION_EPSILON = 0.002;
 
 type MotionDefinition = Readonly<{

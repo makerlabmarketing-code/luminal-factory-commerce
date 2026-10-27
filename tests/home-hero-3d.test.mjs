@@ -25,16 +25,19 @@ test("remote Hero configuration inherits the local orientation without requiring
   assert.doesNotMatch(heroData, /orientation_roll_deg|orientation_pitch_deg|orientation_yaw_deg/);
 });
 
-test("desktop Hero keeps the product poster out of the 3D loading and error path", () => {
+test("desktop Hero shows approved media while 3D loads and when WebGL fails", () => {
   assert.match(heroSource, /import Image from "next\/image"/);
   assert.match(heroSource, /data-hero-product-image="true"/);
-  assert.match(heroSource, /data-hero-poster-role="constrained-fallback"/);
+  assert.match(heroSource, /data-hero-poster-role="loading-and-error-fallback"/);
   assert.match(heroSource, /data-hero-mode="capability-gated"/);
-  assert.match(heroSource, /className="absolute inset-0 z-\[1\] overflow-hidden opacity-100 md:hidden"/);
-  assert.match(heroSource, /preview\.style\.display = "none"/);
-  assert.match(heroSource, /preview\.style\.visibility = "hidden"/);
-  assert.match(heroSource, /stage\.dataset\.heroMode = "3d-error"/);
-  assert.match(heroSource, /3D preview unavailable/);
+  assert.doesNotMatch(heroSource, /md:hidden/);
+  assert.match(heroSource, /webGLAvailable = supportsWebGL\(\)/);
+  assert.match(heroSource, /stage\.dataset\.heroMode = "poster-3d-unavailable"/);
+  assert.match(heroSource, /preview\.style\.visibility = "visible"/);
+  assert.match(heroSource, /preview\.style\.opacity = "1"/);
+  assert.match(heroSource, /mount\.style\.opacity = "1"/);
+  assert.match(heroSource, /if \(preview\) preview\.style\.opacity = "0"/);
+  assert.doesNotMatch(heroSource, /3D preview unavailable/);
   assert.doesNotMatch(heroSource, /Product image active/);
   assert.match(heroSource, /Loading 3D object/);
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
@@ -77,7 +80,7 @@ test("constrained clients keep the image fallback while eligible desktop defers 
   assert.match(heroSource, /connection\?\.saveData === true/);
   assert.match(heroSource, /connection\?\.effectiveType === "slow-2g"/);
   assert.match(heroSource, /connection\?\.effectiveType === "2g"/);
-  assert.match(heroSource, /posterOnly = constrainedNetwork \|\| \(!finePointer && !allowTouch3d\)/);
+  assert.match(heroSource, /posterOnly = constrainedNetwork \|\| \(!finePointer && !allowTouch3d\) \|\| !webGLAvailable/);
   assert.match(heroSource, /poster-coarse-pointer/);
   assert.match(heroSource, /poster-constrained-network/);
   assert.match(heroSource, /preview\.style\.display = "block"/);
