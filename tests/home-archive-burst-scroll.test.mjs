@@ -235,7 +235,8 @@ test("POP uses CSS-only particles, honors reduced motion, and leaves archive nav
   const css = readFileSync("src/features/home/home-archive-burst.module.css", "utf8");
   assert.match(source, /aria-label=\{`Làm vỡ bong bóng/);
   assert.match(source, /Array\.from\(\{ length: 8 \}/);
-  assert.match(source, /Explore the full archive/);
+  assert.match(source, /StageInvitation/);
+  assert.match(source, /Browse Shop/);
   assert.match(css, /bubble-pop-collapse/);
   assert.match(css, /bubble-pop-spark/);
   assert.match(css, /bubble-pop-reform/);

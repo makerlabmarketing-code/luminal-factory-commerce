@@ -24,3 +24,13 @@
 .programMark { width: min(75%, 17rem); aspect-ratio: 1; margin-inline: auto; background: radial-gradient(ellipse at 50% 72%, rgba(255,210,144,.5), transparent 42%), linear-gradient(#d7ac76, #562c35); clip-path: polygon(50% 0, 100% 100%, 0 100%); opacity: .45; }
 .programAfter { margin: 0 0 2.5rem; }
 .programAfter h2 { margin: .7rem 0 0; color: #f2ede7; font-size: clamp(2.2rem, 4vw, 3.8rem); font-weight: 420; letter-spacing: -.05em; }
+.program { border-radius: 0; background: #0a080c; }
+.program::after { opacity: .2; }
+.archivePortrait { position: relative; width: min(100%, 23rem); aspect-ratio: 4 / 5; margin: auto; overflow: hidden; border: 1px solid rgba(219,170,113,.45); box-shadow: 0 0 6rem rgba(197,111,59,.18); }
+.archivePortrait span { position: absolute; bottom: 0; inset-inline: 0; padding: 1rem; background: linear-gradient(transparent, #09060c); color: #eddbca; font: .67rem var(--font-mono), monospace; text-transform: uppercase; }
+:global(.raffle-demo) { margin-top: 1.6rem; padding: 1.1rem 1.25rem; border: 1px solid rgba(229,190,136,.32); background: rgba(8,7,11,.72); }
+:global(.raffle-demo > p) { margin: 0; color: #cdb9a5; font-size: .68rem; line-height: 1.5; letter-spacing: .045em; }
+:global(.raffle-demo-time) { display: flex; align-items: start; gap: .5rem; margin: .65rem 0; color: #f0dcc2; font-variant-numeric: tabular-nums; }
+:global(.raffle-demo-time span) { display: grid; font-size: clamp(2rem, 4vw, 3.8rem); line-height: 1; }
+:global(.raffle-demo-time small) { margin-top: .25rem; color: #aa9682; font-size: .58rem; font-weight: 400; letter-spacing: .12em; }
+:global(.raffle-demo-time b) { font-size: clamp(2rem, 4vw, 3.8rem); font-weight: 300; line-height: .8; }

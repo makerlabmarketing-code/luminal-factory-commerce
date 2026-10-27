@@ -6,6 +6,9 @@ import type { RaffleListEntry, RaffleListResult } from "./raffle-list-service";
 import { RaffleCover } from "./raffle-cover";
 import { CircusProductBubble } from "@/components/discovery/circus-product-bubble";
 import { meowheDiscoveryStory } from "@/components/discovery/meowhe-story";
+import { getCuratedArchiveEntries } from "@/features/archive/archive-content";
+import Image from "next/image";
+import { RaffleCountdownDemo } from "./raffle-countdown-demo";
 import type { ShopPresentationEntry } from "@/features/shop/shop-content";
 
 const statusCopy: Record<RaffleListEntry["state"], string> = {
@@ -22,6 +25,7 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
   const formatDate = new Intl.DateTimeFormat(locale, {
     dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh",
   });
+  const archivePortrait = getCuratedArchiveEntries().find(entry => entry.media.productionApproved);
   return (
     <section className="section" aria-labelledby="raffle-title">
       <div className="section-heading">
@@ -37,10 +41,11 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
           <p className={styles.programEyebrow}>{locale === "vi" ? "LUMINAL / CHƯƠNG MEOWHE" : "LUMINAL / THE MEOWHE CHAPTER"}</p>
           <h2>{featuredMeowhe?.title ?? "Meowhe"}</h2>
           <p>{meowheDiscoveryStory(featuredMeowhe, locale, "raffle")}</p>
+          <RaffleCountdownDemo locale={locale} />
           <span className={styles.programRule} aria-hidden="true" />
           <p className={styles.programNote}>{locale === "vi" ? "Thông tin các đợt phát hành đã công bố nằm bên dưới." : "Published release information follows below."}</p>
         </div>
-        {featuredMeowhe ? <div className={styles.programObject}><CircusProductBubble entry={featuredMeowhe} locale={locale} /></div> : <span className={styles.programMark} aria-hidden="true" />}
+        {featuredMeowhe ? <div className={styles.programObject}><CircusProductBubble entry={featuredMeowhe} locale={locale} /></div> : archivePortrait ? <div className={styles.archivePortrait}><Image src={archivePortrait.media.src} alt={tr(archivePortrait.media.alt)} fill sizes="(max-width: 700px) 60vw, 420px" style={{ objectFit: "cover", objectPosition: archivePortrait.media.objectPosition ?? "center" }} /><span>{locale === "vi" ? "Meowhe / hình lưu trữ minh họa" : "Meowhe / archive illustration"}</span></div> : <span className={styles.programMark} aria-hidden="true" />}
       </div>
       <div className={styles.programAfter}>
         <p className={styles.programEyebrow}>{locale === "vi" ? "LỊCH PHÁT HÀNH / RAFFLE" : "RELEASE PROGRAM / RAFFLE"}</p>

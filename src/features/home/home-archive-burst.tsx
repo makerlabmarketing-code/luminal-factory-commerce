@@ -226,7 +226,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
         <p>{tr("A character with a past. Explore three earlier colorways: Lolipop, Mictlán, and Mono.")}</p>
         <div className={styles.journeyLinks}>
           <StageInvitation locale={locale} />
-          <Link className="text-link" href="/archive">{tr("Explore the full archive")}<span aria-hidden="true">↗</span></Link>
+          <Link className="text-link" href="/shop">{tr("Browse Shop")}<span aria-hidden="true">↗</span></Link>
         </div>
       </div>
     </div>

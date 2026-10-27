@@ -151,7 +151,7 @@ export async function HomePage() {
                 </Link>
               ))}
             </div>
-            <Link className="text-link archive-link" href="/archive">{tr("Explore the full archive")}<span aria-hidden="true">↗</span></Link>
+            <Link className="text-link archive-link" href="/shop">{tr("Browse Shop")}<span aria-hidden="true">↗</span></Link>
           </Container>
         </section> : null}
 

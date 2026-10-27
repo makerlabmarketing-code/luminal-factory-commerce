@@ -23,7 +23,7 @@ export async function ArchiveCollection({ entries }: ArchiveCollectionProps) {
   }
 
   return (
-    <section className="archive-route-section" aria-labelledby="archive-list-title">
+    <section id="archive-records" className="archive-route-section" aria-labelledby="archive-list-title">
       <div className="archive-route-heading">
         <p className="eyebrow">{tr("Curated records")}</p>
         <h2 id="archive-list-title">{tr("Meowhe colorways")}</h2>

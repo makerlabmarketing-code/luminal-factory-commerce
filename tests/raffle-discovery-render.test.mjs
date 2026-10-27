@@ -18,6 +18,9 @@ new Function('require', 'module', 'exports', code)(name => {
   if (name === '@/lib/i18n/link') return { default: ({ href, children, ...props }) => React.createElement('a', { ...props, href: `/${locale}${href}` }, children), __esModule: true };
   if (name === '@/components/discovery/circus-product-bubble') return { CircusProductBubble: ({ entry }) => React.createElement('a', { href: `/${locale}${entry.href}` }, entry.title) };
   if (name === '@/components/discovery/meowhe-story') return { meowheDiscoveryStory: () => 'Meowhe story' };
+  if (name === '@/features/archive/archive-content') return { getCuratedArchiveEntries: () => [] };
+  if (name === 'next/image') return { default: ({ src, alt }) => React.createElement('img', { src, alt }), __esModule: true };
+  if (name === './raffle-countdown-demo') return { RaffleCountdownDemo: ({ locale }) => React.createElement('aside', null, locale === 'vi' ? 'BẢN XEM THỬ · KHÔNG MỞ ĐĂNG KÝ' : 'PREVIEW · ENTRIES ARE NOT OPEN') };
   if (name.endsWith('.css')) return {};
   if (name === './raffle-cover') return { RaffleCover: ({ src, alt }) => React.createElement('img', { src, alt }) };
   return require(name);
@@ -36,6 +39,7 @@ test('both locales distinguish unavailable/disabled from verified empty and loca
       assert.ok(html.includes(`href="/${locale}/shop"`));
       assert.doesNotMatch(html, /Show more|Xem thêm/);
       assert.match(html, /Meowhe story/);
+      assert.match(html, /KHÔNG MỞ ĐĂNG KÝ|ENTRIES ARE NOT OPEN/);
       assert.doesNotMatch(html, /<form|type="submit"/);
     }
   }

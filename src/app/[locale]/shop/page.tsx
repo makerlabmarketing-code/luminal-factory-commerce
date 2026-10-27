@@ -8,16 +8,12 @@ import { Header } from "@/components/layout/header";
 import { Container } from "@/components/ui/container";
 import {
   getShopCatalog,
-  getLatestPublishedMeowhe,
   normalizeShopCatalogQuery,
   SHOP_PRODUCT_TYPES,
   SHOP_RELEASE_TYPES,
   type ShopCatalogQuery,
 } from "@/features/shop/catalog-adapter";
 import { ShopCollection } from "@/features/shop/shop-collection";
-import { CircusDiscoveryGate } from "@/components/discovery/circus-discovery-gate";
-import { meowheDiscoveryStory } from "@/components/discovery/meowhe-story";
-import { CircusProductBubble } from "@/components/discovery/circus-product-bubble";
 
 type ShopPageProps = Readonly<{
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -69,10 +65,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const tr = await getTranslator();
   const locale = await getLocale();
   const rawSearchParams = await searchParams;
-  const [catalog, newestPublishedMeowhe] = await Promise.all([
-    getShopCatalog(rawSearchParams, locale),
-    getLatestPublishedMeowhe(locale),
-  ]);
+  const catalog = await getShopCatalog(rawSearchParams, locale);
   const isLiveCatalog = catalog.source === "commerce-catalog";
   const hasActiveQuery = Boolean(catalog.query.q || catalog.query.type || catalog.query.release || catalog.query.page > 1);
 
@@ -84,29 +77,12 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           <section className="shop-route-hero" aria-labelledby="shop-title">
             <p className="eyebrow">{tr("Luminal shop")}</p>
             <h1 id="shop-title">Shop</h1>
-            <p>
-              {isLiveCatalog
-                ? tr("Shop đang đọc các object đã publish từ Commerce catalog. Search, filter và pagination đều chạy server-side; cart, checkout, payment và order creation vẫn chưa mở trong Phase 5.")
-                : tr("Commerce catalog hiện chưa được cấu hình hoặc tạm thời không truy cập được trên deployment này, nên Shop đang dùng presentation fallback đã kiểm duyệt.")}
-            </p>
+            <p>{locale === "vi" ? "Những vật thể được chế tác tại Luminal. Chọn một sản phẩm để xem hình ảnh, phối màu và câu chuyện của nó." : "Objects made at Luminal. Choose a piece to explore its images, colorways and story."}</p>
           </section>
-
-          <CircusDiscoveryGate
-            stageId="meowhe-stage"
-            id="shop-discovery-content"
-            heading={locale === "vi" ? "Meowhe, dưới ánh đèn" : "Meowhe, in the spotlight"}
-            invitation={locale === "vi" ? "Giữa bóng tối, đôi mắt lệch và nụ cười tinh nghịch của Meowhe dần hiện ra. Mỗi phiên bản giữ một mảnh chuyện riêng." : "Out of the dark emerge Meowhe's mismatched eyes and mischievous grin. Every colorway holds another piece of the story."}
-            actionLabel={locale === "vi" ? "Xem thêm" : "Show more"}
-            storyLabel={locale === "vi" ? "CÂU CHUYỆN / SẢN PHẨM" : "STORY / OBJECT"}
-            storyHeading={newestPublishedMeowhe?.title ?? "Meowhe"}
-            storyBody={meowheDiscoveryStory(newestPublishedMeowhe, locale, "shop")}
-            initiallyOpen={hasActiveQuery}
-            bubbles={newestPublishedMeowhe ? <CircusProductBubble entry={newestPublishedMeowhe} locale={locale} /> : undefined}
-          >
           <section className="shop-route-section" aria-labelledby="shop-filter-title">
             <div className="shop-route-heading">
-              <p className="eyebrow">{tr("Catalog controls")}</p>
-              <h2 id="shop-filter-title">{tr("Tìm và lọc object")}</h2>
+              <p className="eyebrow">{locale === "vi" ? "BỘ SƯU TẬP" : "COLLECTION"}</p>
+              <h2 id="shop-filter-title">{locale === "vi" ? "Tìm vật thể của bạn" : "Find your object"}</h2>
             </div>
             <form action={localeHref("/shop", locale)} method="get">
               <p>
@@ -143,7 +119,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               {catalog.hasNextPage ? <Link href={pageHref(catalog.query, catalog.query.page + 1)}>{tr("Trang sau →")}</Link> : null}
             </nav>
           ) : null}
-          </CircusDiscoveryGate>
         </Container>
       </main>
       <Footer />

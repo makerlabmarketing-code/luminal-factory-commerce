@@ -1,0 +1,19 @@
+.stage { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: space-between; min-height: min(47rem, 83svh); margin: 0 -1rem; padding: clamp(7rem, 15vh, 10rem) clamp(1.5rem, 5vw, 5rem) clamp(2rem, 5vh, 3.5rem); overflow: hidden; background: #08060b; scroll-margin-top: 5rem; }
+.stage::before { content: ""; position: absolute; z-index: -2; inset: 0; background: url("/images/discovery/meowhe-circus-closed.webp") right 15% center / min(82%, 75rem) auto no-repeat; opacity: .74; filter: brightness(.8) saturate(.75); }
+.stage::after { content: ""; position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg, #08060b 0%, rgba(8,6,11,.96) 31%, rgba(8,6,11,.42) 62%, rgba(8,6,11,.17)), linear-gradient(0deg, #08060b 0%, transparent 25%, transparent 75%, rgba(8,6,11,.45)); pointer-events: none; }
+.stageLight { position: absolute; z-index: -1; top: 3%; right: 11%; width: 41%; height: 72%; opacity: .55; pointer-events: none; background: conic-gradient(from 159deg at 50% 0%, transparent 0 10deg, rgba(255,210,132,.23) 18deg, rgba(255,229,174,.13) 29deg, transparent 42deg), radial-gradient(ellipse at 50% 55%, rgba(244,153,79,.18), transparent 56%); mix-blend-mode: screen; }
+.intro { max-width: min(43rem, 52%); }
+.intro h1 { margin: 1rem 0 1.3rem; color: #f4efe8; font-size: clamp(3.1rem, 6.5vw, 7rem); font-weight: 400; line-height: .96; letter-spacing: -.065em; }
+.intro > p:not(.eyebrow) { max-width: 32rem; color: #c9c3c2; line-height: 1.7; }
+.allRecords { display: inline-flex; gap: 1.5rem; min-height: 2.75rem; align-items: center; margin-top: 1.1rem; border-bottom: 1px solid rgba(228,181,122,.66); color: #f2dfc4; text-decoration: none; }
+.allRecords:hover { color: #fff; }
+.allRecords:focus-visible, .colorway:focus-visible { outline: 2px solid #b9e9ff; outline-offset: 4px; }
+.colorways { display: flex; flex-wrap: wrap; gap: clamp(.6rem, 1.6vw, 1.5rem); padding-top: 3rem; }
+.colorway { display: flex; min-width: 0; align-items: center; gap: .75rem; padding: .45rem .85rem .45rem .45rem; border: 1px solid rgba(238,206,165,.21); background: rgba(9,8,12,.72); color: #f2ede8; text-decoration: none; backdrop-filter: blur(8px); transition: border-color .2s ease, transform .2s ease; }
+.colorway:hover { border-color: rgba(238,206,165,.67); transform: translateY(-3px); }
+.portrait { position: relative; width: clamp(3.5rem, 5.4vw, 5rem); aspect-ratio: 1; overflow: hidden; background: #171116; }
+.colorwayLabel { display: grid; gap: .2rem; }
+.colorwayLabel small { color: #c1a989; font: .57rem var(--font-mono), monospace; letter-spacing: .09em; }
+.colorwayLabel strong { font-size: clamp(.88rem, 1.1vw, 1.05rem); font-weight: 500; }
+@media (max-width: 700px) { .stage { min-height: 47rem; margin-inline: -1rem; padding: 5.5rem 1.5rem 2rem; } .stage::before { background-size: auto 65%; background-position: 65% 6%; opacity: .6; } .stage::after { background: linear-gradient(0deg, #08060b 0%, rgba(8,6,11,.88) 39%, rgba(8,6,11,.15) 86%); } .stageLight { top: 3%; right: 0; width: 100%; height: 45%; } .intro { max-width: 100%; margin-top: auto; } .intro h1 { font-size: clamp(2.7rem, 11vw, 4.2rem); } .colorways { padding-top: 1.5rem; } .colorway { flex: 1 1 9rem; } }
+@media (prefers-reduced-motion: reduce) { .colorway { transition: none; } .colorway:hover { transform: none; } }
