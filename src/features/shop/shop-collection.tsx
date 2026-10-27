@@ -1,5 +1,5 @@
 
-import { getTranslator } from "@/lib/i18n/server";
+import { getLocale, getTranslator } from "@/lib/i18n/server";
 import Link from "@/lib/i18n/link";
 import { type ShopDataSource, type ShopPresentationEntry } from "./shop-content";
 import { ShopMedia } from "./shop-media";
@@ -11,6 +11,7 @@ type ShopCollectionProps = Readonly<{
 
 export async function ShopCollection({ entries, source }: ShopCollectionProps) {
   const tr = await getTranslator();
+  const locale = await getLocale();
   if (entries.length === 0) {
     return (
       <section className="shop-route-section" aria-labelledby="shop-empty-title">
@@ -26,8 +27,8 @@ export async function ShopCollection({ entries, source }: ShopCollectionProps) {
     <section className="shop-route-section" aria-labelledby="shop-list-title">
       <div className="shop-route-heading">
         <p className="eyebrow">{tr("Curated object shelf")}</p>
-        <h2 id="shop-list-title">{tr("Sản phẩm")}</h2>
-        <p>{entries.length} {tr("objects")}</p>
+        <h2 id="shop-list-title">{locale === "vi" ? "Sản phẩm" : "Products"}</h2>
+        <p>{locale === "vi" ? `${entries.length} sản phẩm` : `${entries.length} ${entries.length === 1 ? "product" : "products"}`}</p>
       </div>
       <ol className="shop-route-list">
         {entries.map((entry, index) => (
