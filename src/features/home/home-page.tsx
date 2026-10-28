@@ -121,7 +121,7 @@ export async function HomePage() {
                 <p className="featured-story">{content.featured.story}</p>
                 <div className="home-featured-links">
                   <StageInvitation locale={locale} />
-                  <Link className="text-link" href="/archive">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
+                  <Link className="text-link" href="/archive/meowhe-mono">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
                 </div>
               </div>
             </Container>
@@ -136,7 +136,7 @@ export async function HomePage() {
             </header>
             <div className="archive-editorial-grid">
               {content.archive.map((object, index) => (
-                <Link href="/archive" className={`archive-object archive-object-${object.tone} group relative outline-none`} key={object.title} data-luminal-reveal="archive-card" data-luminal-delay={index}>
+                <Link href={object.recordHref} className={`archive-object archive-object-${object.tone} group relative outline-none`} key={object.title} data-luminal-reveal="archive-card" data-luminal-delay={index}>
                   <div className="archive-object-visual" data-luminal-spotlight="true">
                     {homePageMedia.archive[object.mediaKey].availability === "available" ? (
                       <Image className="home-product-image archive-product-image" src={homePageMedia.archive[object.mediaKey].src} alt={homePageMedia.archive[object.mediaKey].alt} fill sizes={homePageMedia.archive[object.mediaKey].sizes} style={{ objectPosition: homePageMedia.archive[object.mediaKey].objectPosition }} />

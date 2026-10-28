@@ -224,6 +224,11 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
       <div ref={copyRef} className={styles.copy}>
         <h2 id="featured-title">{tr("Meet Meowhe.")}</h2>
         <p>{tr("A character with a past. Explore three earlier colorways: Lolipop, Mictlán, and Mono.")}</p>
+        <nav className={styles.records} aria-label={tr("Explore colorway records")}>
+          <Link href="/archive/meowhe-lolipop">Lolipop <span aria-hidden="true">↗</span></Link>
+          <Link href="/archive/meowhe-mictlan">Mictlán <span aria-hidden="true">↗</span></Link>
+          <Link href="/archive/meowhe-mono">Mono <span aria-hidden="true">↗</span></Link>
+        </nav>
         <div className={styles.journeyLinks}>
           <StageInvitation locale={locale} />
           <Link className="text-link" href="/shop">{tr("Browse Shop")}<span aria-hidden="true">↗</span></Link>

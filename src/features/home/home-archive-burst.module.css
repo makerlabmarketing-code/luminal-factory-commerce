@@ -163,6 +163,31 @@
 
 .journeyLinks :global(.text-link) { align-self: flex-start; }
 
+.records {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 1rem;
+}
+
+.records a {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: 2.5rem;
+  padding: .5rem .85rem;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px;
+  color: var(--foreground);
+  font-size: .8rem;
+  transition: border-color .2s, background .2s;
+}
+
+.records a:hover, .records a:focus-visible {
+  border-color: rgba(185,233,255,.7);
+  background: rgba(185,233,255,.09);
+}
+
 .copy h2 {
   max-width: none;
   margin: 0 0 1rem;
@@ -190,6 +215,7 @@
   .copy > p:not(.eyebrow) { margin-inline: auto; }
   .journeyLinks { align-items: center; }
   .journeyLinks :global(.text-link) { align-self: center; }
+  .records { justify-content: center; }
   .bubbleLabel { font-size: .52rem; letter-spacing: .1em; }
   .spotlight { background: radial-gradient(ellipse at 50% 52%, rgba(255,232,189,.11), transparent 65%); }
 }
@@ -200,4 +226,5 @@
   .floatBody, .bubble[data-pop-phase="burst"] .floatBody,
   .bubble[data-pop-phase="reform"] .floatBody { animation: none !important; }
   .popParticles { display: none !important; }
+  .records a { transition: none; }
 }

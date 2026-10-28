@@ -9,6 +9,7 @@ export type PresentationCreation = Readonly<{
 
 export type HomeArchiveObject = Readonly<{
   mediaKey: "meowhe" | "monoMeowhe" | "mictlan";
+  recordHref: "/archive/meowhe-lolipop" | "/archive/meowhe-mono" | "/archive/meowhe-mictlan";
   title: string;
   collection: string;
   year: string;
@@ -32,9 +33,9 @@ export const homePageContent = {
       "A monochrome Meowhe character from the studio's 2023 chapter—sculpted with a mischievous expression and preserved as part of the bridge from Lazy Factory to Luminal Factory.",
   },
   archive: [
-    { mediaKey: "meowhe", title: "Meowhe", collection: "Lazy Factory archive", year: "2023", tone: "lavender" },
-    { mediaKey: "monoMeowhe", title: "Mono Meowhe", collection: "Lazy Factory archive", year: "2023", tone: "ice" },
-    { mediaKey: "mictlan", title: "Mictlán", collection: "Lazy Factory archive", year: "2023", tone: "rose" },
+    { mediaKey: "meowhe", recordHref: "/archive/meowhe-lolipop", title: "Meowhe", collection: "Lazy Factory archive", year: "2023", tone: "lavender" },
+    { mediaKey: "monoMeowhe", recordHref: "/archive/meowhe-mono", title: "Mono Meowhe", collection: "Lazy Factory archive", year: "2023", tone: "ice" },
+    { mediaKey: "mictlan", recordHref: "/archive/meowhe-mictlan", title: "Mictlán", collection: "Lazy Factory archive", year: "2023", tone: "rose" },
   ] satisfies readonly HomeArchiveObject[],
   process: [
     { number: "01", title: "Concept", copy: "A personality, a gesture, and a story establish the object before its form." },

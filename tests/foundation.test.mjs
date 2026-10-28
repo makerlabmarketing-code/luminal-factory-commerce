@@ -37,7 +37,8 @@ test("home follows the owner-approved Wave 1 editorial hierarchy", () => {
     assert.ok(current > previous, `${section} must follow the prior section`);
     previous = current;
   }
-  assert.match(home, /href="\/archive"/);
+  assert.match(home, /href="\/archive\/meowhe-mono"/);
+  assert.match(home, /href=\{object\.recordHref\}/);
   assert.match(home, /href="\/shop"/);
   assert.match(home, /href="\/commission"/);
 });
