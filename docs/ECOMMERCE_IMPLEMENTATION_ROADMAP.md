@@ -553,3 +553,13 @@ Read-only real public-key adapter verification returns empty/0, matching SQL:
 there are no published non-test raffles. Populated-list visual acceptance remains
 pending an approved release; do not create a fictitious release to satisfy it.
 Rollback: revert these list/cover files; no database rollback.
+
+### 2026-10-28 — Public storefront language: English for now
+
+Owner chose English as the sole visible storefront language while the audience is
+predominantly international. The English route remains `/en`; unprefixed public
+URLs and former `/vi/...` links redirect to the same English path, retaining query
+and hash. The header no longer offers a language switch, and canonical/hreflang
+and sitemap expose English only. Vietnamese translations and ERP translation
+editing remain in source so the language can be restored in a later public
+release. This decision does not change product, raffle, cart or payment behavior.

@@ -1,6 +1,8 @@
 export const locales = ['en', 'vi'] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = 'en';
+// Vietnamese content remains available in source, but English is the only public locale for now.
+export const publicLocales = ['en'] as const;
 export const localeCookie = 'luminal_locale';
 export function isLocale(value: unknown): value is Locale { return value === 'en' || value === 'vi'; }
 export function splitLocale(path: string): { locale: Locale | null; path: string } {
@@ -16,5 +18,6 @@ export function localeHref(href: string, locale: Locale): string {
   return `/${locale}${bare === '/' ? '' : bare}${suffix}`;
 }
 export function languageAlternates(path: string, locale: Locale) {
-  return { canonical: localeHref(path, locale), languages: { en: localeHref(path, 'en'), vi: localeHref(path, 'vi'), 'x-default': localeHref(path, 'en') } };
+  void locale;
+  return { canonical: localeHref(path, 'en'), languages: { en: localeHref(path, 'en'), 'x-default': localeHref(path, 'en') } };
 }

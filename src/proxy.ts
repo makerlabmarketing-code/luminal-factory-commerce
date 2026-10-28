@@ -1,19 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { refreshCustomerAuthSession } from "@/lib/supabase/customer-auth-proxy";
-import { defaultLocale, isLocale, localeCookie, localeHref, splitLocale } from '@/lib/i18n/locale';
+import { defaultLocale, localeHref, splitLocale } from '@/lib/i18n/locale';
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const localized = splitLocale(pathname);
   const isApi = pathname.startsWith('/api/');
   const unsupportedLocale = /^\/[a-z]{2}(\/|$)/.test(pathname) && !localized.locale;
-  if (!isApi && !localized.locale && !unsupportedLocale && ['GET', 'HEAD'].includes(request.method)) {
-    const preference = request.cookies.get(localeCookie)?.value;
+  if (!isApi && ['GET', 'HEAD'].includes(request.method) && (localized.locale === 'vi' || (!localized.locale && !unsupportedLocale))) {
     const target = request.nextUrl.clone();
-    target.pathname = localeHref(pathname, isLocale(preference) ? preference : defaultLocale);
+    target.pathname = localeHref(pathname, defaultLocale);
     const redirect = NextResponse.redirect(target);
-    redirect.headers.set('Cache-Control', 'private, no-store, max-age=0');
-    redirect.headers.set('Vary', 'Cookie');
+    redirect.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
     return redirect;
   }
   const routePath = localized.path;

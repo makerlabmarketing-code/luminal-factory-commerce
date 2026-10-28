@@ -6,7 +6,6 @@ import Image from "next/image";
 import Link from "@/lib/i18n/link";
 import { useEffect, useRef, useState } from "react";
 import { navigation } from "@/components/layout/navigation";
-import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import styles from "./home-arrival-header.module.css";
 
 type HeaderStage = "waiting" | "revealed";
@@ -142,7 +141,6 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
               {tr(item.label)}
             </Link>
           ))}
-          <div className={styles.languageDock}><LanguageSwitcher /></div>
         </nav>
 
 
@@ -182,7 +180,6 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
             </li>
           ))}
         </ul>
-        <div className="mobile-language-switch"><LanguageSwitcher onSelect={() => setMenuOpen(false)} /></div>
       </nav>
     </header>
   );

@@ -3,7 +3,7 @@ import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
-import { defaultLocale, localeHref, languageAlternates, splitLocale, isLocale } from '../src/lib/i18n/locale.ts';
+import { defaultLocale, publicLocales, localeHref, languageAlternates, splitLocale, isLocale } from '../src/lib/i18n/locale.ts';
 const require = createRequire(import.meta.url);
 const dictionary = JSON.parse(readFileSync('src/lib/i18n/copy.json', 'utf8'));
 function loadModule(path, dependencies) {
@@ -26,9 +26,10 @@ test('locale URLs preserve slug, query and hash without duplicating prefixes', (
   assert.equal(isLocale('fr'), false);
 });
 
-test('language SEO points both translations and x-default at the same object', () => {
+test('public language SEO points only to English while Vietnamese content stays in source', () => {
+  assert.deepEqual([...publicLocales], ['en']);
   assert.deepEqual(languageAlternates('/shop/meowhe', 'vi'), {
-    canonical: '/vi/shop/meowhe', languages: { en: '/en/shop/meowhe', vi: '/vi/shop/meowhe', 'x-default': '/en/shop/meowhe' },
+    canonical: '/en/shop/meowhe', languages: { en: '/en/shop/meowhe', 'x-default': '/en/shop/meowhe' },
   });
 });
 
@@ -52,7 +53,7 @@ test('presentation translation preserves domain state, identity, URLs and price'
   assert.equal(original.description, 'Scroll to follow the object');
 });
 
-test('proxy respects explicit language, English default, preference cookie and private cart cache', async () => {
+test('proxy sends public Vietnamese links and stale language preferences to English', async () => {
   let refreshes = 0;
   const response = location => ({ location, headers: new Headers() });
   const { proxy } = loadModule('src/proxy.ts', {
@@ -62,16 +63,17 @@ test('proxy respects explicit language, English default, preference cookie and p
   });
   const request = (path, preference) => { const url = new URL(path, 'https://luminalfactory.com'); url.clone = () => new URL(url); return { method: 'GET', nextUrl: url, cookies: { get: () => preference ? { value: preference } : undefined } }; };
   assert.equal((await proxy(request('/shop?q=meowhe'))).location, 'https://luminalfactory.com/en/shop?q=meowhe');
-  assert.equal((await proxy(request('/shop', 'vi'))).location, 'https://luminalfactory.com/vi/shop');
+  assert.equal((await proxy(request('/shop', 'vi'))).location, 'https://luminalfactory.com/en/shop');
   assert.equal((await proxy(request('/shop', 'fr'))).location, 'https://luminalfactory.com/en/shop');
-  for (const path of ['/vi/shop', '/en/shop', '/fr/shop', '/api/cart', '/api/account/auth']) assert.equal((await proxy(request(path, 'vi'))).location, null);
-  for (const path of ['/en/cart', '/vi/cart']) {
-    const result = await proxy(request(path));
-    assert.equal(result.headers.get('Cache-Control'), 'private, no-store, max-age=0');
-    assert.equal(result.headers.get('Vary'), 'Cookie');
-  }
-  for (const path of ['/en/account', '/vi/account']) await proxy(request(path));
-  assert.equal(refreshes, 5);
+  assert.equal((await proxy(request('/vi/shop/meowhe?q=1#details'))).location, 'https://luminalfactory.com/en/shop/meowhe?q=1#details');
+  for (const path of ['/en/shop', '/fr/shop', '/api/cart', '/api/account/auth']) assert.equal((await proxy(request(path, 'vi'))).location, null);
+  assert.equal((await proxy(request('/vi/cart'))).location, 'https://luminalfactory.com/en/cart');
+  assert.equal((await proxy(request('/vi/account'))).location, 'https://luminalfactory.com/en/account');
+  const result = await proxy(request('/en/cart'));
+  assert.equal(result.headers.get('Cache-Control'), 'private, no-store, max-age=0');
+  assert.equal(result.headers.get('Vary'), 'Cookie');
+  await proxy(request('/en/account'));
+  assert.equal(refreshes, 3);
 });
 
 test('Production metadata and sitemap have an absolute verified origin even without an environment override', () => {
@@ -81,10 +83,10 @@ test('Production metadata and sitemap have an absolute verified origin even with
   const previous = process.env.VERCEL_ENV;
   try {
     process.env.VERCEL_ENV = 'production';
-    const { default: sitemap } = loadModule('src/app/sitemap.ts', { '@/lib/site-url': { publicSiteUrl: 'https://luminalfactory.com' }, '@/lib/i18n/locale': { locales: ['en','vi'], localeHref } });
+    const { default: sitemap } = loadModule('src/app/sitemap.ts', { '@/lib/site-url': { publicSiteUrl: 'https://luminalfactory.com' }, '@/lib/i18n/locale': { publicLocales, localeHref } });
     const entries = sitemap();
-    assert.equal(entries.length, 14);
-    assert.ok(entries.some(entry => entry.url === 'https://luminalfactory.com/vi/support'));
+    assert.equal(entries.length, 7);
+    assert.ok(entries.every(entry => !entry.url.includes('/vi/')));
     assert.ok(entries.some(entry => entry.url === 'https://luminalfactory.com/en/support'));
     assert.ok(entries.every(entry => entry.url.startsWith('https://luminalfactory.com/') && Object.values(entry.alternates.languages).every(url => url.startsWith('https://luminalfactory.com/'))));
     assert.ok(entries.every(entry => !/account|cart|test|object-study/.test(entry.url)));
