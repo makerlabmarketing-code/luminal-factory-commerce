@@ -1,6 +1,5 @@
 "use client";
-import { useLocale, useTranslator } from "@/lib/i18n/client";
-import { StageInvitation } from "@/components/discovery/stage-invitation";
+import { useTranslator } from "@/lib/i18n/client";
 import Image from "next/image";
 import Link from "@/lib/i18n/link";
 import { useEffect, useRef } from "react";
@@ -17,7 +16,6 @@ function clamp01(value: number) {
 
 export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
   const tr = useTranslator();
-  const locale = useLocale();
   const sceneRef = useRef<HTMLDivElement>(null);
   const bubbleRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const copyRef = useRef<HTMLDivElement>(null);
@@ -230,7 +228,6 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
           <Link href="/archive/meowhe-mono">Mono <span aria-hidden="true">↗</span></Link>
         </nav>
         <div className={styles.journeyLinks}>
-          <StageInvitation locale={locale} />
           <Link className="text-link" href="/shop">{tr("Browse Shop")}<span aria-hidden="true">↗</span></Link>
         </div>
       </div>

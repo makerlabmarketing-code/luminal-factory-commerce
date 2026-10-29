@@ -146,7 +146,12 @@ export function HeroObjectStage({
     }
 
     stage.dataset.heroMode = "pending-3d";
-    // Keep the approved portrait visible until a 3D frame has loaded.
+    // Leave the 3D stage clear while loading; the portrait is only a fallback.
+    if (preview) {
+      preview.style.display = "none";
+      preview.style.visibility = "hidden";
+      preview.style.opacity = "0";
+    }
 
     let cancelled = false;
     let observer: IntersectionObserver | null = null;
@@ -281,6 +286,7 @@ export function HeroObjectStage({
       if (loaderRef.current) loaderRef.current.style.display = "none";
       mount.style.display = "none";
       if (preview) {
+        preview.style.display = "block";
         preview.style.visibility = "visible";
         preview.style.opacity = "1";
       }
@@ -334,7 +340,7 @@ export function HeroObjectStage({
         window.addEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
         viewer.addEventListener("load", () => {
-          if (cancelled) return;
+          if (cancelled || stage.dataset.heroMode === "poster-3d-unavailable") return;
           if (modelLoadTimeout !== null) window.clearTimeout(modelLoadTimeout);
           applyHeroMaterialTint(viewer.model?.materials ?? [], presentation.tint);
           stage.dataset.heroMode = reducedMotion
@@ -349,7 +355,7 @@ export function HeroObjectStage({
             }, 280);
           }
           mount.style.opacity = "1";
-          if (preview) preview.style.opacity = "0";
+          if (preview) preview.style.display = "none";
           signalObjectReady("3d");
         }, { once: true });
 
@@ -434,9 +440,9 @@ export function HeroObjectStage({
         <>
           <div
             ref={previewRef}
-            className="hero-object-poster absolute inset-[12%] z-[1] overflow-hidden opacity-100 transition-opacity duration-[620ms]"
+            className="hero-object-poster invisible absolute inset-[12%] z-[1] overflow-hidden opacity-0"
             data-hero-product-image="true"
-            data-hero-poster-role="loading-and-error-fallback"
+            data-hero-poster-role="error-and-capability-fallback"
             style={{
               WebkitMaskImage: "radial-gradient(ellipse 94% 86% at 54% 49%, #000 58%, transparent 100%)",
               maskImage: "radial-gradient(ellipse 94% 86% at 54% 49%, #000 58%, transparent 100%)",

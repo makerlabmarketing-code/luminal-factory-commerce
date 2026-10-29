@@ -25,10 +25,11 @@ test("remote Hero configuration inherits the local orientation without requiring
   assert.doesNotMatch(heroData, /orientation_roll_deg|orientation_pitch_deg|orientation_yaw_deg/);
 });
 
-test("desktop Hero shows approved media while 3D loads and when WebGL fails", () => {
+test("Hero keeps the stage clear during 3D loading and shows the portrait only on fallback", () => {
   assert.match(heroSource, /import Image from "next\/image"/);
   assert.match(heroSource, /data-hero-product-image="true"/);
-  assert.match(heroSource, /data-hero-poster-role="loading-and-error-fallback"/);
+  assert.match(heroSource, /data-hero-poster-role="error-and-capability-fallback"/);
+  assert.match(heroSource, /className="hero-object-poster invisible [^"\n]*opacity-0"/);
   assert.match(heroSource, /data-hero-mode="capability-gated"/);
   assert.doesNotMatch(heroSource, /md:hidden/);
   assert.match(heroSource, /webGLAvailable = supportsWebGL\(\)/);
@@ -36,7 +37,8 @@ test("desktop Hero shows approved media while 3D loads and when WebGL fails", ()
   assert.match(heroSource, /preview\.style\.visibility = "visible"/);
   assert.match(heroSource, /preview\.style\.opacity = "1"/);
   assert.match(heroSource, /mount\.style\.opacity = "1"/);
-  assert.match(heroSource, /if \(preview\) preview\.style\.opacity = "0"/);
+  assert.match(heroSource, /if \(preview\) preview\.style\.display = "none"/);
+  assert.match(heroSource, /if \(cancelled \|\| stage\.dataset\.heroMode === "poster-3d-unavailable"\) return/);
   assert.doesNotMatch(heroSource, /3D preview unavailable/);
   assert.doesNotMatch(heroSource, /Product image active/);
   assert.match(heroSource, /Loading 3D object/);

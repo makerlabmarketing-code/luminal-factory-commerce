@@ -230,12 +230,13 @@ test("scroll retraction cancels in-flight POP timers so hidden bubbles do not re
   scene.cleanup();
 });
 
-test("POP uses CSS-only particles, honors reduced motion, and leaves archive navigation in the copy", () => {
+test("POP uses CSS-only particles, honors reduced motion, and keeps direct colorway links", () => {
   const source = readFileSync("src/features/home/home-archive-burst.tsx", "utf8");
   const css = readFileSync("src/features/home/home-archive-burst.module.css", "utf8");
   assert.match(source, /aria-label=\{`Làm vỡ bong bóng/);
   assert.match(source, /Array\.from\(\{ length: 8 \}/);
-  assert.match(source, /StageInvitation/);
+  assert.match(source, /archive\/meowhe-lolipop/);
+  assert.doesNotMatch(source, /StageInvitation/);
   assert.match(source, /Browse Shop/);
   assert.match(css, /bubble-pop-collapse/);
   assert.match(css, /bubble-pop-spark/);

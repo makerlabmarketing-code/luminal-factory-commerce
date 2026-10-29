@@ -26,18 +26,14 @@ test("Homepage follows the approved editorial sequence with the colorway gallery
   assert.match(home, /content\.hero\.secondaryAction/);
 });
 
-test("Homepage gallery uses the approved FlexCarousel with motion-safe native fallback", () => {
+test("Homepage gallery keeps product photos visible without a WebGL loading state", () => {
   const home = read("src/features/home/home-page.tsx");
   const gallery = read("src/features/home/home-flex-gallery.tsx");
-  const engine = read("src/components/ui/flex-carousel.jsx");
   assert.match(home, /<HomeFlexGallery items={media\.gallery}/);
-  assert.match(gallery, /prefers-reduced-motion: reduce/);
-  assert.match(gallery, /IntersectionObserver/);
-  assert.match(gallery, /captureWheel={false} autoplay={false} followCursor={false}/);
+  assert.match(gallery, /data-gallery-mode="compact-strip"/);
+  assert.doesNotMatch(gallery, /FlexCarousel|data-ready|hidden=\{/);
   assert.match(gallery, /<GlowCard customSize/);
   assert.match(gallery, /<dialog/);
-  assert.match(engine, /cancelAnimationFrame\(raf\)/);
-  assert.doesNotMatch(engine, /unsplash|DEFAULT_ITEMS/);
 });
 
 test("Wave 1 keeps the route thin and uses a server component feature boundary", () => {
