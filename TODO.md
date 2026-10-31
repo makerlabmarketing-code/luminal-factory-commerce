@@ -1,5 +1,13 @@
 # Luminal Factory Commerce TODO
 
+## Animate UI · 2026-11-01 · C-046
+
+- Support FAQ uses the local Animate UI v1 disclosure adaptation; Motion remains on the existing v12 dependency.
+- Source, license and rollback: [integration note](docs/vendor/animate-ui.md).
+- Validation and deployment evidence are tracked in the ERP & Commerce coordination sheet.
+- This slice does not change workflow gates or activate any live capability.
+
+
 ## Current checkpoint — 2026-09-28
 
 The checklist below is an early foundation backlog. For current execution status,

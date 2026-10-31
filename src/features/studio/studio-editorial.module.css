@@ -18,9 +18,10 @@
 .links { display:flex; flex-wrap:wrap; gap:.75rem 1.5rem; margin-top:1.5rem; }
 .links a { display:inline-flex; align-items:center; min-height:44px; }
 .faq { max-width:60rem; }
-.faq details { border-top:1px solid var(--border); padding:1rem 0; }
-.faq details:last-child { border-bottom:1px solid var(--border); }
-.faq summary { cursor:pointer; min-height:44px; display:list-item; align-content:center; font-size:1.125rem; line-height:1.5; }
+.faqItem { border-top:1px solid var(--border); padding:1rem 0; }
+.faqItem:last-child { border-bottom:1px solid var(--border); }
+.faqTrigger { cursor:pointer; min-height:44px; display:flex; justify-content:space-between; gap:1rem; align-items:center; width:100%; border:0; background:transparent; color:inherit; text-align:left; font:inherit; font-size:1.125rem; line-height:1.5; }
+.faqTrigger:focus-visible { outline:2px solid var(--ring, #B9E9FF); outline-offset:4px; }
 .faq p { color:var(--muted-foreground); max-width:65ch; line-height:1.7; }
 .section[id] { scroll-margin-top:6rem; }
 @media (max-width:800px) { .story { grid-template-columns:1fr; } .cards { grid-template-columns:1fr; } .cards .image { aspect-ratio:16/10; } }
