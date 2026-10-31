@@ -1,3 +1,4 @@
+import { AnimatedDisclosure } from "@/components/animate-ui/animated-disclosure";
 import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -24,7 +25,7 @@ export default async function SupportPage() {
     {[{id:"care",title:copy.careTitle,items:copy.care},{id:"shipping",title:copy.shippingTitle,items:copy.shipping}].map(group =>
       <section className={`${styles.section} ${styles.faq}`} aria-labelledby={`${group.id}-title`} key={group.id}>
         <header className={styles.heading}><h2 id={`${group.id}-title`}>{group.title}</h2></header>
-        {group.items.map(item => <details key={item.title}><summary>{item.title}</summary><p>{item.text}</p></details>)}
+        {group.items.map(item => <AnimatedDisclosure key={item.title} title={item.title} className={styles.faqItem} triggerClassName={styles.faqTrigger}><p>{item.text}</p></AnimatedDisclosure>)}
       </section>)}
     <section className={styles.section} aria-labelledby="contact-title" id="contact">
       <header className={styles.heading}><h2 id="contact-title">{copy.contactTitle}</h2><p>{copy.contactNote}</p></header>
