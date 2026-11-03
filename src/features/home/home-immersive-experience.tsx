@@ -180,18 +180,14 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       seenIntro = false;
     }
 
-    if (reducedMotion || seenIntro) {
+    if (reducedMotion || seenIntro || window.matchMedia("(max-width: 699px)").matches) {
       document.documentElement.dataset.luminalBrandDocked = "true";
       const finishFrame = window.requestAnimationFrame(() => setPhase("done"));
       return () => window.cancelAnimationFrame(finishFrame);
     }
 
     const root = document.documentElement;
-    const body = document.body;
-    const previousOverflow = body.style.overflow;
-    const previousOverscroll = body.style.overscrollBehavior;
-    body.style.overflow = "hidden";
-    body.style.overscrollBehavior = "none";
+    // The brand flourish must never lock scrolling while 3D is loading.
     root.dataset.luminalIntro = "loading";
     delete root.dataset.luminalBrandDocked;
 
@@ -202,8 +198,6 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     let brandAnimation: Animation | null = null;
 
     const unlock = () => {
-      body.style.overflow = previousOverflow;
-      body.style.overscrollBehavior = previousOverscroll;
       delete root.dataset.luminalIntro;
     };
 
@@ -433,7 +427,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       </div>
 
       <div className={styles.introRoot} data-phase={phase} aria-hidden={phase === "done" ? "true" : undefined}>
-        <div className={styles.veil}>
+        <div className={styles.veil} aria-hidden="true">
           <div className={styles.progress} aria-hidden="true"><span /></div>
           <div className={styles.blueprint} aria-hidden="true">
             <i className={styles.ringOuter} />
@@ -452,7 +446,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
             alt=""
             width={1024}
             height={1024}
-            priority
+            loading="lazy"
             sizes="(max-width: 899px) 104px, 152px"
           />
         </div>

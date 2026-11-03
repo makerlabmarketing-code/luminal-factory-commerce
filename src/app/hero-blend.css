@@ -42,3 +42,10 @@
     mask-image: none;
   }
 }
+
+@media (max-width: 699px) {
+  .hero-object-stage,
+  .home-hero-object-corridor { display: none; }
+  .wave-home[data-home-immersive="true"] .revival-hero,
+  .wave-home[data-home-immersive="true"] .revival-hero-inner { min-height: 100svh; }
+}

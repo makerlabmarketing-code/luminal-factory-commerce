@@ -64,11 +64,19 @@ The pass should strengthen hierarchy rather than add sections.
 - Preserve the cached/timeout-bounded Hero configuration read.
 - Respect `prefers-reduced-motion` and retain the local Hero fallback.
 
+## 2026-11-03 Lighthouse remediation
+
+The owner requested correction of the Home Lighthouse findings. The intro no longer covers readable content with an opaque curtain or locks document scrolling; navigation is rendered in its usable state. Supporting copy and CTAs never wait for a reveal animation. Only desktop title transforms animate, without blur. The desktop/tablet 3D stage uses the existing idle scheduler even when selected as the primary scene. At <=699px the stage is disabled before a WebGL probe or runtime/model request, and the empty reserved corridor is removed. Live breakpoint and reduced-motion changes dispose/reinitialize the viewer safely. Hidden error-fallback artwork is lazy/low priority. The Meowhe colorway field exposes its accessible group role.
+
+The original local production build scored Performance 57 / Accessibility 96 with FCP 1.06s, LCP 5.23s, TBT 1,030ms, Speed Index 3.51s and CLS 0. A post-change sample scored 94 / 100, LCP 3.03s, TBT 48ms, Speed Index 1.80s and CLS 0. These are synthetic cold mobile samples, not field data or a guaranteed Production score. Browser extensions are excluded. Production measurements and smoke results are recorded in the delivery handoff.
+
+The Next.js legacy polyfill audit is a small framework compatibility cost; do not remove framework polyfills or narrow supported browsers speculatively. The Home response remains request-rendered so published Hero/raffle data is not frozen. The bfcache/no-store diagnostic is not addressed by weakening that freshness contract. Extension-owned scripts are outside storefront source and must be excluded when retesting.
+
 ## Mobile
 
-- Keep a single-column hero with the object after the copy.
+- Keep a single-column hero. Phones <=699px render the copy and actions without a 3D stage; tablets retain the object.
 - Avoid additional parallax layers.
-- Let the existing 3D object remain inspectable, but do not add desktop-only motion systems to mobile.
+- Keep tablet 3D inspectable and reduced motion static; do not load model-viewer on phones.
 - Keep Shop and Commission stacked.
 
 ## Exit criteria

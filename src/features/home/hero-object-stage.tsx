@@ -4,7 +4,7 @@ import { useTranslator } from "@/lib/i18n/client";
 
 import Image from "next/image";
 import { LuminalLoadingMark } from "@/components/ui/luminal-loading-mark";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
 import { applyHeroMaterialTint, type HeroModelMaterial } from "./hero-model-materials";
 import type { HeroModelPresentation } from "./hero-model-config";
@@ -97,6 +97,13 @@ export function HeroObjectStage({
   showLoadingIndicator = true,
 }: HeroObjectStageProps) {
   const tr = useTranslator();
+  const [capabilityRevision, setCapabilityRevision] = useState(0);
+  useEffect(() => {
+    const queries = [window.matchMedia("(max-width: 699px)"), window.matchMedia("(prefers-reduced-motion: reduce)")];
+    const refresh = () => setCapabilityRevision((value) => value + 1);
+    queries.forEach((query) => query.addEventListener("change", refresh));
+    return () => queries.forEach((query) => query.removeEventListener("change", refresh));
+  }, []);
   const stageRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
@@ -126,7 +133,15 @@ export function HeroObjectStage({
     const constrainedNetwork = connection?.saveData === true
       || connection?.effectiveType === "slow-2g"
       || connection?.effectiveType === "2g";
-    const webGLAvailable = supportsWebGL();
+    // Phones do not initialize WebGL or fetch the 3D runtime/model.
+    // This runs before even probing a WebGL context; tablets retain the scene.
+    const phoneViewport = window.matchMedia("(max-width: 699px)").matches;
+    if (phoneViewport) {
+      stage.dataset.heroMode = "disabled-mobile";
+      mount.style.display = "none";
+      return;
+    }
+    const webGLAvailable = !reducedMotion && supportsWebGL();
     const posterOnly = constrainedNetwork || (!finePointer && !allowTouch3d) || !webGLAvailable;
     const signalObjectReady = (mode: string) => {
       document.documentElement.dataset.luminalHeroObjectReady = mode;
@@ -389,7 +404,7 @@ export function HeroObjectStage({
     };
 
     if (preload) {
-      void mountViewer();
+      scheduleMountViewer();
     } else {
       observer = new IntersectionObserver((entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
@@ -423,7 +438,7 @@ export function HeroObjectStage({
       viewerRef.current = null;
       mount.replaceChildren();
     };
-  }, [allowTouch3d, media.alt, media.availability, mobileOnly, preload, presentation]);
+  }, [capabilityRevision, allowTouch3d, media.alt, media.availability, mobileOnly, preload, presentation]);
 
   return (
     <div
@@ -453,7 +468,8 @@ export function HeroObjectStage({
               src={media.src}
               alt={tr(media.alt)}
               fill
-              preload
+              loading="lazy"
+              fetchPriority="low"
               sizes={media.sizes}
               style={{ objectPosition: media.objectPosition }}
             />

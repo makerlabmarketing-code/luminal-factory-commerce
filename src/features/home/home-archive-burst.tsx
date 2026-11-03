@@ -196,7 +196,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
   return (
     <div ref={sceneRef} className={styles.scene}>
       <div className={styles.spotlight} aria-hidden="true" />
-      <div className={styles.field} aria-label={tr("Ba colorway Meowhe trước đây")}>
+      <div className={styles.field} role="group" aria-label={tr("Ba colorway Meowhe trước đây")}>
         {colorways.map((colorway, index) => (
           <button
             type="button"

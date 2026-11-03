@@ -11,40 +11,23 @@ export function HeroTextMotionController() {
 
   useEffect(() => {
     const root = markerRef.current?.parentElement;
-    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // First-paint copy and CTAs stay readable; only desktop headings move.
+    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      || window.matchMedia("(max-width: 699px)").matches) return;
 
     const animations: Animation[] = [];
     const words = Array.from(root.querySelectorAll<HTMLElement>("[data-hero-word]"));
-    const supporting = Array.from(root.querySelectorAll<HTMLElement>("[data-hero-copy-support]"));
 
     words.forEach((word, index) => {
       animations.push(
         word.animate(
           [
-            { transform: "translateY(0.4em)", filter: "blur(2.5px)" },
-            { transform: "translateY(0)", filter: "blur(0)" },
+            { transform: "translateY(0.4em)" },
+            { transform: "translateY(0)" },
           ],
           {
             duration: WORD_DURATION_MS,
             delay: WORD_INITIAL_DELAY_MS + index * WORD_STAGGER_MS,
-            easing: "cubic-bezier(.2,.7,.2,1)",
-            fill: "both",
-          },
-        ),
-      );
-    });
-
-    const supportingStart = WORD_INITIAL_DELAY_MS + words.length * WORD_STAGGER_MS + 100;
-    supporting.forEach((element, index) => {
-      animations.push(
-        element.animate(
-          [
-            { transform: "translateY(0.45rem)", filter: "blur(1.5px)" },
-            { transform: "translateY(0)", filter: "blur(0)" },
-          ],
-          {
-            duration: 520,
-            delay: supportingStart + index * 70,
             easing: "cubic-bezier(.2,.7,.2,1)",
             fill: "both",
           },

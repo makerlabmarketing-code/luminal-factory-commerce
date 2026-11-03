@@ -32,7 +32,7 @@ test("Hero keeps the stage clear during 3D loading and shows the portrait only o
   assert.match(heroSource, /className="hero-object-poster invisible [^"\n]*opacity-0"/);
   assert.match(heroSource, /data-hero-mode="capability-gated"/);
   assert.doesNotMatch(heroSource, /md:hidden/);
-  assert.match(heroSource, /webGLAvailable = supportsWebGL\(\)/);
+  assert.match(heroSource, /webGLAvailable = !reducedMotion && supportsWebGL\(\)/);
   assert.match(heroSource, /stage\.dataset\.heroMode = "poster-3d-unavailable"/);
   assert.match(heroSource, /preview\.style\.visibility = "visible"/);
   assert.match(heroSource, /preview\.style\.opacity = "1"/);

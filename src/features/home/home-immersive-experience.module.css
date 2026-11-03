@@ -54,9 +54,8 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(185, 233, 255, 0.025), transparent 30rem),
-    #050505;
+  /* No opaque loading curtain over first-paint content. */
+  background: transparent;
   opacity: 1;
   transition:
     opacity 760ms cubic-bezier(.22, 1, .36, 1),
@@ -290,4 +289,9 @@
   .modelLayer {
     will-change: auto;
   }
+}
+
+/* Phone visitors get the page immediately, without a hidden WebGL workload. */
+@media (max-width: 699px) {
+  .experience { display: none; }
 }

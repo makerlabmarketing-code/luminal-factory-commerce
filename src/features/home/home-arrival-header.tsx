@@ -14,7 +14,7 @@ const INTRO_SESSION_KEY = "luminal-home-intro-v1";
 
 export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }>) {
   const tr = useTranslator();
-  const [stage, setStage] = useState<HeaderStage>(immersive ? "waiting" : "revealed");
+  const [stage, setStage] = useState<HeaderStage>("revealed");
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLElement>(null);
