@@ -699,11 +699,15 @@ const FlexCarousel = ({
 
       if (!introState.running && !introState.done) {
         const allSettled = slots.every(slot => slot.loaded || slot.failed);
-        if (allSettled || now - introState.readyAt > 3500) {
+        if (allSettled && slots.some(slot => slot.loaded)) {
           goal = snapPoint(m, goal);
           pos = goal;
           callbacksRef.current.onReady?.();
           beginIntro(s, m);
+        } else if (now - introState.readyAt > 6000) {
+          // Never hide the native photo strip for an empty or stalled canvas.
+          callbacksRef.current.onError?.();
+          return;
         }
       }
       if (introState.running) {

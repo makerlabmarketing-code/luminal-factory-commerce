@@ -58,5 +58,7 @@ test('first-paint copy and navigation are independent of 3D readiness', () => {
   assert.doesNotMatch(copy, /filter:|supporting\.forEach/);
   assert.doesNotMatch(immersive, /body\.style\.overflow = "hidden"/);
   assert.match(read('src/features/home/home-arrival-header.tsx'), /useState<HeaderStage>\("revealed"\)/);
-  assert.match(read('src/features/home/home-immersive-experience.module.css'), /No opaque loading curtain[\s\S]*?background: transparent/);
+  assert.doesNotMatch(immersive, /!objectReady|let objectReady/);
+  assert.match(read('src/features/home/home-immersive-experience.module.css'), /introVeilExit 760ms/);
+  assert.match(read('src/features/home/home-immersive-experience.module.css'), /introSafetyExit 1500ms/);
 });

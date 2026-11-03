@@ -38,6 +38,8 @@
 }
 
 .introRoot {
+  /* A CSS deadline also releases the intro if hydration is delayed/blocked. */
+  animation: introSafetyExit 1500ms step-end forwards;
   position: fixed;
   inset: 0;
   z-index: 1000;
@@ -45,6 +47,7 @@
 }
 
 .introRoot[data-phase="done"] {
+  animation: none;
   visibility: hidden;
 }
 
@@ -54,8 +57,9 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  /* No opaque loading curtain over first-paint content. */
-  background: transparent;
+  /* Branding is brief and independent of runtime/model download. */
+  background: #050505;
+  animation: introVeilExit 760ms ease-out forwards;
   opacity: 1;
   transition:
     opacity 760ms cubic-bezier(.22, 1, .36, 1),
@@ -173,7 +177,7 @@
   transform: translate(-50%, -50%);
   opacity: 0;
   filter: brightness(1.08) saturate(0.82);
-  animation: brandMaterialize 760ms 360ms cubic-bezier(.22, 1, .36, 1) forwards;
+  animation: brandMaterialize 280ms cubic-bezier(.22, 1, .36, 1) forwards;
   will-change: transform;
 }
 
@@ -294,4 +298,16 @@
 /* Phone visitors get the page immediately, without a hidden WebGL workload. */
 @media (max-width: 699px) {
   .experience { display: none; }
+}
+
+@keyframes introVeilExit {
+  0%, 18% { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@keyframes introSafetyExit {
+  from { visibility: visible; }
+  to { visibility: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .introRoot { display: none; }
 }

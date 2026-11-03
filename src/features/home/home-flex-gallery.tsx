@@ -1,32 +1,74 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "@/lib/i18n/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import type { HomeGalleryMedia } from "@/content/homepage-media";
 import { useTranslator } from "@/lib/i18n/client";
 import styles from "./home-flex-gallery.module.css";
 
+// Keep the native strip if the optional shader chunk cannot be downloaded.
+const FlexCarousel = dynamic(() => import("@/components/ui/flex-carousel").catch(() => ({ default: function GalleryUnavailable() { return null; } })), { ssr: false });
+
 export function HomeFlexGallery({ items }: Readonly<{ items: readonly HomeGalleryMedia[] }>) {
   const tr = useTranslator();
+  const rootRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [enhanced, setEnhanced] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const loaded = useCallback(() => setReady(true), []);
+  const fail = useCallback(() => { setFailed(true); setReady(false); }, []);
   const [selected, setSelected] = useState<HomeGalleryMedia | null>(null);
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const pointer = window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 900px)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    let near = false;
+    const update = () => {
+      const eligible = near && pointer.matches && !reduced.matches && !saveData;
+      setEnhanced(eligible);
+      // Repeated intersection callbacks must not hide an already-ready canvas.
+      if (!eligible) setReady(false);
+    };
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      near = true;
+      observer.disconnect();
+      update();
+    }, { rootMargin: "240px" });
+    observer.observe(root);
+    pointer.addEventListener("change", update);
+    reduced.addEventListener("change", update);
+    return () => { observer.disconnect(); pointer.removeEventListener("change", update); reduced.removeEventListener("change", update); };
+  }, []);
   useEffect(() => {
     if (selected) dialogRef.current?.showModal();
     else dialogRef.current?.close();
   }, [selected]);
   if (!items.length) return null;
-  return <div data-gallery-mode="compact-strip">
+  const showEngine = enhanced && !failed;
+  return <div ref={rootRef} data-gallery-mode={showEngine ? "flex-carousel" : "compact-strip"}>
     <GlowCard customSize glowColor="blue" className={styles.frame}>
-      <div className={styles.strip} aria-label={tr("Meowhe colorway gallery")}>
+      {showEngine && <div className={styles.engine} data-ready={ready} inert={!ready} aria-hidden={!ready}>
+        <FlexCarousel items={items.map((item) => ({ src: item.src, alt: item.alt, title: item.colorway }))}
+          preset="liquid" intro="rise" fit="natural" radius={16} cardHeight={0.56}
+          captureWheel={false} autoplay={false} followCursor={false} dispersion={0.2}
+          ariaLabel={tr("Meowhe colorway gallery")} previousLabel={tr("Previous image")} nextLabel={tr("Next image")}
+          onReady={loaded} onError={fail} onSelect={(index) => setSelected(items[index] ?? null)} />
+      </div>}
+      <div className={styles.strip} hidden={showEngine && ready} role="group" aria-label={tr("Meowhe colorway gallery")}>
         {items.map(item => <button key={item.id} type="button" className={styles.item} onClick={() => setSelected(item)} aria-label={`${tr("View image")}: ${item.colorway}`}>
           <span className={styles.media}><Image src={item.src} alt={item.alt} fill loading="lazy" sizes="(max-width: 540px) 78vw, 350px" style={{ objectPosition: item.objectPosition ?? "center" }} /></span>
           <span className={styles.caption}>{item.colorway}</span>
         </button>)}
       </div>
     </GlowCard>
-    <p className={styles.hint}>{tr("Swipe to explore · Select an image to enlarge")}</p>
+    <p className={styles.hint}>{tr(showEngine && ready ? "Drag to explore · Select an image to enlarge" : "Swipe to explore · Select an image to enlarge")}</p>
     <nav className={styles.records} aria-label={tr("Explore colorway records")}>
       <Link href="/archive/meowhe-lolipop">Lolipop <span aria-hidden="true">↗</span></Link>
       <Link href="/archive/meowhe-mictlan">Mictlán <span aria-hidden="true">↗</span></Link>

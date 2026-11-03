@@ -86,3 +86,23 @@ The Next.js legacy polyfill audit is a small framework compatibility cost; do no
 - No new runtime dependency is added.
 - No new Production env, Supabase mutation, or runtime flag is required.
 - Repository quality gate passes.
+
+## 2026-11-03 — Preserve approved motion after performance remediation
+
+Restore the approved liquid FlexCarousel as an optional desktop enhancement. Its
+chunk is requested only within 240px of the gallery and only with a fine pointer,
+wide viewport, normal motion and no data-saver preference. Native images remain
+visible until real textures are ready; module/image/WebGL failures retain native
+navigation. Repeated intersection callbacks never reset an already-ready canvas.
+The existing engine pauses offscreen and cleans up on teardown. Mobile/reduced
+motion stay native; wheel input continues vertical page scrolling.
+
+The first-visit desktop brand intro again has its dark veil and logo materialize /
+dock sequence. The veil exits in CSS at 760ms and the entire decorative layer has
+a 1500ms safety exit even without hydration. Logo docking begins on its own short
+timer, independent of runtime/model downloads. Navigation/copy remain rendered,
+scroll is not locked, and phone/reduced-motion visits skip the decorative layer.
+The original multi-second wait for 3D is not reinstated. Performance must be
+remeasured with this restored motion; earlier scores describe the prior batch.
+
+The intro session marker is versioned to v2 so prior v1 visits can see the restored first-visit sequence once after rollout.

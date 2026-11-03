@@ -30,8 +30,9 @@ test("Homepage gallery keeps product photos visible without a WebGL loading stat
   const home = read("src/features/home/home-page.tsx");
   const gallery = read("src/features/home/home-flex-gallery.tsx");
   assert.match(home, /<HomeFlexGallery items={media\.gallery}/);
-  assert.match(gallery, /data-gallery-mode="compact-strip"/);
-  assert.doesNotMatch(gallery, /FlexCarousel|data-ready|hidden=\{/);
+  assert.match(gallery, /data-gallery-mode=\{showEngine \? "flex-carousel" : "compact-strip"\}/);
+  assert.match(gallery, /hidden=\{showEngine && ready\}/);
+  assert.match(gallery, /rootMargin: "240px"/);
   assert.match(gallery, /<GlowCard customSize/);
   assert.match(gallery, /<dialog/);
 });

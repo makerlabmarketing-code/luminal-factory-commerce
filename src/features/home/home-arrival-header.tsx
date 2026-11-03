@@ -10,7 +10,7 @@ import styles from "./home-arrival-header.module.css";
 
 type HeaderStage = "waiting" | "revealed";
 
-const INTRO_SESSION_KEY = "luminal-home-intro-v1";
+const INTRO_SESSION_KEY = "luminal-home-intro-v2";
 
 export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }>) {
   const tr = useTranslator();

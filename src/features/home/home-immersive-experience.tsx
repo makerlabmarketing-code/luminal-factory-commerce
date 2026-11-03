@@ -28,7 +28,7 @@ type MotionState = Readonly<{
 
 type MotionKeyframe = MotionState & Readonly<{ scrollY: number }>;
 
-const INTRO_SESSION_KEY = "luminal-home-intro-v1";
+const INTRO_SESSION_KEY = "luminal-home-intro-v2";
 const INTRO_MINIMUM_MS = 550;
 const INTRO_MAXIMUM_MS = 1400;
 const LOGO_DOCK_MS = 480;
@@ -193,7 +193,6 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
     let disposed = false;
     let minimumElapsed = false;
-    let objectReady = Boolean(root.dataset.luminalHeroObjectReady);
     let dockingStarted = false;
     let brandAnimation: Animation | null = null;
 
@@ -215,7 +214,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     };
 
     const dockBrand = () => {
-      if (disposed || dockingStarted || !minimumElapsed || !objectReady) return;
+      if (disposed || dockingStarted || !minimumElapsed) return;
       dockingStarted = true;
       setPhase("docking");
       root.dataset.luminalIntro = "docking";
@@ -251,20 +250,12 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       });
     };
 
-    const handleObjectReady = () => {
-      objectReady = true;
-      dockBrand();
-    };
-
-    window.addEventListener("luminal:hero-object-ready", handleObjectReady);
-
     const minimumTimer = window.setTimeout(() => {
       minimumElapsed = true;
       dockBrand();
     }, INTRO_MINIMUM_MS);
 
     const maximumTimer = window.setTimeout(() => {
-      objectReady = true;
       minimumElapsed = true;
       dockBrand();
     }, INTRO_MAXIMUM_MS);
@@ -273,7 +264,6 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       disposed = true;
       window.clearTimeout(minimumTimer);
       window.clearTimeout(maximumTimer);
-      window.removeEventListener("luminal:hero-object-ready", handleObjectReady);
       brandAnimation?.cancel();
       unlock();
     };
@@ -426,7 +416,8 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         <HeroObjectStage media={media} presentation={presentation} preload allowTouch3d showLoadingIndicator={false} />
       </div>
 
-      <div className={styles.introRoot} data-phase={phase} aria-hidden={phase === "done" ? "true" : undefined}>
+      <noscript><style>{'[data-home-brand-intro="true"] { display: none !important; }'}</style></noscript>
+      <div className={styles.introRoot} data-home-brand-intro="true" data-phase={phase} aria-hidden={phase === "done" ? "true" : undefined}>
         <div className={styles.veil} aria-hidden="true">
           <div className={styles.progress} aria-hidden="true"><span /></div>
           <div className={styles.blueprint} aria-hidden="true">
@@ -446,7 +437,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
             alt=""
             width={1024}
             height={1024}
-            loading="lazy"
+            priority
             sizes="(max-width: 899px) 104px, 152px"
           />
         </div>
