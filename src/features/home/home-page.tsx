@@ -15,6 +15,7 @@ import { HeroTextMotionController } from "./hero-copy-motion";
 import { HomeFlexGallery } from "./home-flex-gallery";
 import { HomeArchiveBurst } from "./home-archive-burst";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
+import { HomeLightPassage } from "./home-light-passage";
 import { MadeAtLuminalStack } from "./made-at-luminal-stack";
 import { getHomeFeaturedRaffle } from "@/features/raffle/raffle-home-service";
 import { CollectorGuide } from "@/features/studio/studio-editorial";
@@ -155,6 +156,8 @@ export async function HomePage() {
           </Container>
         </section> : null}
 
+        <div className="home-gallery-studio-passage relative">
+        <HomeLightPassage />
         <section className="home-gallery section border-t border-white/10 [content-visibility:auto] [contain-intrinsic-size:auto_980px]" aria-labelledby="gallery-title" data-home-3d-section="gallery">
           <Container>
             <header className="editorial-heading" data-luminal-reveal="copy">
@@ -182,6 +185,8 @@ export async function HomePage() {
             <MadeAtLuminalStack steps={content.process} />
           </Container>
         </section>
+
+        </div>
 
         <Container><CollectorGuide /></Container>
         <section className="commerce-split [content-visibility:auto] [contain-intrinsic-size:auto_700px]" aria-label={tr("Shop and commission")}>
