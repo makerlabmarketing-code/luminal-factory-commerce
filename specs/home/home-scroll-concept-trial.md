@@ -1,5 +1,13 @@
 # Connected Home — owner-approved trial, 2026-11-03
 
+## Closed by owner — 2026-11-04
+
+The owner rejected this trial because its motion felt less smooth than the
+current Home. Remove the preview route and all five trial source files. Keep the
+existing Home. Future effect changes should be incremental replacements selected
+by the owner rather than promotion of this concept. The remaining specification
+is an historical record, not an active implementation task or approved roadmap.
+
 ## Experience specification
 
 The owner approved the five-chapter storyboard, continuous native scrolling and
