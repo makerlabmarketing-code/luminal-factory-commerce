@@ -17,21 +17,6 @@
   pointer-events: auto;
 }
 
-.modelLayer::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  width: clamp(11rem, 18vw, 17rem);
-  aspect-ratio: 1;
-  top: 30%;
-  left: 50%;
-  border: 1px solid rgba(222, 174, 132, .25);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(185, 233, 255, .08), transparent 70%);
-  opacity: var(--home-poster-opacity, .64);
-  pointer-events: none;
-}
-
 .modelLayer :global(.hero-object-stage) {
   height: 100%;
   min-height: 100% !important;
