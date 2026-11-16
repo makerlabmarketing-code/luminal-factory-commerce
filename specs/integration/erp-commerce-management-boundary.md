@@ -105,6 +105,12 @@ Nonce acceptance must be atomic. A process-local in-memory set is not sufficient
 
 Replay protection and operation idempotency remain separate. Homepage Hero mutations use the private idempotency receipt store and `manage_homepage_hero` RPC so retries reuse the same result instead of duplicating work. Production integration runtime remains disabled until the remaining ERP/credential/E2E gates pass.
 
+### Runtime credential scope policy (opt-in, Production gate)
+
+The Commerce server may narrow each HMAC key with `COMMERCE_ADMIN_HMAC_CURRENT_ALLOWED_SCOPES` and `COMMERCE_ADMIN_HMAC_PREVIOUS_ALLOWED_SCOPES` (comma-separated exact names from `COMMERCE_ADMIN_SCOPES`). This policy is **server-only** and never part of the signed browser payload. Empty, duplicate or unknown entries fail closed with a configuration error; a previous key cannot be configured with broader scopes than the current key. If the previous-key allowlist is omitted, it inherits the current-key allowlist.
+
+For backward compatibility, when both variables are absent, the current behavior remains unchanged: every declared Commerce scope is available to the authenticated machine credential, subject to the signed route's required scope and ERP operator permissions. **Deploying code alone does not narrow Production permissions.** Apply an audited, least-privilege Production allowlist only after confirming every required ERP→Commerce operation, with a rollback plan and explicit approval. No Production secret rotation or flag change is implied.
+
 ## Credential lifecycle
 
 The HMAC design must support overlapping key rotation:

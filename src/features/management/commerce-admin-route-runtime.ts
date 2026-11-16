@@ -4,7 +4,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { z } from "zod";
-import { COMMERCE_ADMIN_SCOPES, type CommerceAdminScope } from "./commerce-admin-contract";
+import type { CommerceAdminScope } from "./commerce-admin-contract";
 import { readCommerceAdminEnvironment } from "./commerce-admin-env";
 import { COMMERCE_ADMIN_SECURITY_HEADERS } from "./commerce-admin-security-contract";
 import { verifyCommerceAdminRequest, type CommerceAdminVerifiedIdentity } from "./commerce-admin-verifier";
@@ -103,12 +103,11 @@ function buildCredentials(environment: ReturnType<typeof readCommerceAdminEnviro
   return {
     async resolve(clientId: string, keyId: string) {
       if (!environment.enabled || clientId !== environment.clientId || !environment.audience) return null;
-      const allowedScopes = new Set<CommerceAdminScope>(COMMERCE_ADMIN_SCOPES);
-      if (keyId === environment.currentKeyId && environment.currentSecret) {
-        return { clientId, keyId, audience: environment.audience, secret: environment.currentSecret, active: true, allowedScopes };
+      if (keyId === environment.currentKeyId && environment.currentSecret && environment.currentAllowedScopes) {
+        return { clientId, keyId, audience: environment.audience, secret: environment.currentSecret, active: true, allowedScopes: environment.currentAllowedScopes };
       }
-      if (keyId === environment.previousKeyId && environment.previousSecret) {
-        return { clientId, keyId, audience: environment.audience, secret: environment.previousSecret, active: true, allowedScopes };
+      if (keyId === environment.previousKeyId && environment.previousSecret && environment.previousAllowedScopes) {
+        return { clientId, keyId, audience: environment.audience, secret: environment.previousSecret, active: true, allowedScopes: environment.previousAllowedScopes };
       }
       return null;
     },

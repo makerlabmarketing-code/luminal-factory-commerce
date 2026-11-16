@@ -3,6 +3,7 @@ import "server-only";
 import { z } from "zod";
 
 import { COMMERCE_ADMIN_MIN_SECRET_BYTES } from "./commerce-admin-security-contract";
+import { COMMERCE_ADMIN_SCOPES, type CommerceAdminScope } from "./commerce-admin-contract";
 
 const safeToken = z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/);
 
@@ -13,8 +14,10 @@ const commerceAdminEnvironmentSchema = z
     audience: safeToken.optional(),
     currentKeyId: safeToken.optional(),
     currentSecretBase64: z.string().trim().min(1).optional(),
+    currentAllowedScopes: z.string().optional(),
     previousKeyId: safeToken.optional(),
     previousSecretBase64: z.string().trim().min(1).optional(),
+    previousAllowedScopes: z.string().optional(),
   })
   .strict()
   .superRefine((value, context) => {
@@ -36,6 +39,9 @@ const commerceAdminEnvironmentSchema = z
     if (hasPreviousKey !== hasPreviousSecret) {
       context.addIssue({ code: "custom", message: "Previous HMAC key id and secret must be configured together." });
     }
+    if (value.previousAllowedScopes !== undefined && !value.previousKeyId) {
+      context.addIssue({ code: "custom", path: ["previousAllowedScopes"], message: "Previous key scopes require a configured previous key." });
+    }
     if (value.previousKeyId && value.previousKeyId === value.currentKeyId) {
       context.addIssue({ code: "custom", path: ["previousKeyId"], message: "Previous and current HMAC key ids must differ." });
     }
@@ -47,9 +53,29 @@ export type CommerceAdminEnvironment = Readonly<{
   audience?: string;
   currentKeyId?: string;
   currentSecret?: Uint8Array;
+  currentAllowedScopes?: ReadonlySet<CommerceAdminScope>;
   previousKeyId?: string;
   previousSecret?: Uint8Array;
+  previousAllowedScopes?: ReadonlySet<CommerceAdminScope>;
 }>;
+
+
+// Legacy credentials keep their existing permissions until a reviewed allowlist
+// is configured. Explicit empty, unknown or duplicate scopes always fail closed.
+function parseAllowedScopes(
+  rawValue: string | undefined,
+  fallback: ReadonlySet<CommerceAdminScope>,
+): ReadonlySet<CommerceAdminScope> {
+  if (rawValue === undefined) return new Set(fallback);
+
+  const names = rawValue.split(",").map((scope) => scope.trim());
+  const known = new Set<string>(COMMERCE_ADMIN_SCOPES);
+  if (names.some((scope) => !scope || !known.has(scope)) || new Set(names).size !== names.length) {
+    throw new Error("Commerce Admin HMAC scope allowlist is invalid.");
+  }
+
+  return new Set(names as CommerceAdminScope[]);
+}
 
 function decodeSecretBase64(value: string | undefined): Uint8Array | undefined {
   if (!value) return undefined;
@@ -75,11 +101,24 @@ export function readCommerceAdminEnvironment(env: NodeJS.ProcessEnv = process.en
     audience: env.COMMERCE_ADMIN_HMAC_AUDIENCE,
     currentKeyId: env.COMMERCE_ADMIN_HMAC_CURRENT_KEY_ID,
     currentSecretBase64: env.COMMERCE_ADMIN_HMAC_CURRENT_SECRET_BASE64,
+    currentAllowedScopes: env.COMMERCE_ADMIN_HMAC_CURRENT_ALLOWED_SCOPES,
     previousKeyId: env.COMMERCE_ADMIN_HMAC_PREVIOUS_KEY_ID,
     previousSecretBase64: env.COMMERCE_ADMIN_HMAC_PREVIOUS_SECRET_BASE64,
+    previousAllowedScopes: env.COMMERCE_ADMIN_HMAC_PREVIOUS_ALLOWED_SCOPES,
   });
 
   if (!parsed.enabled) return { enabled: false };
+
+  const currentAllowedScopes = parseAllowedScopes(
+    parsed.currentAllowedScopes,
+    new Set(COMMERCE_ADMIN_SCOPES),
+  );
+  const previousAllowedScopes = parsed.previousKeyId
+    ? parseAllowedScopes(parsed.previousAllowedScopes, currentAllowedScopes)
+    : undefined;
+  if (previousAllowedScopes && [...previousAllowedScopes].some((scope) => !currentAllowedScopes.has(scope))) {
+    throw new Error("Previous HMAC key scopes must not exceed the current key allowlist.");
+  }
 
   return {
     enabled: true,
@@ -87,7 +126,9 @@ export function readCommerceAdminEnvironment(env: NodeJS.ProcessEnv = process.en
     audience: parsed.audience,
     currentKeyId: parsed.currentKeyId,
     currentSecret: decodeSecretBase64(parsed.currentSecretBase64),
+    currentAllowedScopes,
     previousKeyId: parsed.previousKeyId,
     previousSecret: decodeSecretBase64(parsed.previousSecretBase64),
+    previousAllowedScopes,
   };
 }
