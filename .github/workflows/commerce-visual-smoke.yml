@@ -1,0 +1,48 @@
+name: Commerce guest visual smoke
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/commerce-visual-smoke.yml"
+      - "scripts/qa/site-visual-smoke.mjs"
+      - "src/app/globals.css"
+      - "src/app/[locale]/archive/**"
+      - "src/app/[locale]/shop/**"
+      - "src/features/home/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install project and pinned test-only browser
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false playwright@1.65.1
+          npx playwright install --with-deps chromium
+
+      - name: Guest Homepage, Archive, Shop screenshots and geometry assertions
+        run: node scripts/qa/site-visual-smoke.mjs
+
+      - name: Upload QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luminal-visual-smoke
+          path: artifacts/visual-smoke/
+          if-no-files-found: warn
+          retention-days: 7
