@@ -12,6 +12,20 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-only-local-fixture
+          POSTGRES_DB: commerce_admin_contract_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d commerce_admin_contract_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout
@@ -25,6 +39,21 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Real PostgreSQL contract test (local disposable DB only)
+        env:
+          COMMERCE_ADMIN_DB_QA_LOCAL_ONLY: "true"
+          PGHOST: "127.0.0.1"
+          PGPORT: "5432"
+          PGDATABASE: commerce_admin_contract_ci
+          PGUSER: postgres
+          PGPASSWORD: ci-only-local-fixture
+        run: |
+          if ! command -v psql >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          bash scripts/qa/run-commerce-admin-postgres.sh
 
       - name: Quality gate
         run: npm run check
