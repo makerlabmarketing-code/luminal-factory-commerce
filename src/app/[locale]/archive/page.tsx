@@ -37,7 +37,7 @@ export default async function ArchivePage() {
             <div className={styles.colorways} aria-label={locale === "vi" ? "Ba phối màu Meowhe trong kho lưu trữ" : "Three Meowhe colorways in the archive"}>
               {entries.slice(0, 3).map((entry, index) => (
                 <Link key={entry.id} href={entry.href} className={styles.colorway} aria-label={`${locale === "vi" ? "Xem hồ sơ" : "View record"}: ${entry.title}`}>
-                  <span className={styles.portrait}><Image src={entry.media.src} alt={tr(entry.media.alt)} fill sizes="(max-width: 600px) 20vw, 110px" style={{ objectFit: "cover", objectPosition: entry.media.objectPosition ?? "center" }} /></span>
+                  <span className={styles.portrait}><Image src={entry.media.src} alt={tr(entry.media.alt)} fill sizes="(max-width: 700px) 96px, (max-width: 900px) 112px, (max-width: 1400px) 8vw, 136px" style={{ objectFit: "cover", objectPosition: entry.media.objectPosition ?? "center" }} /></span>
                   <span className={styles.colorwayLabel}><small>0{index + 1} / MEOWHE</small><strong>{entry.title.replace(/^Meowhe\s+/i, "")}</strong></span>
                 </Link>
               ))}

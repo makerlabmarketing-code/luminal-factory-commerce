@@ -96,6 +96,20 @@
 .selected-archive .editorial-heading { margin-bottom: clamp(2rem, 4vw, 3.5rem); }
 .selected-archive .archive-object:nth-child(even) { margin-top: 3rem; }
 .made-at-luminal { background: #0a0a0a; border-top: 1px solid var(--border); }
+@media (min-width: 768px) {
+  /* A feathered scrim follows the sticky copy without cutting the continuous WebGL beam. */
+  .made-at-luminal [data-made-at-luminal-header] { isolation: isolate; }
+  .made-at-luminal [data-made-at-luminal-header]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -1.25rem -1rem -1rem;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(10,10,10,.94) 0%, rgba(10,10,10,.84) 40%, rgba(10,10,10,.55) 60%, transparent 88%);
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
+    mask-image: linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
+  }
+}
 .making-steps { list-style: none; display: grid; grid-template-columns: repeat(4,1fr); padding: 0; margin: 0; border-top: 1px solid var(--border); }
 .making-steps li { min-height: 22rem; padding: 1.5rem; border-right: 1px solid var(--border); }.making-steps li:first-child { padding-left: 0; }.making-steps li:last-child { border: 0; }
 .making-steps span { color: var(--muted-foreground); font: .65rem var(--font-mono); }.making-steps h3 { margin: 6rem 0 1.5rem; font-size: clamp(1.6rem,2.6vw,2.8rem); font-weight: 420; }.making-steps p { color: var(--muted-foreground); line-height: 1.65; font-size: .9rem; }
