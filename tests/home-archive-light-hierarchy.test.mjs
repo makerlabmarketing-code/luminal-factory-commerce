@@ -34,3 +34,11 @@ test("Archive makes real colorway photographs legible and keyboard navigation st
   assert.match(archive, /136px/);
   assert.match(archive, /styles\.colorwayLabel/);
 });
+
+test("Making beam stays near the card edge and respects the supporting copy", () => {
+  const renderer = read("src/features/home/home-light-renderer.ts");
+  assert.match(renderer, /const beamX = left \+ \(right - left\) \* 0\.965/);
+  assert.match(renderer, /opacity \* 0\.52/);
+  assert.match(renderer, /u\.uAmount, 0\.50/);
+  assert.match(globals, /text-shadow: 0 2px 12px rgba\(0,0,0,\.85\)/);
+});

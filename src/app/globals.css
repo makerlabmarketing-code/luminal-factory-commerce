@@ -109,6 +109,10 @@
     -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
     mask-image: linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
   }
+  .made-at-luminal [data-made-at-luminal-header] > p:last-child {
+    color: #d0d5d7;
+    text-shadow: 0 2px 12px rgba(0,0,0,.85);
+  }
 }
 .making-steps { list-style: none; display: grid; grid-template-columns: repeat(4,1fr); padding: 0; margin: 0; border-top: 1px solid var(--border); }
 .making-steps li { min-height: 22rem; padding: 1.5rem; border-right: 1px solid var(--border); }.making-steps li:first-child { padding-left: 0; }.making-steps li:last-child { border: 0; }

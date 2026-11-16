@@ -118,7 +118,7 @@ export function mountHomeLight(host: HTMLElement, passage: HTMLElement, surface:
     const progress = clamp((viewport * 0.8 - passageRect.top) / Math.max(1, distance));
     const fade = smooth((anchorRect.top - viewport * 0.12) / (viewport * 0.28));
     const opacity = smooth(progress / 0.16) * fade;
-    host.style.opacity = `${opacity * 0.72}`;
+    host.style.opacity = `${opacity * 0.52}`;
     if (opacity < 0.001) return;
     const originY = groupRect.top + top;
     const left = surfaceRect.left - groupRect.left;
@@ -126,7 +126,8 @@ export function mountHomeLight(host: HTMLElement, passage: HTMLElement, surface:
     const y = surfaceRect.top - originY;
     const bottom = surfaceRect.bottom - originY;
     // The incoming beam stays away from the central brand title.
-    const beamX = left + (right - left) * 0.86;
+    // Keep the beam close to the process card rim, away from the supporting copy.
+    const beamX = left + (right - left) * 0.965;
     const scale = Math.max(0.2, Math.min(width / 585, height / 507));
     const impact = smooth((progress - 0.58) / 0.27);
     const front = -100 + (y + 280) * smooth(progress / 0.7);
@@ -146,7 +147,7 @@ export function mountHomeLight(host: HTMLElement, passage: HTMLElement, surface:
     gl.uniform3f(u.uIntro, front, impact, 0);
     gl.uniform4f(u.uPour, impact * 450, impact * 450, impact, impact);
     gl.uniform2f(u.uRun, run, 0);
-    gl.uniform4f(u.uAmount, 0.62, 0, 0, 0.24);
+    gl.uniform4f(u.uAmount, 0.50, 0, 0, 0.20);
     gl.bindVertexArray(vao);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
