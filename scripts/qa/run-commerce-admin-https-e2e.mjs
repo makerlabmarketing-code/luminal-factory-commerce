@@ -18,8 +18,8 @@ const require = createRequire(import.meta.url);
 const sourceModules = new Map();
 function loadTypeScript(filePath) {
   if (sourceModules.has(filePath)) return sourceModules.get(filePath).exports;
-  const module = { exports: {} };
-  sourceModules.set(filePath, module);
+  const transpiledModule = { exports: {} };
+  sourceModules.set(filePath, transpiledModule);
   const compiled = ts.transpileModule(readFileSync(filePath, "utf8"), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;
@@ -31,10 +31,10 @@ function loadTypeScript(filePath) {
     (specifier) => specifier.startsWith(".")
       ? loadTypeScript(resolve(dirname(filePath), specifier + ".ts"))
       : require(specifier),
-    module,
-    module.exports,
+    transpiledModule,
+    transpiledModule.exports,
   );
-  return module.exports;
+  return transpiledModule.exports;
 }
 
 const { verifyCommerceAdminRequest } = loadTypeScript(
