@@ -26,7 +26,15 @@ export function CustomerRaffleHistoryLink() {
         setMessage("Could not sync your entries. Please try again later.");
         return;
       }
-      setMessage("Your raffle entries are linked to this account.");
+      const linked = "entriesLinked" in payload &&
+        typeof payload.entriesLinked === "number" &&
+        Number.isInteger(payload.entriesLinked) &&
+        payload.entriesLinked >= 0 ? payload.entriesLinked : null;
+      setMessage(linked === 0
+        ? "Your raffle history is up to date."
+        : linked !== null
+          ? `${linked} raffle ${linked === 1 ? "entry has" : "entries have"} been linked to your account.`
+          : "Your raffle entries are linked to this account.");
       router.refresh();
     } catch {
       setMessage("Could not sync your entries. Please try again later.");
