@@ -18,8 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: locale === "vi" ? "T\u00e0i kho\u1ea3n" : "Account", description: locale === "vi" ? "T\u00e0i kho\u1ea3n Luminal Factory c\u1ee7a b\u1ea1n." : "Your Luminal Factory account.", alternates: languageAlternates("/account", locale), robots: { index: false, follow: false } };
 }
 
-export default async function AccountPage() {
+export default async function AccountPage({ searchParams }: Readonly<{ searchParams: Promise<{ auth_error?: string }> }>) {
   const tr = await getTranslator();
+  const { auth_error: authError } = await searchParams;
   const environment = getCustomerAuthEnvironment();
   const siteKey = environment.ready ? process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY?.trim() ?? "" : "";
   const authenticatedEmail = environment.ready ? await getServerCustomerAuthEmail() : null;
@@ -27,7 +28,7 @@ export default async function AccountPage() {
   const history = environment.ready && authenticatedEmail ? await getCustomerRaffleHistory() : null;
   return <><Header /><main id="main-content" className="account-route"><Container className="account-route-grid">
     <section className="account-intro" aria-labelledby="account-title"><p className="eyebrow">{tr("Luminal account")}</p><h1 id="account-title">{tr("Một lối vào yên tĩnh cho những object bạn chọn giữ lại.")}</h1><p>{tr("Account được xây theo từng lớp an toàn. Đơn hàng, thanh toán và các tính năng chưa được phê duyệt vẫn nằm ngoài phạm vi.")}</p></section>
-    {environment.ready && siteKey ? <CustomerAccountPanel siteKey={siteKey} initialEmail={authenticatedEmail} googleEnabled={process.env.COMMERCE_CUSTOMER_GOOGLE_AUTH_ENABLED === "true"} /> : <section className="account-panel account-unavailable" aria-labelledby="account-unavailable-title"><p className="eyebrow">{tr("Private staging gate")}</p><h2 id="account-unavailable-title">{tr("Account chưa được mở trên môi trường này.")}</h2><p>{tr("Trang vẫn giữ trạng thái an toàn cho đến khi runtime Auth của đúng Preview được bật và kiểm tra.")}</p></section>}
+    {environment.ready && siteKey ? <CustomerAccountPanel siteKey={siteKey} initialEmail={authenticatedEmail} googleEnabled={process.env.COMMERCE_CUSTOMER_GOOGLE_AUTH_ENABLED === "true"} googleError={authError === "google"} /> : <section className="account-panel account-unavailable" aria-labelledby="account-unavailable-title"><p className="eyebrow">{tr("Private staging gate")}</p><h2 id="account-unavailable-title">{tr("Account chưa được mở trên môi trường này.")}</h2><p>{tr("Trang vẫn giữ trạng thái an toàn cho đến khi runtime Auth của đúng Preview được bật và kiểm tra.")}</p></section>}
     {addressesEnabled && authenticatedEmail && <CustomerAddressesPanel />}
     {history && history.state !== "disabled" && <section className="account-panel" aria-labelledby="customer-raffle-history-title">
       <div className="account-panel-heading">
