@@ -1,3 +1,5 @@
+import { shopPublicEnabled } from "@/features/shop/shop-public-gate";
+import { ShopPaused } from "@/features/shop/shop-paused";
 import { getLocale, getTranslator } from "@/lib/i18n/server";
 import { languageAlternates, localeHref } from "@/lib/i18n/locale";
 import type { Metadata } from "next";
@@ -16,6 +18,7 @@ type ShopProductDetailPageProps = Readonly<{
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: ShopProductDetailPageProps): Promise<Metadata> {
+  if (!shopPublicEnabled) return { title: "Shop on pause", description: "Luminal Factory is focusing on raffle releases.", robots: { index: false, follow: true } };
   const locale = await getLocale();
   const tr = await getTranslator();
   const { slug } = await params;
@@ -49,6 +52,7 @@ export async function generateMetadata({ params }: ShopProductDetailPageProps): 
 }
 
 export default async function ShopProductDetailPage({ params }: ShopProductDetailPageProps) {
+  if (!shopPublicEnabled) return <ShopPaused />;
   const locale = await getLocale();
   const { slug } = await params;
   const entry = await getShopCatalogEntryBySlug(slug, locale);

@@ -82,6 +82,10 @@ try {
     {
       const { page, info, errors } = await visit(context, "/shop", size);
       assert.equal(await page.locator("main.shop-route").count(), 1, "Shop route missing");
+      assert.equal(await page.locator('[data-shop-paused="true"]').count(), 1, "Shop must be paused while raffle-first");
+      assert.equal(await page.locator(".shop-route-card").count(), 0, "A paused Shop must not render product cards");
+      assert.equal(await page.locator('a[href$="/raffle"]').count() > 0, true, "Shop pause screen must link to Raffle");
+      assert.equal(await page.locator('nav a[href$="/shop"]').count(), 0, "Shop must not appear in public navigation");
       const featured = page.locator(".shop-route-section--featured");
       if (await featured.count() === 1 && await featured.locator(".shop-route-image img").count() > 0) {
         // Real approved catalog image must decode without a manual scroll or a fixture fallback.
@@ -121,6 +125,24 @@ try {
       await page.close();
     }
 
+    // Guest Raffle is the active discovery surface, even if no release is currently published.
+    {
+      const { page, info, errors } = await visit(context, "/raffle", size);
+      assert.equal(await page.locator("#raffle-title").count(), 1, "Raffle discovery heading missing");
+      assert.equal(await page.locator('nav a[href$="/shop"]').count(), 0, "Shop still shown in navigation");
+      await capture(page, `raffle-${size.name}`);
+      report.push({ route: "/raffle", viewport: size.name, ...info, pageErrors: errors });
+      await page.close();
+    }
+    // Direct public Shop bookmarks (including product details) remain safe and reversible.
+    {
+      const { page, info, errors } = await visit(context, "/shop/meowhe-lolipop", size);
+      assert.equal(await page.locator('[data-shop-paused="true"]').count(), 1, "Deep-linked Shop object must respect public pause");
+      await capture(page, `shop-paused-detail-${size.name}`);
+      report.push({ route: "/shop/meowhe-lolipop", viewport: size.name, ...info, pageErrors: errors });
+      await page.close();
+    }
+
     await context.close();
   }
 } catch (error) {
@@ -134,4 +156,4 @@ for (const entry of report) {
   process.stdout.write(JSON.stringify(entry) + "\n");
 }
 if (failed) process.exitCode = 1;
-else process.stdout.write("LUMINAL_VISUAL_SMOKE_PASS: 3 routes, 4 viewports, 20+ screenshots; CSS and responsive geometry checked.\n");
+else process.stdout.write("LUMINAL_VISUAL_SMOKE_PASS: 5 routes, 4 viewports, 28+ screenshots; CSS and responsive geometry checked.\n");

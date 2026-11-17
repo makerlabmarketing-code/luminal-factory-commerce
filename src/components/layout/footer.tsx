@@ -3,7 +3,7 @@ import { getLocale, getTranslator } from "@/lib/i18n/server";
 import { getStudioCopy } from "@/features/studio/studio-copy";
 import Image from "next/image";
 import Link from "@/lib/i18n/link";
-import { navigation } from "./navigation";
+import { publicNavigation } from "./navigation";
 
 export async function Footer() {
   const tr = await getTranslator();
@@ -24,7 +24,7 @@ export async function Footer() {
           <h2>{tr("Shaped by light.")}<br />{tr("Crafted to last.")}</h2>
         </div>
         <nav aria-label={tr("Điều hướng chân trang")}>
-          {navigation.map((item) => <Link key={item.href} href={item.href}>{tr(item.label)}</Link>)}
+          {publicNavigation.map((item) => <Link key={item.href} href={item.href}>{tr(item.label)}</Link>)}
           <Link href="/support">{copy.support}</Link>
           <Link href="/support#contact">{copy.contactTitle}</Link>
         </nav>

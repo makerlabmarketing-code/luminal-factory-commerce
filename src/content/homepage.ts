@@ -22,8 +22,8 @@ export const homePageContent = {
     title: "Artisan objects, shaped by light.",
     description:
       "A new chapter for our small-batch artisan objects—formed slowly, finished by hand, and released with intention.",
-    primaryAction: { label: "Explore the Archive", href: "/archive" },
-    secondaryAction: { label: "Shop objects", href: "/shop" },
+    primaryAction: { label: "Explore Raffles", href: "/raffle" },
+    secondaryAction: { label: "View Archive", href: "/archive" },
   },
   featured: {
     index: "01 / Featured object",

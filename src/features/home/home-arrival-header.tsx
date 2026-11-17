@@ -5,7 +5,7 @@ import { useTranslator } from "@/lib/i18n/client";
 import Image from "next/image";
 import Link from "@/lib/i18n/link";
 import { useEffect, useRef, useState } from "react";
-import { navigation } from "@/components/layout/navigation";
+import { publicNavigation } from "@/components/layout/navigation";
 import styles from "./home-arrival-header.module.css";
 
 type HeaderStage = "waiting" | "revealed";
@@ -131,7 +131,7 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
         <span className={styles.railLabel} aria-hidden="true">{tr("Luminal Factory")}</span>
 
         <nav className={styles.desktopNav} aria-label={tr("Điều hướng chính")}>
-          {navigation.map((item, index) => (
+          {publicNavigation.map((item, index) => (
             <Link
               href={item.href}
               key={item.href}
@@ -168,7 +168,7 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
       >
         <div className={styles.menuBackdrop} onClick={() => setMenuOpen(false)} aria-hidden="true" />
         <ul>
-          {navigation.map((item, index) => (
+          {publicNavigation.map((item, index) => (
             <li
               key={item.href}
               style={{ "--nav-index": index } as React.CSSProperties}

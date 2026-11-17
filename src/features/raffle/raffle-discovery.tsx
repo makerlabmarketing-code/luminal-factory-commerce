@@ -71,13 +71,12 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
       ) : (
         <div className="contact-panel">
           <h2>{tr(releases.state === "empty" ? "No announced releases" : "Release information is unavailable")}</h2>
-          <p>{tr(releases.state === "empty" ? "Explore the Archive or browse the Shop while there are no announced releases to show." : "We cannot display release information right now. Explore the Archive or Shop, or check back later.")}</p>
+          <p>{tr(releases.state === "empty" ? "No raffle releases are announced yet. Explore the Meowhe archive in the meantime." : "Raffle release information is unavailable right now. You can still explore the Meowhe archive.")}</p>
           {releases.state === "unavailable" && <a className="button-link button-secondary" href={localeHref("/raffle", locale)}>{tr("Reload release information")}</a>}
         </div>
       )}
       <div className={`actions ${styles.navigation}`}>
         <Link className="button-link button-secondary" href="/archive">{tr("Explore Archive")}</Link>
-        <Link className="button-link button-secondary" href="/shop">{tr("Browse Shop")}</Link>
       </div>
     </section>
   );
