@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { getCustomerAuthEnvironment } from "@/features/auth/customer-auth-request";
 import type { Database } from "@/lib/supabase/database.types";
+import { isRaffleHistoryLinkRequestAllowed } from "@/features/account/raffle-history-link-guard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,12 +32,7 @@ export async function POST(request: NextRequest) {
   if (!env.ready || process.env.COMMERCE_CUSTOMER_RAFFLE_HISTORY_ENABLED !== "true") {
     return reply(404, { ok: false, code: "unavailable" });
   }
-  const origin = request.headers.get("origin");
-  if (!origin || origin !== request.nextUrl.origin || !env.allowedOrigins.has(origin) ||
-    request.headers.get("x-luminal-history-link") !== "1" ||
-    (request.headers.get("sec-fetch-site") !== null &&
-      request.headers.get("sec-fetch-site") !== "same-origin") ||
-    Number(request.headers.get("content-length") ?? "0") > 0) {
+  if (!isRaffleHistoryLinkRequestAllowed(request, env.allowedOrigins)) {
     return reply(403, { ok: false, code: "invalid_request" });
   }
 
