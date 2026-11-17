@@ -9,6 +9,7 @@ import { meowheDiscoveryStory } from "@/components/discovery/meowhe-story";
 import { getCuratedArchiveEntries } from "@/features/archive/archive-content";
 import Image from "next/image";
 import { RaffleCountdownDemo } from "./raffle-countdown-demo";
+import { isRaffleEntryPresentationEnabled } from "./raffle-detail-service";
 import type { ShopPresentationEntry } from "@/features/shop/shop-content";
 
 const statusCopy: Record<RaffleListEntry["state"], string> = {
@@ -22,6 +23,7 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
   locale: "vi" | "en";
 }>) {
   const tr = await getTranslator();
+  const canEnter = isRaffleEntryPresentationEnabled();
   const formatDate = new Intl.DateTimeFormat(locale, {
     dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh",
   });
@@ -64,7 +66,7 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
                 {release.closesAt && <><dt>{tr("Closes")}</dt><dd><time dateTime={release.closesAt}>{formatDate.format(new Date(release.closesAt))}</time></dd></>}
                 <dt>{tr("Time zone")}</dt><dd>Asia/Ho_Chi_Minh (UTC+7)</dd>
               </dl>}
-              <Link className="button-link button-secondary" href={`/raffle/${release.slug}`} aria-label={`${tr("View release")}: ${release.title}`}>{tr("View release")}</Link>
+              <Link className="button-link button-secondary" href={`/raffle/${release.slug}${release.state === "open" && canEnter ? "#raffle-entry" : ""}`} aria-label={`${tr(release.state === "open" && canEnter ? "Enter Raffle" : "View release")}: ${release.title}`}>{tr(release.state === "open" && canEnter ? "Enter Raffle" : "View release")}</Link>
             </li>
           ))}
         </ul>
