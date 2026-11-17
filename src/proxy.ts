@@ -18,12 +18,14 @@ export async function proxy(request: NextRequest) {
   const usesCustomerSession =
     routePath.startsWith("/account") ||
     routePath === "/cart" ||
-    request.nextUrl.pathname === "/api/cart";
+    request.nextUrl.pathname === "/api/cart" ||
+    request.nextUrl.pathname.startsWith("/api/account/");
   const response = usesCustomerSession
     ? await refreshCustomerAuthSession(request)
     : NextResponse.next({ request });
 
-  if (routePath === "/cart") {
+  if (routePath === "/cart" || routePath.startsWith("/account") ||
+      request.nextUrl.pathname.startsWith("/api/account/")) {
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
     response.headers.set("Pragma", "no-cache");
     response.headers.set("Vary", "Cookie");
