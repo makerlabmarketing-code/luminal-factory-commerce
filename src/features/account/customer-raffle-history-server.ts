@@ -5,6 +5,7 @@ import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { resolveRaffleHistory, type RaffleHistoryItem } from "./raffle-history-policy";
+import { resolveRaffleCustomerOwner } from "./raffle-customer-identity";
 
 const raffleSchema = z.object({
   id: z.string().uuid(),
@@ -68,20 +69,25 @@ export async function getCustomerRaffleHistory(): Promise<
     // Stable ownership: resolve the currently verified Auth user to exactly
     // one customer. Never grant history using email equality alone.
     const { data: customer, error: customerError } = await admin.from("customers")
-      .select("id,email")
+      .select("id,email,auth_user_id")
       .eq("auth_user_id", user.id)
       .maybeSingle();
     if (customerError) return { state: "unavailable", items: [] };
     if (!customer) return { state: "ready", items: [] };
-    if (customer.email.trim().toLowerCase() !== email) {
-      // Account email changed. Ownership needs explicit re-verification,
-      // never silently bind guest entries belonging to an old email.
-      return { state: "unavailable", items: [] };
-    }
+    const customerId = resolveRaffleCustomerOwner({
+      id: user.id,
+      email: user.email,
+      emailConfirmedAt: user.email_confirmed_at,
+    }, {
+      id: customer.id,
+      email: customer.email,
+      authUserId: customer.auth_user_id ?? "",
+    });
+    if (!customerId) return { state: "unavailable", items: [] };
 
     const { data, error } = await admin.from("raffle_entries")
       .select("id,created_at,raffles!inner(title,slug,is_test,is_published,results_published_at,status)")
-      .eq("customer_id", customer.id)
+      .eq("customer_id", customerId)
       .eq("raffles.is_test", false)
       .eq("raffles.is_published", true)
       .order("created_at", { ascending: false })
