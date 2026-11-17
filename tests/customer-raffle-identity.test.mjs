@@ -26,10 +26,10 @@ test("rejects unverified email even when customer ID and email match", () => {
   ), null);
 });
 
-test("rejects customer email mismatch after an account email change", () => {
+test("retains history after a verified account email change when auth ID is stable", () => {
   assert.equal(resolveRaffleCustomerOwner(
     { ...identity, email: "new@example.com" }, customer,
-  ), null);
+  ), "customer-a");
 });
 
 test("rejects missing identities, customers and empty emails", () => {
