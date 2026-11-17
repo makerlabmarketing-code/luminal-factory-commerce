@@ -72,7 +72,7 @@ export async function RaffleDetailView({ raffle, entryEnabled, turnstileSiteKey 
         </div>
       </section>
 
-      <section className="section" aria-label={tr("Raffle entry")}>
+      <section id="raffle-entry" className="section" aria-label={tr("Raffle entry")}>
         {canPresentEntry ? (
           <RaffleEntryForm
             enabled={entryEnabled}
