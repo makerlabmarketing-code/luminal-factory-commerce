@@ -26,6 +26,7 @@ test("Single-product shelf prioritizes image without representing unavailable ch
   assert.match(shelf, /const featured = entries\.length === 1/);
   assert.match(shelf, /shop-route-card--featured/);
   assert.match(shelf, /\(max-width: 900px\) 90vw, 46vw/);
+  assert.match(shelf, /priority=\{featured && index === 0\}/);
   assert.match(shelf, /<Link href=\{entry\.href\}>\{entry\.title\}<\/Link>/);
   assert.match(css, /grid-template-areas: "media details" "media status" "media price" "media action"/);
   assert.match(css, /grid-template-areas: "media" "details" "status" "price" "action"/);

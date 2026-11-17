@@ -36,7 +36,7 @@ export async function ShopCollection({ entries, source }: ShopCollectionProps) {
       <ol className={`shop-route-list${featured ? " shop-route-list--featured" : ""}`}>
         {entries.map((entry, index) => (
           <li key={entry.id} className={`shop-route-card${featured ? " shop-route-card--featured" : ""}`}>
-            <Link href={entry.href} className="shop-route-image" aria-label={`${tr("Xem object detail")}: ${entry.title}`}><ShopMedia media={entry.media} sizes={featured ? "(max-width: 900px) 90vw, 46vw" : "(max-width: 700px) 25vw, 160px"} /></Link>
+            <Link href={entry.href} className="shop-route-image" aria-label={`${tr("Xem object detail")}: ${entry.title}`}><ShopMedia media={entry.media} priority={featured && index === 0} sizes={featured ? "(max-width: 900px) 90vw, 46vw" : "(max-width: 700px) 25vw, 160px"} /></Link>
             <div className="shop-route-copy">
               <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
               <p>{tr(entry.collection)} · {tr(entry.type)}</p>

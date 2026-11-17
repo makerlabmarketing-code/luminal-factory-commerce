@@ -31,7 +31,7 @@ export default async function ArchivePage() {
             <div className={styles.intro}>
               <p className="eyebrow">{tr("Luminal archive")} / MEOWHE</p>
               <h1 id="archive-title">{locale === "vi" ? "Bộ sưu tập Meowhe" : "The Meowhe Archive"}</h1>
-              <p>{locale === "vi" ? "Ba phối màu. Một nhân vật. Khám phá từng phiên bản." : "Three colorways. One character. Explore each edition."}</p>
+              <p>{locale === "vi" ? "Ba phối màu. Một nhân vật. Khám phá từng phiên bản." : "Three colorways. One character. Explore each colorway."}</p>
               <Link className={styles.allRecords} href="#archive-records">{locale === "vi" ? "Xem các phối màu" : "View colorways"} <span aria-hidden="true">↘</span></Link>
             </div>
             <div className={styles.colorways} aria-label={locale === "vi" ? "Ba phối màu Meowhe trong kho lưu trữ" : "Three Meowhe colorways in the archive"}>
