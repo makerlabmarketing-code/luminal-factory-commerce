@@ -36,7 +36,7 @@ test('both locales distinguish unavailable/disabled from verified empty and loca
       assert.equal(html.includes(emptyCopy), state === 'empty');
       assert.equal(html.includes(`href="/${locale}/raffle"`), state === 'unavailable');
       assert.ok(html.includes(`href="/${locale}/archive"`));
-      assert.ok(html.includes(`href="/${locale}/shop"`));
+      assert.ok(!html.includes(`href="/${locale}/shop"`));
       assert.doesNotMatch(html, /Show more|Xem thêm/);
       assert.match(html, /Meowhe story/);
       assert.match(html, /KHÔNG MỞ ĐĂNG KÝ|ENTRIES ARE NOT OPEN/);

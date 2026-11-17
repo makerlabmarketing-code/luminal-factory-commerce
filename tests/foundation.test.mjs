@@ -8,7 +8,7 @@ const read = (path) => readFileSync(path, "utf8");
 const walk = (directory) => readdirSync(directory).flatMap((name) => { const path = join(directory, name); return statSync(path).isDirectory() ? walk(path) : [path]; });
 const src = () => walk("src").filter((path) => /\.(ts|tsx|css)$/.test(path)).map(read).join("\n");
 
-test("homepage has the semantic Wave 1 hero and Archive-first CTA", () => {
+test("homepage keeps the semantic Wave 1 hero with a Raffle-first CTA", () => {
   const page = read("src/app/[locale]/page.tsx");
   const home = read("src/features/home/home-page.tsx");
   const content = read("src/content/homepage.ts");
@@ -16,8 +16,8 @@ test("homepage has the semantic Wave 1 hero and Archive-first CTA", () => {
   assert.match(page, /<HomePage \/>/);
   assert.match(home, /<section className="revival-hero"[^>]+aria-labelledby="hero-title"/);
   assert.match(home, /<h1 id="hero-title"/);
-  assert.match(content, /Explore the Archive/);
-  assert.match(content, /href: "\/archive"/);
+  assert.match(content, /primaryAction: \{ label: "Explore Raffles", href: "\/raffle" \}/);
+  assert.match(content, /secondaryAction: \{ label: "View Archive", href: "\/archive" \}/);
 });
 
 test("home follows the owner-approved Wave 1 editorial hierarchy", () => {
@@ -39,7 +39,8 @@ test("home follows the owner-approved Wave 1 editorial hierarchy", () => {
   }
   assert.match(home, /href="\/archive\/meowhe-mono"/);
   assert.match(home, /href=\{object\.recordHref\}/);
-  assert.match(home, /href="\/shop"/);
+  assert.doesNotMatch(home, /href="\/shop"/);
+  assert.match(home, /href="\/raffle"/);
   assert.match(home, /href="\/commission"/);
 });
 
