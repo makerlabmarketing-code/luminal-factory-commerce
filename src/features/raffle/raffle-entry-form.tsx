@@ -48,6 +48,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const requestIdRef = useRef<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [message, setMessage] = useState("");
@@ -178,7 +179,18 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
       </div>
 
       {!isComplete ? (
-        <form className="account-form" onSubmit={handleSubmit}>
+        <>
+          <button
+            className="button-link account-submit"
+            type="button"
+            aria-expanded={isExpanded}
+            aria-controls="raffle-entry-fields"
+            onClick={() => setIsExpanded(expanded => !expanded)}
+          >
+            {tr(isExpanded ? "Hide entry form" : "Enter Raffle")}
+          </button>
+          {isExpanded ? (
+            <form id="raffle-entry-fields" className="account-form" onSubmit={handleSubmit}>
           <div className="account-field">
             <label htmlFor={nameId}>{tr("Tên hiển thị")}</label>
             <input id={nameId} name="displayName" autoComplete="name" minLength={2} maxLength={120} required />
@@ -238,7 +250,9 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
           <button className="button-link account-submit" type="submit" disabled={isPending || !captchaToken}>
             {isPending ? tr("Đang gửi entry…") : tr("Gửi entry")}
           </button>
-        </form>
+            </form>
+          ) : null}
+        </>
       ) : null}
 
       <div className="account-feedback" aria-live="polite" aria-atomic="true">
