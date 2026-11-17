@@ -6,13 +6,30 @@ export const confirmationPayloadSchema = z.object({
 });
 export type ConfirmationPayload = z.infer<typeof confirmationPayloadSchema>;
 const escapeHtml = (value:string) => value.replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]!));
-export function buildRaffleConfirmation(payload:ConfirmationPayload) {
-  const title = payload.title.replace(/[\r\n]/g,' ');
-  const url=`https://luminalfactory.com/vi/raffle/${payload.slug}`;
-  const text=`Xin chào ${payload.displayName},\n\nLuminal Factory đã nhận đăng ký tham gia ${title} của bạn.\nMã đăng ký: ${payload.entryId}\n\nĐây là xác nhận tham gia, chưa phải xác nhận được chọn mua hoặc thanh toán. Kết quả và hướng dẫn tiếp theo sẽ được thông báo riêng.\n\nXem đợt raffle: ${url}\n\nLuminal Factory`;
+export function buildRaffleConfirmation(payload: ConfirmationPayload) {
+  const title = payload.title.replace(/[\r\n]/g, ' ').trim();
+  const url = `https://luminalfactory.com/en/raffle/${payload.slug}`;
+  const name = escapeHtml(payload.displayName);
+  const safeTitle = escapeHtml(title);
+  const reference = escapeHtml(payload.entryId);
+  const text = [
+    `Hello ${payload.displayName},`,
+    '',
+    `Your entry for ${title} has been received by Luminal Factory.`,
+    `Entry reference: ${payload.entryId}`,
+    '',
+    'Your entry is confirmed. This is not a winning notification or a purchase confirmation.',
+    'If selected, you will receive a separate email with the next steps and payment deadline.',
+    'Your shipping details have been saved for raffle fulfillment. Please contact Luminal Factory if they need updating.',
+    '',
+    `View the raffle: ${url}`,
+    '',
+    'Luminal Factory',
+  ].join('\n');
   return {
-    subject:`Đăng ký thành công · ${title} · Luminal Factory`, text,
-    html:`<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Xác nhận tham gia raffle</title></head><body style="margin:0;background:#f4f4f5;color:#18181b;font-family:Arial,sans-serif"><div style="max-width:560px;margin:24px auto;padding:28px;background:white"><p style="font-size:14px">LUMINAL FACTORY</p><h1 style="font-size:24px">Đã nhận đăng ký của bạn</h1><p style="font-size:16px;line-height:1.6">Xin chào ${escapeHtml(payload.displayName)},</p><p style="font-size:16px;line-height:1.6">Bạn đã đăng ký tham gia <strong>${escapeHtml(title)}</strong> thành công.</p><p style="font-size:16px;line-height:1.6;overflow-wrap:anywhere">Mã đăng ký: ${escapeHtml(payload.entryId)}</p><p style="font-size:16px;line-height:1.6">Đây là xác nhận tham gia, chưa phải xác nhận được chọn mua hoặc thanh toán. Kết quả và hướng dẫn tiếp theo sẽ được thông báo riêng.</p><p><a href="${url}" style="display:inline-block;background:#18181b;color:white;padding:16px 20px;text-decoration:none">Xem đợt raffle</a></p></div></body></html>`,
+    subject: `Entry confirmed | ${title} | Luminal Factory`,
+    text,
+    html: `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Raffle entry confirmed</title></head><body style="margin:0;padding:24px 12px;background:#0b0c10;color:#f5f4fa;font-family:Arial,Helvetica,sans-serif"><div style="max-width:560px;margin:0 auto;border:1px solid #393441;background:#14121b"><div style="padding:28px 30px 20px;border-bottom:1px solid #393441"><p style="margin:0;font-size:12px;letter-spacing:3px;font-weight:700;color:#ded0f8">LUMINAL FACTORY</p><p style="margin:14px 0 0;font-size:12px;letter-spacing:2px;color:#b7abc6">RAFFLE ENTRY CONFIRMATION</p></div><div style="padding:30px"><h1 style="margin:0 0 18px;font-size:28px;line-height:1.2;color:#fff">You're in the draw.</h1><p style="font-size:15px;line-height:1.7;color:#dedbe7">Hello ${name},</p><p style="font-size:15px;line-height:1.7;color:#dedbe7">We've received your entry for <strong style="color:#fff">${safeTitle}</strong>.</p><div style="padding:18px;margin:22px 0;background:#231e2c;border:1px solid #50415e"><p style="margin:0 0 8px;font-size:11px;letter-spacing:1px;color:#c8b7d9">ENTRY REFERENCE</p><p style="margin:0;font-size:14px;overflow-wrap:anywhere;color:#fff">${reference}</p></div><p style="font-size:15px;line-height:1.7;color:#dedbe7">Your entry is confirmed, but this does not mean you've won or placed an order. Winners will receive a separate email with next steps and the payment deadline.</p><p style="font-size:14px;line-height:1.7;color:#bbb3c7">Your shipping information has been securely recorded for fulfillment if selected. Need to update it? Contact Luminal Factory before shipping.</p><p style="margin:26px 0"><a href="${url}" style="display:inline-block;background:#e6d6ff;color:#1b1525;padding:14px 20px;font-size:13px;font-weight:700;text-decoration:none">VIEW RAFFLE</a></p></div><div style="padding:18px 30px;border-top:1px solid #393441;font-size:12px;color:#a9a0b4">Luminal Factory · Hand-finished objects with character</div></div></body></html>`,
   };
 }
 export type ConfirmationSendResult = {providerId:string;retryable:false;failureCode:null} | {providerId:null;retryable:boolean;failureCode:string};
