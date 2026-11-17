@@ -1,4 +1,5 @@
 -- Runs after executing the exact review-only SQL proposal into isolated CI DB.
+SET ROLE service_role;
 DO $test$
 DECLARE
   a uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -65,3 +66,5 @@ BEGIN
 END
 $test$;
 SELECT 'C049_POSTGRES_OWNERSHIP_PASS' AS result;
+
+RESET ROLE;
