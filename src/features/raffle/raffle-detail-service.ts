@@ -84,6 +84,10 @@ export const getPublishedRaffleBySlug = cache(async (slug: string): Promise<Publ
       "id,slug,title,summary,rules_summary,status,rules_version,opens_at,closes_at,published_at,product_id",
     )
     .eq("slug", slug)
+    .eq("is_published", true)
+    .eq("is_test", false)
+    .neq("status", "DRAFT")
+    .lte("published_at", new Date().toISOString())
     .maybeSingle();
 
   if (error || !data) return null;
