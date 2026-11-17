@@ -10,6 +10,7 @@ import { CustomerAddressesPanel } from "@/features/account/customer-addresses-pa
 import { getCustomerAuthEnvironment } from "@/features/auth/customer-auth-request";
 import { getServerCustomerAuthEmail } from "@/lib/supabase/customer-auth-server";
 import { getCustomerRaffleHistory } from "@/features/account/customer-raffle-history-server";
+import { CustomerRaffleHistoryLink } from "@/features/account/customer-raffle-history-link";
 import Link from "@/lib/i18n/link";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +36,7 @@ export default async function AccountPage({ searchParams }: Readonly<{ searchPar
         <p className="eyebrow">LUMINAL / MY RAFFLES</p>
         <h2 id="customer-raffle-history-title">My Raffle History</h2>
         <p>Your previous raffle entries and published results.</p>
+        {history.state === "ready" && <CustomerRaffleHistoryLink />}
       </div>
       {history.state === "unavailable" ? <p role="status">Raffle history is temporarily unavailable.</p> :
         history.state === "signed_out" ? <p role="status">Sign in with a verified email to view your history.</p> :
