@@ -57,7 +57,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
   const renderTurnstile = useCallback(() => {
     const turnstile = getTurnstile();
     const container = turnstileContainerRef.current;
-    if (!enabled || !turnstile || !container || turnstileWidgetIdRef.current) return;
+    if (!enabled || !isExpanded || isComplete || !turnstile || !container || turnstileWidgetIdRef.current) return;
 
     turnstileWidgetIdRef.current = turnstile.render(container, {
       sitekey: siteKey,
@@ -77,7 +77,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
         return true;
       },
     });
-  }, [enabled, siteKey, locale]);
+  }, [enabled, isExpanded, isComplete, siteKey, locale]);
 
   useEffect(() => {
     renderTurnstile();
@@ -87,6 +87,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
         turnstile.remove(turnstileWidgetIdRef.current);
         turnstileWidgetIdRef.current = null;
       }
+      setCaptchaToken("");
     };
   }, [renderTurnstile]);
 
