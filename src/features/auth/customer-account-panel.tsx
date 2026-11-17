@@ -37,9 +37,10 @@ type CustomerAccountPanelProps = Readonly<{
   siteKey: string;
   initialEmail: string | null;
   googleEnabled?: boolean;
+  googleError?: boolean;
 }>;
 
-export function CustomerAccountPanel({ siteKey, initialEmail, googleEnabled = false }: CustomerAccountPanelProps) {
+export function CustomerAccountPanel({ siteKey, initialEmail, googleEnabled = false, googleError = false }: CustomerAccountPanelProps) {
   const tr = useTranslator();
   const locale = useLocale();
   const router = useRouter();
@@ -56,7 +57,7 @@ export function CustomerAccountPanel({ siteKey, initialEmail, googleEnabled = fa
   const [captchaToken, setCaptchaToken] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState(initialEmail ? "Phiên đăng nhập đang hoạt động." : "");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(googleError ? "Google sign-in could not be completed. Please try again or use email instead." : "");
 
   const renderTurnstile = useCallback(() => {
     const turnstile = getTurnstile();
