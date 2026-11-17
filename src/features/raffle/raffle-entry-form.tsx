@@ -152,7 +152,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
       setMessage("Email này đã có một entry cho raffle. Không có entry mới được tạo thêm.");
       return;
     }
-    setMessage(tr("Entry recorded. Reference: {reference}").replace("{reference}", response.entryReference));
+    setMessage(tr("Entry recorded. Reference: {reference}").replace("{reference}", response.entryReference) + " " + tr("A confirmation email will be sent if email notifications are enabled. Please check your inbox and spam folder."));
     form.reset();
   }
 
