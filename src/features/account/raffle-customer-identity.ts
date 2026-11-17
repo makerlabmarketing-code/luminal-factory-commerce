@@ -10,17 +10,21 @@ export type LinkedRaffleCustomer = Readonly<{
 }>;
 
 /**
- * Fail-closed ownership check. A matching email alone is not ownership;
- * the Supabase Auth subject must be bound to exactly this customer.
+ * Customer ID ownership follows the stable Supabase Auth user ID, not email.
+ * A verified email is required at login, but changes to email must not erase
+ * access to entries already bound to the same customer ID.
+ *
+ * Claiming *unlinked guest* entries uses a separate explicit verified-email
+ * operation; it MUST NOT silently claim entries from a previous email.
  */
 export function resolveRaffleCustomerOwner(
   identity: VerifiedRaffleIdentity | null,
   customer: LinkedRaffleCustomer | null,
 ): string | null {
   if (!identity || !customer || !identity.emailConfirmedAt) return null;
-  const verifiedEmail = identity.email?.trim().toLowerCase();
-  const linkedEmail = customer.email.trim().toLowerCase();
-  if (!verifiedEmail || !linkedEmail ||
-      identity.id !== customer.authUserId || verifiedEmail !== linkedEmail) return null;
+  const verifiedEmail = identity.email?.trim();
+  if (!verifiedEmail || !identity.id || identity.id !== customer.authUserId || !customer.id) {
+    return null;
+  }
   return customer.id;
 }
