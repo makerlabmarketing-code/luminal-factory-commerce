@@ -27,10 +27,21 @@ BEGIN
   FROM public.claim_verified_customer_raffle_history(a,'alice@example.com');
   IF linked <> 0 THEN RAISE EXCEPTION 'Replay was not idempotent'; END IF;
 
+  -- Simulate an entry already owned by Alice which carries Bob's current
+  -- contact email. Bob's sync MUST NOT override the existing owner.
+  UPDATE public.raffle_entries
+    SET email_normalized = 'bob@example.com'
+    WHERE id = '44444444-4444-4444-8444-444444444444';
+
   SELECT linked_customer_id, linked_entries INTO cidb, linked
   FROM public.claim_verified_customer_raffle_history(b,'bob@example.com');
   IF cidb IS NULL OR cidb = cida OR linked <> 1 THEN
     RAISE EXCEPTION 'Independent customer binding failed';
+  END IF;
+
+  IF (SELECT customer_id FROM public.raffle_entries
+      WHERE id = '44444444-4444-4444-8444-444444444444') <> cida THEN
+    RAISE EXCEPTION 'Bob claimed a raffle entry already owned by Alice';
   END IF;
 
   -- Change of verified email keeps the same customer ID and previously claimed entries.
