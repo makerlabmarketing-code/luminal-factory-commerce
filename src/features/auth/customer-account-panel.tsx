@@ -36,9 +36,10 @@ function getFailureMessage(response: Extract<CustomerAuthClientResponse, { ok: f
 type CustomerAccountPanelProps = Readonly<{
   siteKey: string;
   initialEmail: string | null;
+  googleEnabled?: boolean;
 }>;
 
-export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountPanelProps) {
+export function CustomerAccountPanel({ siteKey, initialEmail, googleEnabled = false }: CustomerAccountPanelProps) {
   const tr = useTranslator();
   const locale = useLocale();
   const router = useRouter();
@@ -185,6 +186,8 @@ export function CustomerAccountPanel({ siteKey, initialEmail }: CustomerAccountP
             : tr("Nhận mã dùng một lần qua email. Luminal Factory không yêu cầu bạn tạo hoặc ghi nhớ mật khẩu.")}
         </p>
       </div>
+
+      {stage === "email" && googleEnabled ? <a className="button-link account-submit" href="/api/account/google">Continue with Google</a> : null}
 
       {stage === "email" ? (
         <form className="account-form" onSubmit={handleRequestOtp}>
