@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { resolveRaffleHistory, type RaffleHistoryItem } from "./raffle-history-policy";
 
 const raffleSchema = z.object({
   id: z.string().uuid(),
@@ -22,14 +23,7 @@ const allocationSchema = z.object({
   status: z.string(),
 });
 
-export type CustomerRaffleHistoryItem = Readonly<{
-  id: string;
-  title: string;
-  slug: string;
-  enteredAt: string;
-  outcome: "entered" | "selected" | "not_selected";
-  fulfillmentStatus: string | null;
-}>;
+export type CustomerRaffleHistoryItem = RaffleHistoryItem;
 
 /**
  * Read-only, feature-gated customer history. Never accept an email from the
@@ -98,24 +92,8 @@ export async function getCustomerRaffleHistory(): Promise<
       if (!parsed.success) return { state: "unavailable", items: [] };
       allocations = parsed.data;
     }
-    const selected = new Map(allocations.map((allocation) => [allocation.raffle_entry_id, allocation.status]));
+    return { state: "ready", items: resolveRaffleHistory(visible, allocations, now) };
 
-    return {
-      state: "ready",
-      items: visible.map((entry) => {
-        const announcedResult = announced.some((item) => item.id === entry.id);
-        const fulfillmentStatus = announcedResult ? selected.get(entry.id) ?? null : null;
-        return {
-          id: entry.id,
-          title: entry.raffles.title,
-          slug: entry.raffles.slug,
-          enteredAt: entry.created_at,
-          outcome: !announcedResult ? "entered" :
-            fulfillmentStatus !== null ? "selected" : "not_selected",
-          fulfillmentStatus,
-        };
-      }),
-    };
   } catch {
     return { state: "unavailable", items: [] };
   }
