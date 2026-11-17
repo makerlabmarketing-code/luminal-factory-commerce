@@ -48,8 +48,19 @@ BEGIN
   WHERE c.auth_user_id = p_auth_user_id
   FOR UPDATE;
 
+  -- An authenticated customer may change their confirmed email without
+  -- losing the stable customer ID or already linked raffle history.
+  -- However, a newly verified email may not belong to another customer.
   IF v_customer_id IS NOT NULL AND lower(btrim(v_customer_email)) <> v_email THEN
-    RAISE EXCEPTION 'customer identity conflict' USING ERRCODE = '23505';
+    IF EXISTS (
+      SELECT 1 FROM public.customers c
+      WHERE lower(btrim(c.email)) = v_email AND c.id <> v_customer_id
+    ) THEN
+      RAISE EXCEPTION 'customer identity conflict' USING ERRCODE = '23505';
+    END IF;
+    UPDATE public.customers c
+      SET email = v_email, updated_at = statement_timestamp()
+      WHERE c.id = v_customer_id AND c.auth_user_id = p_auth_user_id;
   END IF;
 
   IF v_customer_id IS NULL THEN
@@ -86,6 +97,8 @@ COMMIT;
 -- 2. Different verified users must never claim each other's customer_id.
 -- 3. Repeated claim is idempotent (linked_entries=0).
 -- 4. Existing claimed entries may not be reassigned.
--- 5. Missing/changed email or customers identity conflict must fail closed.
+-- 5. Missing/unverified email or conflicting customer email must fail closed.
+-- 8. Same auth subject may change verified email without losing old history.
+-- 9. Only the new verified email may claim new unlinked entries; old email must not auto-claim.
 -- 6. Direct select on private raffle shipping data remains denied.
 -- 7. Deploy schema before enabling COMMERCE_CUSTOMER_RAFFLE_HISTORY_ENABLED.
