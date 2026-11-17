@@ -68,6 +68,11 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const catalog = await getShopCatalog(rawSearchParams, locale);
   const isLiveCatalog = catalog.source === "commerce-catalog";
   const hasActiveQuery = Boolean(catalog.query.q || catalog.query.type || catalog.query.release || catalog.query.page > 1);
+  // Keep browsing and search useful as the catalog grows, but never hide the only
+  // published object behind a large filter form on the unfiltered landing page.
+  const showcaseFirst = isLiveCatalog && !hasActiveQuery && !catalog.hasNextPage
+    && catalog.entries.length > 0 && catalog.entries.length <= 3;
+  const products = <ShopCollection entries={isLiveCatalog ? catalog.entries : []} source={catalog.source} />;
 
   return (
     <>
@@ -76,15 +81,14 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         <Container>
           <section className="shop-route-hero" aria-labelledby="shop-title">
             <p className="eyebrow">{tr("Luminal shop")}</p>
-            <h1 id="shop-title">Shop</h1>
-            <p>{locale === "vi" ? "Những vật thể được chế tác tại Luminal. Chọn một sản phẩm để xem hình ảnh, phối màu và câu chuyện của nó." : "Objects made at Luminal. Choose a piece to explore its images, colorways and story."}</p>
+            <h1 id="shop-title">{locale === "vi" ? "Keycap & vật thể sưu tầm" : "Artisan keycaps & collectibles"}</h1>
+            <p>{locale === "vi" ? "Khám phá tạo hình và chi tiết của từng sản phẩm." : "Explore each piece, its details and finish."}</p>
           </section>
-          <section className="shop-route-section" aria-labelledby="shop-filter-title">
-            <div className="shop-route-heading">
-              <p className="eyebrow">{locale === "vi" ? "BỘ SƯU TẬP" : "COLLECTION"}</p>
-              <h2 id="shop-filter-title">{locale === "vi" ? "Tìm vật thể của bạn" : "Find your object"}</h2>
-            </div>
-            <form action={localeHref("/shop", locale)} method="get">
+          {showcaseFirst ? products : null}
+          <section className="shop-route-section shop-route-filters" aria-labelledby="shop-filter-title">
+            <details className="shop-filter-disclosure" open={!showcaseFirst}>
+              <summary id="shop-filter-title">{locale === "vi" ? "Tìm kiếm & bộ lọc" : "Search & filters"}</summary>
+              <form action={localeHref("/shop", locale)} method="get">
               <p>
                 <label htmlFor="shop-query">{tr("Tìm kiếm")}</label><br />
                 <input id="shop-query" name="q" type="search" maxLength={80} defaultValue={catalog.query.q} placeholder={tr("Tên hoặc mô tả object")} />
@@ -107,10 +111,11 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                 <button type="submit" className="button-link">{tr("Áp dụng")}</button>
                 {hasActiveQuery ? <Link href="/shop">{tr("Đặt lại")}</Link> : null}
               </p>
-            </form>
+              </form>
+            </details>
           </section>
 
-          <ShopCollection entries={isLiveCatalog ? catalog.entries : []} source={catalog.source} />
+          {!showcaseFirst ? products : null}
 
           {(catalog.query.page > 1 || catalog.hasNextPage) ? (
             <nav className="actions" aria-label={tr("Phân trang Shop")}>

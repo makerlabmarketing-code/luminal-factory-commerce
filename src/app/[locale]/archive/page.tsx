@@ -30,9 +30,9 @@ export default async function ArchivePage() {
             <div className={styles.stageLight} aria-hidden="true" />
             <div className={styles.intro}>
               <p className="eyebrow">{tr("Luminal archive")} / MEOWHE</p>
-              <h1 id="archive-title">{locale === "vi" ? "Những câu chuyện còn ở lại." : "Stories that stay with us."}</h1>
-              <p>{locale === "vi" ? "Sau ánh đèn là những phiên bản Meowhe từng đi cùng xưởng. Chọn một phối màu để khám phá tạo hình và câu chuyện của nó." : "Beyond the light are the Meowhe colorways that shaped our studio. Choose one to explore its form and story."}</p>
-              <Link className={styles.allRecords} href="#archive-records">{locale === "vi" ? "Xem toàn bộ hồ sơ" : "Explore all records"} <span aria-hidden="true">↘</span></Link>
+              <h1 id="archive-title">{locale === "vi" ? "Bộ sưu tập Meowhe" : "The Meowhe Archive"}</h1>
+              <p>{locale === "vi" ? "Ba phối màu. Một nhân vật. Khám phá từng phiên bản." : "Three colorways. One character. Explore each edition."}</p>
+              <Link className={styles.allRecords} href="#archive-records">{locale === "vi" ? "Xem các phối màu" : "View colorways"} <span aria-hidden="true">↘</span></Link>
             </div>
             <div className={styles.colorways} aria-label={locale === "vi" ? "Ba phối màu Meowhe trong kho lưu trữ" : "Three Meowhe colorways in the archive"}>
               {entries.slice(0, 3).map((entry, index) => (

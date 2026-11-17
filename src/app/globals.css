@@ -305,6 +305,55 @@ button { font: inherit; }
 @media (max-width: 900px) { .shop-route .shop-route-card { grid-template-columns: 6rem minmax(0, 1fr) auto; } .shop-route .shop-route-status { grid-column: 2; } .shop-route .shop-route-price { grid-column: 3; grid-row: 1; } .shop-route .shop-route-action { grid-column: 2 / -1; } }
 @media (max-width: 600px) { .shop-route .shop-route-heading { grid-template-columns: 1fr; } .shop-route .shop-route-card { grid-template-columns: 5rem minmax(0, 1fr); gap: .5rem 1rem; } .shop-route .shop-route-price { grid-column: 2; grid-row: auto; } .shop-route .shop-route-status { grid-column: 2; } .shop-route .shop-route-action { grid-column: 2; } .shop-route-section:has(#shop-filter-title) form > p { flex: 1 1 100%; } }
 
+/* A tiny live catalog is an object gallery, not a filter-first admin table. */
+.shop-route .shop-route-section--featured { padding-top: clamp(1.25rem, 3vw, 2.5rem); }
+.shop-route .shop-route-list--featured { border-top: 0; }
+.shop-route .shop-route-card--featured {
+  grid-template-columns: minmax(0, 1.12fr) minmax(15rem, .88fr);
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  grid-template-areas: "media details" "media status" "media price" "media action";
+  gap: .75rem clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(.75rem, 2vw, 1.5rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  background: rgba(255,255,255,.022);
+  align-items: start;
+}
+.shop-route .shop-route-card--featured > .shop-route-image { grid-area: media; }
+.shop-route .shop-route-card--featured > .shop-route-copy { grid-area: details; align-self: end; }
+.shop-route .shop-route-card--featured > .shop-route-status { grid-area: status; }
+.shop-route .shop-route-card--featured > .shop-route-price { grid-area: price; }
+.shop-route .shop-route-card--featured > .shop-route-action { grid-area: action; justify-self: start; align-self: start; min-height: 2.75rem; display: inline-flex; align-items: center; }
+.shop-route .shop-route-card--featured .shop-media { min-height: clamp(20rem, 35vw, 35rem); aspect-ratio: 1; }
+.shop-route .shop-route-card--featured .shop-route-copy h3 { font-size: clamp(2rem, 4vw, 4.3rem); }
+.shop-filter-disclosure { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.shop-filter-disclosure > summary { display: flex; align-items: center; min-height: 3rem; color: #e5dfda; cursor: pointer; font-size: .86rem; font-weight: 600; list-style: none; }
+.shop-filter-disclosure > summary::-webkit-details-marker { display: none; }
+.shop-filter-disclosure > summary::after { content: "+"; margin-left: auto; color: var(--muted-foreground); font-size: 1.2rem; }
+.shop-filter-disclosure[open] > summary::after { content: "−"; }
+.shop-filter-disclosure > summary:focus-visible { outline: 2px solid var(--ice); outline-offset: 4px; }
+.shop-filter-disclosure form { margin: .5rem 0 1rem; }
+@media (max-width: 900px) {
+  .shop-route .shop-route-card--featured {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas: "media" "details" "status" "price" "action";
+    gap: .65rem;
+  }
+  .shop-route .shop-route-card--featured .shop-media { min-height: 0; aspect-ratio: 1; }
+  .shop-route .shop-route-card--featured > .shop-route-copy { padding-top: .75rem; }
+  .shop-route .shop-route-card--featured > .shop-route-status,
+  .shop-route .shop-route-card--featured > .shop-route-price,
+  .shop-route .shop-route-card--featured > .shop-route-action { grid-column: auto; grid-row: auto; }
+}
+@media (max-width: 600px) {
+  .shop-route .shop-route-card--featured { grid-template-columns: minmax(0, 1fr); }
+  .shop-route .shop-route-hero { padding-bottom: 0; }
+  .shop-route .shop-route-section--featured { padding-top: 1rem; }
+  .shop-route .shop-route-card--featured .shop-route-copy h3 { font-size: clamp(2rem, 8vw, 3rem); }
+}
+
+
 .cart-route { min-height: calc(100svh - 4.75rem); padding-block: clamp(3rem, 7vw, 7rem); background: radial-gradient(circle at 84% 8%, rgba(185,233,255,.07), transparent 27%), radial-gradient(circle at 8% 62%, rgba(200,196,255,.045), transparent 28%), var(--background); }
 .cart-page-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(18rem, .65fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
 .cart-page-heading { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(18rem, .75fr); gap: clamp(1.5rem, 5vw, 5rem); align-items: end; padding-block: clamp(1rem, 4vw, 4rem); border-bottom: 1px solid var(--border); }

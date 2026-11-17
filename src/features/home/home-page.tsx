@@ -161,8 +161,8 @@ export async function HomePage() {
         <section className="home-gallery section border-t border-white/10 [content-visibility:auto] [contain-intrinsic-size:auto_980px]" aria-labelledby="gallery-title" data-home-3d-section="gallery">
           <Container>
             <header className="editorial-heading" data-luminal-reveal="copy">
-              <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("One character.")}<br />{tr("Three moods.")}</h2></div>
-              <p>{tr("A closer look at the colorful Lolipop, death-inspired Mictlán, and monochrome finishes from the studio archive.")}</p>
+              <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("One character.")}<br />{tr("Three colorways.")}</h2></div>
+              <p>{tr("Explore Lolipop, Mictlán and Mono.")}</p>
             </header>
             <HomeFlexGallery items={media.gallery} />
           </Container>
@@ -172,15 +172,15 @@ export async function HomePage() {
           <Container>
             <p className="eyebrow" data-luminal-reveal="copy">{tr("A studio in transition")}</p>
             <h2 id="revival-title" data-luminal-reveal="copy"><span>{tr("Lazy Factory")}</span><i aria-hidden="true">→</i>{tr("Luminal Factory")}</h2>
-            <p data-luminal-reveal="copy">{tr("Formerly Lazy Factory. The same independent hands, now with a clearer focus on light, material, and collectible character.")}</p>
+            <p data-luminal-reveal="copy">{tr("Same independent studio. A new chapter.")}</p>
           </Container>
         </section>
 
         <section className="made-at-luminal section overflow-visible md:pb-0" aria-labelledby="making-title">
           <Container>
             <header className="editorial-heading md:sticky md:top-20 md:z-30 md:bg-transparent md:pb-8" data-luminal-reveal="copy" data-made-at-luminal-header="true">
-              <div><p className="eyebrow">{tr("Made at Luminal")}</p><h2 id="making-title">{tr("From thought")}<br />{tr("to artifact.")}</h2></div>
-              <p>{tr("Four measured movements. Digital tools support the process; the final character still comes from the hand.")}</p>
+              <div><p className="eyebrow">{tr("Made at Luminal")}</p><h2 id="making-title">{tr("Made with intention.")}</h2></div>
+              <p>{tr("Designed digitally. Finished by hand.")}</p>
             </header>
             <MadeAtLuminalStack steps={content.process} />
           </Container>

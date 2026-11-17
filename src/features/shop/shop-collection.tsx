@@ -12,6 +12,7 @@ type ShopCollectionProps = Readonly<{
 export async function ShopCollection({ entries, source }: ShopCollectionProps) {
   const tr = await getTranslator();
   const locale = await getLocale();
+  const featured = entries.length === 1;
   if (entries.length === 0) {
     return (
       <section className="shop-route-section" aria-labelledby="shop-empty-title">
@@ -24,16 +25,18 @@ export async function ShopCollection({ entries, source }: ShopCollectionProps) {
   }
 
   return (
-    <section className="shop-route-section" aria-labelledby="shop-list-title">
+    <section className={`shop-route-section${featured ? " shop-route-section--featured" : ""}`} aria-labelledby="shop-list-title">
       <div className="shop-route-heading">
-        <p className="eyebrow">{tr("Curated object shelf")}</p>
-        <h2 id="shop-list-title">{locale === "vi" ? "Sản phẩm" : "Products"}</h2>
+        <p className="eyebrow">{locale === "vi" ? "BỘ SƯU TẬP" : "COLLECTION"}</p>
+        <h2 id="shop-list-title">{featured
+          ? (locale === "vi" ? "Sản phẩm nổi bật" : "Featured object")
+          : (locale === "vi" ? "Sản phẩm" : "Products")}</h2>
         <p>{locale === "vi" ? `${entries.length} sản phẩm` : `${entries.length} ${entries.length === 1 ? "product" : "products"}`}</p>
       </div>
-      <ol className="shop-route-list">
+      <ol className={`shop-route-list${featured ? " shop-route-list--featured" : ""}`}>
         {entries.map((entry, index) => (
-          <li key={entry.id} className="shop-route-card">
-            <Link href={entry.href} className="shop-route-image" aria-label={`${tr("Xem object detail")}: ${entry.title}`}><ShopMedia media={entry.media} sizes="(max-width: 700px) 25vw, 160px" /></Link>
+          <li key={entry.id} className={`shop-route-card${featured ? " shop-route-card--featured" : ""}`}>
+            <Link href={entry.href} className="shop-route-image" aria-label={`${tr("Xem object detail")}: ${entry.title}`}><ShopMedia media={entry.media} sizes={featured ? "(max-width: 900px) 90vw, 46vw" : "(max-width: 700px) 25vw, 160px"} /></Link>
             <div className="shop-route-copy">
               <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
               <p>{tr(entry.collection)} · {tr(entry.type)}</p>

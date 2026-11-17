@@ -38,9 +38,9 @@ export const homePageContent = {
     { mediaKey: "mictlan", recordHref: "/archive/meowhe-mictlan", title: "Mictlán", collection: "Lazy Factory archive", year: "2023", tone: "rose" },
   ] satisfies readonly HomeArchiveObject[],
   process: [
-    { number: "01", title: "Concept", copy: "A personality, a gesture, and a story establish the object before its form." },
-    { number: "02", title: "Sculpt", copy: "Proportion and expression are explored in the studio—not published as production masters." },
-    { number: "03", title: "Making", copy: "Each small run is cast, assembled, and considered by hand." },
-    { number: "04", title: "Finish", copy: "Surface, color, and reflected light give every object its final presence." },
+    { number: "01", title: "Concept", copy: "Every character starts with an idea." },
+    { number: "02", title: "Sculpt", copy: "Form and expression take shape digitally." },
+    { number: "03", title: "Making", copy: "Cast and assembled in small batches." },
+    { number: "04", title: "Finish", copy: "Every piece is finished by hand." },
   ],
 } as const;

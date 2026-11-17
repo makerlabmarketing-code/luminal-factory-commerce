@@ -83,7 +83,34 @@ try {
       const { page, info, errors } = await visit(context, "/shop", size);
       assert.equal(await page.locator("main.shop-route").count(), 1, "Shop route missing");
       await capture(page, `shop-${size.name}`);
-      report.push({ route: "/shop", viewport: size.name, ...info, pageErrors: errors });
+      const featured = page.locator(".shop-route-section--featured");
+      let productFirst = false;
+      let productImageWidth = null;
+      if (await featured.count() === 1) {
+        const filters = page.locator(".shop-route-filters");
+        const positions = await page.evaluate(() => {
+          const product = document.querySelector(".shop-route-section--featured");
+          const filters = document.querySelector(".shop-route-filters");
+          return {
+            productTop: product.getBoundingClientRect().top + scrollY,
+            filtersTop: filters.getBoundingClientRect().top + scrollY,
+          };
+        });
+        assert.ok(positions.productTop < positions.filtersTop, "Single published object must appear before search filters");
+        const details = filters.locator("details");
+        assert.equal(await details.evaluate((el) => el.open), false, "Filters should start collapsed on a small unfiltered catalog");
+        productImageWidth = Math.round(await featured.locator(".shop-route-image").first()
+          .evaluate((element) => element.getBoundingClientRect().width));
+        assert.ok(productImageWidth >= Math.min(250, size.width * .65),
+          "A featured keycap photo must not shrink to a tiny thumbnail");
+        await featured.scrollIntoViewIfNeeded();
+        await capture(page, `shop-product-${size.name}`);
+        await details.locator("summary").click();
+        assert.equal(await details.evaluate((el) => el.open), true, "Filters must remain operable");
+        assert.equal(await details.locator('input[name="q"]').count(), 1, "Search input missing");
+        productFirst = true;
+      }
+      report.push({ route: "/shop", viewport: size.name, productFirst, productImageWidth, ...info, pageErrors: errors });
       await page.close();
     }
 
@@ -100,4 +127,4 @@ for (const entry of report) {
   process.stdout.write(JSON.stringify(entry) + "\n");
 }
 if (failed) process.exitCode = 1;
-else process.stdout.write("LUMINAL_VISUAL_SMOKE_PASS: 3 routes, 4 viewports, 20 screenshots; CSS and responsive geometry checked.\n");
+else process.stdout.write("LUMINAL_VISUAL_SMOKE_PASS: 3 routes, 4 viewports, 20+ screenshots; CSS and responsive geometry checked.\n");
