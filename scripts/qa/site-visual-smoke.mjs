@@ -82,8 +82,15 @@ try {
     {
       const { page, info, errors } = await visit(context, "/shop", size);
       assert.equal(await page.locator("main.shop-route").count(), 1, "Shop route missing");
-      await capture(page, `shop-${size.name}`);
       const featured = page.locator(".shop-route-section--featured");
+      if (await featured.count() === 1 && await featured.locator(".shop-route-image img").count() > 0) {
+        // Real approved catalog image must decode without a manual scroll or a fixture fallback.
+        await page.waitForFunction(() => {
+          const image = document.querySelector(".shop-route-card--featured .shop-route-image img");
+          return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0;
+        }, null, { timeout: 15_000 });
+      }
+      await capture(page, `shop-${size.name}`);
       let productFirst = false;
       let productImageWidth = null;
       if (await featured.count() === 1) {

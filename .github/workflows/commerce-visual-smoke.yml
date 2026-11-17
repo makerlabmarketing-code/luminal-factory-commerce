@@ -7,9 +7,13 @@ on:
       - ".github/workflows/commerce-visual-smoke.yml"
       - "scripts/qa/site-visual-smoke.mjs"
       - "src/app/globals.css"
-      - "src/app/[locale]/archive/**"
-      - "src/app/[locale]/shop/**"
+      - "src/app/*/archive/**"
+      - "src/app/*/shop/**"
+      - "src/features/archive/**"
+      - "src/features/shop/**"
       - "src/features/home/**"
+      - "src/content/homepage.ts"
+      - "src/lib/i18n/copy.json"
   workflow_dispatch:
 
 permissions:
