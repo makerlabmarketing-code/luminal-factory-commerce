@@ -32,3 +32,13 @@ test("Guest-facing navigation and home calls to action prioritize Raffle", () =>
   assert.match(raffle, /No raffle releases are announced yet/);
   assert.doesNotMatch(paused, /Buy now|Checkout|Add to cart/i);
 });
+
+test("Mobile Raffle stage has a full-width single-column rule after desktop styles", () => {
+  const css = read("src/features/raffle/raffle-discovery.module.css");
+  const lastMedia = css.lastIndexOf("@media (max-width: 700px)");
+  const desktop = css.indexOf(".program { position: relative;");
+  assert.ok(lastMedia > desktop, "The final mobile rule must override the desktop grid");
+  assert.match(css.slice(lastMedia), /\.program\s*\{\s*grid-template-columns: minmax\(0, 1fr\)/);
+  assert.match(css.slice(lastMedia), /\.programCopy \{ min-width: 0; max-width: 100%; \}/);
+  assert.match(paused, /href="\/raffle" style=\{\{ color: "#080808" \}\}/);
+});

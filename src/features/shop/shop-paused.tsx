@@ -18,7 +18,7 @@ export async function ShopPaused() {
               ? "Hiện tại Luminal tập trung vào các đợt raffle. Hãy xem lịch phát hành và bộ sưu tập Meowhe."
               : "We're focusing on raffle releases for now. Explore announced raffles or revisit the Meowhe archive."}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link className="button-link" href="/raffle">{vi ? "Khám phá Raffle" : "Explore Raffles"}</Link>
+              <Link className="button-link" href="/raffle" style={{ color: "#080808" }}>{vi ? "Khám phá Raffle" : "Explore Raffles"}</Link>
               <Link className="button-link button-secondary" href="/archive">{vi ? "Xem Archive" : "View Archive"}</Link>
             </div>
           </section>

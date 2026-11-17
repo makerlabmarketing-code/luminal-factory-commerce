@@ -34,3 +34,23 @@
 :global(.raffle-demo-time span) { display: grid; font-size: clamp(2rem, 4vw, 3.8rem); line-height: 1; }
 :global(.raffle-demo-time small) { margin-top: .25rem; color: #aa9682; font-size: .58rem; font-weight: 400; letter-spacing: .12em; }
 :global(.raffle-demo-time b) { font-size: clamp(2rem, 4vw, 3.8rem); font-weight: 300; line-height: .8; }
+
+/* Keep the mobile one-column rule after the desktop stage declaration.
+ * Earlier mobile declarations were shadowed by the later .program rule. */
+@media (max-width: 700px) {
+  .program {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    gap: 2rem;
+    padding: clamp(1.25rem, 5vw, 2rem);
+  }
+  .programCopy { min-width: 0; max-width: 100%; }
+  .programCopy h2 { font-size: clamp(2.25rem, 9vw, 3.75rem); }
+  .programCopy > p:not(.programEyebrow) {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+  .programObject { width: min(55vw, 13rem); }
+  .program::after { inset: 35% 0 0; mask-image: linear-gradient(transparent, #000); }
+}
