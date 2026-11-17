@@ -27,12 +27,13 @@ export type CustomerRaffleHistoryItem = RaffleHistoryItem;
 
 /**
  * Read-only, feature-gated customer history. Never accept an email from the
- * client: a verified Supabase Auth user is the only source of identity.
+ * client: a verified Supabase Auth user bound to customers.id owns entries.
  * Do not expose address/contact fields or unpublished selection decisions.
  */
 export async function getCustomerRaffleHistory(): Promise<
   { state: "disabled" | "signed_out" | "ready" | "unavailable"; items: CustomerRaffleHistoryItem[] }
 > {
+  // Requires rollout of the reviewed customer_id schema migration first.
   if (process.env.COMMERCE_CUSTOMER_RAFFLE_HISTORY_ENABLED !== "true" ||
       process.env.COMMERCE_CUSTOMER_AUTH_ENABLED !== "true") {
     return { state: "disabled", items: [] };
@@ -64,9 +65,23 @@ export async function getCustomerRaffleHistory(): Promise<
     const admin = createClient(url, secret, {
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     });
+    // Stable ownership: resolve the currently verified Auth user to exactly
+    // one customer. Never grant history using email equality alone.
+    const { data: customer, error: customerError } = await admin.from("customers")
+      .select("id,email")
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
+    if (customerError) return { state: "unavailable", items: [] };
+    if (!customer) return { state: "ready", items: [] };
+    if (customer.email.trim().toLowerCase() !== email) {
+      // Account email changed. Ownership needs explicit re-verification,
+      // never silently bind guest entries belonging to an old email.
+      return { state: "unavailable", items: [] };
+    }
+
     const { data, error } = await admin.from("raffle_entries")
       .select("id,created_at,raffles!inner(title,slug,is_test,is_published,results_published_at,status)")
-      .eq("email_normalized", email)
+      .eq("customer_id", customer.id)
       .eq("raffles.is_test", false)
       .eq("raffles.is_published", true)
       .order("created_at", { ascending: false })
