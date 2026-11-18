@@ -128,7 +128,14 @@ test("production source has no Drive or legacy hotlink and preserves current bra
   assert.doesNotMatch(productionSource, /drive\.google\.com|googleusercontent\.com|hostingersite\.com/i);
   assert.doesNotMatch(productionSource, /https?:\/\/[^\s"')]+\.(?:png|jpe?g|webp|avif|gif|mp4|webm)/i);
   assert.doesNotMatch(read("src/components/layout/header.tsx") + read("src/components/layout/footer.tsx"), /LazyFactory/i);
-  assert.doesNotMatch(productionSource, /from\(["'`] |supabase\.|create table|service_role/i);
+  // The previous global scan incorrectly rejected server-only Supabase Auth.
+  // SQL DDL and accidental embedded database credentials remain forbidden.
+  assert.doesNotMatch(productionSource, /\bcreate\s+table\b|SUPABASE_DB_PASSWORD/i);
+  // Privileged credentials and service role references must not be shipped
+  // in explicitly client-side components.
+  const clientModules = walk("src").filter((path) => /\.(ts|tsx)$/.test(path) &&
+    /^\s*["']use client["'];?/.test(read(path))).map(read).join("\n");
+  assert.doesNotMatch(clientModules, /service_role|SUPABASE_SECRET_KEY|\bsb_secret_|\bcreate\s+table\b/i);
 });
 
 test("approved local Luminal logo is integrated accessibly without changing navigation", () => {
