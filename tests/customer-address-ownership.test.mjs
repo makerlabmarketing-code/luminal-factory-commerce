@@ -45,7 +45,17 @@ const compiled = ts.transpileModule(readFileSync("src/features/account/customer-
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
 }).outputText;
 const mod = { exports: {} };
-new Function("require", "module", "exports", compiled)((name) => {
+// The server adapter executes in an isolated VM-like Function scope.
+ // Inject a stable fixture environment rather than mutating process.env:
+ // global dotenv/Node test runner state must not affect this test suite.
+const fixtureProcess = {
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-publishable-key",
+    COMMERCE_SAVED_ADDRESSES_ENABLED: "true",
+  },
+};
+new Function("require", "module", "exports", "process", compiled)((name) => {
   if (name === "server-only") return {};
   if (name === "@supabase/ssr") return { createServerClient: () => client };
   if (name === "next/headers") return { cookies: async () => ({ getAll: () => [] }) };
@@ -58,23 +68,8 @@ new Function("require", "module", "exports", compiled)((name) => {
     customerAddressSchema: { parse: value => value },
   };
   return require(name);
-}, mod, mod.exports);
+}, mod, mod.exports, fixtureProcess);
 const { getAddressContext, listCustomerAddresses } = mod.exports;
-
-const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const previousKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
-process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "test-publishable-key";
-const priorFlag = process.env.COMMERCE_SAVED_ADDRESSES_ENABLED;
-test.after(() => {
-  if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL;
-  else process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl;
-  if (previousKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  else process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = previousKey;
-  if (priorFlag === undefined) delete process.env.COMMERCE_SAVED_ADDRESSES_ENABLED;
-  else process.env.COMMERCE_SAVED_ADDRESSES_ENABLED = priorFlag;
-});
-process.env.COMMERCE_SAVED_ADDRESSES_ENABLED = "true";
 
 test("verified Customer A reads only own addresses", async () => {
   currentUser = users.alice;
@@ -110,9 +105,9 @@ test("a verified user without customer binding cannot query another customer's a
 
 test("saved addresses are feature-gated even for verified sessions", async () => {
   currentUser = users.alice;
-  process.env.COMMERCE_SAVED_ADDRESSES_ENABLED = "false";
+  fixtureProcess.env.COMMERCE_SAVED_ADDRESSES_ENABLED = "false";
   queries.length = 0;
   assert.equal(await getAddressContext(), null);
   assert.deepEqual(queries, []);
-  process.env.COMMERCE_SAVED_ADDRESSES_ENABLED = "true";
+  fixtureProcess.env.COMMERCE_SAVED_ADDRESSES_ENABLED = "true";
 });
