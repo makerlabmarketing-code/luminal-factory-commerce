@@ -73,7 +73,8 @@ test('proxy sends public Vietnamese links and stale language preferences to Engl
   assert.equal(result.headers.get('Cache-Control'), 'private, no-store, max-age=0');
   assert.equal(result.headers.get('Vary'), 'Cookie');
   await proxy(request('/en/account'));
-  assert.equal(refreshes, 3);
+  // Cart, account and account API routes now all refresh the private session.
+  assert.equal(refreshes, 4);
 });
 
 test('Production metadata and sitemap have an absolute verified origin even without an environment override', () => {
