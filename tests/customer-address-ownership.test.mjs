@@ -61,8 +61,16 @@ new Function("require", "module", "exports", compiled)((name) => {
 }, mod, mod.exports);
 const { getAddressContext, listCustomerAddresses } = mod.exports;
 
+const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const previousKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
+process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "test-publishable-key";
 const priorFlag = process.env.COMMERCE_SAVED_ADDRESSES_ENABLED;
 test.after(() => {
+  if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+  else process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl;
+  if (previousKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  else process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = previousKey;
   if (priorFlag === undefined) delete process.env.COMMERCE_SAVED_ADDRESSES_ENABLED;
   else process.env.COMMERCE_SAVED_ADDRESSES_ENABLED = priorFlag;
 });
