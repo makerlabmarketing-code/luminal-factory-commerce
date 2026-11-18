@@ -2,6 +2,7 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getCustomerAuthEnvironment } from "@/features/auth/customer-auth-request";
+import { getVerifiedCustomerIdentity } from "@/features/auth/verified-customer-identity";
 import type { AddressDatabase, CustomerAddress } from "@/features/account/customer-address-contract";
 import { customerAddressSchema } from "@/features/account/customer-address-contract";
 import type { z } from "zod";
@@ -23,12 +24,14 @@ export async function getAddressContext() {
 
   const client = createClient(await cookies());
   const { data, error } = await client.auth.getUser();
-  if (error || !data.user) return null;
+  // A session is insufficient: require a verified Supabase Auth identity.
+  const identity = error ? null : getVerifiedCustomerIdentity(data.user);
+  if (!identity) return null;
 
   const { data: customer, error: customerError } = await client
     .from("customers")
     .select("id")
-    .eq("auth_user_id", data.user.id)
+    .eq("auth_user_id", identity.authUserId)
     .maybeSingle();
   if (customerError) throw new Error("Address service unavailable.");
 
