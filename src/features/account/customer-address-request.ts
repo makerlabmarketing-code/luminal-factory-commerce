@@ -20,18 +20,22 @@ export async function handleAddressRequest(request: Request): Promise<Response> 
   }
 
   const origin = request.headers.get("origin");
+  // An allowlisted host does not authorize modifying a different host.
+  const requestOrigin = new URL(request.url).origin;
   const site = request.headers.get("sec-fetch-site");
   if (
     request.method !== "GET" &&
     (!origin ||
       !environment.allowedOrigins.has(origin) ||
+      origin !== requestOrigin ||
       (site !== null && site !== "same-origin") ||
       request.headers.get("x-luminal-address-request") !== "1" ||
       request.headers.get("content-type")?.split(";")[0] !== "application/json")
   ) {
     return failure(403, "invalid_request");
   }
-  if (request.method === "GET" && origin && !environment.allowedOrigins.has(origin)) {
+  if (request.method === "GET" && origin &&
+    (!environment.allowedOrigins.has(origin) || origin !== requestOrigin)) {
     return failure(403, "invalid_request");
   }
 
@@ -41,8 +45,14 @@ export async function handleAddressRequest(request: Request): Promise<Response> 
     }
     if (request.method !== "POST") return failure(405, "invalid_request");
 
-    const length = Number(request.headers.get("content-length") ?? "0");
-    if (length > MAX_BYTES) return failure(413, "invalid_request");
+    const declaredLength = request.headers.get("content-length");
+    if (declaredLength !== null && !/^\d+$/.test(declaredLength)) {
+      return failure(400, "invalid_request");
+    }
+    const length = declaredLength === null ? 0 : Number(declaredLength);
+    if (!Number.isSafeInteger(length) || length > MAX_BYTES) {
+      return failure(413, "invalid_request");
+    }
     const text = await request.text();
     if (Buffer.byteLength(text, "utf8") > MAX_BYTES) return failure(413, "invalid_request");
 
