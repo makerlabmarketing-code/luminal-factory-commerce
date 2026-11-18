@@ -40,7 +40,7 @@ export default async function AccountPage({ searchParams }: Readonly<{ searchPar
       </div>
       {history.state === "unavailable" ? <p role="status">Raffle history is temporarily unavailable.</p> :
         history.state === "signed_out" ? <p role="status">Sign in with a verified email to view your history.</p> :
-        history.items.length === 0 ? <p role="status">You haven't entered a raffle yet.</p> :
+        history.items.length === 0 ? <p role="status">You haven&apos;t entered a raffle yet.</p> :
         <ul className="account-raffle-history-list">
           {history.items.map(item => <li key={item.id} className="account-session">
             <h3>{item.title}</h3>
