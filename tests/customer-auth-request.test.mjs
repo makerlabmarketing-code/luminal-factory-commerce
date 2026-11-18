@@ -343,7 +343,13 @@ test("route and server adapter keep Auth dynamic, private and fresh-user verifie
   assert.match(adapter, /captchaToken/);
   assert.match(adapter, /shouldCreateUser: true/);
   assert.match(adapter, /auth\.getUser\(\)/);
-  assert.match(adapter, /authUserId: confirmed\.user\.id/);
+  // Verify the new shared guard rather than an obsolete inline return shape.
+  const identityGuard = readFileSync("src/features/auth/verified-customer-identity.ts", "utf8");
+  assert.match(adapter, /getVerifiedCustomerIdentity\(confirmed\.user, input\.email\)/);
+  assert.match(adapter, /identity\.authUserId !== data\.user\.id/);
+  assert.match(adapter, /getVerifiedCustomerIdentity\(data\.user\)/);
+  assert.match(identityGuard, /!user\.email_confirmed_at/);
+  assert.match(identityGuard, /expectedEmail !== email/);
   assert.match(route, /getServerCustomerCartMergeService/);
   assert.match(route, /GUEST_CART_COOKIE_NAME/);
   assert.match(route, /createGuestCartCookieRemoval/);
