@@ -19,7 +19,10 @@ test("saved addresses remain behind an independent default-off gate", () => {
 
 test("address access uses verified identity and explicit ownership", () => {
   assert.match(service, /client\.auth\.getUser\(\)/);
-  assert.match(service, /eq\("auth_user_id", data\.user\.id\)/);
+  // Auth identities must be verified before resolving customer ownership.
+  assert.match(service, /getVerifiedCustomerIdentity\(data\.user\)/);
+  assert.match(service, /if \(!identity\) return null/);
+  assert.match(service, /eq\("auth_user_id", identity\.authUserId\)/);
   assert.match(service, /eq\("customer_id", context\.customerId\)/);
   assert.doesNotMatch(service, /service_role|SUPABASE_SECRET_KEY|user_metadata/);
 });
