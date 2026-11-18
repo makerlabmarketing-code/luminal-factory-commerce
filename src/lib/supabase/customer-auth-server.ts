@@ -3,6 +3,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { CustomerAuthService } from "@/features/auth/customer-auth-request";
 import type { Database } from "@/lib/supabase/database.types";
+import { getVerifiedCustomerIdentity } from "@/features/auth/verified-customer-identity";
 
 type AuthCookieStore = Readonly<{
   getAll(): Array<Readonly<{ name: string; value: string }>>;
@@ -42,16 +43,15 @@ export function createServerCustomerAuthService(cookieStore: AuthCookieStore): C
       if (error || !data.user) return null;
 
       const { data: confirmed, error: confirmationError } = await client.auth.getUser();
-      const confirmedEmail = confirmed.user?.email?.trim().toLowerCase();
-      if (
-        confirmationError ||
-        !confirmed.user ||
-        confirmed.user.id !== data.user.id ||
-        confirmedEmail !== input.email
-      ) {
+      const identity = confirmationError
+        ? null
+        : getVerifiedCustomerIdentity(confirmed.user, input.email);
+      if (!identity || identity.authUserId !== data.user.id) {
+        // Never preserve an authenticated session from a failed identity check.
+        await client.auth.signOut({ scope: "local" });
         return null;
       }
-      return { authUserId: confirmed.user.id, email: confirmedEmail };
+      return identity;
     },
     async signOut() {
       const { error } = await client.auth.signOut({ scope: "local" });
@@ -77,5 +77,5 @@ export async function getServerCustomerAuthEmail(): Promise<string | null> {
     },
   });
   const { data, error } = await client.auth.getUser();
-  return error === null ? data.user?.email ?? null : null;
+  return error === null ? getVerifiedCustomerIdentity(data.user)?.email ?? null : null;
 }
