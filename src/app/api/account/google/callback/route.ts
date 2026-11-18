@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/lib/supabase/database.types";
 import { getCustomerAuthEnvironment } from "@/features/auth/customer-auth-request";
+import { getVerifiedCustomerIdentity } from "@/features/auth/verified-customer-identity";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
     return response;
   }
   const verified = await client.auth.getUser();
-  if (verified.error || !verified.data.user?.email_confirmed_at) {
+  if (verified.error || !getVerifiedCustomerIdentity(verified.data.user)) {
     await client.auth.signOut({ scope: "local" });
     accountUrl.searchParams.set("auth_error", "google");
   }
