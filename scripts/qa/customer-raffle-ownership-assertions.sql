@@ -71,6 +71,18 @@ BEGIN
   EXCEPTION WHEN unique_violation THEN NULL;
   END;
 
+  -- Claimed history must not become unowned when its Customer is deleted.
+  -- A future account with the previous email could otherwise inherit it.
+  BEGIN
+    DELETE FROM public.customers WHERE id = cida;
+    RAISE EXCEPTION 'Claimed customer was deleted and history orphaned';
+  EXCEPTION WHEN foreign_key_violation THEN NULL;
+  END;
+  IF (SELECT count(*) FROM public.raffle_entries
+      WHERE customer_id = cida) <> 3 THEN
+    RAISE EXCEPTION 'Claimed entries were detached from original customer';
+  END IF;
+
   IF (SELECT count(*) FROM public.customers) <> 2 THEN
     RAISE EXCEPTION 'Unexpected customer duplication';
   END IF;
