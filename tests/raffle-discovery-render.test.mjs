@@ -12,7 +12,8 @@ const mod = { exports: {} };
 const code = ts.transpileModule(readFileSync('src/features/raffle/raffle-discovery.tsx', 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
 }).outputText;
-new Function('require', 'module', 'exports', code)(name => {
+try {
+  new Function('require', 'module', 'exports', code)(name => {
   if (name === '@/lib/i18n/server') return { getLocale: async () => locale, getTranslator: async () => text => dictionary[text]?.[locale === 'vi' ? 1 : 0] ?? text };
   if (name === '@/lib/i18n/locale') return { localeHref: href => `/${locale}${href}` };
   if (name === '@/lib/i18n/link') return { default: ({ href, children, ...props }) => React.createElement('a', { ...props, href: `/${locale}${href}` }, children), __esModule: true };
@@ -24,8 +25,19 @@ new Function('require', 'module', 'exports', code)(name => {
   if (name === './raffle-countdown-demo') return { RaffleCountdownDemo: ({ locale }) => React.createElement('aside', null, locale === 'vi' ? 'BẢN XEM THỬ · KHÔNG MỞ ĐĂNG KÝ' : 'PREVIEW · ENTRIES ARE NOT OPEN') };
   if (name.endsWith('.css')) return {};
   if (name === './raffle-cover') return { RaffleCover: ({ src, alt }) => React.createElement('img', { src, alt }) };
+  // A missing internal mock must fail with the actual dependency name instead
+  // of a vague module-not-found error in the aggregate CI test output.
+  if (name.startsWith('@/') || name.startsWith('./')) {
+    throw new Error(`Raffle render test has no mock for dependency: ${name}`);
+  }
   return require(name);
-}, mod, mod.exports);
+  }, mod, mod.exports);
+} catch (error) {
+  // Do not suppress test failures. Print the original stack close to the
+  // bootstrap so that GitHub Actions surfaces the root error before its tail.
+  console.error('Raffle render bootstrap failed:', error);
+  throw error;
+}
 const render = async releases => renderToStaticMarkup(await mod.exports.RaffleDiscovery({ releases, locale }));
 
 test('both locales distinguish unavailable/disabled from verified empty and localize retry/navigation', async () => {
