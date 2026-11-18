@@ -10,7 +10,7 @@ const payload={entryId:'550e8400-e29b-41d4-a716-446655440000',email:'guest@examp
 test('confirmation escapes customer input, strips subject newlines and says entry is not a win',()=>{
  const mail=buildRaffleConfirmation(payload);
  assert(!mail.html.includes('<img'));assert(mail.html.includes('&lt;img'));
- assert(!/[\r\n]/.test(mail.subject));assert(mail.text.includes('chưa phải xác nhận được chọn mua'));
+ assert(!/[\r\n]/.test(mail.subject));assert(mail.text.includes('This is not a winning notification or a purchase confirmation.'));
  assert(!confirmationPayloadSchema.safeParse({...payload,slug:'//evil.test'}).success);
 });
 test('retries reuse the same provider key and send only the transactional recipient',async()=>{
