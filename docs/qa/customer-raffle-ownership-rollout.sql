@@ -3,11 +3,13 @@
 -- an isolated database. This file is a proposal, not a migration history entry.
 -- customer_id links a verified customer to each immutable entry; shipping
 -- snapshots remain in their existing protected table.
+-- RESTRICT prevents deleted customers from orphaning previously claimed entries
+-- and allowing future holders of a recycled email to claim them.
 BEGIN;
 
 ALTER TABLE public.raffle_entries
   ADD COLUMN IF NOT EXISTS customer_id uuid
-  REFERENCES public.customers(id) ON DELETE SET NULL;
+  REFERENCES public.customers(id) ON DELETE RESTRICT;
 
 CREATE INDEX IF NOT EXISTS raffle_entries_customer_created_idx
   ON public.raffle_entries (customer_id, created_at DESC)
@@ -102,3 +104,4 @@ COMMIT;
 -- 9. Only the new verified email may claim new unlinked entries; old email must not auto-claim.
 -- 6. Direct select on private raffle shipping data remains denied.
 -- 7. Deploy schema before enabling COMMERCE_CUSTOMER_RAFFLE_HISTORY_ENABLED.
+-- 10. Deleting a Customer with claimed entries must be blocked, not orphan history.
