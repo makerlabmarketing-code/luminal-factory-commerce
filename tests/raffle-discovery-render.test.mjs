@@ -20,6 +20,7 @@ new Function('require', 'module', 'exports', code)(name => {
   if (name === '@/components/discovery/meowhe-story') return { meowheDiscoveryStory: () => 'Meowhe story' };
   if (name === '@/features/archive/archive-content') return { getCuratedArchiveEntries: () => [] };
   if (name === 'next/image') return { default: ({ src, alt }) => React.createElement('img', { src, alt }), __esModule: true };
+  if (name === './raffle-detail-service') return { isRaffleEntryPresentationEnabled: () => false };
   if (name === './raffle-countdown-demo') return { RaffleCountdownDemo: ({ locale }) => React.createElement('aside', null, locale === 'vi' ? 'BẢN XEM THỬ · KHÔNG MỞ ĐĂNG KÝ' : 'PREVIEW · ENTRIES ARE NOT OPEN') };
   if (name.endsWith('.css')) return {};
   if (name === './raffle-cover') return { RaffleCover: ({ src, alt }) => React.createElement('img', { src, alt }) };
