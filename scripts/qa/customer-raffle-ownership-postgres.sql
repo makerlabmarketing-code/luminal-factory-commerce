@@ -30,6 +30,9 @@ INSERT INTO public.raffle_entries(id,email_normalized) VALUES
 
 GRANT USAGE ON SCHEMA public TO service_role;
 GRANT SELECT, INSERT, UPDATE ON public.customers, public.raffle_entries TO service_role;
+-- The deletion protection assertion needs DELETE privilege. Otherwise it
+-- would only test a permission error rather than the actual FK restriction.
+GRANT DELETE ON public.customers TO service_role;
 -- Keep source tables private: even with table privileges, RLS denies clients.
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.raffle_entries ENABLE ROW LEVEL SECURITY;
