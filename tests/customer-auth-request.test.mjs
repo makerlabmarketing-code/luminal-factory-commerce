@@ -167,6 +167,36 @@ test("Auth request boundary rejects cross-origin, unsupported content and missin
   }
 });
 
+test("allowlisted Preview host cannot send Auth writes to a different allowed host", async () => {
+  const previewOrigin = "https://preview.luminalfactory.com";
+  const { service, calls } = createService();
+  const environment = getCustomerAuthEnvironment({
+    COMMERCE_CUSTOMER_AUTH_ENABLED: "true",
+    COMMERCE_CUSTOMER_AUTH_ALLOWED_ORIGINS: `${ORIGIN},${previewOrigin}`,
+    NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "public-key",
+    NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: "turnstile-site-key",
+    COMMERCE_CUSTOMER_AUTH_RATE_LIMIT_SECRET: RATE_SECRET,
+  });
+  assert.equal(environment.ready, true);
+  const request = createRequest({ action: "sign_out" }, { origin: previewOrigin });
+  assert.deepEqual(await handleCustomerAuthRequest(request, dependencies({ environment, service })), {
+    status: 403, body: { ok: false, code: "invalid_request" },
+  });
+  assert.equal(calls.signOut, 0);
+});
+
+test("Auth rejects malformed and oversized content lengths without provider calls", async () => {
+  const { service, calls } = createService();
+  for (const value of ["invalid", "-1", "1.5", "Infinity", "999999999999999999"]) {
+    const request = createRequest({ action: "sign_out" }, { "content-length": value });
+    assert.deepEqual(await handleCustomerAuthRequest(request, dependencies({ service })), {
+      status: 400, body: { ok: false, code: "invalid_request" },
+    });
+  }
+  assert.equal(calls.signOut, 0);
+});
+
 test("OTP request requires CAPTCHA, normalizes email and returns no identity data", async () => {
   const { service, calls } = createService();
   const outcome = await handleCustomerAuthRequest(createRequest({

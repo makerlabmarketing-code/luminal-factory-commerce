@@ -150,8 +150,10 @@ function failure(
 }
 
 async function parseRequestBody(request: Request): Promise<z.infer<typeof customerAuthRequestSchema> | null> {
-  const contentLength = Number.parseInt(request.headers.get("content-length") ?? "0", 10);
-  if (Number.isFinite(contentLength) && contentLength > CUSTOMER_AUTH_REQUEST_MAX_BYTES) return null;
+  const declaredLength = request.headers.get("content-length");
+  if (declaredLength !== null && !/^\d+$/.test(declaredLength)) return null;
+  const contentLength = declaredLength === null ? 0 : Number(declaredLength);
+  if (!Number.isSafeInteger(contentLength) || contentLength > CUSTOMER_AUTH_REQUEST_MAX_BYTES) return null;
 
   try {
     const text = await request.text();
@@ -191,11 +193,14 @@ export async function handleCustomerAuthRequest(
 
   const contentType = request.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase() ?? "";
   const origin = request.headers.get("origin");
+  // Reject requests originating from another allowed deployment hostname.
+  const requestOrigin = new URL(request.url).origin;
   const fetchSite = request.headers.get("sec-fetch-site");
   if (
     contentType !== "application/json" ||
     !origin ||
     !dependencies.environment.allowedOrigins.has(origin) ||
+    origin !== requestOrigin ||
     request.headers.get(CUSTOMER_AUTH_REQUEST_HEADER) !== CUSTOMER_AUTH_REQUEST_HEADER_VALUE ||
     (fetchSite !== null && fetchSite !== "same-origin")
   ) {
