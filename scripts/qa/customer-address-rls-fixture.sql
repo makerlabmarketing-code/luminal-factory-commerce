@@ -12,6 +12,8 @@ create table public.customers (
   id uuid primary key,
   auth_user_id uuid unique not null
 );
+-- The real customers table is RLS protected. The fixture must be too.
+alter table public.customers enable row level security;
 create function public.commerce_set_updated_at()
 returns trigger language plpgsql set search_path = ''
 as $$
