@@ -55,6 +55,7 @@ jobs:
           fi
           bash scripts/qa/run-commerce-admin-postgres.sh
           bash scripts/qa/run-customer-raffle-ownership-postgres.sh
+          bash scripts/qa/run-customer-address-rls-postgres.sh
 
       # Isolate the known flaky render contract so failures show the original
       # exception, not only the final "test failed" line in a large npm log.
