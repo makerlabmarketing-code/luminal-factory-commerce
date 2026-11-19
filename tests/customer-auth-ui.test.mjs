@@ -33,6 +33,18 @@ test("Account OTP form uses explicit Turnstile and accessible staged controls", 
   assert.doesNotMatch(`${panel}\n${client}`, /console\.|localStorage|sessionStorage/);
 });
 
+test("Google OAuth entry uses a full browser navigation, never a prefetched Next Link", () => {
+  const panel = read("src/features/auth/customer-account-panel.tsx");
+  const start = read("src/app/api/account/google/route.ts");
+  const callback = read("src/app/api/account/google/callback/route.ts");
+  assert.match(panel, /<a className="button-link account-submit" href="\/api\/account\/google">Continue with Google<\/a>/);
+  assert.doesNotMatch(panel, /import Link from "next\/link"/);
+  assert.match(start, /skipBrowserRedirect: true/);
+  assert.match(start, /api\/account\/google\/callback/);
+  assert.match(callback, /exchangeCodeForSession\(code\)/);
+  assert.match(callback, /getVerifiedCustomerIdentity\(verified\.data\.user\)/);
+});
+
 test("Account session refresh is limited to Account routes and remains runtime-gated", () => {
   const proxyEntry = read("src/proxy.ts");
   const proxyService = read("src/lib/supabase/customer-auth-proxy.ts");

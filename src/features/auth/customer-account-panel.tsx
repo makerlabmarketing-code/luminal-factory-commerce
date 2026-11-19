@@ -3,7 +3,6 @@ import { useTranslator, useLocale } from "@/lib/i18n/client";
 
 
 import Script from "next/script";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
 import {
@@ -189,7 +188,7 @@ export function CustomerAccountPanel({ siteKey, initialEmail, googleEnabled = fa
         </p>
       </div>
 
-      {stage === "email" && googleEnabled ? <Link className="button-link account-submit" href="/api/account/google">Continue with Google</Link> : null}
+      {stage === "email" && googleEnabled ? <a className="button-link account-submit" href="/api/account/google">Continue with Google</a> : null}
 
       {stage === "email" ? (
         <form className="account-form" onSubmit={handleRequestOtp}>
