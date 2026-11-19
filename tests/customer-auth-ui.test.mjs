@@ -37,7 +37,7 @@ test("Google OAuth entry uses a full browser navigation, never a prefetched Next
   const panel = read("src/features/auth/customer-account-panel.tsx");
   const start = read("src/app/api/account/google/route.ts");
   const callback = read("src/app/api/account/google/callback/route.ts");
-  assert.match(panel, /<a className="button-link account-submit" href="\/api\/account\/google">Continue with Google<\/a>/);
+  assert.match(panel, /window\.location\.assign\("\/api\/account\/google"\)/);
   assert.doesNotMatch(panel, /import Link from "next\/link"/);
   assert.match(start, /skipBrowserRedirect: true/);
   assert.match(start, /api\/account\/google\/callback/);

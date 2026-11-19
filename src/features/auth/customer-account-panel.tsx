@@ -188,7 +188,7 @@ export function CustomerAccountPanel({ siteKey, initialEmail, googleEnabled = fa
         </p>
       </div>
 
-      {stage === "email" && googleEnabled ? <a className="button-link account-submit" href="/api/account/google">Continue with Google</a> : null}
+      {stage === "email" && googleEnabled ? <button type="button" className="button-link account-submit" onClick={() => window.location.assign("/api/account/google")}>Continue with Google</button> : null}
 
       {stage === "email" ? (
         <form className="account-form" onSubmit={handleRequestOtp}>
