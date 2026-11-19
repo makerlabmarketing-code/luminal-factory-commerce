@@ -1,6 +1,6 @@
 # C-049 | Customer Auth Preview readiness
 
-Status: **blocked by missing Preview-only runtime configuration** (checked 2026-11-19). Do not enable Production Auth to work around this gate.
+Status: **Preview fail-closed flags configured; live sign-in remains blocked** (checked 2026-11-19). Do not enable Production Auth to work around this gate.
 
 ## Verified repo state
 
@@ -20,13 +20,15 @@ At inspection, `NEXT_PUBLIC_SUPABASE_URL` targeted Preview and Production. The f
 - `COMMERCE_CUSTOMER_AUTH_ALLOWED_ORIGINS`
 - `COMMERCE_CUSTOMER_AUTH_RATE_LIMIT_SECRET`
 
-No project environment entry for `COMMERCE_CUSTOMER_GOOGLE_AUTH_ENABLED` was identified.
+After the inspection, three **Preview-only** Vercel environment entries were created with value `false`: `COMMERCE_CUSTOMER_AUTH_ENABLED`, `COMMERCE_CUSTOMER_GOOGLE_AUTH_ENABLED` and `COMMERCE_SAVED_ADDRESSES_ENABLED`. Existing Production entries were left untouched. These settings apply to subsequent Preview builds; previously built deployments may need a redeploy to receive them.
 
-**Therefore a real Preview sign-in is not yet possible.** Vercel deployment READY and GitHub CI PASS do not verify provider configuration or a real sign-in.
+A second Supabase project named `Luminal Factory` exists, but it is not confirmed to be an isolated Commerce Auth staging backend. **Do not silently reuse it**, or reuse Commerce Production Auth users, for Preview testing. No third project was created, since cost/free-tier availability was not confirmed.
+
+**Therefore a real Preview sign-in is not yet possible.** The three Preview flags deliberately remain off. Vercel deployment READY and GitHub CI PASS do not verify provider configuration or a real sign-in.
 
 ## Safe activation plan (requires explicit approval)
 
-1. Choose an isolated Preview deployment hostname, ideally with a dedicated Supabase non-production project and isolated users.
+1. Confirm a dedicated, isolated non-production Supabase backend and a Preview deployment hostname. Reusing the current Commerce Production Supabase project is **not approved**. Confirm that creating an extra project/branch has no cost before provisioning it.
 2. Configure the Preview-scoped Supabase URL and **publishable** key, Turnstile site key, a new random rate-limit secret of at least 32 characters, and an exact HTTPS `COMMERCE_CUSTOMER_AUTH_ALLOWED_ORIGINS` list. Never copy production service-role secrets into the client or into this checklist.
 3. Validate Supabase Auth provider settings, email OTP delivery and Google OAuth redirect allowlist for the selected Preview hostname. The Google callback must be `https://<preview-host>/api/account/google/callback`.
 4. Only in Preview: enable `COMMERCE_CUSTOMER_AUTH_ENABLED=true`. Enable `COMMERCE_CUSTOMER_GOOGLE_AUTH_ENABLED=true` only after the provider redirects are verified.
