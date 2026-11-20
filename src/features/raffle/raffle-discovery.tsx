@@ -4,7 +4,7 @@ import Link from "@/lib/i18n/link";
 import styles from "./raffle-discovery.module.css";
 import type { RaffleListEntry, RaffleListResult } from "./raffle-list-service";
 import { RaffleCover } from "./raffle-cover";
-import { CircusProductBubble } from "@/components/discovery/circus-product-bubble";
+import { ShopMedia } from "@/features/shop/shop-media";
 import { meowheDiscoveryStory } from "@/components/discovery/meowhe-story";
 import { getCuratedArchiveEntries } from "@/features/archive/archive-content";
 import Image from "next/image";
@@ -28,29 +28,38 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
     dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh",
   });
   const archivePortrait = getCuratedArchiveEntries().find(entry => entry.media.productionApproved);
+  const featuredPhoto = featuredMeowhe?.media.type === "image" && featuredMeowhe.media.productionApproved
+    ? featuredMeowhe.media
+    : undefined;
   return (
     <section className="section" aria-labelledby="raffle-title">
-      <div className="section-heading">
-        <p className="eyebrow">Luminal Factory / Raffle</p>
-        <div>
-          <h1 id="raffle-title">{tr("Raffle releases")}</h1>
-          <p className="lede">{tr("Explore announced releases and their participation windows.")}</p>
-        </div>
-        <p>{tr("View each release for its published information. Viewing a release does not submit an entry.")}</p>
+      <div className={`section-heading ${styles.heading}`}>
+        <h1 id="raffle-title">{tr("Raffle releases")}</h1>
       </div>
       <div className={styles.program}>
-        <div className={styles.programCopy}>
-          <p className={styles.programEyebrow}>{locale === "vi" ? "LUMINAL / CHƯƠNG MEOWHE" : "LUMINAL / THE MEOWHE CHAPTER"}</p>
+        <div className={styles.programTitle}>
           <h2>{featuredMeowhe?.title ?? "Meowhe"}</h2>
+        </div>
+        <div className={styles.programVisual}>
+          {featuredPhoto ? (
+            <div className={styles.programObject}>
+              <ShopMedia media={featuredPhoto} sizes="(max-width: 700px) 80vw, 368px" />
+            </div>
+          ) : archivePortrait ? (
+            <div className={styles.archivePortrait}>
+              <Image src={archivePortrait.media.src} alt={tr(archivePortrait.media.alt)} fill sizes="(max-width: 700px) 80vw, 368px" fetchPriority="high" style={{ objectFit: "cover", objectPosition: archivePortrait.media.objectPosition ?? "center" }} />
+              <span>{locale === "vi" ? "Ảnh từ bộ sưu tập" : "From the archive"}</span>
+            </div>
+          ) : (
+            <span className={styles.programMark} aria-hidden="true" />
+          )}
+        </div>
+        <div className={styles.programCopy}>
           <p>{meowheDiscoveryStory(featuredMeowhe, locale, "raffle")}</p>
           <RaffleCountdownDemo locale={locale} />
-          <span className={styles.programRule} aria-hidden="true" />
-          <p className={styles.programNote}>{locale === "vi" ? "Thông tin các đợt phát hành đã công bố nằm bên dưới." : "Published release information follows below."}</p>
         </div>
-        {featuredMeowhe ? <div className={styles.programObject}><CircusProductBubble entry={featuredMeowhe} locale={locale} /></div> : archivePortrait ? <div className={styles.archivePortrait}><Image src={archivePortrait.media.src} alt={tr(archivePortrait.media.alt)} fill sizes="(max-width: 700px) 60vw, 420px" style={{ objectFit: "cover", objectPosition: archivePortrait.media.objectPosition ?? "center" }} /><span>{locale === "vi" ? "Meowhe / hình lưu trữ minh họa" : "Meowhe / archive illustration"}</span></div> : <span className={styles.programMark} aria-hidden="true" />}
       </div>
       <div className={styles.programAfter}>
-        <p className={styles.programEyebrow}>{locale === "vi" ? "LỊCH PHÁT HÀNH / RAFFLE" : "RELEASE PROGRAM / RAFFLE"}</p>
         <h2>{locale === "vi" ? "Những đợt đã công bố" : "Announced releases"}</h2>
       </div>
       {releases.state === "ready" ? (
