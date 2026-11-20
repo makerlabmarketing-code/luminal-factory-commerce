@@ -35,7 +35,7 @@ test("raffle list remains non-transactional", () => {
   ].join("\n");
 
   assert.match(source, /Release information is unavailable/);
-  assert.match(source, /does not submit an entry/);
+  assert.match(source, /No raffle releases are announced yet/);
   assert.doesNotMatch(source, /<form|type=["'](?:file|email|password)["']|onSubmit=|createOrder|payment provider/i);
   assert.doesNotMatch(source, /supabase\.|from\(["'`]|create table|service_role/i);
   assert.doesNotMatch(source, /setInterval|setTimeout|Date\.now\(|winnerCount|slotCount|price:/i);

@@ -17,7 +17,7 @@ try {
   if (name === '@/lib/i18n/server') return { getLocale: async () => locale, getTranslator: async () => text => dictionary[text]?.[locale === 'vi' ? 1 : 0] ?? text };
   if (name === '@/lib/i18n/locale') return { localeHref: href => `/${locale}${href}` };
   if (name === '@/lib/i18n/link') return { default: ({ href, children, ...props }) => React.createElement('a', { ...props, href: `/${locale}${href}` }, children), __esModule: true };
-  if (name === '@/components/discovery/circus-product-bubble') return { CircusProductBubble: ({ entry }) => React.createElement('a', { href: `/${locale}${entry.href}` }, entry.title) };
+  if (name === '@/features/shop/shop-media') return { ShopMedia: ({ media }) => React.createElement('img', { src: media.src, alt: media.alt }) };
   if (name === '@/components/discovery/meowhe-story') return { meowheDiscoveryStory: () => 'Meowhe story' };
   if (name === '@/features/archive/archive-content') return { getCuratedArchiveEntries: () => [] };
   if (name === 'next/image') return { default: ({ src, alt }) => React.createElement('img', { src, alt }), __esModule: true };
@@ -38,7 +38,17 @@ try {
   console.error('Raffle render bootstrap failed:', error);
   throw error;
 }
-const render = async releases => renderToStaticMarkup(await mod.exports.RaffleDiscovery({ releases, locale }));
+const render = async (releases, featuredMeowhe) => renderToStaticMarkup(await mod.exports.RaffleDiscovery({ releases, featuredMeowhe, locale }));
+
+test('approved Meowhe photo comes before the story and demo without linking to paused Shop', async () => {
+  locale = 'en';
+  const html = await render({ state: 'empty', entries: [] }, {
+    title: 'Meowhe Lolipop', href: '/shop/meowhe-lolipop',
+    media: { type: 'image', productionApproved: true, src: '/meowhe.webp', alt: 'Meowhe photo' },
+  });
+  assert.match(html, /<h2>Meowhe Lolipop<\/h2>.*<img[^>]+alt="Meowhe photo".*Meowhe story.*ENTRIES ARE NOT OPEN/);
+  assert.doesNotMatch(html, /href="[^"]*\/shop\b/);
+});
 
 test('both locales distinguish unavailable/disabled from verified empty and localize retry/navigation', async () => {
   for (locale of ['en', 'vi']) {
