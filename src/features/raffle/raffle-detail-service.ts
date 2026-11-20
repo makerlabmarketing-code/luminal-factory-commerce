@@ -4,6 +4,7 @@ import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/lib/supabase/database.types";
+import { shippingCountrySchema, shippingMoneySchema } from "./raffle-shipping";
 
 const raffleRowSchema = z.object({
   id: z.string().uuid(),
@@ -42,6 +43,7 @@ export type PublicRaffleDetail = Readonly<{
   closesAt: string | null;
   publishedAt: string;
   productId: string | null;
+  shippingRates?: Record<string, number>;
   presentationTimeZone: "Asia/Ho_Chi_Minh";
 }>;
 
@@ -94,7 +96,16 @@ export const getPublishedRaffleBySlug = cache(async (slug: string): Promise<Publ
   const parsed = raffleRowSchema.safeParse(data);
   if (!parsed.success) return null;
 
+  const rates = await client.from("raffle_shipping_rates")
+    .select("country_code,customer_minor").eq("raffle_id", parsed.data.id);
+  const result = z.array(z.object({
+    country_code: shippingCountrySchema, customer_minor: shippingMoneySchema,
+  })).safeParse(rates.data);
+
   return {
+    ...(result.success && result.data.length > 0 ? {
+      shippingRates: Object.fromEntries(result.data.map(rate => [rate.country_code, rate.customer_minor])),
+    } : {}),
     id: parsed.data.id,
     slug: parsed.data.slug,
     title: parsed.data.title,
