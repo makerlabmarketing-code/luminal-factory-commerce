@@ -989,6 +989,12 @@ export type Database = {
           },
         ]
       }
+      raffle_shipping_rates: {
+        Row: { raffle_id: string; country_code: string; carrier_minor: number; covered_minor: number; customer_minor: number }
+        Insert: { raffle_id: string; country_code: string; carrier_minor: number; covered_minor: number }
+        Update: { carrier_minor?: number; covered_minor?: number }
+        Relationships: []
+      }
       raffles: {
         Row: {
           closes_at: string | null
@@ -1128,6 +1134,10 @@ export type Database = {
       }
     }
     Functions: {
+      confirm_raffle_winner_with_shipping_quote: {
+        Args: { p_operation_id: string; p_client_id: string; p_raffle_id: string; p_allocation_id: string; p_actor_id: string; p_request_fingerprint: string; p_payload: Json }
+        Returns: Json
+      }
       read_catalog_media_draft: {
         Args: { p_product_id: string; p_variant_id: string }
         Returns: Json

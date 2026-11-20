@@ -1,4 +1,6 @@
 "use client";
+
+import { formatShippingUsd, getShippingEstimate } from "./raffle-shipping";
 import { useTranslator, useLocale } from "@/lib/i18n/client";
 
 
@@ -29,9 +31,10 @@ type RaffleEntryFormProps = Readonly<{
   raffleId: string;
   rulesVersion: string;
   siteKey: string;
+  shippingRates?: Readonly<Record<string, number>>;
 }>;
 
-export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: RaffleEntryFormProps) {
+export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, shippingRates }: RaffleEntryFormProps) {
   const tr = useTranslator();
   const locale = useLocale();
   const emailId = useId();
@@ -47,6 +50,8 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const requestIdRef = useRef<string | null>(null);
+  const [shippingCountry, setShippingCountry] = useState("");
+  const shippingEstimate = shippingRates ? getShippingEstimate(shippingCountry, shippingRates) : null;
   const [captchaToken, setCaptchaToken] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -234,7 +239,12 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey }: Ra
             </div>
             <div className="account-field">
               <label htmlFor={countryCodeId}>{tr("Mã quốc gia")}</label>
-              <input id={countryCodeId} name="countryCode" autoComplete="shipping country" inputMode="text" minLength={2} maxLength={2} placeholder={tr("VN")} required />
+              <input id={countryCodeId} name="countryCode" autoComplete="shipping country" inputMode="text" minLength={2} maxLength={2} placeholder={tr("VN")} required onChange={event => setShippingCountry(event.target.value)} />
+              {shippingRates && /^[A-Za-z]{2}$/.test(shippingCountry.trim()) && <small aria-live="polite">
+                {shippingEstimate === 0 ? (locale === "vi" ? "Miễn phí giao hàng" : "Free shipping")
+                  : shippingEstimate === null ? (locale === "vi" ? "Phí giao hàng sẽ được báo trước khi thanh toán." : "Shipping will be quoted before payment.")
+                  : `${locale === "vi" ? "Phí giao hàng dự kiến" : "Estimated shipping"} · ${formatShippingUsd(shippingEstimate)}`}
+              </small>}
               <span>{tr("Dùng mã ISO 2 ký tự, ví dụ VN, US, JP.")}</span>
             </div>
             <div className="account-field">

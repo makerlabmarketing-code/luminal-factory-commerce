@@ -79,6 +79,7 @@ export async function RaffleDetailView({ raffle, entryEnabled, turnstileSiteKey 
             raffleId={raffle.id}
             rulesVersion={raffle.rulesVersion}
             siteKey={turnstileSiteKey}
+            shippingRates={raffle.shippingRates}
           />
         ) : (
           <div className="feedback-state" role="status">

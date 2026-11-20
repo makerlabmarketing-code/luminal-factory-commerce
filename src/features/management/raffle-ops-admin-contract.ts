@@ -1,16 +1,25 @@
 import { z } from "zod";
+import { shippingMoneySchema } from "@/features/raffle/raffle-shipping";
 
 export const raffleWinnerSelectSchema = z.object({
   operationId: z.uuid(),
   entryId: z.uuid(),
 }).strict();
 
-export const raffleWinnerConfirmSchema = z.object({
+const winnerPaymentTerms = {
   operationId: z.uuid(),
-  shippingMinor: z.number().int().min(0),
   paymentDeadlineAt: z.string().datetime({ offset: true }),
   fulfillmentDueAt: z.string().datetime({ offset: true }).nullable().optional(),
-}).strict();
+};
+
+export const raffleWinnerConfirmSchema = z.union([
+  z.object({ ...winnerPaymentTerms, shippingMinor: z.number().int().min(0) }).strict(),
+  z.object({
+    ...winnerPaymentTerms,
+    useShippingRates: z.literal(true),
+    override: z.object({ carrierMinor: shippingMoneySchema, coveredMinor: shippingMoneySchema }).strict().optional(),
+  }).strict(),
+]);
 
 export const raffleWinnerConfirmPaymentSchema = z.object({
   operationId: z.uuid(),

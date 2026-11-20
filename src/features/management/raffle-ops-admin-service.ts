@@ -151,11 +151,28 @@ export function selectRaffleWinner(client: CommerceAdminPrivilegedClient, raffle
   return executeWinnerAction(client, { operationId: mutation.operationId, action: "select", raffleId, entryId: mutation.entryId, payload: {}, ...contextPayload(context) });
 }
 
-export function confirmRaffleWinner(client: CommerceAdminPrivilegedClient, raffleId: string, allocationId: string, mutation: RaffleWinnerConfirmWire, context: Readonly<{ clientId: string; actorId: string; requestFingerprint: string }>) {
-  return executeWinnerAction(client, {
-    operationId: mutation.operationId, action: "confirm", raffleId, allocationId, ...contextPayload(context),
-    payload: { shipping_minor: mutation.shippingMinor, payment_deadline_at: mutation.paymentDeadlineAt, fulfillment_due_at: mutation.fulfillmentDueAt ?? null },
+export async function confirmRaffleWinner(client: CommerceAdminPrivilegedClient, raffleId: string, allocationId: string, mutation: RaffleWinnerConfirmWire, context: Readonly<{ clientId: string; actorId: string; requestFingerprint: string }>) {
+  const terms = { payment_deadline_at: mutation.paymentDeadlineAt, fulfillment_due_at: mutation.fulfillmentDueAt ?? null };
+  if ("shippingMinor" in mutation) {
+    return executeWinnerAction(client, {
+      operationId: mutation.operationId, action: "confirm", raffleId, allocationId, ...contextPayload(context),
+      payload: { ...terms, shipping_minor: mutation.shippingMinor },
+    });
+  }
+
+  const { data, error } = await client.rpc("confirm_raffle_winner_with_shipping_quote", {
+    p_operation_id: mutation.operationId,
+    p_client_id: context.clientId,
+    p_raffle_id: raffleId,
+    p_allocation_id: allocationId,
+    p_actor_id: context.actorId,
+    p_request_fingerprint: context.requestFingerprint,
+    p_payload: mutation.override ? {
+      ...terms, carrier_minor: mutation.override.carrierMinor, covered_minor: mutation.override.coveredMinor,
+    } : terms,
   });
+  if (error || !data) persistenceFailure(error);
+  return mutationResultSchema.parse(data);
 }
 
 export function confirmRaffleWinnerPayment(client: CommerceAdminPrivilegedClient, raffleId: string, allocationId: string, mutation: RaffleWinnerConfirmPaymentWire, context: Readonly<{ clientId: string; actorId: string; requestFingerprint: string }>) {
