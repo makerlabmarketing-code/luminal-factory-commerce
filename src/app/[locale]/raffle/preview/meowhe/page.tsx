@@ -34,11 +34,6 @@ export default async function MeowhePreviewPage({ params }: Readonly<{ params: P
     <>
       <Header />
       <main id="main-content" className={resin.resinStage}>
-        <div className={resin.resinFall} aria-hidden="true">
-          <span className={resin.resinSource} />
-          <span className={resin.resinThread} />
-          <span className={resin.resinThread} />
-        </div>
         <Container>
           <section className="section" aria-labelledby="raffle-preview-title">
             <div className={styles.program}>
@@ -46,9 +41,14 @@ export default async function MeowhePreviewPage({ params }: Readonly<{ params: P
                 <p className="eyebrow">Raffle preview</p>
                 <h1 className={styles.previewTitle} id="raffle-preview-title">Meowhe Archive</h1>
               </div>
-              <div className={styles.programVisual}>
+              <div className={`${styles.programVisual} ${resin.resinComposition}`}>
                 <div className={styles.archivePortrait}>
                   <Image src="/images/home/archive-meowhe.webp" alt="Meowhe artisan keycap from the Luminal Factory archive" fill sizes="(max-width: 700px) 80vw, 368px" style={{ objectFit: "cover" }} preload />
+                </div>
+                <div className={resin.resinFall} aria-hidden="true">
+                  <span className={resin.resinSource} />
+                  <span className={resin.resinThread} />
+                  <span className={resin.resinPool} />
                 </div>
               </div>
               <div className={styles.programCopy}>
