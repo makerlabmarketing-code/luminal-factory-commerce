@@ -15,7 +15,7 @@
 .program::before { content: ""; position: absolute; z-index: -2; inset: 0; background: radial-gradient(ellipse at 77% 50%, rgba(205,128,68,.26), transparent 46%), linear-gradient(108deg, #0c0911 15%, #1b0d16 52%, #100b11); }
 .program::after { content: ""; position: absolute; z-index: -1; inset: 0 0 0 55%; opacity: .38; background: repeating-linear-gradient(100deg, transparent 0 8%, rgba(102,34,47,.72) 11%, rgba(28,13,22,.6) 19%, transparent 24% 30%); mask-image: linear-gradient(90deg, transparent, #000 42%); pointer-events: none; }
 .programTitle { grid-area: title; align-self: end; min-width: 0; }
-.programTitle h2 { margin: 0; color: #f2ece6; font-size: clamp(2.5rem, 5vw, 5rem); font-weight: 420; letter-spacing: -.055em; line-height: .99; overflow-wrap: anywhere; }
+.programTitle h2, .previewTitle { margin: 0; color: #f2ece6; font-size: clamp(2.5rem, 5vw, 5rem); font-weight: 420; letter-spacing: -.055em; line-height: .99; overflow-wrap: anywhere; }
 .programVisual { grid-area: visual; align-self: center; min-width: 0; }
 .programCopy { grid-area: copy; max-width: 39rem; }
 .programCopy > p { margin: 0; max-width: 37rem; color: #c9c1bf; line-height: 1.65; white-space: pre-line; overflow-wrap: anywhere; }
@@ -44,8 +44,13 @@
     padding: clamp(1.25rem, 5vw, 2rem);
   }
   .programCopy { min-width: 0; max-width: 100%; }
-  .programTitle h2 { font-size: clamp(2.25rem, 9vw, 3.75rem); }
+  .programTitle h2, .previewTitle { font-size: clamp(2.25rem, 9vw, 3.75rem); }
   .programCopy > p { white-space: normal; }
   .programMark { width: 8rem; }
   .program::after { inset: 35% 0 0; mask-image: linear-gradient(transparent, #000); }
 }
+
+.previewFacts { display: grid; gap: .6rem; margin: 1.25rem 0 0; font-size: .9rem; }
+.previewFacts div { display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(0, 1.45fr); gap: .65rem; padding-top: .6rem; border-top: 1px solid var(--border); }
+.previewFacts dt { color: var(--muted-foreground); }
+.previewFacts dd { margin: 0; overflow-wrap: anywhere; }

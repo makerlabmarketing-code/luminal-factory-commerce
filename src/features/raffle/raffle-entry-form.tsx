@@ -32,9 +32,10 @@ type RaffleEntryFormProps = Readonly<{
   rulesVersion: string;
   siteKey: string;
   shippingRates?: Readonly<Record<string, number>>;
+  preview?: boolean;
 }>;
 
-export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, shippingRates }: RaffleEntryFormProps) {
+export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, shippingRates, preview = false }: RaffleEntryFormProps) {
   const tr = useTranslator();
   const locale = useLocale();
   const emailId = useId();
@@ -50,7 +51,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const requestIdRef = useRef<string | null>(null);
-  const [shippingCountry, setShippingCountry] = useState("");
+  const [shippingCountry, setShippingCountry] = useState(preview ? "VN" : "");
   const shippingEstimate = shippingRates ? getShippingEstimate(shippingCountry, shippingRates) : null;
   const [captchaToken, setCaptchaToken] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
@@ -62,7 +63,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
   const renderTurnstile = useCallback(() => {
     const turnstile = getTurnstile();
     const container = turnstileContainerRef.current;
-    if (!enabled || !isExpanded || isComplete || !turnstile || !container || turnstileWidgetIdRef.current) return;
+    if (preview || !enabled || !isExpanded || isComplete || !turnstile || !container || turnstileWidgetIdRef.current) return;
 
     turnstileWidgetIdRef.current = turnstile.render(container, {
       sitekey: siteKey,
@@ -82,7 +83,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
         return true;
       },
     });
-  }, [enabled, isExpanded, isComplete, siteKey, locale]);
+  }, [enabled, isExpanded, isComplete, siteKey, locale, preview]);
 
   useEffect(() => {
     renderTurnstile();
@@ -114,6 +115,10 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!enabled || isPending || isComplete) return;
+    if (preview) {
+      setIsComplete(true);
+      return;
+    }
     if (!captchaToken) {
       setError("Vui lòng hoàn tất bước xác minh bảo mật.");
       return;
@@ -172,16 +177,16 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
 
   return (
     <div className="raffle-entry-panel">
-      <Script
+      {!preview && <Script
         id="cloudflare-turnstile-raffle"
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
         strategy="afterInteractive"
         onReady={renderTurnstile}
-      />
+      />}
       <div>
         <p className="eyebrow">{tr("Guest entry")}</p>
         <h2>{tr("Gửi một entry cho raffle này.")}</h2>
-        <p>{tr("Entry không phải order, không tạo nghĩa vụ thanh toán và không đảm bảo quyền mua.")}</p>
+        <p>{preview ? "Use the sample details to try the form. Your entry stays on this page." : tr("Entry không phải order, không tạo nghĩa vụ thanh toán và không đảm bảo quyền mua.")}</p>
       </div>
 
       {!isComplete ? (
@@ -193,17 +198,17 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
             aria-controls="raffle-entry-fields"
             onClick={() => setIsExpanded(expanded => !expanded)}
           >
-            {tr(isExpanded ? "Hide entry form" : "Enter Raffle")}
+            {preview && !isExpanded ? "Participate" : tr(isExpanded ? "Hide entry form" : "Enter Raffle")}
           </button>
           {isExpanded ? (
             <form id="raffle-entry-fields" className="account-form" onSubmit={handleSubmit}>
           <div className="account-field">
             <label htmlFor={nameId}>{tr("Tên hiển thị")}</label>
-            <input id={nameId} name="displayName" autoComplete="name" minLength={2} maxLength={120} required />
+            <input id={nameId} name="displayName" defaultValue={preview ? "Meowhe Tester" : undefined} autoComplete="name" minLength={2} maxLength={120} required />
           </div>
           <div className="account-field">
             <label htmlFor={emailId}>{tr("Email")}</label>
-            <input id={emailId} name="email" type="email" inputMode="email" autoComplete="email" maxLength={254} required />
+            <input id={emailId} name="email" defaultValue={preview ? "tester@example.invalid" : undefined} type="email" inputMode="email" autoComplete="email" maxLength={254} required />
             <span>{tr("Dùng để quản lý entry, liên hệ winner và lịch sử khách hàng theo chính sách của Luminal.")}</span>
           </div>
 
@@ -215,11 +220,11 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
             </div>
             <div className="account-field">
               <label htmlFor={recipientNameId}>{tr("Tên người nhận")}</label>
-              <input id={recipientNameId} name="recipientName" autoComplete="shipping name" minLength={2} maxLength={120} required />
+              <input id={recipientNameId} name="recipientName" defaultValue={preview ? "Meowhe Tester" : undefined} autoComplete="shipping name" minLength={2} maxLength={120} required />
             </div>
             <div className="account-field">
               <label htmlFor={addressLine1Id}>{tr("Địa chỉ")}</label>
-              <input id={addressLine1Id} name="addressLine1" autoComplete="shipping address-line1" minLength={3} maxLength={240} required />
+              <input id={addressLine1Id} name="addressLine1" defaultValue={preview ? "1 Example Street" : undefined} autoComplete="shipping address-line1" minLength={3} maxLength={240} required />
             </div>
             <div className="account-field">
               <label htmlFor={addressLine2Id}>{tr("Địa chỉ bổ sung")}</label>
@@ -227,11 +232,11 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
             </div>
             <div className="account-field">
               <label htmlFor={cityId}>{tr("Thành phố / Quận huyện")}</label>
-              <input id={cityId} name="city" autoComplete="shipping address-level2" maxLength={120} required />
+              <input id={cityId} name="city" defaultValue={preview ? "Hanoi" : undefined} autoComplete="shipping address-level2" maxLength={120} required />
             </div>
             <div className="account-field">
               <label htmlFor={stateProvinceId}>{tr("Tỉnh / Bang / Khu vực")}</label>
-              <input id={stateProvinceId} name="stateProvince" autoComplete="shipping address-level1" maxLength={120} required />
+              <input id={stateProvinceId} name="stateProvince" defaultValue={preview ? "Hanoi" : undefined} autoComplete="shipping address-level1" maxLength={120} required />
             </div>
             <div className="account-field">
               <label htmlFor={postalCodeId}>{tr("Postal code")}</label>
@@ -239,7 +244,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
             </div>
             <div className="account-field">
               <label htmlFor={countryCodeId}>{tr("Mã quốc gia")}</label>
-              <input id={countryCodeId} name="countryCode" autoComplete="shipping country" inputMode="text" minLength={2} maxLength={2} placeholder={tr("VN")} required onChange={event => setShippingCountry(event.target.value)} />
+              <input id={countryCodeId} name="countryCode" defaultValue={preview ? "VN" : undefined} autoComplete="shipping country" inputMode="text" minLength={2} maxLength={2} placeholder={tr("VN")} required onChange={event => setShippingCountry(event.target.value)} />
               {shippingRates && /^[A-Za-z]{2}$/.test(shippingCountry.trim()) && <small aria-live="polite">
                 {shippingEstimate === 0 ? (locale === "vi" ? "Miễn phí giao hàng" : "Free shipping")
                   : shippingEstimate === null ? (locale === "vi" ? "Phí giao hàng sẽ được báo trước khi thanh toán." : "Shipping will be quoted before payment.")
@@ -255,11 +260,11 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
 
           <label className="raffle-entry-consent">
             <input type="checkbox" name="rulesAccepted" required />
-            <span>{tr("Tôi đồng ý với rules phiên bản")}{" "}{rulesVersion} {tr("và xác nhận thông tin trên là chính xác.")}</span>
+            <span>{preview ? "I’m using sample details for this preview." : <>{tr("Tôi đồng ý với rules phiên bản")}{" "}{rulesVersion} {tr("và xác nhận thông tin trên là chính xác.")}</>}</span>
           </label>
-          <div className="account-turnstile" ref={turnstileContainerRef} aria-label={tr("Xác minh bảo mật")} />
-          <button className="button-link account-submit" type="submit" disabled={isPending || !captchaToken}>
-            {isPending ? tr("Đang gửi entry…") : tr("Gửi entry")}
+          {!preview && <div className="account-turnstile" ref={turnstileContainerRef} aria-label={tr("Xác minh bảo mật")} />}
+          <button className="button-link account-submit" type="submit" disabled={isPending || (!preview && !captchaToken)}>
+            {preview ? "Submit test entry" : isPending ? tr("Đang gửi entry…") : tr("Gửi entry")}
           </button>
             </form>
           ) : null}
@@ -267,6 +272,7 @@ export function RaffleEntryForm({ enabled, raffleId, rulesVersion, siteKey, ship
       ) : null}
 
       <div className="account-feedback" aria-live="polite" aria-atomic="true">
+        {preview && isComplete && <p className="account-message">Test entry complete. This preview sends no email.</p>}
         {message ? <p className="account-message">{tr(message)}</p> : null}
         {error ? <p className="account-error" role="alert">{tr(error)}</p> : null}
       </div>
