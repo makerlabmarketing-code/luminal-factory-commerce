@@ -567,7 +567,7 @@ begin
 
   return v_result;
 end;
-$function$
+$function$;
 
 revoke execute on function public.manage_raffle_winner_allocation(
   uuid, text, text, uuid, uuid, uuid, text, text, jsonb

@@ -45,7 +45,7 @@ AS $function$
   left join private.raffle_entry_shipping_addresses s
     on s.raffle_entry_id = e.id
   where e.raffle_id = p_raffle_id;
-$function$
+$function$;
 
 revoke execute on function public.read_raffle_entries_for_admin(uuid)
   from public, anon, authenticated;
@@ -619,7 +619,7 @@ begin
 
   return v_result;
 end;
-$function$
+$function$;
 
 revoke execute on function public.manage_raffle_winner_allocation(
   uuid, text, text, uuid, uuid, uuid, text, text, jsonb
@@ -712,7 +712,7 @@ begin
 
   return v_result;
 end;
-$function$
+$function$;
 
 revoke execute on function public.publish_raffle_result(uuid, text, uuid, text, text)
   from public, anon, authenticated;
