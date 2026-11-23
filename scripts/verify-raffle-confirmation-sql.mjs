@@ -9,7 +9,12 @@ await db.exec(`create role anon;create role authenticated;create role service_ro
 create schema private;
 create table public.raffles(id uuid primary key,title text,slug text,is_test boolean,is_published boolean,published_at timestamptz,status text,opens_at timestamptz,closes_at timestamptz,updated_at timestamptz);
 create table public.raffle_entries(id uuid primary key,raffle_id uuid references raffles,contact_email text,display_name text,unique(raffle_id,contact_email));
-create schema cron;create table cron.job(jobid bigint,jobname text);create function cron.unschedule(bigint) returns boolean language sql as 'select true';`);
+create schema cron;
+create table cron.job(jobid bigint primary key,jobname text,active boolean);
+create function cron.alter_job(job_id bigint, active boolean) returns void language sql
+as 'update cron.job set active = $2 where jobid = $1';
+insert into cron.job values
+  (1,'commerce-raffle-lifecycle',true),(2,'commerce-raffle-confirmation-retry',true),(3,'unrelated-job',true);`);
 await db.exec(readFileSync(root+'forward.sql','utf8'));
 await db.exec(readFileSync(root+'lifecycle.sql','utf8'));
 const raffle='550e8400-e29b-41d4-a716-446655440000',entry='550e8400-e29b-41d4-a716-446655440001';
@@ -55,8 +60,20 @@ await db.exec(`update raffles set status='DRAWN' where id='${raffle}';`);
 await db.query('select private.advance_scheduled_raffles()');
 assert.equal((await db.query('select status from raffles where id=$1',[raffle])).rows[0].status,'DRAWN');
 await db.exec(readFileSync(root+'rollback.sql','utf8'));
+assert.deepEqual((await db.query('select active from cron.job order by jobid')).rows.map(row=>row.active),[false,false,true]);
+await db.exec('set role service_role;');
+await assert.rejects(()=>db.query('select * from public.claim_raffle_entry_confirmations()'));
+await db.exec('reset role;');
 assert.equal((await db.query('select count(*)::int n from private.raffle_entry_confirmation_jobs')).rows[0].n,2);
 await db.exec(insert('550e8400-e29b-41d4-a716-446655440004','rollback@example.test'));
 assert.equal((await db.query('select count(*)::int n from private.raffle_entry_confirmation_jobs')).rows[0].n,2);
+await db.exec(readFileSync(root+'resume.sql','utf8'));
+assert.deepEqual((await db.query('select active from cron.job order by jobid')).rows.map(row=>row.active),[false,false,true]);
+await db.exec(insert('550e8400-e29b-41d4-a716-446655440005','resume@example.test'));
+await db.exec('set role service_role;');
+const resumed=(await db.query('select * from public.claim_raffle_entry_confirmations()')).rows;
+assert.deepEqual(resumed.map(row=>row.entry_id),['550e8400-e29b-41d4-a716-446655440005']);
+await db.exec('reset role;');
+assert.equal((await db.query("select count(*)::int n from private.raffle_entry_confirmation_jobs where state='sent'")).rows[0].n,1);
 await db.close();
-console.log('PASS: atomic rollback, uniqueness, test exclusion, browser denial, leases, stale token, retry, sent deduplication, expiry, lifecycle, safe rollback. Cron/net require live validation after approval.');
+console.log('PASS: atomic rollback, uniqueness, test exclusion, browser denial, leases, stale token, retry, sent deduplication, expiry, lifecycle, pause/resume without backfill. Cron/net require live validation after approval.');

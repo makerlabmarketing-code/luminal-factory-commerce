@@ -1,5 +1,6 @@
 -- Read only, no PII or credential values in results.
 select jsonb_build_object(
+ 'queue_trigger_enabled',(select tgenabled in ('O','A') from pg_trigger where tgrelid='public.raffle_entries'::regclass and tgname='raffle_entry_confirmation_queue'),
  'queue_rls',(select relrowsecurity from pg_class where oid='private.raffle_entry_confirmation_jobs'::regclass),
  'anon_claim_denied',not has_function_privilege('anon','public.claim_raffle_entry_confirmations(uuid)','execute'),
  'authenticated_claim_denied',not has_function_privilege('authenticated','public.claim_raffle_entry_confirmations(uuid)','execute'),

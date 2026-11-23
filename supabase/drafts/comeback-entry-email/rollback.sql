@@ -1,10 +1,10 @@
--- Stop COMMERCE_RAFFLE_CONFIRMATION_ENABLED and the worker schedule first.
--- Preserve existing entries, shipping addresses and confirmation-job evidence.
+-- Turn off COMMERCE_RAFFLE_CONFIRMATION_ENABLED before pausing database work.
+-- Preserve entries, shipping addresses, confirmation evidence and job history.
 begin;
-select cron.unschedule(jobid) from cron.job where jobname in ('commerce-raffle-lifecycle','commerce-raffle-confirmation-retry');
-drop function if exists private.invoke_raffle_email_worker();
-drop function if exists private.advance_scheduled_raffles();
-drop trigger if exists raffle_entry_confirmation_queue on public.raffle_entries;
+select cron.alter_job(jobid, active := false)
+from cron.job
+where jobname in ('commerce-raffle-lifecycle','commerce-raffle-confirmation-retry') and active;
+alter table public.raffle_entries disable trigger raffle_entry_confirmation_queue;
 revoke execute on function public.claim_raffle_entry_confirmations(uuid) from service_role;
 revoke execute on function public.finish_raffle_entry_confirmation(uuid,uuid,text,boolean,text) from service_role;
 commit;

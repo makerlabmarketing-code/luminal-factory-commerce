@@ -17,5 +17,5 @@ end; $$;
 revoke all on function private.invoke_raffle_email_worker() from public,anon,authenticated,service_role;
 select cron.schedule('commerce-raffle-lifecycle','* * * * *','select private.advance_scheduled_raffles();');
 select cron.schedule('commerce-raffle-confirmation-retry','*/2 * * * *','select private.invoke_raffle_email_worker();');
-update cron.job set active=false where jobname in ('commerce-raffle-lifecycle','commerce-raffle-confirmation-retry');
+select cron.alter_job(jobid, active := false) from cron.job where jobname in ('commerce-raffle-lifecycle','commerce-raffle-confirmation-retry');
 commit;

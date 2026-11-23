@@ -43,13 +43,15 @@ PII stays in Commerce. Lists fail closed when response limits are exceeded.
    random worker secret in Vercel. Store the identical worker secret in Vault
    named `raffle_email_worker_secret`; never commit or print it. The domain
    luminalfactory.com was verified for sending on 9 October 2026.
-5. Validate the worker denies missing/bad Authorization. With a controlled,
-   explicitly approved mailbox, verify one confirmation and no duplicate on
-   retry; verify ERP displays the correct customer's data. The mail flag stays
-   false until these prerequisites are ready. Test raffles intentionally never
-   queue customer confirmations; use an isolated approved transactional fixture.
-6. Set `COMMERCE_RAFFLE_CONFIRMATION_ENABLED=true`, redeploy, activate the two
-   named jobs with `cron.alter_job(jobid, active := true)`.
+5. Verify the worker denies missing/bad Authorization. Run a controlled
+   signup in an isolated deployment with the mail flag enabled there and a
+   single approved mailbox. Verify one confirmation and no duplicate on retry.
+   Verify ERP displays the test entry. Keep Production email disabled during
+   these checks. Test raffles intentionally never queue customer confirmations.
+6. Before opening a Production release, set
+   `COMMERCE_RAFFLE_CONFIRMATION_ENABLED=true`, redeploy and verify the
+   worker returns `idle` with valid authorization for an empty queue. Activate
+   the two named schedules with `cron.alter_job(jobid, active := true)`.
 7. Only after name/image/price/rules are ready, schedule and publish the draft
    through the existing management contract. Clock jobs run every minute;
    opening status may lag by up to a minute, while entry SQL enforces the exact
@@ -58,10 +60,16 @@ PII stays in Commerce. Lists fail closed when response limits are exceeded.
 
 ## Rollback
 
-Disable the mail flag first; apply `rollback.sql`. It stops both jobs, removes
-the entry trigger and revokes service queue RPCs. Entries, addresses and job
-evidence remain. Existing raffle states are not reversed. The pg_net extension
-is retained to avoid disturbing other consumers. No customer deletion.
+Disable the mail flag and deploy that change, then run `rollback.sql`.
+Both schedules pause, the entry trigger stops accepting new jobs, and service
+execution of the queue RPCs is revoked. Entries, addresses, and job evidence
+are preserved. Existing raffle states are not reversed. An email already
+handed to Resend can still arrive.
+
+To resume, use `resume.sql` and verify `validation.sql`. Resume restores the
+trigger and service RPCs and leaves both schedules paused until step 6. Entries
+created during the pause are not backfilled. Already sent messages stay sent.
+Pending jobs within the 23-hour retry window can be processed again.
 
 ## Validation evidence
 
@@ -69,7 +77,7 @@ is retained to avoid disturbing other consumers. No customer deletion.
 isolated PostgreSQL execution: transaction rollback, entry uniqueness, test
 exclusion, browser denial, lease claim exclusion, stale lease tokens,
 retry, accepted-mail deduplication, retry expiry, canonical lifecycle updates
-and non-destructive rollback. It does not exercise live pg_cron, pg_net, Vault
+and reversible pause/resume without backfill. It does not exercise live pg_cron, pg_net, Vault
 or Resend delivery. Email unit tests cover escaping, subject newlines, stable
 provider keys, response/error classification and recipient isolation.
 
