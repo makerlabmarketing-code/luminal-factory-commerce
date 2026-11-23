@@ -31,7 +31,7 @@ export async function ArchiveCollection({ entries }: ArchiveCollectionProps) {
       </div>
       <ol className="archive-route-grid">
         {entries.map((entry) => (
-          <li key={entry.id} className="archive-route-card">
+          <li key={entry.id} className="archive-route-card" data-luminal-bento-card>
             <Link href={entry.href} aria-label={`${tr("View object record")}: ${entry.title}`}>
               <ArchiveMedia entry={entry} sizes="(max-width: 800px) calc(100vw - 2rem), 33vw" />
               <div className="archive-route-card-copy">

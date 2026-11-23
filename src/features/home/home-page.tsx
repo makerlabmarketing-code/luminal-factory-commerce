@@ -75,7 +75,7 @@ export async function HomePage() {
           <Container className="revival-hero-inner lg:!grid-cols-[minmax(0,.72fr)_minmax(28rem,1.28fr)] lg:!gap-[clamp(2rem,5vw,6rem)]">
             <div className="revival-hero-copy lg:max-w-[34rem] lg:-translate-y-[4vh]" data-hero-text-motion="word-reveal">
               <p className="eyebrow" data-hero-copy-support>{content.hero.eyebrow}</p>
-              <h1 id="hero-title">
+              <h1 id="hero-title" className="luminal-masked-heading">
                 {heroTitleWords.map((word, index) => (
                   <span className="inline-block will-change-transform" data-hero-word key={`${word}-${index}`}>
                     {word}{index < heroTitleWords.length - 1 ? "\u00A0" : null}

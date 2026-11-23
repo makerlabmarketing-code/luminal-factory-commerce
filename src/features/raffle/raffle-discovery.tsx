@@ -34,9 +34,9 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
   return (
     <section className="section" aria-labelledby="raffle-title">
       <div className={`section-heading ${styles.heading}`}>
-        <h1 id="raffle-title">{tr("Raffle releases")}</h1>
+        <h1 id="raffle-title" className="luminal-masked-heading">{tr("Raffle releases")}</h1>
       </div>
-      <div className={styles.program}>
+      <div className={`${styles.program} luminal-side-rays`}>
         <div className={styles.programTitle}>
           <h2>{featuredMeowhe?.title ?? "Meowhe"}</h2>
         </div>
@@ -65,7 +65,7 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
       {releases.state === "ready" ? (
         <ul className={styles.list}>
           {releases.entries.map(release => (
-            <li className={styles.card} key={release.slug}>
+            <li className={styles.card} key={release.slug} data-luminal-bento-card>
               {release.media && <RaffleCover key={release.media.src} src={release.media.src} alt={release.media.alt || release.title} className={styles.cover} />}
               <span className="status-badge">{tr(statusCopy[release.state])}</span>
               <h2>{release.title}</h2>

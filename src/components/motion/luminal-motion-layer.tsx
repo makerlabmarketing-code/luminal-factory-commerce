@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import "./luminal-bento.module.css";
 
 const REVEAL_SELECTOR = "[data-luminal-reveal]";
-const SPOTLIGHT_SELECTOR = "[data-luminal-spotlight]";
+const SPOTLIGHT_SELECTOR = "[data-luminal-spotlight], [data-luminal-bento-card]";
 const BENTO_SELECTOR = ".made-at-luminal ol > li";
 const BENTO_PROXIMITY_PX = 260;
 const BENTO_AMBIENT_SCALE = 0.28;
