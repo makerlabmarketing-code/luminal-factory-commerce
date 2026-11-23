@@ -9,7 +9,6 @@ import { Container } from "@/components/ui/container";
 import { RaffleEntryForm } from "@/features/raffle/raffle-entry-form";
 import { formatShippingUsd } from "@/features/raffle/raffle-shipping";
 import styles from "@/features/raffle/raffle-discovery.module.css";
-import resin from "@/features/raffle/raffle-resin-preview.module.css";
 
 export const metadata: Metadata = {
   title: "Meowhe Raffle Preview | Luminal Factory",
@@ -32,8 +31,8 @@ export default async function MeowhePreviewPage({ params }: Readonly<{ params: P
 
   return (
     <>
-      <Header />
-      <main id="main-content" className={resin.resinStage}>
+      <Header rafflePreview />
+      <main id="main-content">
         <Container>
           <section className="section" aria-labelledby="raffle-preview-title">
             <div className={styles.program}>
@@ -41,14 +40,9 @@ export default async function MeowhePreviewPage({ params }: Readonly<{ params: P
                 <p className="eyebrow">Raffle preview</p>
                 <h1 className={styles.previewTitle} id="raffle-preview-title">Meowhe Archive</h1>
               </div>
-              <div className={`${styles.programVisual} ${resin.resinComposition}`}>
+              <div className={styles.programVisual}>
                 <div className={styles.archivePortrait}>
                   <Image src="/images/home/archive-meowhe.webp" alt="Meowhe artisan keycap from the Luminal Factory archive" fill sizes="(max-width: 700px) 80vw, 368px" style={{ objectFit: "cover" }} preload />
-                </div>
-                <div className={resin.resinFall} aria-hidden="true">
-                  <span className={resin.resinSource} />
-                  <span className={resin.resinThread} />
-                  <span className={resin.resinPool} />
                 </div>
               </div>
               <div className={styles.programCopy}>
@@ -61,12 +55,10 @@ export default async function MeowhePreviewPage({ params }: Readonly<{ params: P
                 </dl>
               </div>
             </div>
-            <RaffleEntryForm enabled raffleId="" rulesVersion="preview" siteKey="" shippingRates={shippingRates} preview />
-            <div className={`${styles.navigation} ${resin.previewActions}`}>
-              <label className={resin.motionControl}>
-                <input type="checkbox" className={resin.pauseInput} />
-                Pause resin animation
-              </label>
+            <div id="raffle-entry" style={{ scrollMarginTop: "6rem" }}>
+              <RaffleEntryForm enabled raffleId="" rulesVersion="preview" siteKey="" shippingRates={shippingRates} preview />
+            </div>
+            <div className={styles.navigation}>
               <Link className="button-link button-secondary" href="/en/raffle">Back to raffle releases</Link>
             </div>
           </section>

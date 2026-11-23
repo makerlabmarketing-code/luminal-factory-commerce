@@ -7,12 +7,13 @@ import Link from "@/lib/i18n/link";
 import { useEffect, useRef, useState } from "react";
 import { publicNavigation } from "@/components/layout/navigation";
 import styles from "./home-arrival-header.module.css";
+import { RaffleHeaderNotice } from "@/features/raffle/raffle-header-notice";
 
 type HeaderStage = "waiting" | "revealed";
 
 const INTRO_SESSION_KEY = "luminal-home-intro-v2";
 
-export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }>) {
+export function HomeArrivalHeader({ immersive, rafflePreview = false }: Readonly<{ immersive: boolean; rafflePreview?: boolean }>) {
   const tr = useTranslator();
   const [stage, setStage] = useState<HeaderStage>("revealed");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -129,6 +130,8 @@ export function HomeArrivalHeader({ immersive }: Readonly<{ immersive: boolean }
         </Link>
 
         <span className={styles.railLabel} aria-hidden="true">{tr("Luminal Factory")}</span>
+
+        {stage === "revealed" && !menuOpen && <RaffleHeaderNotice preview={rafflePreview} />}
 
         <nav className={styles.desktopNav} aria-label={tr("Điều hướng chính")}>
           {publicNavigation.map((item, index) => (

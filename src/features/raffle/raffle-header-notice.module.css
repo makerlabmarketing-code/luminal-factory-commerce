@@ -1,0 +1,57 @@
+.notice {
+  position: absolute;
+  z-index: 3;
+  top: 1.35rem;
+  left: clamp(13.5rem, 28%, 25rem);
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 2.75rem;
+  padding: .35rem .8rem;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid #c59b4e75;
+  border-radius: 999px;
+  background: #0a1316;
+  color: #ecfbfa;
+  font-size: .72rem;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.notice:hover { border-color: var(--rim-highlight); }
+
+.resin {
+  position: absolute;
+  z-index: -1;
+  inset: auto 1px 1px;
+  height: .68rem;
+  overflow: hidden;
+  border-radius: 45% 55% 999px 999px;
+  background: linear-gradient(180deg, #12374766, #2f898fa6 75%, #4ccedb7a);
+}
+
+.resin::before {
+  position: absolute;
+  content: "";
+  inset: 0;
+  background: linear-gradient(95deg, transparent 12%, #4ccedba8 40%, #d5ffed 52%, #357fa783 64%, transparent 86%);
+  animation: headerResinFlow 3.8s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes headerResinFlow {
+  0% { transform: translateX(-110%) skewX(-16deg); opacity: 0; }
+  15% { opacity: .72; }
+  100% { transform: translateX(110%) skewX(-16deg); opacity: 0; }
+}
+
+.label { letter-spacing: .035em; }
+.arrow { color: #b4f1ed; font-size: .88rem; }
+
+@media (max-width: 899px) {
+  .notice { top: 1rem; left: 50%; transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resin::before { animation: none; opacity: .22; }
+}
