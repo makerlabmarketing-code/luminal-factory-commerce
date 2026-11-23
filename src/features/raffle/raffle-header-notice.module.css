@@ -5,7 +5,6 @@
   left: clamp(13.5rem, 28%, 25rem);
   display: inline-flex;
   align-items: center;
-  gap: .55rem;
   min-height: 2.75rem;
   padding: .35rem .8rem;
   overflow: hidden;
@@ -46,7 +45,6 @@
 }
 
 .label { letter-spacing: .035em; }
-.arrow { color: #b4f1ed; font-size: .88rem; }
 
 @media (max-width: 899px) {
   .notice { top: 1rem; left: 50%; transform: translateX(-50%); }

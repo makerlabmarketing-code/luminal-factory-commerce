@@ -55,7 +55,6 @@ export function RaffleHeaderNotice({ preview }: Readonly<{ preview: boolean }>) 
     <Link className={styles.notice} href={href} prefetch={false}>
       <span className={styles.resin} aria-hidden="true" />
       <span className={styles.label}>{preview ? "Raffle preview" : locale === "vi" ? "Raffle đang mở" : "Raffle open"}</span>
-      <span className={styles.arrow} aria-hidden="true">↗</span>
     </Link>
   );
 }
