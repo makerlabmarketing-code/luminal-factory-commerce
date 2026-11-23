@@ -1,7 +1,8 @@
 # Comeback registration confirmation — review package
 
-Status: implementation tested; new Production SQL and email activation awaiting
-approval. Target **Commerce bkmbhcfokobmhfzgsfzh**, not ERP.
+Status: Production migration `20261123034440` installed on Commerce
+`bkmbhcfokobmhfzgsfzh`. The queue is empty, its entry trigger is disabled, and
+both schedules are inactive. Email activation is pending.
 
 ## Draft prepared
 
@@ -31,11 +32,12 @@ Only Owner has implicit access; no employee gets customer PII from Product
 permissions. Staff provisioning is a separate explicit operational action.
 PII stays in Commerce. Lists fail closed when response limits are exceeded.
 
-## Apply after exact-package approval
+## Install on a fresh project and activate
 
 1. Run `preflight.sql`: existing foundation present; no conflicting objects/jobs.
-2. Apply `forward.sql`, `lifecycle.sql`, then `schedules.sql`. Both cron jobs
-   are created inactive. `pg_net` is the only new extension.
+2. Apply the recorded migration. It installs the queue, lifecycle and two
+   inactive cron jobs and leaves the queue trigger disabled. `pg_net` is the
+   only new extension.
 3. Run `validation.sql`. Verify browser-role denial and service-only RPC access.
 4. Configure a domain-restricted sending credential as server-only
    `RESEND_API_KEY`, `RAFFLE_CONFIRMATION_FROM= Luminal Factory
@@ -50,8 +52,9 @@ PII stays in Commerce. Lists fail closed when response limits are exceeded.
    these checks. Test raffles intentionally never queue customer confirmations.
 6. Before opening a Production release, set
    `COMMERCE_RAFFLE_CONFIRMATION_ENABLED=true`, redeploy and verify the
-   worker returns `idle` with valid authorization for an empty queue. Activate
-   the two named schedules with `cron.alter_job(jobid, active := true)`.
+   worker returns `idle` with valid authorization for an empty queue. Run
+   `resume.sql` to enable the entry trigger, then activate the two named
+   schedules with `cron.alter_job(jobid, active := true)`.
 7. Only after name/image/price/rules are ready, schedule and publish the draft
    through the existing management contract. Clock jobs run every minute;
    opening status may lag by up to a minute, while entry SQL enforces the exact

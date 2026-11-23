@@ -9,8 +9,12 @@ const {buildRaffleConfirmation,sendRaffleConfirmation,confirmationPayloadSchema}
 const payload={entryId:'550e8400-e29b-41d4-a716-446655440000',email:'guest@example.test',displayName:'<img src=x onerror=alert(1)>',title:'Comeback\r\nNew',slug:'comeback-2026'};
 test('confirmation escapes customer input, strips subject newlines and says entry is not a win',()=>{
  const mail=buildRaffleConfirmation(payload);
- assert(!mail.html.includes('<img'));assert(mail.html.includes('&lt;img'));
- assert(!/[\r\n]/.test(mail.subject));assert(mail.text.includes('This is not a winning notification or a purchase confirmation.'));
+ assert(!mail.html.includes(payload.displayName));assert(mail.html.includes('&lt;img'));
+ assert(!/[\r\n]/.test(mail.subject));assert(mail.text.includes('This confirmation does not place an order or require payment.'));
+ assert.match(mail.html, /<h1[^>]*>Entry recorded<\/h1>/);
+ assert.match(mail.html, /brand\/luminal-factory-email-mark\.png/);
+ assert.match(mail.html, /href="https:\/\/luminalfactory\.com\/en\/raffle\/comeback-2026"/);
+ assert(mail.text.includes('View raffle: https://luminalfactory.com/en/raffle/comeback-2026'));
  assert(!confirmationPayloadSchema.safeParse({...payload,slug:'//evil.test'}).success);
 });
 test('retries reuse the same provider key and send only the transactional recipient',async()=>{

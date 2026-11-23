@@ -9,6 +9,7 @@ import { Container } from "@/components/ui/container";
 import { RaffleEntryForm } from "@/features/raffle/raffle-entry-form";
 import { formatShippingUsd } from "@/features/raffle/raffle-shipping";
 import styles from "@/features/raffle/raffle-discovery.module.css";
+import resin from "@/features/raffle/raffle-resin-preview.module.css";
 
 export const metadata: Metadata = {
   title: "Meowhe Raffle Preview | Luminal Factory",
@@ -32,7 +33,12 @@ export default async function MeowhePreviewPage({ params }: Readonly<{ params: P
   return (
     <>
       <Header />
-      <main id="main-content">
+      <main id="main-content" className={resin.resinStage}>
+        <div className={resin.resinFall} aria-hidden="true">
+          <span className={resin.resinSource} />
+          <span className={resin.resinThread} />
+          <span className={resin.resinThread} />
+        </div>
         <Container>
           <section className="section" aria-labelledby="raffle-preview-title">
             <div className={styles.program}>
@@ -56,7 +62,11 @@ export default async function MeowhePreviewPage({ params }: Readonly<{ params: P
               </div>
             </div>
             <RaffleEntryForm enabled raffleId="" rulesVersion="preview" siteKey="" shippingRates={shippingRates} preview />
-            <div className={styles.navigation}>
+            <div className={`${styles.navigation} ${resin.previewActions}`}>
+              <label className={resin.motionControl}>
+                <input type="checkbox" className={resin.pauseInput} />
+                Pause resin animation
+              </label>
               <Link className="button-link button-secondary" href="/en/raffle">Back to raffle releases</Link>
             </div>
           </section>
