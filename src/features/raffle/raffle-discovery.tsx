@@ -36,7 +36,7 @@ export async function RaffleDiscovery({ releases, featuredMeowhe, locale }: Read
       <div className={`section-heading ${styles.heading}`}>
         <h1 id="raffle-title" className="luminal-masked-heading">{tr("Raffle releases")}</h1>
       </div>
-      <div className={`${styles.program} luminal-side-rays`}>
+      <div className={styles.program}>
         <div className={styles.programTitle}>
           <h2>{featuredMeowhe?.title ?? "Meowhe"}</h2>
         </div>

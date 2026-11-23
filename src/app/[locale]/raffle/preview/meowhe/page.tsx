@@ -35,7 +35,7 @@ export default async function MeowhePreviewPage({ params }: Readonly<{ params: P
       <main id="main-content">
         <Container>
           <section className="section" aria-labelledby="raffle-preview-title">
-            <div className={`${styles.program} luminal-side-rays`}>
+            <div className={styles.program}>
               <div className={styles.programTitle}>
                 <p className="eyebrow">Raffle preview</p>
                 <h1 className={`${styles.previewTitle} luminal-masked-heading`} id="raffle-preview-title">Meowhe Archive</h1>

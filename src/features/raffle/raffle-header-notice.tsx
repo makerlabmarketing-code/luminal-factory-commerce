@@ -53,7 +53,6 @@ export function RaffleHeaderNotice({ preview }: Readonly<{ preview: boolean }>) 
   if (!href) return null;
   return (
     <Link className={styles.notice} href={href} prefetch={false}>
-      <span className={styles.resin} aria-hidden="true" />
       <span className={styles.label}>{preview ? "Raffle preview" : locale === "vi" ? "Raffle đang mở" : "Raffle open"}</span>
     </Link>
   );

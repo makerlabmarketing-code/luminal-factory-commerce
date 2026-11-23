@@ -874,13 +874,6 @@ html[lang="vi"] .wave-home h2 {overflow-wrap:break-word}
   }
 }
 
-.luminal-side-rays.luminal-side-rays {
-  background-image: conic-gradient(from 197deg at 100% 0%, transparent 4deg, #dba9795c 9deg, transparent 14deg 18deg, #a3c4cd52 21deg, transparent 27deg);
-  background-repeat: no-repeat;
-}
-
-.luminal-side-rays::before { opacity: .76; }
-
 @supports (background-clip: text) {
   .luminal-masked-heading:not(#hero-title),
   #hero-title.luminal-masked-heading [data-hero-word] {
