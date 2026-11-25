@@ -19,6 +19,7 @@ export function HomeArrivalHeader({ immersive, rafflePreview = false }: Readonly
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLElement>(null);
+  const desktopNavRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export function HomeArrivalHeader({ immersive, rafflePreview = false }: Readonly
     const header = headerRef.current;
     const panel = menuRef.current;
     const trigger = triggerRef.current;
+    const desktopNav = desktopNavRef.current;
     if (!header || !panel || !trigger) return;
     const previousOverflow = document.body.style.overflow;
     const isolated = new Map<HTMLElement, boolean>();
@@ -71,8 +73,21 @@ export function HomeArrivalHeader({ immersive, rafflePreview = false }: Readonly
     document.body.style.overflow = "hidden";
     const items = () => [trigger, ...Array.from(panel.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), [tabindex="0"]'))]
       .filter((element) => element.getClientRects().length > 0);
-    (items()[1] ?? trigger).focus();
     const desktop = window.matchMedia("(min-width: 900px)");
+    let mobileHref: string | null = null;
+    const rememberFocusedLink = (event: FocusEvent) => {
+      mobileHref = event.target instanceof HTMLAnchorElement ? event.target.getAttribute("href") : null;
+    };
+    panel.addEventListener("focusin", rememberFocusedLink);
+    // Wait for the panel to become visible before moving focus into it.
+    const focusFirstLink = (retry: boolean) => {
+      if (desktop.matches || panel.contains(document.activeElement)) return;
+      items()[1]?.focus({ preventScroll: true });
+      if (retry && !panel.contains(document.activeElement)) {
+        focusFrame = window.requestAnimationFrame(() => focusFirstLink(false));
+      }
+    };
+    let focusFrame = window.requestAnimationFrame(() => focusFirstLink(true));
     const closeOnDesktop = () => { if (desktop.matches) setMenuOpen(false); };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") { event.preventDefault(); setMenuOpen(false); }
@@ -90,11 +105,19 @@ export function HomeArrivalHeader({ immersive, rafflePreview = false }: Readonly
     desktop.addEventListener("change", closeOnDesktop);
     window.addEventListener("keydown", handleKeyDown);
     return () => {
+      window.cancelAnimationFrame(focusFrame);
+      panel.removeEventListener("focusin", rememberFocusedLink);
       desktop.removeEventListener("change", closeOnDesktop);
       window.removeEventListener("keydown", handleKeyDown);
       for (const [element, inert] of isolated) element.inert = inert;
       document.body.style.overflow = previousOverflow;
-      if (trigger.isConnected && trigger.getClientRects().length > 0) trigger.focus();
+      if (!trigger.isConnected) return;
+      if (desktop.matches) {
+        const links = Array.from(desktopNav?.querySelectorAll<HTMLAnchorElement>("a[href]") ?? []);
+        (links.find((link) => link.getAttribute("href") === mobileHref) ?? links[0])?.focus({ preventScroll: true });
+      } else {
+        trigger.focus({ preventScroll: true });
+      }
     };
   }, [menuOpen]);
 
@@ -133,7 +156,7 @@ export function HomeArrivalHeader({ immersive, rafflePreview = false }: Readonly
 
         {stage === "revealed" && !menuOpen && <RaffleHeaderNotice preview={rafflePreview} />}
 
-        <nav className={styles.desktopNav} aria-label={tr("Điều hướng chính")}>
+        <nav ref={desktopNavRef} className={styles.desktopNav} aria-label={tr("Điều hướng chính")}>
           {publicNavigation.map((item, index) => (
             <Link
               href={item.href}

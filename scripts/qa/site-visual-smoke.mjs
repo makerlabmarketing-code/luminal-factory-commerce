@@ -35,6 +35,26 @@ async function capture(page, name) {
   await page.screenshot({ path: `${output}/${name}.png`, animations: "disabled" });
 }
 
+async function verifyMobileNavigation(page, viewport) {
+  const toggle = page.getByRole("button", { name: "Open menu", exact: true });
+  const mobile = page.getByRole("navigation", { name: "Mobile main navigation", exact: true });
+
+  await toggle.click();
+  await page.waitForFunction(() => document.activeElement?.getAttribute("href") === "/en/raffle");
+  assert.equal(await page.evaluate(() => document.body.style.overflow), "hidden");
+  assert.equal(await page.locator("main").evaluate((element) => !!element.closest("[inert]")), true);
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Open menu");
+  assert.notEqual(await page.evaluate(() => document.body.style.overflow), "hidden");
+
+  await toggle.click();
+  await mobile.getByRole("link", { name: "Archive", exact: true }).focus();
+  await page.setViewportSize({ width: 900, height: viewport.height });
+  await page.waitForFunction(() => document.activeElement?.closest("nav")?.getAttribute("aria-label") === "Main navigation");
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("href")), "/en/archive");
+  assert.notEqual(await page.evaluate(() => document.body.style.overflow), "hidden");
+}
+
 try {
   for (const size of sizes) {
     const context = await browser.newContext({
@@ -74,7 +94,9 @@ try {
       const lightBg = await stage.locator('[class*="stageLight"]').evaluate((node) => getComputedStyle(node).backgroundImage);
       assert.ok(!lightBg.includes("conic-gradient"), "Misaligned directional spotlight has returned");
       await capture(page, `archive-colorways-${size.name}`);
-      report.push({ route: "/archive", viewport: size.name, colorwayWidths: images, ...info, pageErrors: errors });
+      const mobileNavigationChecked = size.width < 900;
+      if (mobileNavigationChecked) await verifyMobileNavigation(page, size);
+      report.push({ route: "/archive", viewport: size.name, colorwayWidths: images, mobileNavigationChecked, ...info, pageErrors: errors });
       await page.close();
     }
 
