@@ -45,6 +45,14 @@ test("Hero keeps the stage clear during 3D loading and shows the portrait only o
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
+test("Hero deadline begins before runtime registration and ignores a late runtime after fallback", () => {
+  const viewerSetup = heroSource.slice(heroSource.indexOf("const mountViewer = async ()"));
+  assert.match(viewerSetup, /setTimeout\(showError, HERO_ENHANCEMENT_TIMEOUT_MS\);\s+await ensureModelViewer\(\);\s+if \(cancelled \|\| fellBack \|\| viewerRef\.current\) return/);
+  const fallback = heroSource.slice(heroSource.indexOf("const showError ="), heroSource.indexOf("const mountViewer ="));
+  assert.match(fallback, /fellBack = true/);
+  assert.match(fallback, /mount\.replaceChildren\(\)/);
+});
+
 test("Hero supports constrained drag, preserves scroll orbit, and recenters on release", () => {
   assert.match(heroConfig, /rollDeg: 0/);
   assert.match(heroConfig, /pitchDeg: -52/);

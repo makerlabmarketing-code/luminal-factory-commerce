@@ -36,7 +36,7 @@ const MODEL_VIEWER_SCRIPT_ID = "luminal-model-viewer-runtime";
 const MODEL_VIEWER_SCRIPT_SRC = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js";
 const HERO_IDLE_TIMEOUT_MS = 1200;
 const HERO_IDLE_FALLBACK_MS = 450;
-const HERO_MODEL_LOAD_TIMEOUT_MS = 6000;
+const HERO_ENHANCEMENT_TIMEOUT_MS = 6000;
 const HERO_DRAG_RETURN_RATE = 5.5;
 // The published ERP camera angle is the Hero resting pose. No hard-coded yaw addition.
 const HERO_POINTER_SETTLE_EPSILON_DEG = 0.01;
@@ -169,10 +169,11 @@ export function HeroObjectStage({
     }
 
     let cancelled = false;
+    let fellBack = false;
     let observer: IntersectionObserver | null = null;
     let idleHandle: number | null = null;
     let fallbackTimeout: number | null = null;
-    let modelLoadTimeout: number | null = null;
+    let enhancementTimeout: number | null = null;
     let pointerAnimationFrame: number | null = null;
     let previousPointerFrameTime = performance.now();
     let scrollOrbitProgress = 0;
@@ -250,7 +251,7 @@ export function HeroObjectStage({
     };
 
     const handlePointerDown = (event: PointerEvent) => {
-      if (event.button !== 0 || !finePointer || reducedMotion) return;
+      if (event.button !== 0 || !finePointer || reducedMotion || fellBack) return;
       if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
       if (event.target instanceof Element && event.target.closest("a, button, input, textarea, select, h1, h2, h3, p, [role='button']")) return;
       const stageBounds = stage.getBoundingClientRect();
@@ -296,8 +297,11 @@ export function HeroObjectStage({
 
     const showError = () => {
       if (cancelled || stage.dataset.heroMode === "poster-3d-unavailable") return;
+      fellBack = true;
       stage.dataset.heroMode = "poster-3d-unavailable";
-      if (modelLoadTimeout !== null) window.clearTimeout(modelLoadTimeout);
+      if (enhancementTimeout !== null) window.clearTimeout(enhancementTimeout);
+      viewerRef.current = null;
+      mount.replaceChildren();
       if (loaderRef.current) loaderRef.current.style.display = "none";
       mount.style.display = "none";
       if (preview) {
@@ -311,8 +315,10 @@ export function HeroObjectStage({
     const mountViewer = async () => {
       try {
         stage.dataset.heroMode = "loading-3d";
+        // Cover the runtime download and registration as well as the model load.
+        enhancementTimeout = window.setTimeout(showError, HERO_ENHANCEMENT_TIMEOUT_MS);
         await ensureModelViewer();
-        if (cancelled || viewerRef.current) return;
+        if (cancelled || fellBack || viewerRef.current) return;
 
         const viewer = document.createElement("model-viewer") as HTMLElement & { model?: { materials: HeroModelMaterial[] } };
         viewer.style.display = "block";
@@ -356,7 +362,7 @@ export function HeroObjectStage({
 
         viewer.addEventListener("load", () => {
           if (cancelled || stage.dataset.heroMode === "poster-3d-unavailable") return;
-          if (modelLoadTimeout !== null) window.clearTimeout(modelLoadTimeout);
+          if (enhancementTimeout !== null) window.clearTimeout(enhancementTimeout);
           applyHeroMaterialTint(viewer.model?.materials ?? [], presentation.tint);
           stage.dataset.heroMode = reducedMotion
             ? "enhanced-static"
@@ -377,7 +383,6 @@ export function HeroObjectStage({
         viewer.addEventListener("error", showError, { once: true });
         mount.replaceChildren(viewer);
         viewerRef.current = viewer;
-        modelLoadTimeout = window.setTimeout(showError, HERO_MODEL_LOAD_TIMEOUT_MS);
         // Apply the resting text-facing angle immediately, even before any scroll event.
         applyPointerOrbit();
       } catch {
@@ -424,7 +429,7 @@ export function HeroObjectStage({
         idleWindow.cancelIdleCallback(idleHandle);
       }
       if (fallbackTimeout !== null) window.clearTimeout(fallbackTimeout);
-      if (modelLoadTimeout !== null) window.clearTimeout(modelLoadTimeout);
+      if (enhancementTimeout !== null) window.clearTimeout(enhancementTimeout);
       if (pointerAnimationFrame !== null) window.cancelAnimationFrame(pointerAnimationFrame);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerdown", handlePointerDown);
