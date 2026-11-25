@@ -6,6 +6,28 @@ import { authorizeCommerceAdminRoute, commerceAdminFailure, commerceAdminSuccess
 export const dynamic = "force-dynamic";
 type Props = Readonly<{ params: Promise<{ id: string; allocationId: string }> }>;
 
+export async function GET(request: Request, { params }: Props) {
+  const context = await authorizeCommerceAdminRoute(request, ["commerce.raffle.fulfillment.manage"]);
+  if (context instanceof Response) return context;
+  const requestId = context.identity.requestId;
+  const { id, allocationId } = await params;
+  if (!z.uuid().safeParse(id).success || !z.uuid().safeParse(allocationId).success) {
+    return commerceAdminFailure(requestId, 400, "REQUEST_INVALID", "Raffle/allocation id không hợp lệ.");
+  }
+  const { data, error } = await context.privilegedClient.from("raffle_winner_allocation_events")
+    .select("note,created_at")
+    .eq("allocation_id", allocationId)
+    .eq("raffle_id", id)
+    .eq("event_type", "completed")
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) return commerceAdminFailure(requestId, 503, "REMOTE_UNAVAILABLE", "Không thể đọc lịch sử gửi hàng.", true);
+  const tracking = data === null ? null : { note: data.note, completedAt: data.created_at };
+  return commerceAdminSuccess({ tracking }, requestId);
+}
+
 export async function POST(request: Request, { params }: Props) {
   const context = await authorizeCommerceAdminRoute(request, ["commerce.raffle.fulfillment.manage"]);
   if (context instanceof Response) return context;
