@@ -24,7 +24,7 @@ function ease(start: number, end: number, progress: number) {
 // The centerline rises as the photos orbit the same cylinder.
 const rise = [
   [-2, 1.30], [-1.65, 1.17], [-0.8, 0.88], [0, 0.74], [1.57, 0.67],
-  [3.14, 0.50], [4.71, 0.27], [6.0, -0.22], [7.65, -0.6],
+  [3.14, 0.50], [4.71, 0.27], [5.45, 0.10], [6.0, -0.18], [7.65, -0.65],
 ] as const;
 
 function centerHeight(angle: number) {
@@ -43,7 +43,10 @@ function centerHeight(angle: number) {
     + u * (1 - u) * ((1 - u) * m0 - u * m1);
 }
 
-const radiusFor = (width: number, height: number) => Math.min(width, height * 1.85) * 0.43;
+function radiusFor(width: number, height: number) {
+  const spread = mix(0.46, 0.50, ease(440, 1050, width));
+  return Math.min(width, height * 2) * spread;
+}
 const cameraScale = (angle: number) => 1.65 / (2.55 + Math.cos(angle));
 
 export function getGalleryProgress(sectionTop: number, viewport: number) {
@@ -108,4 +111,27 @@ export function getGalleryPanelTransform(corners: Quad, slot: { x: number; y: nu
 export function getGalleryArrival(progress: number, index: number) {
   const start = galleryArrivalProgress + index * 0.008;
   return ease(start, start + 0.082, progress);
+}
+
+export function getGalleryCornerOffset(
+  arrival: number,
+  index: number,
+  columns: number,
+  rows: number,
+  viewport: { width: number; height: number },
+  slot: { x: number; y: number; width: number; height: number },
+  settleOffset: number,
+) {
+  const column = index % columns;
+  const row = Math.floor(index / columns);
+  const side = Math.sign(column * 2 - (columns - 1)) || (row % 2 ? 1 : -1);
+  const vertical = Math.sign(row * 2 - (rows - 1)) || (column % 2 ? 1 : -1);
+  const margin = Math.ceil(Math.max(slot.width, slot.height) * 0.1);
+  const edgeX = side < 0 ? -slot.width - margin : viewport.width + margin;
+  const edgeY = vertical < 0 ? -slot.height - margin : viewport.height + margin;
+  return {
+    x: mix(edgeX - slot.x, 0, arrival),
+    y: mix(edgeY - slot.y, settleOffset, arrival),
+    tilt: (1 - arrival) * 6 * side * vertical || 0,
+  };
 }

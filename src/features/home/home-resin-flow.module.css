@@ -18,6 +18,7 @@
 .photoChapter {
   --ribbon-photo-overlap: clamp(3.5rem, 8vw, 7rem);
   position: relative;
+  overflow-x: clip;
   background: linear-gradient(180deg, var(--home-photo-entry-surface) 0, var(--home-photo-exit-surface) clamp(11rem, 29vw, 28rem));
   padding-bottom: clamp(1rem, 3vw, 2.5rem);
 }

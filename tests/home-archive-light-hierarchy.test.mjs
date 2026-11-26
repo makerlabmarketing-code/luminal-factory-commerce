@@ -108,3 +108,28 @@ test("The curved photos share one perspective and leave before gallery arrival",
     assert.ok(getGalleryProgress(-0.88 * height, height) < 0.85);
   }
 });
+
+test("The gallery flies in from all four viewport corners and settles on its slots", async () => {
+  const { getGalleryCornerOffset } = await import("../src/features/home/home-gallery-motion.ts");
+  for (const [width, height, columns] of [[390, 844, 2], [1440, 900, 3]]) {
+    const rows = Math.ceil(9 / columns);
+    const slot = { x: 40, y: 110, width: 150, height: 100 };
+    const viewport = { width, height };
+    const origins = new Set();
+    for (let index = 0; index < 9; index++) {
+      const offset = getGalleryCornerOffset(0, index, columns, rows, viewport, slot, -80);
+      const x = slot.x + offset.x;
+      const y = slot.y + offset.y;
+      assert.ok(x + slot.width < 0 || x > width);
+      assert.ok(y + slot.height < 0 || y > height);
+      origins.add(`${x < 0 ? "left" : "right"} ${y < 0 ? "top" : "bottom"}`);
+      const halfway = getGalleryCornerOffset(0.5, index, columns, rows, viewport, slot, -80);
+      assert.equal(halfway.x, offset.x / 2);
+      assert.equal(halfway.y, (offset.y - 80) / 2);
+      assert.deepEqual(getGalleryCornerOffset(1, index, columns, rows, viewport, slot, 0), {
+        x: 0, y: 0, tilt: 0,
+      });
+    }
+    assert.equal(origins.size, 4);
+  }
+});

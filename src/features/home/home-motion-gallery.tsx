@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { HomeGalleryMedia } from "@/content/homepage-media";
 import { useTranslator } from "@/lib/i18n/client";
-import { getGalleryArrival, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGalleryStripPanel, galleryArrivalProgress, galleryEntryViewportRatio, gallerySettleProgress } from "./home-gallery-motion";
+import { getGalleryArrival, getGalleryCornerOffset, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGalleryStripPanel, galleryArrivalProgress, galleryEntryViewportRatio, gallerySettleProgress } from "./home-gallery-motion";
 import styles from "./home-motion-gallery.module.css";
 
 const maxSlices = 7;
@@ -39,7 +39,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
     let frame = 0;
     let previous = -1;
     const motionAllowed = () => !reduced.matches && !(coarse.matches && (device.deviceMemory ?? Infinity) <= 2);
-    let dimensions: { width: number; height: number; y: number; backgroundX: number; backgroundY: number }[] = [];
+    let dimensions: { width: number; height: number; x: number; y: number; backgroundX: number; backgroundY: number }[] = [];
 
     function clearTiles() {
       for (const tile of tiles) {
@@ -113,7 +113,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
             piece.style.backgroundSize = `${imageWidth}px ${imageHeight}px`;
           }
           return {
-            width, height, y: slot.offsetTop,
+            width, height, x: slot.offsetLeft, y: slot.offsetTop,
             backgroundX: (width - imageWidth) * positionX,
             backgroundY: (height - imageHeight) * positionY,
           };
@@ -145,14 +145,16 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       }
 
       const settleOffset = getGallerySettleOffset(progress, stageHeight);
+      const columns = compact.matches ? 2 : 3;
+      const rows = Math.ceil(tiles.length / columns);
       tiles.forEach((tile, index) => {
         const slot = dimensions[index];
         if (!slot.width) return;
-        const y = rect.top + slot.y;
         const arrival = getGalleryArrival(progress, index);
-        const direction = index % (compact.matches ? 2 : 3) - (compact.matches ? 0.5 : 1);
-        const drop = (-slot.height - y) * (1 - arrival) + settleOffset * arrival;
-        tile.style.transform = `translate3d(${direction * width * 0.12 * (1 - arrival)}px,${drop}px,0) rotate(${direction * 5 * (1 - arrival)}deg)`;
+        const offset = getGalleryCornerOffset(arrival, index, columns, rows, { width, height }, {
+          x: rect.left + slot.x, y: rect.top + slot.y, width: slot.width, height: slot.height,
+        }, settleOffset);
+        tile.style.transform = `translate3d(${offset.x}px,${offset.y}px,0) rotate(${offset.tilt}deg)`;
         tile.style.opacity = arrival > 0 ? "1" : "0";
         tile.style.zIndex = "31";
       });
