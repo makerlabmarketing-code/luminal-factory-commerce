@@ -54,9 +54,7 @@
 .hero-crystal-mark { position: absolute; z-index: -1; width: min(48vw, 46rem); height: auto; right: -9vw; top: 50%; opacity: .09; filter: saturate(.25); transform: translateY(-50%) rotate(12deg); }
 .revival-hero-inner { position: relative; min-height: inherit; display: grid; grid-template-columns: minmax(0, .92fr) minmax(20rem, .8fr); align-items: center; gap: clamp(3rem, 7vw, 9rem); padding-block: clamp(4rem, 8vw, 8rem); }
 .revival-hero-copy { position: relative; z-index: 2; }
-.revival-hero h1 { max-width: 10ch; margin: 1.3rem 0 1.65rem; font-size: clamp(3rem, 6.7vw, 7rem); font-weight: 390; letter-spacing: -.065em; line-height: 1.04; }
-/* Give background-clipped words room for both ascenders and descenders. */
-.revival-hero [data-hero-word] { padding-block: .06em; margin-block: -.06em; }
+.revival-hero h1 { max-width: 10ch; margin: 1.3rem 0 1.65rem; font-size: clamp(3rem, 6.7vw, 7rem); font-weight: 390; letter-spacing: -.065em; line-height: 1.04; color: var(--foreground); }
 .revival-hero .lede { max-width: 33rem; }
 .hero-object-stage { position: relative; min-height: min(68vh, 46rem); display: grid; place-items: center; border: 1px solid rgba(255,255,255,.08); background: linear-gradient(145deg, rgba(255,255,255,.035), transparent 45%); animation: wave-object-reveal 1.1s cubic-bezier(.2,.7,.2,1) both; }
 .hero-object-stage::before { content: ""; position: absolute; inset: 9%; border-radius: 50%; background: radial-gradient(circle, rgba(188,226,240,.12), transparent 61%); filter: blur(14px); }
@@ -889,8 +887,7 @@ html[lang="vi"] .wave-home h2 {overflow-wrap:break-word}
 }
 
 @supports (background-clip: text) {
-  .luminal-masked-heading:not(#hero-title),
-  #hero-title.luminal-masked-heading [data-hero-word] {
+  .luminal-masked-heading {
     background-image: linear-gradient(104deg, #f7f2e9 16%, #efdcc0 47%, #c1edf2 70%, #f7f2e9 96%);
     background-clip: text;
     color: transparent;
@@ -898,6 +895,5 @@ html[lang="vi"] .wave-home h2 {overflow-wrap:break-word}
 }
 
 @media (forced-colors: active) {
-  .luminal-masked-heading:not(#hero-title),
-  #hero-title.luminal-masked-heading [data-hero-word] { background: none; color: CanvasText; }
+  .luminal-masked-heading { background: none; color: CanvasText; }
 }
