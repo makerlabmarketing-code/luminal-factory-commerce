@@ -35,12 +35,13 @@ test("Archive makes real colorway photographs legible and keyboard navigation st
   assert.match(archive, /styles\.colorwayLabel/);
 });
 
-test("Two reversible resin strokes frame the photo handoff in opposite directions", async () => {
+test("The gallery pauses resin strokes while retaining the hero fallback", async () => {
   const { getHeroPhotoMotion, getHomePhotoHandoffProgress } = await import("../src/features/home/home-photo-handoff.ts");
   const flow = read("src/features/home/home-resin-flow.tsx");
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   const style = read("src/features/home/home-resin-flow.module.css");
-  assert.match(home, /<HomeResinFlow direction="entry" \/>[\s\S]*<HomeMotionGallery[\s\S]*<HomeResinFlow direction="exit" \/>/);
+  assert.match(home, /<HomeMotionGallery/);
+  assert.doesNotMatch(home, /<HomeResinFlow/);
   assert.doesNotMatch(home, /HomeFlexGallery/);
   assert.match(flow, /entry: \{\s*start: \[0\.025, 0\.025\]/);
   assert.match(flow, /exit: \{\s*start: \[1\.04,[\s\S]*-0\.04/);
@@ -69,36 +70,27 @@ test("Two reversible resin strokes frame the photo handoff in opposite direction
 });
 
 
-test("Gallery cards grow along one arc and card seven covers a front-facing hero before the grid", async () => {
-  const { galleryCoverCardIndex, galleryCoverProgress, gallerySettleProgress, getGalleryCardPose, getGalleryCoverWidth, getGalleryHeroPose, getGalleryProgress, getGallerySettleOffset } = await import("../src/features/home/home-gallery-motion.ts");
-  assert.equal(galleryCoverCardIndex, 6);
-  assert.match(home, /const galleryPhotos = media\.gallery;/);
+test("Adjacent panels share a projected edge and the complete strip exits before gallery arrival", async () => {
+  const { galleryCoverProgress, galleryArrivalProgress, gallerySettleProgress, getGalleryArrival, getGalleryHeroPose, getGalleryStripPanel } = await import("../src/features/home/home-gallery-motion.ts");
   for (const [width, height] of [[390, 844], [1440, 900], [1920, 1030]]) {
-    const at = (p, index) => getGalleryCardPose(p, index, width, height, width < 700);
-    const start = at(0.21, 0);
-    assert.ok(start.x < 0 && start.y > height * 0.35 && start.opacity > 0);
-    assert.equal(at(0.21, 1).opacity, 0);
-    assert.ok(at(0.34, 0).width > start.width * 1.2);
-    assert.ok(at(0.39, 0).x > 0 && at(0.39, 0).y < start.y);
-    assert.equal(getGalleryHeroPose(0, -22).yaw, -22);
-    assert.ok(getGalleryHeroPose(0.16, -22).yaw > -22 && getGalleryHeroPose(0.16, -22).yaw < 0);
-    assert.equal(getGalleryHeroPose(0.35, -22).yaw, 0);
+    const at = (progress, index) => getGalleryStripPanel(progress, index, width, height);
+    const head = at(0.2, 0);
+    const following = at(0.2, 1);
+    const nearlyEqual = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.001;
+    assert.equal(head.corners.filter(a => following.corners.some(b => nearlyEqual(a, b))).length, 2);
+    assert.equal(getGalleryHeroPose(0.3, -22).yaw, 0);
     assert.equal(getGalleryHeroPose(galleryCoverProgress - 0.001, -22).visible, true);
     assert.equal(getGalleryHeroPose(galleryCoverProgress, -22).visible, false);
-    const cover = at(galleryCoverProgress, galleryCoverCardIndex);
-    assert.equal(cover.opacity, 1);
-    assert.equal(cover.layer, 39);
-    assert.equal(cover.width, getGalleryCoverWidth(width, height));
-    assert.ok(Math.abs(cover.x) < 1 && Math.abs(cover.y) < 1);
-    assert.equal(cover.settle, 0);
-    assert.ok(at(0.77, galleryCoverCardIndex).y < cover.y);
-    assert.ok(at(0.8, 0).settle > at(0.8, 8).settle);
-    assert.equal(at(gallerySettleProgress, 8).settle, 1);
-    assert.ok(getGallerySettleOffset(0.8, height) < 0);
-    assert.equal(Math.abs(getGallerySettleOffset(gallerySettleProgress, height)), 0);
-    const positions = [height, height / 2, 0, -height];
-    const down = positions.map(top => getGalleryProgress(top, height));
-    const up = positions.toReversed().map(top => getGalleryProgress(top, height));
-    assert.deepEqual(up, down.toReversed());
+    const cover = at(galleryCoverProgress, 0);
+    assert.ok(cover.layer > 30);
+    assert.ok(cover.corners[0][0] < width / 2 && cover.corners[1][0] > width / 2);
+    assert.ok(cover.corners[0][1] < height / 2 && cover.corners[2][1] > height / 2);
+    assert.ok(cover.corners[1][0] - cover.corners[0][0] > (head.corners[1][0] - head.corners[0][0]) * 1.4);
+    const tail = at(0.802, 8);
+    assert.ok(tail.corners.every(point => point[1] < 0));
+    assert.equal(at(galleryArrivalProgress, 8), null);
+    assert.equal(getGalleryArrival(galleryArrivalProgress, 0), 0);
+    assert.ok(getGalleryArrival(0.88, 0) > getGalleryArrival(0.88, 8));
+    assert.equal(getGalleryArrival(gallerySettleProgress, 8), 1);
   }
 });

@@ -14,7 +14,6 @@ import { HeroTextMotionController } from "./hero-copy-motion";
 import { HomeArchiveBurst } from "./home-archive-burst";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
 import { HomeMotionGallery } from "./home-motion-gallery";
-import { HomeResinFlow } from "./home-resin-flow";
 import photoStyles from "./home-resin-flow.module.css";
 import { MadeAtLuminalStack } from "./made-at-luminal-stack";
 import { getHomeFeaturedRaffle } from "@/features/raffle/raffle-home-service";
@@ -158,7 +157,6 @@ export async function HomePage() {
 
         {galleryPhotos.length ? (
           <section className={photoStyles.photoChapter} aria-labelledby="gallery-title" data-home-3d-section="gallery" data-home-photo-handoff>
-            <HomeResinFlow direction="entry" />
             <span className={photoStyles.galleryViewport} data-home-gallery-viewport aria-hidden="true" />
             <Container className={photoStyles.galleryContainer}>
               <header className={`editorial-heading ${photoStyles.photoCopy}`} data-luminal-reveal="home-copy">
@@ -167,7 +165,6 @@ export async function HomePage() {
               </header>
               <HomeMotionGallery items={galleryPhotos} />
             </Container>
-            <HomeResinFlow direction="exit" />
           </section>
         ) : null}
 

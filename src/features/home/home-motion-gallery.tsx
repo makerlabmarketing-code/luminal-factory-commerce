@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { HomeGalleryMedia } from "@/content/homepage-media";
 import { useTranslator } from "@/lib/i18n/client";
-import { getGalleryCardPose, getGalleryHeroPose, getGalleryProgress, getGallerySettleOffset, galleryEntryViewportRatio, gallerySettleProgress } from "./home-gallery-motion";
+import { getGalleryArrival, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGalleryStripPanel, galleryArrivalProgress, galleryEntryViewportRatio, gallerySettleProgress } from "./home-gallery-motion";
 import styles from "./home-motion-gallery.module.css";
 
 export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGalleryMedia[] }>) {
@@ -64,7 +64,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       const progress = getGalleryProgress(top, stageHeight);
       if (progress === previous) return;
       previous = progress;
-      chapter.toggleAttribute("data-gallery-show-heading", progress >= 0.83);
+      chapter.toggleAttribute("data-gallery-show-heading", progress >= galleryArrivalProgress);
 
       const moving = progress < gallerySettleProgress;
       grid.inert = moving;
@@ -96,14 +96,24 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       tiles.forEach((tile, index) => {
         const slot = dimensions[index];
         if (!slot.width) return;
-        const pose = getGalleryCardPose(progress, index, width, stageHeight, compact.matches);
-        const left = rect.left + slot.x + slot.width / 2;
-        const top = rect.top + slot.y + slot.height / 2;
-        const remaining = 1 - pose.settle;
-        const y = (stageHeight / 2 + pose.y - top) * remaining + settleOffset * pose.settle;
-        tile.style.transform = `translate3d(${(width / 2 + pose.x - left) * remaining}px,${y}px,0) perspective(950px) rotateZ(${pose.roll * remaining}deg) rotateY(${pose.yaw * remaining}deg) scale(${1 + (pose.width / slot.width - 1) * remaining})`;
-        tile.style.opacity = String(pose.opacity);
-        tile.style.zIndex = String(pose.layer);
+        const x = rect.left + slot.x;
+        const y = rect.top + slot.y;
+        if (progress < galleryArrivalProgress) {
+          const panel = getGalleryStripPanel(progress, index, width, stageHeight);
+          tile.style.opacity = panel ? "1" : "0";
+          if (panel) {
+            tile.style.transform = getGalleryPanelTransform(panel.corners, { ...slot, x, y });
+            tile.style.zIndex = String(panel.layer);
+          }
+          return;
+        }
+
+        const arrival = getGalleryArrival(progress, index);
+        const direction = index % (compact.matches ? 2 : 3) - (compact.matches ? 0.5 : 1);
+        const drop = (-slot.height - y) * (1 - arrival) + settleOffset * arrival;
+        tile.style.transform = `translate3d(${direction * width * 0.12 * (1 - arrival)}px,${drop}px,0) rotate(${direction * 5 * (1 - arrival)}deg)`;
+        tile.style.opacity = arrival > 0 ? "1" : "0";
+        tile.style.zIndex = "31";
       });
     }
 

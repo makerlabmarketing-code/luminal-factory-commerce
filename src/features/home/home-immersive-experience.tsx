@@ -348,7 +348,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         if (photoChapter.dataset.galleryMotion === "ready" && galleryProgress > 0) {
           const pose = getGalleryHeroPose(galleryProgress, -presentation.camera.thetaDeg);
           const coverWidth = getGalleryCoverWidth(document.documentElement.clientWidth, stableHeight);
-          const coverScale = Math.min(0.49, coverWidth * 0.51 / layer.offsetHeight, coverWidth * 0.78 / layer.offsetWidth);
+          const coverScale = Math.min(0.49, Math.min(stableHeight, document.documentElement.clientWidth * 0.82) * 0.28 / layer.offsetHeight, coverWidth * 0.75 / layer.offsetWidth);
           const galleryCenterX = document.documentElement.clientWidth * 0.5;
           const sourceY = y - releaseY - stableHeight * (1 - galleryEntryViewportRatio);
           x = interpolate(x, galleryCenterX - layer.offsetLeft - layer.offsetWidth * 0.5, pose.travel);

@@ -24,7 +24,8 @@
 .grid[data-moving] .tile {
   pointer-events: none;
   will-change: transform, opacity;
-  border-radius: .2rem;
+  border-radius: 0;
+  transform-origin: 0 0;
 }
 
 .tile img { object-fit: cover; }
@@ -62,8 +63,8 @@
   top: 0;
   left: 50%;
   z-index: 30;
-  width: min(48vw, 40svh);
-  height: min(50vw, 38svh);
+  width: min(24vw, 30svh);
+  height: min(26vw, 33svh);
   pointer-events: none;
   opacity: 0;
   mask-image: radial-gradient(ellipse at center, #000 48%, transparent 73%);
