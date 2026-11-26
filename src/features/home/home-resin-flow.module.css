@@ -50,7 +50,7 @@
 }
 
 .photoChapter[data-gallery-motion="ready"] .galleryContainer {
-  padding-top: 147svh;
+  padding-top: var(--gallery-arrival-padding, 147svh);
 }
 
 .photoChapter[data-gallery-motion="ready"]:not([data-gallery-show-heading]) .photoCopy {

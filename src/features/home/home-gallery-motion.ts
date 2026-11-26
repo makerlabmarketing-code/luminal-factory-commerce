@@ -5,11 +5,16 @@ const angleStart = -1.65;
 const angleTravel = 8.8;
 const flightDuration = 0.40;
 const scrollDistanceRatio = 2.25;
+const extraArrivalScroll = 0.24;
 
 export const galleryEntryViewportRatio = 0.88;
 export const galleryCoverProgress = entryProgress + flightDuration * ((Math.PI - angleStart) / angleTravel);
 export const gallerySettleProgress = 0.99;
 export const galleryArrivalProgress = 0.84;
+
+const arrivalScrollStart = galleryArrivalProgress * scrollDistanceRatio;
+const arrivalScrollSpan = (gallerySettleProgress - galleryArrivalProgress) * scrollDistanceRatio + extraArrivalScroll;
+export const galleryArrivalPadding = `${147 + extraArrivalScroll * 100}svh`;
 
 type Point = readonly [number, number];
 type Quad = readonly [Point, Point, Point, Point];
@@ -50,16 +55,26 @@ function radiusFor(width: number, height: number) {
 const cameraScale = (angle: number) => 1.65 / (2.55 + Math.cos(angle));
 
 export function getGalleryProgress(sectionTop: number, viewport: number) {
-  return clamp((viewport * galleryEntryViewportRatio - sectionTop) / (viewport * scrollDistanceRatio));
+  const distance = galleryEntryViewportRatio - sectionTop / viewport;
+  if (distance <= arrivalScrollStart) return clamp(distance / scrollDistanceRatio);
+  return clamp(galleryArrivalProgress + (distance - arrivalScrollStart) / arrivalScrollSpan
+    * (gallerySettleProgress - galleryArrivalProgress));
 }
 
 export function getGallerySettleOffset(progress: number, viewport: number) {
-  return -Math.max(0, gallerySettleProgress - progress) * viewport * scrollDistanceRatio;
+  return -clamp((gallerySettleProgress - progress) / (gallerySettleProgress - galleryArrivalProgress))
+    * viewport * arrivalScrollSpan;
 }
 
 export function getGalleryHeroPose(progress: number, meetAngle: number) {
   const travel = ease(0, 0.28, progress);
   return { travel, yaw: mix(meetAngle, 0, travel), visible: progress < galleryCoverProgress };
+}
+
+export function getGallerySideCopy(progress: number) {
+  const travel = ease(0.13, 0.74, progress);
+  const opacity = ease(0.13, 0.29, progress) * (1 - ease(0.62, 0.80, progress));
+  return { travel, opacity };
 }
 
 export function getGalleryCoverWidth(width: number, height: number) {

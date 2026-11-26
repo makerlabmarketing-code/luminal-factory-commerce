@@ -133,3 +133,21 @@ test("The gallery flies in from all four viewport corners and settles on its slo
     assert.equal(origins.size, 4);
   }
 });
+
+test("The scroll keeps spiral timing and gives the four-corner arrival more room", async () => {
+  const { galleryArrivalProgress, gallerySettleProgress, getGalleryProgress, getGallerySettleOffset, getGallerySideCopy } = await import("../src/features/home/home-gallery-motion.ts");
+  const viewport = 900;
+  const entry = 0.88 * viewport;
+  const topAtArrival = entry - 2.25 * galleryArrivalProgress * viewport;
+  assert.ok(Math.abs(getGalleryProgress(topAtArrival, viewport) - galleryArrivalProgress) < 0.00001);
+  const oldSettleTop = entry - 2.25 * gallerySettleProgress * viewport;
+  assert.ok(getGalleryProgress(oldSettleTop, viewport) < gallerySettleProgress);
+  const newTop = oldSettleTop - 0.24 * viewport;
+  const easeError = Math.abs(getGalleryProgress(newTop, viewport) - gallerySettleProgress);
+  assert.ok(easeError < 0.00001);
+  assert.ok(Math.abs(getGallerySettleOffset(getGalleryProgress((newTop + topAtArrival) / 2, viewport), viewport) - (newTop - topAtArrival) / 2) < 0.00001);
+  assert.equal(getGallerySideCopy(0).opacity, 0);
+  assert.equal(getGallerySideCopy(galleryArrivalProgress).opacity, 0);
+  assert.ok(getGallerySideCopy(0.4).opacity > 0);
+  assert.ok(getGallerySideCopy(0.55).travel > getGallerySideCopy(0.3).travel);
+});
