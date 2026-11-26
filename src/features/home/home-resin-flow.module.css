@@ -18,8 +18,15 @@
 .photoChapter {
   --ribbon-photo-overlap: clamp(3.5rem, 8vw, 7rem);
   position: relative;
-  background: linear-gradient(180deg, #0b0b0e, #080808);
+  background: linear-gradient(180deg, var(--home-photo-entry-surface) 0, var(--home-photo-exit-surface) clamp(11rem, 29vw, 28rem));
   padding-bottom: clamp(1rem, 3vw, 2.5rem);
+}
+
+.photoChapter + :global(.brand-revival) {
+  border-block-start-color: transparent;
+  background:
+    linear-gradient(180deg, var(--home-photo-exit-surface), transparent clamp(4rem, 8vw, 8rem)) border-box,
+    linear-gradient(90deg, #060606, #0d0d0f 50%, #060606);
 }
 
 .photoFrame {

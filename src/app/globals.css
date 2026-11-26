@@ -43,7 +43,13 @@
 }
 
 /* Homepage Wave 1 — one material reveal with restrained depth and hover responses. */
-.wave-home { overflow: clip; background: #050505; }
+.wave-home {
+  --home-photo-entry-surface: #050505;
+  --home-photo-exit-surface: #080808;
+  overflow: clip;
+  background: #050505;
+}
+.wave-home[data-home-immersive="true"] { --home-photo-entry-surface: #080608; }
 .revival-hero { position: relative; min-height: calc(100svh - 4.75rem); overflow: hidden; border-bottom: 1px solid var(--border); isolation: isolate; }
 .hero-atmosphere { position: absolute; inset: 0; z-index: -2; background: radial-gradient(circle at 73% 42%, rgba(113, 171, 205, .13), transparent 24%), radial-gradient(circle at 88% 78%, rgba(224, 185, 214, .07), transparent 22%), linear-gradient(122deg, #030303 20%, #090a0c 65%, #030303); }
 .hero-crystal-mark { position: absolute; z-index: -1; width: min(48vw, 46rem); height: auto; right: -9vw; top: 50%; opacity: .09; filter: saturate(.25); transform: translateY(-50%) rotate(12deg); }
@@ -639,9 +645,10 @@ html.luminal-motion-ready .wave-home [data-luminal-reveal="home-copy"] {
   padding-block: 0;
   overflow: visible;
   background:
+    linear-gradient(180deg, transparent 78%, var(--home-photo-entry-surface)),
     radial-gradient(ellipse at 29% 49%, rgba(127, 57, 76, .15), transparent 35rem),
     linear-gradient(112deg, transparent 36%, rgba(141, 82, 67, .045) 53%, transparent 69%),
-    #080608;
+    var(--home-photo-entry-surface);
 }
 
 .wave-home[data-home-immersive="true"] .hero-atmosphere {
