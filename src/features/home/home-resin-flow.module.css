@@ -1,0 +1,30 @@
+.flow {
+  block-size: clamp(4rem, 10vw, 9rem);
+  inline-size: min(100%, 91rem);
+  margin-inline: auto;
+  pointer-events: none;
+}
+
+.ribbon {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flow[data-flow-direction] .ribbon {
+    transition: clip-path 1150ms cubic-bezier(.23, 1, .32, 1);
+  }
+
+  :global(.luminal-motion-ready) .flow:not([data-luminal-visible]) .ribbon {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  :global(.luminal-motion-ready) .flow[data-flow-direction="reverse"]:not([data-luminal-visible]) .ribbon {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .flow[data-luminal-visible] .ribbon {
+    clip-path: inset(0);
+  }
+}

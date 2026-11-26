@@ -35,10 +35,14 @@ test("Archive makes real colorway photographs legible and keyboard navigation st
   assert.match(archive, /styles\.colorwayLabel/);
 });
 
-test("Making beam stays near the card edge and respects the supporting copy", () => {
-  const renderer = read("src/features/home/home-light-renderer.ts");
-  assert.match(renderer, /const beamX = left \+ \(right - left\) \* 0\.965/);
-  assert.match(renderer, /opacity \* 0\.52/);
-  assert.match(renderer, /u\.uAmount, 0\.50/);
-  assert.match(globals, /text-shadow: 0 2px 12px rgba\(0,0,0,\.85\)/);
+test("Home resin arcs connect the editorial sections without locking readers to a scroll timeline", () => {
+  const flow = read("src/features/home/home-resin-flow.tsx");
+  const style = read("src/features/home/home-resin-flow.module.css");
+  assert.match(home, /<HomeResinFlow \/>[\s\S]*home-gallery[\s\S]*<HomeResinFlow reverse \/>[\s\S]*brand-revival[\s\S]*<HomeResinFlow \/>[\s\S]*made-at-luminal/);
+  assert.match(flow, /getContext\("2d"\)/);
+  assert.match(flow, /ResizeObserver\(draw\)/);
+  assert.match(flow, /aria-hidden="true"/);
+  assert.match(style, /prefers-reduced-motion: no-preference/);
+  assert.match(style, /clip-path 1150ms/);
+  assert.doesNotMatch(flow, /addEventListener\("scroll"|requestAnimationFrame|webgl/i);
 });
