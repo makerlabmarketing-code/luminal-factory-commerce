@@ -1,14 +1,25 @@
 .ribbon {
   display: block;
   inline-size: 100%;
-  block-size: clamp(7rem, 19vw, 22rem);
   pointer-events: none;
 }
 
+.ribbon[data-home-resin-flow="entry"] {
+  position: relative;
+  block-size: clamp(11rem, 29vw, 28rem);
+  margin-block-end: calc(-1 * var(--ribbon-photo-overlap));
+}
+
+.ribbon[data-home-resin-flow="exit"] {
+  block-size: clamp(5rem, 12vw, 12rem);
+  margin-block-start: clamp(1rem, 3vw, 2.5rem);
+}
+
 .photoChapter {
+  --ribbon-photo-overlap: clamp(3.5rem, 8vw, 7rem);
   position: relative;
   background: linear-gradient(180deg, #0b0b0e, #080808);
-  padding-bottom: clamp(3rem, 7vw, 7rem);
+  padding-bottom: clamp(1rem, 3vw, 2.5rem);
 }
 
 .photoFrame {

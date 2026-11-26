@@ -4,14 +4,39 @@ import { useEffect, useRef } from "react";
 import { getHomePhotoHandoffProgress } from "./home-photo-handoff";
 import styles from "./home-resin-flow.module.css";
 
-export function HomeResinFlow() {
+const paths = {
+  entry: {
+    start: [0.025, 0.025],
+    segments: [
+      [0.10, 0.03, 0.12, 0.42, 0.33, 0.43],
+      [0.54, 0.44, 0.59, 0.12, 0.45, 0.13],
+      [0.29, 0.14, 0.34, 0.55, 0.56, 0.55],
+      [0.72, 0.55, 0.78, 0.54, 0.71, 0.79],
+      [0.68, 0.89, 0.64, 0.92, 0.60, 0.96],
+    ],
+  },
+  exit: {
+    start: [1.04, 0.20],
+    segments: [
+      [0.90, 0.66, 0.78, 0.84, 0.61, 0.77],
+      [0.43, 0.70, 0.39, 0.22, 0.24, 0.26],
+      [0.12, 0.29, 0.06, 0.61, -0.04, 0.69],
+    ],
+  },
+} as const;
+
+type ResinFlowDirection = keyof typeof paths;
+
+export function HomeResinFlow({ direction }: Readonly<{ direction: ResinFlowDirection }>) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const section = canvas?.closest<HTMLElement>("[data-home-photo-handoff]");
+    const chapter = canvas?.closest<HTMLElement>("[data-home-photo-handoff]");
     const context = canvas?.getContext("2d");
-    if (!canvas || !section || !context) return;
+    if (!canvas || !chapter || !context) return;
+
+    const isEntry = direction === "entry";
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const clamp = (value: number) => Math.max(0, Math.min(1, value));
@@ -24,14 +49,18 @@ export function HomeResinFlow() {
 
     const render = () => {
       frame = 0;
-      const top = section.getBoundingClientRect().top;
+      const top = (isEntry ? chapter : canvas).getBoundingClientRect().top;
       const viewport = window.innerHeight;
       // A single scroll position controls both directions, even mid-transition.
-      const next = reducedMotion.matches ? 1 : getHomePhotoHandoffProgress(top, viewport);
+      const next = reducedMotion.matches ? 1 : isEntry
+        ? getHomePhotoHandoffProgress(top, viewport)
+        : clamp((viewport * 0.92 - top) / (viewport * 0.38));
       if (next === progress) return;
       progress = next;
-      const photoProgress = clamp((next - 0.42) / 0.58);
-      section.style.setProperty("--photo-reveal", String(photoProgress));
+      if (isEntry) {
+        const photoProgress = clamp((next - 0.42) / 0.58);
+        chapter.style.setProperty("--photo-reveal", String(photoProgress));
+      }
 
       context.clearRect(0, 0, width, height);
       if (next === 0) return;
@@ -52,16 +81,10 @@ export function HomeResinFlow() {
       canvas.height = Math.round(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-      // The long first crest flattens before the line sweeps past the right edge.
-      // Measure the same cubic segments for a draw-on stroke with a rounded head.
+      // Both paths use distances in the rendered aspect ratio, including on phones.
       curve = new Path2D();
-      const segments = [
-        [0.19, 0.32, 0.31, 0.155, 0.44, 0.155],
-        [0.65, 0.155, 0.78, 0.69, 0.96, 0.59],
-        [1.04, 0.546, 1.085, 0.58, 1.12, 0.83],
-      ];
-      let x = 0.124;
-      let y = 0.60;
+      const { start, segments } = paths[direction];
+      let [x, y]: [number, number] = [...start];
       curve.moveTo(x * width, y * height);
       length = 0;
       for (const [x1, y1, x2, y2, endX, endY] of segments) {
@@ -102,9 +125,9 @@ export function HomeResinFlow() {
       reducedMotion.removeEventListener("change", schedule);
       window.removeEventListener("scroll", schedule);
       window.cancelAnimationFrame(frame);
-      section.style.removeProperty("--photo-reveal");
+      if (isEntry) chapter.style.removeProperty("--photo-reveal");
     };
-  }, []);
+  }, [direction]);
 
-  return <canvas ref={canvasRef} className={styles.ribbon} data-home-resin-flow aria-hidden="true" />;
+  return <canvas ref={canvasRef} className={styles.ribbon} data-home-resin-flow={direction} aria-hidden="true" />;
 }

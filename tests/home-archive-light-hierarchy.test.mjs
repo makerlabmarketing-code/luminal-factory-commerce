@@ -35,17 +35,20 @@ test("Archive makes real colorway photographs legible and keyboard navigation st
   assert.match(archive, /styles\.colorwayLabel/);
 });
 
-test("One scroll-reversible resin curve unveils a photograph while the existing Hero reaches it", async () => {
+test("Two reversible resin strokes frame the photo handoff in opposite directions", async () => {
   const { getHomePhotoHandoffProgress } = await import("../src/features/home/home-photo-handoff.ts");
   const flow = read("src/features/home/home-resin-flow.tsx");
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   const style = read("src/features/home/home-resin-flow.module.css");
-  assert.equal(home.match(/<HomeResinFlow \/>/g)?.length, 1);
+  assert.match(home, /<HomeResinFlow direction="entry" \/>[\s\S]*data-home-chapter-photo[\s\S]*<HomeResinFlow direction="exit" \/>/);
   assert.match(home, /data-home-chapter-photo/);
   assert.doesNotMatch(home, /HomeFlexGallery/);
+  assert.match(flow, /entry: \{\s*start: \[0\.025, 0\.025\]/);
+  assert.match(flow, /exit: \{\s*start: \[1\.04,[\s\S]*-0\.04/);
   assert.match(flow, /setLineDash/);
   assert.match(flow, /aria-hidden="true"/);
   assert.match(immersive, /getHomePhotoHandoffProgress\(photoChapter/);
+  assert.match(style, /margin-block-end: calc\(-1 \* var\(--ribbon-photo-overlap\)\)/);
   assert.match(style, /prefers-reduced-motion: reduce/);
   const down = [960, 540, 320, 160].map((top) => getHomePhotoHandoffProgress(top, 800));
   assert.equal(down[0], 0);

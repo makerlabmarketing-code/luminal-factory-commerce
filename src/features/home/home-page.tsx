@@ -157,7 +157,7 @@ export async function HomePage() {
 
         {chapterPhoto ? (
           <section className={photoStyles.photoChapter} aria-labelledby="gallery-title" data-home-3d-section="gallery" data-home-photo-handoff>
-            <HomeResinFlow />
+            <HomeResinFlow direction="entry" />
             <Container>
               <div className={photoStyles.photoFrame} data-home-chapter-photo>
                 <Image src={chapterPhoto.src} alt={chapterPhoto.alt} fill sizes="(max-width: 1440px) calc(100vw - 32px), 1408px" style={{ objectPosition: chapterPhoto.objectPosition }} />
@@ -167,6 +167,7 @@ export async function HomePage() {
                 <Link className="text-link" href="/archive/meowhe-mono">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
               </header>
             </Container>
+            <HomeResinFlow direction="exit" />
           </section>
         ) : null}
 
