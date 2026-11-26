@@ -76,7 +76,7 @@ export async function HomePage() {
               <p className="eyebrow" data-hero-copy-support>{content.hero.eyebrow}</p>
               <h1 id="hero-title" className="luminal-masked-heading">
                 {heroTitleWords.map((word, index) => (
-                  <span className="inline-block will-change-transform" data-hero-word key={`${word}-${index}`}>
+                  <span className="inline-block" data-hero-word key={`${word}-${index}`}>
                     {word}{index < heroTitleWords.length - 1 ? "\u00A0" : null}
                   </span>
                 ))}

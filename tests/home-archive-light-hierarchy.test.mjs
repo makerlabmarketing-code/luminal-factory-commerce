@@ -36,7 +36,7 @@ test("Archive makes real colorway photographs legible and keyboard navigation st
 });
 
 test("Two reversible resin strokes frame the photo handoff in opposite directions", async () => {
-  const { getHomePhotoHandoffProgress } = await import("../src/features/home/home-photo-handoff.ts");
+  const { getHeroPhotoMotion, getHomePhotoHandoffProgress } = await import("../src/features/home/home-photo-handoff.ts");
   const flow = read("src/features/home/home-resin-flow.tsx");
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   const style = read("src/features/home/home-resin-flow.module.css");
@@ -47,7 +47,7 @@ test("Two reversible resin strokes frame the photo handoff in opposite direction
   assert.match(flow, /exit: \{\s*start: \[1\.04,[\s\S]*-0\.04/);
   assert.match(flow, /setLineDash/);
   assert.match(flow, /aria-hidden="true"/);
-  assert.match(immersive, /getHomePhotoHandoffProgress\(photoChapter/);
+  assert.match(immersive, /getHeroPhotoMotion\(photoChapter/);
   assert.match(style, /margin-block-end: calc\(-1 \* var\(--ribbon-photo-overlap\)\)/);
   assert.match(style, /prefers-reduced-motion: reduce/);
   const down = [960, 540, 320, 160].map((top) => getHomePhotoHandoffProgress(top, 800));
@@ -56,4 +56,15 @@ test("Two reversible resin strokes frame the photo handoff in opposite direction
   assert.ok(down[1] < down[2]);
   const up = [160, 320, 540, 960].map((top) => getHomePhotoHandoffProgress(top, 800));
   assert.deepEqual(up, down.toReversed());
+  const viewport = 800;
+  const at = (progress) => getHeroPhotoMotion(viewport * (0.88 - 0.82 * progress), viewport);
+  const facing = at(0.64);
+  assert.equal(facing.faceFront, 1);
+  assert.equal(facing.opacity, 1);
+  assert.ok(facing.travel < 1);
+  const fading = at(0.88);
+  assert.equal(fading.faceFront, 1);
+  assert.equal(fading.travel, 1);
+  assert.ok(fading.opacity > 0 && fading.opacity < 1);
+  assert.equal(getHeroPhotoMotion(0, viewport).opacity, 0);
 });

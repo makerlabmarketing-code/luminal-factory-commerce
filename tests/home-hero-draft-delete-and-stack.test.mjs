@@ -46,6 +46,6 @@ test("drag is limited to cursor-primary button, does not capture pointer, and pr
   assert.match(stage, /HERO_DRAG_PHI_MAX_DEG = 85/);
   assert.match(stage, /draggingPointerId === null \|\| draggingPointerId !== event\.pointerId/);
   assert.match(stage, /if \(presentation\.autoRotate\) viewerRef\.current\?\.removeAttribute\("auto-rotate"\)/);
-  assert.match(stage, /if \(presentation\.autoRotate && !reducedMotion\) viewerRef\.current\?\.setAttribute\("auto-rotate", ""\)/);
+  assert.match(stage, /if \(presentation\.autoRotate && !reducedMotion && frontAlignment === 0\) viewerRef\.current\?\.setAttribute\("auto-rotate", ""\)/);
   assert.doesNotMatch(stage, /setPointerCapture/);
 });

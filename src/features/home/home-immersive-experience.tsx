@@ -8,7 +8,7 @@ import type { HomeMediaContract } from "@/content/homepage-media";
 import type { HeroModelPresentation } from "./hero-model-config";
 import { HeroObjectStage } from "./hero-object-stage";
 import { HomeArrivalHeader } from "./home-arrival-header";
-import { getHomePhotoHandoffProgress } from "./home-photo-handoff";
+import { getHeroPhotoMotion } from "./home-photo-handoff";
 import styles from "./home-immersive-experience.module.css";
 
 type HomeImmersiveExperienceProps = Readonly<{
@@ -336,17 +336,19 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       let scale = state.scale;
       let rotation = state.rotationDeg;
       let opacity = state.opacity;
+      let faceFront = 0;
 
       if (photoChapter && chapterPhoto) {
-        const handoff = getHomePhotoHandoffProgress(photoChapter.getBoundingClientRect().top, viewportHeight);
-        if (handoff > 0) {
-          const travel = smoothstep(handoff / 0.64);
+        const motion = getHeroPhotoMotion(photoChapter.getBoundingClientRect().top, viewportHeight);
+        const { travel } = motion;
+        if (travel > 0) {
           const destination = chapterPhoto.getBoundingClientRect();
           x = interpolate(x, destination.left + destination.width * 0.5 - layer.offsetLeft - layer.offsetWidth * 0.5, travel);
           y = interpolate(y, destination.top + Math.min(destination.height * 0.36, 138) - layer.offsetTop - layer.offsetHeight * 0.5, travel);
           scale = interpolate(scale, 0.48, travel);
-          rotation = interpolate(rotation, 0, travel);
-          opacity *= 1 - smoothstep((handoff - 0.48) / 0.40);
+          faceFront = motion.faceFront;
+          rotation = interpolate(rotation, 0, faceFront);
+          opacity *= motion.opacity;
         }
       }
 
@@ -378,7 +380,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         : clamp01(state.orbitDeg / finalOrbitDeg);
       window.dispatchEvent(
         new CustomEvent("luminal:hero-orbit-offset", {
-          detail: { orbitDeg: state.orbitDeg, orbitProgress },
+          detail: { orbitDeg: state.orbitDeg, orbitProgress: interpolate(orbitProgress, 0.5, faceFront), faceFront },
         }),
       );
     };

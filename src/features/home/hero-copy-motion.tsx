@@ -29,7 +29,7 @@ export function HeroTextMotionController() {
             duration: WORD_DURATION_MS,
             delay: WORD_INITIAL_DELAY_MS + index * WORD_STAGGER_MS,
             easing: "cubic-bezier(.2,.7,.2,1)",
-            fill: "both",
+            fill: "backwards",
           },
         ),
       );

@@ -164,6 +164,7 @@ export function HeroObjectStage({
     let pointerAnimationFrame: number | null = null;
     let previousPointerFrameTime = performance.now();
     let scrollOrbitProgress = 0;
+    let frontAlignment = 0;
     const dragOffset = { yawDeg: 0, phiDeg: 0 };
     let draggingPointerId: number | null = null;
     let dragX = 0;
@@ -180,13 +181,13 @@ export function HeroObjectStage({
       // Reverse scrolling follows the same path back; dragging stays relative.
       const sectionTheta = presentation.camera.thetaDeg * (1 - 2 * scrollOrbitProgress);
       const orbitTheta = clamp(
-        sectionTheta + dragOffset.yawDeg,
+        sectionTheta + dragOffset.yawDeg * (1 - frontAlignment),
         sectionTheta - HERO_DRAG_YAW_MAX_DEG,
         sectionTheta + HERO_DRAG_YAW_MAX_DEG,
       );
       viewer.setAttribute(
         "camera-orbit",
-        `${orbitTheta}deg ${clamp(presentation.camera.phiDeg + dragOffset.phiDeg, HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
+        `${orbitTheta}deg ${clamp(presentation.camera.phiDeg + dragOffset.phiDeg * (1 - frontAlignment), HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
       );
     };
 
@@ -264,7 +265,7 @@ export function HeroObjectStage({
       if (draggingPointerId !== event.pointerId) return;
       draggingPointerId = null;
       releaseTextSelection();
-      if (presentation.autoRotate && !reducedMotion) viewerRef.current?.setAttribute("auto-rotate", "");
+      if (presentation.autoRotate && !reducedMotion && frontAlignment === 0) viewerRef.current?.setAttribute("auto-rotate", "");
       startPointerTilt();
     };
 
@@ -272,13 +273,19 @@ export function HeroObjectStage({
       if (draggingPointerId === null) return;
       draggingPointerId = null;
       releaseTextSelection();
-      if (presentation.autoRotate && !reducedMotion) viewerRef.current?.setAttribute("auto-rotate", "");
+      if (presentation.autoRotate && !reducedMotion && frontAlignment === 0) viewerRef.current?.setAttribute("auto-rotate", "");
       startPointerTilt();
     };
 
     const handleScrollOrbit = (event: Event) => {
-      const detail = (event as CustomEvent<{ orbitProgress?: number }>).detail;
+      const detail = (event as CustomEvent<{ orbitProgress?: number; faceFront?: number }>).detail;
+      const wasTurningFront = frontAlignment > 0;
       scrollOrbitProgress = clamp(detail?.orbitProgress ?? 0, 0, 1);
+      frontAlignment = clamp(detail?.faceFront ?? 0, 0, 1);
+      const isTurningFront = frontAlignment > 0;
+      if (wasTurningFront !== isTurningFront && presentation.autoRotate && draggingPointerId === null) {
+        viewerRef.current?.toggleAttribute("auto-rotate", !isTurningFront);
+      }
       applyPointerOrbit();
     };
 
