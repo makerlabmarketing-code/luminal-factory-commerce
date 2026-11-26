@@ -38,8 +38,8 @@
 }
 
 .photoChapter .galleryContainer {
-  width: max(72%, min(calc(100% - 2rem), calc(52% + 18rem)));
-  max-inline-size: 86rem;
+  width: max(60%, min(calc(100% - 2rem), calc(42% + 13rem)));
+  max-inline-size: 72rem;
   padding-top: clamp(1rem, 4vw, 3rem);
 }
 

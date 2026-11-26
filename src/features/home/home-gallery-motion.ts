@@ -11,14 +11,14 @@ const extraSpiralScroll = 0.42;
 
 export const galleryEntryViewportRatio = 0.88;
 export const galleryCoverProgress = entryProgress + flightDuration * ((Math.PI - angleStart) / angleTravel);
-export const gallerySettleProgress = 0.99;
-export const galleryArrivalProgress = 0.84;
+export const galleryArrivalProgress = 0.742;
+export const gallerySettleProgress = galleryArrivalProgress + 0.15;
 
 const spiralScrollStart = galleryCoverProgress * scrollDistanceRatio;
 const spiralScrollSpan = (galleryArrivalProgress - galleryCoverProgress) * scrollDistanceRatio + extraSpiralScroll;
 const arrivalScrollStart = spiralScrollStart + spiralScrollSpan;
 const arrivalScrollSpan = (gallerySettleProgress - galleryArrivalProgress) * scrollDistanceRatio + extraArrivalScroll;
-export const galleryArrivalPadding = `${147 + (extraSpiralScroll + extraArrivalScroll) * 100}svh`;
+export const galleryArrivalPadding = `${(147 + ((gallerySettleProgress - 0.99) * scrollDistanceRatio + extraSpiralScroll + extraArrivalScroll) * 100).toFixed(2)}svh`;
 
 type Point = readonly [number, number];
 type Quad = readonly [Point, Point, Point, Point];
@@ -84,7 +84,7 @@ export function getGalleryHeroPose(progress: number, meetAngle: number) {
 }
 
 export function getGalleryCaptionOpacity(progress: number) {
-  return ease(0.40, 0.54, progress) * (1 - ease(galleryArrivalProgress, 0.94, progress));
+  return ease(0.40, 0.54, progress) * (1 - ease(galleryArrivalProgress, galleryArrivalProgress + 0.10, progress));
 }
 
 export function getGalleryCoverWidth(width: number, height: number) {

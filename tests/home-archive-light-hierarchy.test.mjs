@@ -71,7 +71,8 @@ test("The gallery pauses resin strokes while retaining the hero fallback", async
 
 
 test("The curved photos separate front and rear depth before the inset gallery settles", async () => {
-  assert.match(read("src/features/home/home-resin-flow.module.css"), /\.galleryContainer \{\s*width: max\(72%,[^;]+;\s*max-inline-size: 86rem;/);
+  assert.match(home, /media\.gallery\.slice\(0, 6\)/);
+  assert.match(read("src/features/home/home-resin-flow.module.css"), /\.galleryContainer \{\s*width: max\(60%,[^;]+;\s*max-inline-size: 72rem;/);
   const { galleryCoverProgress, galleryArrivalProgress, gallerySettleProgress, getGalleryArrival, getGalleryHeroPose, getGalleryProgress, getGalleryStripPanel } = await import("../src/features/home/home-gallery-motion.ts");
   for (const [width, height, slices] of [[390, 844, 4], [1440, 900, 7], [1920, 1030, 7]]) {
     const at = (progress, index = 0) => getGalleryStripPanel(progress, index, width, height, slices);
@@ -105,14 +106,14 @@ test("The curved photos separate front and rear depth before the inset gallery s
     assert.equal(getGalleryHeroPose(galleryCoverProgress, -22).visible, false);
     const entrance = bounds(at(0.165, 0));
     assert.ok(entrance.every(([x]) => x < width * 0.4));
-    const exit = bounds(at(0.797, 8));
+    const exit = bounds(at(0.699, 5));
     assert.ok(exit.every(([x]) => x > width * 0.62));
     assert.ok(exit.some(([, y]) => y <= height * 0.08));
-    assert.ok(bounds(at(0.823, 8)).every(([, y]) => y < 0));
-    assert.equal(at(galleryArrivalProgress, 8), null);
+    assert.ok(bounds(at(0.725, 5)).every(([, y]) => y < 0));
+    assert.equal(at(galleryArrivalProgress, 5), null);
     assert.equal(getGalleryArrival(galleryArrivalProgress, 0), 0);
-    assert.ok(getGalleryArrival(0.88, 0) > getGalleryArrival(0.88, 8));
-    assert.equal(getGalleryArrival(gallerySettleProgress, 8), 1);
+    assert.ok(getGalleryArrival(galleryArrivalProgress + 0.04, 0) > getGalleryArrival(galleryArrivalProgress + 0.04, 5));
+    assert.equal(getGalleryArrival(gallerySettleProgress, 5), 1);
     assert.ok(getGalleryProgress(-0.88 * height, height) < 0.85);
   }
 });
@@ -120,11 +121,11 @@ test("The curved photos separate front and rear depth before the inset gallery s
 test("The gallery flies in from all four viewport corners and settles on its slots", async () => {
   const { getGalleryCornerOffset } = await import("../src/features/home/home-gallery-motion.ts");
   for (const [width, height, columns] of [[390, 844, 2], [1440, 900, 3]]) {
-    const rows = Math.ceil(9 / columns);
+    const rows = Math.ceil(6 / columns);
     const slot = { x: 40, y: 110, width: 150, height: 100 };
     const viewport = { width, height };
     const origins = new Set();
-    for (let index = 0; index < 9; index++) {
+    for (let index = 0; index < 6; index++) {
       const offset = getGalleryCornerOffset(0, index, columns, rows, viewport, slot, -80);
       const x = slot.x + offset.x;
       const y = slot.y + offset.y;
@@ -155,6 +156,6 @@ test("The extended spiral and four-corner arrival crossfade into the gallery", a
   assert.ok(Math.abs(getGallerySettleOffset(getGalleryProgress((newTop + topAtArrival) / 2, viewport), viewport) - (newTop - topAtArrival) / 2) < 0.00001);
   assert.equal(getGalleryCaptionOpacity(0), 0);
   assert.equal(getGalleryCaptionOpacity(galleryArrivalProgress), 1);
-  assert.ok(getGalleryCaptionOpacity(0.89) < 1 && getGalleryCaptionOpacity(0.89) > 0);
+  assert.ok(getGalleryCaptionOpacity(galleryArrivalProgress + 0.05) < 1 && getGalleryCaptionOpacity(galleryArrivalProgress + 0.05) > 0);
   assert.equal(getGalleryCaptionOpacity(gallerySettleProgress), 0);
 });
