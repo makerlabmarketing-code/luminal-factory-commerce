@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { HomeGalleryMedia } from "@/content/homepage-media";
 import { useTranslator } from "@/lib/i18n/client";
-import { getGalleryCardPose, getGalleryHeroPose, getGalleryProgress } from "./home-gallery-motion";
+import { getGalleryCardPose, getGalleryHeroPose, getGalleryProgress, getGallerySettleOffset, galleryEntryViewportRatio, gallerySettleProgress } from "./home-gallery-motion";
 import styles from "./home-motion-gallery.module.css";
 
 export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGalleryMedia[] }>) {
@@ -55,7 +55,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       const width = document.documentElement.clientWidth;
       const height = document.documentElement.clientHeight;
       const stageHeight = viewport?.offsetHeight || height;
-      if (ready && motionAllowed() && !chapter.dataset.galleryMotion && top >= stageHeight * 0.88) {
+      if (ready && motionAllowed() && !chapter.dataset.galleryMotion && top >= stageHeight * galleryEntryViewportRatio) {
         chapter.dataset.galleryMotion = "ready";
         dimensions = [];
         previous = -1;
@@ -64,8 +64,9 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       const progress = getGalleryProgress(top, stageHeight);
       if (progress === previous) return;
       previous = progress;
+      chapter.toggleAttribute("data-gallery-show-heading", progress >= 0.83);
 
-      const moving = progress < 0.97;
+      const moving = progress < gallerySettleProgress;
       grid.inert = moving;
       if (!moving) {
         if (grid.dataset.moving) clearTiles();
@@ -85,6 +86,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
         }
       }
       const rect = grid.getBoundingClientRect();
+      const settleOffset = getGallerySettleOffset(progress, stageHeight);
       if (!dimensions.length) {
         dimensions = tiles.map(tile => {
           const slot = tile.parentElement ?? tile;
@@ -98,7 +100,8 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
         const left = rect.left + slot.x + slot.width / 2;
         const top = rect.top + slot.y + slot.height / 2;
         const remaining = 1 - pose.settle;
-        tile.style.transform = `translate3d(${(width / 2 + pose.x - left) * remaining}px,${(stageHeight / 2 + pose.y - top) * remaining}px,0) perspective(950px) rotateZ(${pose.roll * remaining}deg) rotateY(${pose.yaw * remaining}deg) scale(${1 + (pose.width / slot.width - 1) * remaining})`;
+        const y = (stageHeight / 2 + pose.y - top) * remaining + settleOffset * pose.settle;
+        tile.style.transform = `translate3d(${(width / 2 + pose.x - left) * remaining}px,${y}px,0) perspective(950px) rotateZ(${pose.roll * remaining}deg) rotateY(${pose.yaw * remaining}deg) scale(${1 + (pose.width / slot.width - 1) * remaining})`;
         tile.style.opacity = String(pose.opacity);
         tile.style.zIndex = String(pose.layer);
       });
@@ -134,6 +137,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
     function updatePreference() {
       if (chapter && !motionAllowed()) {
         delete chapter.dataset.galleryMotion;
+        chapter.removeAttribute("data-gallery-show-heading");
         clearTiles();
       }
       resize();
@@ -154,6 +158,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       window.removeEventListener("resize", resize);
       window.cancelAnimationFrame(frame);
       delete chapter.dataset.galleryMotion;
+      chapter.removeAttribute("data-gallery-show-heading");
       clearTiles();
     };
   }, [items.length]);

@@ -8,7 +8,7 @@ import type { HomeMediaContract } from "@/content/homepage-media";
 import type { HeroModelPresentation } from "./hero-model-config";
 import { HeroObjectStage } from "./hero-object-stage";
 import { HomeArrivalHeader } from "./home-arrival-header";
-import { getGalleryHeroPose, getGalleryProgress } from "./home-gallery-motion";
+import { galleryEntryViewportRatio, getGalleryCoverWidth, getGalleryHeroPose, getGalleryProgress } from "./home-gallery-motion";
 import { getHeroPhotoMotion } from "./home-photo-handoff";
 import styles from "./home-immersive-experience.module.css";
 
@@ -347,10 +347,12 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         const galleryProgress = getGalleryProgress(sectionTop, stableHeight);
         if (photoChapter.dataset.galleryMotion === "ready" && galleryProgress > 0) {
           const pose = getGalleryHeroPose(galleryProgress, -presentation.camera.thetaDeg);
-          const coverWidth = Math.min(viewportWidth * 0.88, stableHeight * 0.82);
+          const coverWidth = getGalleryCoverWidth(document.documentElement.clientWidth, stableHeight);
           const coverScale = Math.min(0.49, coverWidth * 0.51 / layer.offsetHeight, coverWidth * 0.78 / layer.offsetWidth);
-          x = interpolate(x, viewportWidth * 0.5 - layer.offsetLeft - layer.offsetWidth * 0.5, pose.travel);
-          y = interpolate(y, stableHeight * 0.5 - layer.offsetTop - layer.offsetHeight * 0.5, pose.travel);
+          const galleryCenterX = document.documentElement.clientWidth * 0.5;
+          const sourceY = y - releaseY - stableHeight * (1 - galleryEntryViewportRatio);
+          x = interpolate(x, galleryCenterX - layer.offsetLeft - layer.offsetWidth * 0.5, pose.travel);
+          y = interpolate(sourceY, stableHeight * 0.5 - layer.offsetTop - layer.offsetHeight * 0.5, pose.travel);
           scale = interpolate(scale, coverScale, pose.travel);
           faceFront = pose.travel;
           rotation = interpolate(rotation, 0, pose.travel);

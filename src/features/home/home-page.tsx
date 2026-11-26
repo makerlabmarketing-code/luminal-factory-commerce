@@ -56,7 +56,7 @@ export async function HomePage() {
     getHomeFeaturedRaffle(),
   ]);
   const immersive = !featuredRaffle;
-  const galleryPhotos = media.gallery.slice(0, 6);
+  const galleryPhotos = media.gallery;
   const heroTitleWords = content.hero.title.trim().split(/\s+/);
 
   return (

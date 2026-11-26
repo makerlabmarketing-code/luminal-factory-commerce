@@ -57,3 +57,8 @@
   inset: 0 0 auto;
   margin: 0;
 }
+
+.photoChapter[data-gallery-motion="ready"]:not([data-gallery-show-heading]) .photoCopy {
+  opacity: 0;
+  visibility: hidden;
+}
