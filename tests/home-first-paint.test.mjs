@@ -40,7 +40,7 @@ function mountPhoneStage(width) {
   fixtureModule.exports.HeroObjectStage({ media: { availability: 'available', alt: 'Meowhe' }, presentation: {}, preload: true, allowTouch3d: true });
   for (const effect of effects) { const cleanup = effect(); if (cleanup) cleanups.push(cleanup); }
   for (const cleanup of cleanups) cleanup();
-  return { mode: refs[0].current.dataset.heroMode, webglProbes, mountDisplay: refs[2].current.style.display };
+  return { mode: refs[0].current.dataset.heroMode, webglProbes, mountDisplay: refs[1].current.style.display };
 }
 
 for (const width of [320, 390, 699]) {
@@ -52,13 +52,16 @@ for (const width of [320, 390, 699]) {
   });
 }
 
-test('first-paint copy and navigation are independent of 3D readiness', () => {
+test('home waits for a bounded intro, with no-JS and mobile escape paths', () => {
   const copy = read('src/features/home/hero-copy-motion.tsx');
   const immersive = read('src/features/home/home-immersive-experience.tsx');
+  const styles = read('src/features/home/home-immersive-experience.module.css');
   assert.doesNotMatch(copy, /filter:|supporting\.forEach/);
-  assert.doesNotMatch(immersive, /body\.style\.overflow = "hidden"/);
-  assert.match(read('src/features/home/home-arrival-header.tsx'), /useState<HeaderStage>\("revealed"\)/);
-  assert.doesNotMatch(immersive, /!objectReady|let objectReady/);
-  assert.match(read('src/features/home/home-immersive-experience.module.css'), /introVeilExit 760ms/);
-  assert.match(read('src/features/home/home-immersive-experience.module.css'), /introSafetyExit 1500ms/);
+  assert.match(immersive, /if \(objectSettled.current\) dockBrand\(\)/);
+  assert.match(immersive, /phone.matches/);
+  assert.match(immersive, /root.style.overflow = "hidden"/);
+  assert.match(immersive, /root.style.overflow = previousOverflow/);
+  assert.match(immersive, /stage=\{waiting \? "waiting" : "revealed"\}/);
+  assert.match(styles, /introSafetyExit 1500ms/);
+  assert.match(immersive, /<noscript><style>/);
 });

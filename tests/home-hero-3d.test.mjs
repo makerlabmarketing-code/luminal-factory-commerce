@@ -25,31 +25,23 @@ test("remote Hero configuration inherits the local orientation without requiring
   assert.doesNotMatch(heroData, /orientation_roll_deg|orientation_pitch_deg|orientation_yaw_deg/);
 });
 
-test("Hero keeps the stage clear during 3D loading and shows the portrait only on fallback", () => {
-  assert.match(heroSource, /import Image from "next\/image"/);
-  assert.match(heroSource, /data-hero-product-image="true"/);
-  assert.match(heroSource, /data-hero-poster-role="error-and-capability-fallback"/);
-  assert.match(heroSource, /className="hero-object-poster invisible [^"\n]*opacity-0"/);
+test("Hero renders the 3D scene without a replacement image", () => {
+  assert.doesNotMatch(heroSource, /import Image|hero-object-poster|data-hero-product-image/);
   assert.match(heroSource, /data-hero-mode="capability-gated"/);
-  assert.doesNotMatch(heroSource, /md:hidden/);
+  assert.match(heroSource, /stage\.dataset\.heroMode = "unavailable-3d"/);
   assert.match(heroSource, /webGLAvailable = !reducedMotion && supportsWebGL\(\)/);
-  assert.match(heroSource, /stage\.dataset\.heroMode = "poster-3d-unavailable"/);
-  assert.match(heroSource, /preview\.style\.visibility = "visible"/);
-  assert.match(heroSource, /preview\.style\.opacity = "1"/);
   assert.match(heroSource, /mount\.style\.opacity = "1"/);
-  assert.match(heroSource, /if \(preview\) preview\.style\.display = "none"/);
-  assert.match(heroSource, /if \(cancelled \|\| stage\.dataset\.heroMode === "poster-3d-unavailable"\) return/);
-  assert.doesNotMatch(heroSource, /3D preview unavailable/);
-  assert.doesNotMatch(heroSource, /Product image active/);
+  assert.match(heroSource, /if \(cancelled \|\| failed\) return/);
+  assert.match(heroSource, /onSettled\?\.\(\)/);
   assert.match(heroSource, /Loading 3D object/);
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
 test("Hero deadline begins before runtime registration and ignores a late runtime after fallback", () => {
   const viewerSetup = heroSource.slice(heroSource.indexOf("const mountViewer = async ()"));
-  assert.match(viewerSetup, /setTimeout\(showError, HERO_ENHANCEMENT_TIMEOUT_MS\);\s+await ensureModelViewer\(\);\s+if \(cancelled \|\| fellBack \|\| viewerRef\.current\) return/);
+  assert.match(viewerSetup, /setTimeout\(showError, HERO_ENHANCEMENT_TIMEOUT_MS\);\s+await ensureModelViewer\(\);\s+if \(cancelled \|\| failed \|\| viewerRef\.current\) return/);
   const fallback = heroSource.slice(heroSource.indexOf("const showError ="), heroSource.indexOf("const mountViewer ="));
-  assert.match(fallback, /fellBack = true/);
+  assert.match(fallback, /failed = true/);
   assert.match(fallback, /mount\.replaceChildren\(\)/);
 });
 
@@ -86,14 +78,14 @@ test("Hero supports constrained drag, preserves scroll orbit, and recenters on r
   assert.doesNotMatch(heroSource, /viewer\.setAttribute\("camera-controls"/);
 });
 
-test("constrained clients keep the image fallback while eligible desktop defers 3D until browser idle", () => {
+test("constrained clients settle without 3D while eligible desktop defers 3D until browser idle", () => {
   assert.match(heroSource, /connection\?\.saveData === true/);
   assert.match(heroSource, /connection\?\.effectiveType === "slow-2g"/);
   assert.match(heroSource, /connection\?\.effectiveType === "2g"/);
-  assert.match(heroSource, /posterOnly = constrainedNetwork \|\| \(!finePointer && !allowTouch3d\) \|\| !webGLAvailable/);
-  assert.match(heroSource, /poster-coarse-pointer/);
-  assert.match(heroSource, /poster-constrained-network/);
-  assert.match(heroSource, /preview\.style\.display = "block"/);
+  assert.match(heroSource, /canEnhance = webGLAvailable && !constrainedNetwork && \(finePointer \|\| allowTouch3d\)/);
+  assert.match(heroSource, /static-coarse-pointer/);
+  assert.match(heroSource, /static-constrained-network/);
+  assert.match(heroSource, /mount\.style\.display = "none"/);
   assert.match(heroSource, /requestIdleCallback/);
   assert.match(heroSource, /HERO_IDLE_TIMEOUT_MS/);
   assert.match(heroSource, /HERO_IDLE_FALLBACK_MS/);

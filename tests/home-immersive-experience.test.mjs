@@ -10,11 +10,11 @@ test("HOME-3D-HANDOFF-02 uses a measured logo dock before revealing Home navigat
   const header = read("src/features/home/home-arrival-header.tsx");
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   assert.match(header, /data-home-logo-dock="true"/);
-  assert.match(header, /luminal:brand-docked/);
-  assert.match(immersive, /querySelector<HTMLElement>\("\[data-home-logo-dock\]"\)/);
+  assert.match(header, /inert=\{stage === "waiting"\}/);
+  assert.match(immersive, /querySelector<HTMLElement>\("\[data-home-logo-dock\] img"\)/);
   assert.match(immersive, /LOGO_DOCK_MS = 480/);
-  assert.match(immersive, /INTRO_MAXIMUM_MS = 1400/);
-  assert.match(immersive, /luminal:brand-docked/);
+  assert.match(immersive, /INTRO_MAXIMUM_MS = 8000/);
+  assert.match(immersive, /brandAnimation.addEventListener\("finish", finishDock/);
 });
 
 test("Home header rail and desktop navigation bubbles remain unavailable until dock completion", () => {

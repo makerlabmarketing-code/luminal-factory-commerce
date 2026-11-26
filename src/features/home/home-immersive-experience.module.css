@@ -23,16 +23,24 @@
 }
 
 .introRoot {
-  /* A CSS deadline also releases the intro if hydration is delayed/blocked. */
-  animation: introSafetyExit 1500ms step-end forwards;
   position: fixed;
   inset: 0;
   z-index: 1000;
   pointer-events: none;
 }
 
+.introRoot[data-phase="pending"] {
+  /* Keep the page usable when hydration is delayed or blocked. */
+  animation: introSafetyExit 1500ms step-end forwards;
+}
+
+.introRoot[data-phase="pending"],
+.introRoot[data-phase="loading"],
+.introRoot[data-phase="docking"] {
+  pointer-events: auto;
+}
+
 .introRoot[data-phase="done"] {
-  animation: none;
   visibility: hidden;
 }
 
@@ -42,13 +50,11 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  /* Branding is brief and independent of runtime/model download. */
   background: #050505;
-  animation: introVeilExit 760ms ease-out forwards;
   opacity: 1;
   transition:
-    opacity 760ms cubic-bezier(.22, 1, .36, 1),
-    visibility 0s linear 760ms;
+    opacity 420ms cubic-bezier(.22, 1, .36, 1),
+    visibility 0s linear 420ms;
 }
 
 .introRoot[data-phase="docking"] .veil,
@@ -67,18 +73,15 @@
 
 .progress span {
   display: block;
-  width: 100%;
+  width: 34%;
   height: 100%;
-  transform: scaleX(0.03);
-  transform-origin: left center;
   background: linear-gradient(90deg, rgba(185, 233, 255, 0.25), #eef8ff 52%, rgba(243, 201, 232, 0.42));
-  animation: introProgress 2.15s cubic-bezier(.2, .7, .2, 1) forwards;
+  animation: introProgress 1.55s cubic-bezier(.36, 0, .64, 1) infinite;
 }
 
 .introRoot[data-phase="docking"] .progress span,
 .introRoot[data-phase="done"] .progress span {
-  transform: scaleX(1);
-  transition: transform 240ms ease-out;
+  animation-play-state: paused;
 }
 
 .blueprint {
@@ -187,9 +190,8 @@
 }
 
 @keyframes introProgress {
-  0% { transform: scaleX(0.03); }
-  70% { transform: scaleX(0.72); }
-  100% { transform: scaleX(0.9); }
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
 }
 
 @keyframes blueprintSettle {
@@ -282,13 +284,9 @@
 
 /* Phone visitors get the page immediately, without a hidden WebGL workload. */
 @media (max-width: 699px) {
-  .experience { display: none; }
+  .experience, .introRoot { display: none; }
 }
 
-@keyframes introVeilExit {
-  0%, 18% { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; }
-}
 @keyframes introSafetyExit {
   from { visibility: visible; }
   to { visibility: hidden; }

@@ -28,11 +28,11 @@ test("legacy decorative Hero watermark stays out of the Homepage", () => {
 });
 
 test("small header branding keeps source geometry without competing with the product Hero preload", () => {
-  assert.match(header, /<HomeArrivalHeader immersive=\{false\}/);
+  assert.match(header, /<HomeArrivalHeader rafflePreview=\{rafflePreview\}/);
   assert.match(arrivalHeader, /width=\{1024\}/);
   assert.match(arrivalHeader, /height=\{1024\}/);
   assert.match(arrivalHeader, /sizes="56px"/);
-  assert.match(arrivalHeader, /priority=\{immersive\}/);
+  assert.match(arrivalHeader, /priority=\{stage === "waiting"\}/);
 });
 
 test("footer branding declares its rendered width instead of requesting an oversized source", () => {
@@ -58,8 +58,8 @@ test("safe below-fold Homepage sections opt into rendering deferral", () => {
 
 test("Hero 3D stays idle-loaded with bounded pointer-follow and mobile continuity", () => {
   assert.match(heroStage, /requestIdleCallback/);
-  assert.match(heroStage, /poster-coarse-pointer/);
-  assert.match(heroStage, /poster-constrained-network/);
+  assert.match(heroStage, /static-coarse-pointer/);
+  assert.match(heroStage, /static-constrained-network/);
   assert.match(heroStage, /rounded-full opacity-55 blur-3xl/);
   assert.match(heroStage, /drag-and-recenter/);
   assert.match(heroStage, /allowTouch3d/);

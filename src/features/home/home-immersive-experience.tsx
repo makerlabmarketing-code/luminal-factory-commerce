@@ -3,10 +3,11 @@ import { useTranslator } from "@/lib/i18n/client";
 
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
 import type { HeroModelPresentation } from "./hero-model-config";
 import { HeroObjectStage } from "./hero-object-stage";
+import { HomeArrivalHeader } from "./home-arrival-header";
 import styles from "./home-immersive-experience.module.css";
 
 type HomeImmersiveExperienceProps = Readonly<{
@@ -15,7 +16,7 @@ type HomeImmersiveExperienceProps = Readonly<{
   enabled: boolean;
 }>;
 
-type IntroPhase = "loading" | "docking" | "done";
+type IntroPhase = "pending" | "loading" | "docking" | "done";
 
 type MotionState = Readonly<{
   xVw: number;
@@ -28,9 +29,9 @@ type MotionState = Readonly<{
 
 type MotionKeyframe = MotionState & Readonly<{ scrollY: number }>;
 
-const INTRO_SESSION_KEY = "luminal-home-intro-v2";
+const INTRO_SESSION_KEY = "luminal-home-intro-v3";
 const INTRO_MINIMUM_MS = 550;
-const INTRO_MAXIMUM_MS = 1400;
+const INTRO_MAXIMUM_MS = 8000;
 const LOGO_DOCK_MS = 480;
 const MOTION_EPSILON = 0.002;
 
@@ -167,62 +168,74 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
   const tr = useTranslator();
   const modelLayerRef = useRef<HTMLDivElement>(null);
   const travelBrandRef = useRef<HTMLDivElement>(null);
-  const [phase, setPhase] = useState<IntroPhase>(() => enabled ? "loading" : "done");
+  const [phase, setPhase] = useState<IntroPhase>(() => enabled ? "pending" : "done");
+  const objectSettled = useRef(false);
+  const tryDock = useRef<(() => void) | null>(null);
+  const onObjectSettled = useCallback(() => {
+    objectSettled.current = true;
+    tryDock.current?.();
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const phone = window.matchMedia("(max-width: 699px)");
     let seenIntro = false;
     try {
       seenIntro = window.sessionStorage.getItem(INTRO_SESSION_KEY) === "1";
     } catch {
-      seenIntro = false;
+      // Storage may be unavailable in privacy mode.
     }
 
-    if (reducedMotion || seenIntro || window.matchMedia("(max-width: 699px)").matches) {
-      document.documentElement.dataset.luminalBrandDocked = "true";
+    if (reducedMotion.matches || seenIntro || phone.matches || window.scrollY > 0 || location.hash) {
       const finishFrame = window.requestAnimationFrame(() => setPhase("done"));
       return () => window.cancelAnimationFrame(finishFrame);
     }
 
     const root = document.documentElement;
-    // The brand flourish must never lock scrolling while 3D is loading.
-    root.dataset.luminalIntro = "loading";
-    delete root.dataset.luminalBrandDocked;
+    const previousOverflow = root.style.overflow;
+    const background = Array.from(document.querySelectorAll<HTMLElement>("#main-content, footer"));
+    const previousInert = background.map((item) => item.inert);
+    root.style.overflow = "hidden";
+    background.forEach((item) => { item.inert = true; });
 
     let disposed = false;
+    let finished = false;
     let minimumElapsed = false;
     let dockingStarted = false;
     let brandAnimation: Animation | null = null;
+    let dockFrame: number | undefined;
+    const showFrame = window.requestAnimationFrame(() => {
+      if (!finished && !dockingStarted) setPhase("loading");
+    });
 
     const unlock = () => {
-      delete root.dataset.luminalIntro;
+      root.style.overflow = previousOverflow;
+      background.forEach((item, index) => { item.inert = previousInert[index]; });
     };
 
     const finishDock = () => {
-      if (disposed) return;
-      root.dataset.luminalBrandDocked = "true";
-      window.dispatchEvent(new CustomEvent("luminal:brand-docked"));
+      if (disposed || finished) return;
+      finished = true;
       setPhase("done");
       unlock();
       try {
         window.sessionStorage.setItem(INTRO_SESSION_KEY, "1");
       } catch {
-        // Storage can be unavailable in privacy modes without blocking the experience.
+        // The page remains available when storage is blocked.
       }
     };
 
     const dockBrand = () => {
-      if (disposed || dockingStarted || !minimumElapsed) return;
+      if (disposed || finished || dockingStarted || !minimumElapsed) return;
       dockingStarted = true;
       setPhase("docking");
-      root.dataset.luminalIntro = "docking";
 
-      window.requestAnimationFrame(() => {
+      dockFrame = window.requestAnimationFrame(() => {
         const traveler = travelBrandRef.current;
-        const dock = document.querySelector<HTMLElement>("[data-home-logo-dock]");
-        if (!traveler || !dock) {
+        const dock = document.querySelector<HTMLElement>("[data-home-logo-dock] img");
+        if (!traveler || !dock || typeof traveler.animate !== "function" || phone.matches || reducedMotion.matches) {
           finishDock();
           return;
         }
@@ -250,22 +263,39 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       });
     };
 
+    tryDock.current = () => {
+      if (objectSettled.current) dockBrand();
+    };
     const minimumTimer = window.setTimeout(() => {
       minimumElapsed = true;
-      dockBrand();
+      tryDock.current?.();
     }, INTRO_MINIMUM_MS);
 
+    // Fail open if the 3D stage is unable to report a terminal state.
     const maximumTimer = window.setTimeout(() => {
       minimumElapsed = true;
       dockBrand();
     }, INTRO_MAXIMUM_MS);
 
+    const exitForPreference = () => {
+      if (!phone.matches && !reducedMotion.matches) return;
+      brandAnimation?.cancel();
+      finishDock();
+    };
+    phone.addEventListener("change", exitForPreference);
+    reducedMotion.addEventListener("change", exitForPreference);
+
     return () => {
       disposed = true;
+      tryDock.current = null;
       window.clearTimeout(minimumTimer);
       window.clearTimeout(maximumTimer);
+      window.cancelAnimationFrame(showFrame);
+      if (dockFrame !== undefined) window.cancelAnimationFrame(dockFrame);
+      phone.removeEventListener("change", exitForPreference);
+      reducedMotion.removeEventListener("change", exitForPreference);
       brandAnimation?.cancel();
-      unlock();
+      if (!finished) unlock();
     };
   }, [enabled]);
 
@@ -405,17 +435,21 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     presentation.camera.thetaDeg,
   ]);
 
-  if (!enabled) return null;
+  if (!enabled) return <HomeArrivalHeader />;
+  const waiting = phase === "loading" || phase === "docking";
 
   return (
-    <div className={styles.experience} data-home-immersive-experience="true">
-      <div ref={modelLayerRef} className={styles.modelLayer} data-home-immersive-model="true">
-        <HeroObjectStage media={media} presentation={presentation} preload allowTouch3d showLoadingIndicator={false} />
+    <>
+      <HomeArrivalHeader stage={waiting ? "waiting" : "revealed"} />
+      <div className={styles.experience} data-home-immersive-experience="true">
+        <div ref={modelLayerRef} className={styles.modelLayer} data-home-immersive-model="true">
+          <HeroObjectStage media={media} presentation={presentation} preload allowTouch3d showLoadingIndicator={false} onSettled={onObjectSettled} />
+        </div>
       </div>
 
       <noscript><style>{'[data-home-brand-intro="true"] { display: none !important; }'}</style></noscript>
       <div className={styles.introRoot} data-home-brand-intro="true" data-phase={phase} aria-hidden={phase === "done" ? "true" : undefined}>
-        <div className={styles.veil} aria-hidden="true">
+        <div className={styles.veil}>
           <div className={styles.progress} aria-hidden="true"><span /></div>
           <div className={styles.blueprint} aria-hidden="true">
             <i className={styles.ringOuter} />
@@ -439,6 +473,6 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
           />
         </div>
       </div>
-    </div>
+    </>
   );
 }

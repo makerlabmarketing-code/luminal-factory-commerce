@@ -141,7 +141,7 @@ test("production source has no Drive or legacy hotlink and preserves current bra
 test("approved local Luminal logo is integrated accessibly without changing navigation", () => {
   const sharedHeader = read("src/features/home/home-arrival-header.tsx");
   const brandSurfaces = sharedHeader + read("src/components/layout/footer.tsx");
-  assert.match(read("src/components/layout/header.tsx"), /<HomeArrivalHeader immersive=\{false\}/);
+  assert.match(read("src/components/layout/header.tsx"), /<HomeArrivalHeader rafflePreview=\{rafflePreview\}/);
   assert.match(brandSurfaces, /aria-label=\{tr\("Luminal Factory"\)\}/);
   assert.match(sharedHeader, /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png\?v=gold-20261007"/);
   assert.match(read("src/components/layout/footer.tsx"), /href="\/"[\s\S]*src="\/brand\/luminal-factory-logo-primary\.png\?v=gold-20261007"/);

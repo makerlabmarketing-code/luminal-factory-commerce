@@ -2,7 +2,6 @@
 import { useTranslator } from "@/lib/i18n/client";
 
 
-import Image from "next/image";
 import { LuminalLoadingMark } from "@/components/ui/luminal-loading-mark";
 import { useEffect, useRef, useState } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
@@ -16,6 +15,7 @@ type HeroObjectStageProps = Readonly<{
   allowTouch3d?: boolean;
   mobileOnly?: boolean;
   showLoadingIndicator?: boolean;
+  onSettled?: () => void;
 }>;
 
 type NetworkInformationLike = {
@@ -95,6 +95,7 @@ export function HeroObjectStage({
   allowTouch3d = false,
   mobileOnly = false,
   showLoadingIndicator = true,
+  onSettled,
 }: HeroObjectStageProps) {
   const tr = useTranslator();
   const [capabilityRevision, setCapabilityRevision] = useState(0);
@@ -105,16 +106,17 @@ export function HeroObjectStage({
     return () => queries.forEach((query) => query.removeEventListener("change", refresh));
   }, []);
   const stageRef = useRef<HTMLDivElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const stage = stageRef.current;
-    const preview = previewRef.current;
     const mount = modelMountRef.current;
-    if (!stage || !mount || media.availability !== "available") return;
+    if (!stage || !mount || media.availability !== "available") {
+      onSettled?.();
+      return;
+    }
 
     const mobileViewport = window.matchMedia("(max-width: 899px)").matches;
     if (mobileOnly && !mobileViewport) return;
@@ -139,37 +141,22 @@ export function HeroObjectStage({
     if (phoneViewport) {
       stage.dataset.heroMode = "disabled-mobile";
       mount.style.display = "none";
+      onSettled?.();
       return;
     }
     const webGLAvailable = !reducedMotion && supportsWebGL();
-    const posterOnly = constrainedNetwork || (!finePointer && !allowTouch3d) || !webGLAvailable;
-    const signalObjectReady = (mode: string) => {
-      document.documentElement.dataset.luminalHeroObjectReady = mode;
-      window.dispatchEvent(new CustomEvent("luminal:hero-object-ready", { detail: { mode } }));
-    };
-
-    if (posterOnly) {
-      stage.dataset.heroMode = !webGLAvailable ? "poster-no-webgl" : !finePointer ? "poster-coarse-pointer" : "poster-constrained-network";
+    const canEnhance = webGLAvailable && !constrainedNetwork && (finePointer || allowTouch3d);
+    if (!canEnhance) {
+      stage.dataset.heroMode = !webGLAvailable ? "static-no-webgl" : constrainedNetwork ? "static-constrained-network" : "static-coarse-pointer";
       mount.style.display = "none";
-      if (preview) {
-        preview.style.display = "block";
-        preview.style.visibility = "visible";
-        preview.style.opacity = "1";
-      }
-      signalObjectReady("poster");
+      onSettled?.();
       return;
     }
 
     stage.dataset.heroMode = "pending-3d";
-    // Leave the 3D stage clear while loading; the portrait is only a fallback.
-    if (preview) {
-      preview.style.display = "none";
-      preview.style.visibility = "hidden";
-      preview.style.opacity = "0";
-    }
 
     let cancelled = false;
-    let fellBack = false;
+    let failed = false;
     let observer: IntersectionObserver | null = null;
     let idleHandle: number | null = null;
     let fallbackTimeout: number | null = null;
@@ -251,7 +238,7 @@ export function HeroObjectStage({
     };
 
     const handlePointerDown = (event: PointerEvent) => {
-      if (event.button !== 0 || !finePointer || reducedMotion || fellBack) return;
+      if (event.button !== 0 || !finePointer || reducedMotion || failed) return;
       if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
       if (event.target instanceof Element && event.target.closest("a, button, input, textarea, select, h1, h2, h3, p, [role='button']")) return;
       const stageBounds = stage.getBoundingClientRect();
@@ -296,29 +283,28 @@ export function HeroObjectStage({
     };
 
     const showError = () => {
-      if (cancelled || stage.dataset.heroMode === "poster-3d-unavailable") return;
-      fellBack = true;
-      stage.dataset.heroMode = "poster-3d-unavailable";
+      if (cancelled || failed) return;
+      failed = true;
+      stage.dataset.heroMode = "unavailable-3d";
       if (enhancementTimeout !== null) window.clearTimeout(enhancementTimeout);
       viewerRef.current = null;
       mount.replaceChildren();
       if (loaderRef.current) loaderRef.current.style.display = "none";
       mount.style.display = "none";
-      if (preview) {
-        preview.style.display = "block";
-        preview.style.visibility = "visible";
-        preview.style.opacity = "1";
-      }
-      signalObjectReady("poster");
+      onSettled?.();
     };
 
     const mountViewer = async () => {
       try {
         stage.dataset.heroMode = "loading-3d";
+        if (loaderRef.current) {
+          loaderRef.current.style.display = "flex";
+          loaderRef.current.style.opacity = "1";
+        }
         // Cover the runtime download and registration as well as the model load.
         enhancementTimeout = window.setTimeout(showError, HERO_ENHANCEMENT_TIMEOUT_MS);
         await ensureModelViewer();
-        if (cancelled || fellBack || viewerRef.current) return;
+        if (cancelled || failed || viewerRef.current) return;
 
         const viewer = document.createElement("model-viewer") as HTMLElement & { model?: { materials: HeroModelMaterial[] } };
         viewer.style.display = "block";
@@ -361,7 +347,7 @@ export function HeroObjectStage({
         window.addEventListener("luminal:hero-orbit-offset", handleScrollOrbit);
 
         viewer.addEventListener("load", () => {
-          if (cancelled || stage.dataset.heroMode === "poster-3d-unavailable") return;
+          if (cancelled || failed) return;
           if (enhancementTimeout !== null) window.clearTimeout(enhancementTimeout);
           applyHeroMaterialTint(viewer.model?.materials ?? [], presentation.tint);
           stage.dataset.heroMode = reducedMotion
@@ -376,8 +362,7 @@ export function HeroObjectStage({
             }, 280);
           }
           mount.style.opacity = "1";
-          if (preview) preview.style.display = "none";
-          signalObjectReady("3d");
+          onSettled?.();
         }, { once: true });
 
         viewer.addEventListener("error", showError, { once: true });
@@ -443,7 +428,7 @@ export function HeroObjectStage({
       viewerRef.current = null;
       mount.replaceChildren();
     };
-  }, [capabilityRevision, allowTouch3d, media.alt, media.availability, mobileOnly, preload, presentation]);
+  }, [capabilityRevision, allowTouch3d, media.alt, media.availability, mobileOnly, onSettled, preload, presentation]);
 
   return (
     <div
@@ -459,28 +444,6 @@ export function HeroObjectStage({
       {media.availability === "available" ? (
         <>
           <div
-            ref={previewRef}
-            className="hero-object-poster invisible absolute inset-[12%] z-[1] overflow-hidden opacity-0"
-            data-hero-product-image="true"
-            data-hero-poster-role="error-and-capability-fallback"
-            style={{
-              WebkitMaskImage: "radial-gradient(ellipse 94% 86% at 54% 49%, #000 58%, transparent 100%)",
-              maskImage: "radial-gradient(ellipse 94% 86% at 54% 49%, #000 58%, transparent 100%)",
-            }}
-          >
-            <Image
-              className="home-product-image hero-product-image"
-              src={media.src}
-              alt={tr(media.alt)}
-              fill
-              loading="lazy"
-              fetchPriority="low"
-              sizes={media.sizes}
-              style={{ objectPosition: media.objectPosition }}
-            />
-          </div>
-
-          <div
             className="pointer-events-none absolute inset-[1%] z-[1] rounded-full opacity-55 blur-3xl"
             style={{ background: "radial-gradient(circle, rgba(214,179,90,.075) 0%, rgba(243,230,195,.035) 34%, rgba(114,89,184,.025) 52%, rgba(0,0,0,0) 74%)" }}
             aria-hidden="true"
@@ -495,12 +458,7 @@ export function HeroObjectStage({
 
           <div ref={modelMountRef} className="absolute -inset-x-[9%] -inset-y-[4%] z-[2] opacity-0 transition-opacity duration-[620ms]" />
         </>
-      ) : (
-        <>
-          <span className="hero-object-silhouette" aria-hidden="true" />
-          <p className="home-media-pending">{tr(media.alt)}<br /><span>{tr("Approved product media pending sync")}</span></p>
-        </>
-      )}
+      ) : null}
       <div className="hero-object-vignette pointer-events-none z-[3]" aria-hidden="true" />
     </div>
   );

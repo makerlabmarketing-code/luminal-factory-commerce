@@ -9,7 +9,6 @@ import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
 import { getHeroModelPresentation } from "./hero-model-data";
 import { HeroObjectStage } from "./hero-object-stage";
-import { HomeArrivalHeader } from "./home-arrival-header";
 import { HomeImmersiveExperience } from "./home-immersive-experience";
 import { HeroTextMotionController } from "./hero-copy-motion";
 import { HomeFlexGallery } from "./home-flex-gallery";
@@ -60,7 +59,6 @@ export async function HomePage() {
 
   return (
     <>
-      <HomeArrivalHeader immersive={immersive} />
       <HomeImmersiveExperience
         media={media.hero}
         presentation={heroPresentation}

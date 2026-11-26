@@ -11,41 +11,13 @@ import { RaffleHeaderNotice } from "@/features/raffle/raffle-header-notice";
 
 type HeaderStage = "waiting" | "revealed";
 
-const INTRO_SESSION_KEY = "luminal-home-intro-v2";
-
-export function HomeArrivalHeader({ immersive, rafflePreview = false }: Readonly<{ immersive: boolean; rafflePreview?: boolean }>) {
+export function HomeArrivalHeader({ stage = "revealed", rafflePreview = false }: Readonly<{ stage?: HeaderStage; rafflePreview?: boolean }>) {
   const tr = useTranslator();
-  const [stage, setStage] = useState<HeaderStage>("revealed");
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLElement>(null);
   const desktopNavRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!immersive) return;
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let seenIntro = false;
-    try {
-      seenIntro = window.sessionStorage.getItem(INTRO_SESSION_KEY) === "1";
-    } catch {
-      seenIntro = false;
-    }
-
-    if (
-      reducedMotion
-      || seenIntro
-      || document.documentElement.dataset.luminalBrandDocked === "true"
-    ) {
-      const revealFrame = window.requestAnimationFrame(() => setStage("revealed"));
-      return () => window.cancelAnimationFrame(revealFrame);
-    }
-
-    const reveal = () => setStage("revealed");
-    window.addEventListener("luminal:brand-docked", reveal);
-    return () => window.removeEventListener("luminal:brand-docked", reveal);
-  }, [immersive]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -128,7 +100,8 @@ export function HomeArrivalHeader({ immersive, rafflePreview = false }: Readonly
       aria-modal={menuOpen ? true : undefined}
       aria-label={menuOpen ? tr("Điều hướng chính trên di động") : undefined}
       className={styles.header}
-      data-stage={immersive ? stage : "revealed"}
+      data-stage={stage}
+      inert={stage === "waiting"}
       data-menu-open={menuOpen ? "true" : "false"}
     >
       <a className="skip-link" href="#main-content">{tr("Bỏ qua đến nội dung chính")}</a>
@@ -148,7 +121,7 @@ export function HomeArrivalHeader({ immersive, rafflePreview = false }: Readonly
             width={1024}
             height={1024}
             sizes="56px"
-            priority={immersive}
+            priority={stage === "waiting"}
           />
         </Link>
 
