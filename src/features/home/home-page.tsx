@@ -10,7 +10,6 @@ import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media"
 import { getHeroModelPresentation } from "./hero-model-data";
 import { HeroObjectStage } from "./hero-object-stage";
 import { HomeImmersiveExperience } from "./home-immersive-experience";
-import { HeroTextMotionController } from "./hero-copy-motion";
 import { HomeArchiveBurst } from "./home-archive-burst";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
 import { HomeMotionGallery } from "./home-motion-gallery";
@@ -56,7 +55,6 @@ export async function HomePage() {
   ]);
   const immersive = !featuredRaffle;
   const galleryPhotos = media.gallery.slice(0, 6);
-  const heroTitleWords = content.hero.title.trim().split(/\s+/);
 
   return (
     <>
@@ -71,22 +69,19 @@ export async function HomePage() {
 
         <section className="revival-hero" aria-labelledby="hero-title" data-home-3d-section="hero">
           <div className="hero-atmosphere" aria-hidden="true" />
-          <Container className="revival-hero-inner lg:!grid-cols-[minmax(0,.72fr)_minmax(28rem,1.28fr)] lg:!gap-[clamp(2rem,5vw,6rem)]">
-            <div className="revival-hero-copy lg:max-w-[34rem] lg:-translate-y-[4vh]" data-hero-text-motion="word-reveal">
-              <p className="eyebrow" data-hero-copy-support>{content.hero.eyebrow}</p>
-              <h1 id="hero-title">
-                {heroTitleWords.map((word, index) => (
-                  <span className="inline-block" data-hero-word key={`${word}-${index}`}>
-                    {word}{index < heroTitleWords.length - 1 ? "\u00A0" : null}
-                  </span>
-                ))}
-              </h1>
-              <p className="lede" data-hero-copy-support>{content.hero.description}</p>
-              <div className="actions" data-hero-copy-support>
-                <ButtonLink href={content.hero.primaryAction.href}>{content.hero.primaryAction.label}</ButtonLink>
-                <ButtonLink href={content.hero.secondaryAction.href} variant="secondary">{content.hero.secondaryAction.label}</ButtonLink>
+          <Container className={`revival-hero-inner ${immersive ? "" : "lg:!grid-cols-[minmax(0,.72fr)_minmax(28rem,1.28fr)] lg:!gap-[clamp(2rem,5vw,6rem)]"}`}>
+            <div className="revival-hero-copy">
+              <div className="revival-hero-title">
+                <p className="eyebrow" data-hero-entrance>{content.hero.eyebrow}</p>
+                <h1 id="hero-title" data-hero-entrance>{content.hero.title}</h1>
               </div>
-              <HeroTextMotionController />
+              <div className="revival-hero-details">
+                <p className="lede" data-hero-entrance>{content.hero.description}</p>
+                <div className="actions" data-hero-entrance>
+                  <ButtonLink href={content.hero.primaryAction.href}>{content.hero.primaryAction.label}</ButtonLink>
+                  <ButtonLink href={content.hero.secondaryAction.href} variant="secondary">{content.hero.secondaryAction.label}</ButtonLink>
+                </div>
+              </div>
             </div>
 
             <div className="home-hero-object-corridor relative min-w-0 lg:-mr-[min(7vw,7rem)] lg:pt-6">

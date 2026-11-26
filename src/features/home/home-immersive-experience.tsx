@@ -1,9 +1,5 @@
 "use client";
-import { useTranslator } from "@/lib/i18n/client";
-
-
-import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { HomeMediaContract } from "@/content/homepage-media";
 import type { HeroModelPresentation } from "./hero-model-config";
 import { HeroObjectStage } from "./hero-object-stage";
@@ -18,8 +14,6 @@ type HomeImmersiveExperienceProps = Readonly<{
   enabled: boolean;
 }>;
 
-type IntroPhase = "pending" | "loading" | "docking" | "done";
-
 type MotionState = Readonly<{
   xVw: number;
   yVh: number;
@@ -31,10 +25,8 @@ type MotionState = Readonly<{
 
 type MotionKeyframe = MotionState & Readonly<{ scrollY: number }>;
 
-const INTRO_SESSION_KEY = "luminal-home-intro-v3";
-const INTRO_MINIMUM_MS = 550;
-const INTRO_MAXIMUM_MS = 8000;
-const LOGO_DOCK_MS = 480;
+const HERO_INTRO_MS = 1600;
+const HERO_SCROLL_HANDOFF_MS = 200;
 const MOTION_EPSILON = 0.002;
 
 type MotionDefinition = Readonly<{
@@ -167,139 +159,9 @@ function stateDistance(left: MotionState, right: MotionState) {
 }
 
 export function HomeImmersiveExperience({ media, presentation, enabled }: HomeImmersiveExperienceProps) {
-  const tr = useTranslator();
   const modelLayerRef = useRef<HTMLDivElement>(null);
-  const travelBrandRef = useRef<HTMLDivElement>(null);
-  const [phase, setPhase] = useState<IntroPhase>(() => enabled ? "pending" : "done");
-  const objectSettled = useRef(false);
-  const tryDock = useRef<(() => void) | null>(null);
-  const onObjectSettled = useCallback(() => {
-    objectSettled.current = true;
-    tryDock.current?.();
-  }, []);
-
-  useEffect(() => {
-    if (!enabled) return;
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const phone = window.matchMedia("(max-width: 699px)");
-    let seenIntro = false;
-    try {
-      seenIntro = window.sessionStorage.getItem(INTRO_SESSION_KEY) === "1";
-    } catch {
-      // Storage may be unavailable in privacy mode.
-    }
-
-    if (reducedMotion.matches || seenIntro || phone.matches || window.scrollY > 0 || location.hash) {
-      const finishFrame = window.requestAnimationFrame(() => setPhase("done"));
-      return () => window.cancelAnimationFrame(finishFrame);
-    }
-
-    const root = document.documentElement;
-    const previousOverflow = root.style.overflow;
-    const background = Array.from(document.querySelectorAll<HTMLElement>("#main-content, footer"));
-    const previousInert = background.map((item) => item.inert);
-    root.style.overflow = "hidden";
-    background.forEach((item) => { item.inert = true; });
-
-    let disposed = false;
-    let finished = false;
-    let minimumElapsed = false;
-    let dockingStarted = false;
-    let brandAnimation: Animation | null = null;
-    let dockFrame: number | undefined;
-    const showFrame = window.requestAnimationFrame(() => {
-      if (!finished && !dockingStarted) setPhase("loading");
-    });
-
-    const unlock = () => {
-      root.style.overflow = previousOverflow;
-      background.forEach((item, index) => { item.inert = previousInert[index]; });
-    };
-
-    const finishDock = () => {
-      if (disposed || finished) return;
-      finished = true;
-      setPhase("done");
-      unlock();
-      try {
-        window.sessionStorage.setItem(INTRO_SESSION_KEY, "1");
-      } catch {
-        // The page remains available when storage is blocked.
-      }
-    };
-
-    const dockBrand = () => {
-      if (disposed || finished || dockingStarted || !minimumElapsed) return;
-      dockingStarted = true;
-      setPhase("docking");
-
-      dockFrame = window.requestAnimationFrame(() => {
-        const traveler = travelBrandRef.current;
-        const dock = document.querySelector<HTMLElement>("[data-home-logo-dock] img");
-        if (!traveler || !dock || typeof traveler.animate !== "function" || phone.matches || reducedMotion.matches) {
-          finishDock();
-          return;
-        }
-
-        const from = traveler.getBoundingClientRect();
-        const to = dock.getBoundingClientRect();
-        const dx = to.left + to.width / 2 - (from.left + from.width / 2);
-        const dy = to.top + to.height / 2 - (from.top + from.height / 2);
-        const scale = to.width / Math.max(from.width, 1);
-
-        brandAnimation = traveler.animate(
-          [
-            { transform: "translate(-50%, -50%) translate3d(0, 0, 0) scale(1)" },
-            { transform: `translate(-50%, -50%) translate3d(${dx}px, ${dy}px, 0) scale(${scale})` },
-          ],
-          {
-            duration: LOGO_DOCK_MS,
-            easing: "cubic-bezier(.68, 0, .18, 1)",
-            fill: "forwards",
-          },
-        );
-
-        brandAnimation.addEventListener("finish", finishDock, { once: true });
-        brandAnimation.addEventListener("cancel", finishDock, { once: true });
-      });
-    };
-
-    tryDock.current = () => {
-      if (objectSettled.current) dockBrand();
-    };
-    const minimumTimer = window.setTimeout(() => {
-      minimumElapsed = true;
-      tryDock.current?.();
-    }, INTRO_MINIMUM_MS);
-
-    // Fail open if the 3D stage is unable to report a terminal state.
-    const maximumTimer = window.setTimeout(() => {
-      minimumElapsed = true;
-      dockBrand();
-    }, INTRO_MAXIMUM_MS);
-
-    const exitForPreference = () => {
-      if (!phone.matches && !reducedMotion.matches) return;
-      brandAnimation?.cancel();
-      finishDock();
-    };
-    phone.addEventListener("change", exitForPreference);
-    reducedMotion.addEventListener("change", exitForPreference);
-
-    return () => {
-      disposed = true;
-      tryDock.current = null;
-      window.clearTimeout(minimumTimer);
-      window.clearTimeout(maximumTimer);
-      window.cancelAnimationFrame(showFrame);
-      if (dockFrame !== undefined) window.cancelAnimationFrame(dockFrame);
-      phone.removeEventListener("change", exitForPreference);
-      reducedMotion.removeEventListener("change", exitForPreference);
-      brandAnimation?.cancel();
-      if (!finished) unlock();
-    };
-  }, [enabled]);
+  const startIntroRef = useRef<(() => void) | null>(null);
+  const onFirstFrame = useCallback(() => startIntroRef.current?.(), []);
 
   useEffect(() => {
     if (!enabled) return;
@@ -311,7 +173,14 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     const compactMotion = window.matchMedia("(max-width: 1023px), (orientation: portrait) and (hover: none) and (pointer: coarse)");
     const portraitTabletMotion = window.matchMedia("(min-width: 700px) and (orientation: portrait) and (hover: none) and (pointer: coarse)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reducedMotion.matches) return;
+    const hero = document.querySelector<HTMLElement>('[data-home-3d-section="hero"]');
+    const light = hero?.querySelector<HTMLElement>(".hero-atmosphere");
+    const copy = hero?.querySelectorAll<HTMLElement>("[data-hero-entrance]");
+    let introStart: number | undefined;
+    let finishFrom: { start: number; age: number } | undefined;
+    let introAge = HERO_INTRO_MS;
+    let hasScrolled = window.scrollY > 1 || Boolean(location.hash);
+    const copyAnimations: Animation[] = [];
 
     const selectMotionStates = () => portraitTabletMotion.matches
       ? portraitTabletStates
@@ -330,6 +199,12 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     const galleryViewport = photoChapter?.querySelector<HTMLElement>("[data-home-gallery-viewport]");
 
     const apply = (state: MotionState) => {
+      if (reducedMotion.matches) {
+        layer.style.removeProperty("transform");
+        layer.style.removeProperty("opacity");
+        layer.style.removeProperty("filter");
+        return;
+      }
       const releaseY = featuredSection ? Math.min(0, featuredSection.getBoundingClientRect().bottom - window.innerHeight) : 0;
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
@@ -373,15 +248,32 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         }
       }
 
+      if (introAge < HERO_INTRO_MS) {
+        const lightPower = smoothstep(introAge / 800);
+        light?.style.setProperty("--hero-atmosphere-light", String(interpolate(0.58, 1, lightPower)));
+        const reveal = smoothstep((introAge - 80) / 1080);
+        const remaining = 1 - clamp01(introAge / HERO_INTRO_MS);
+        const lift = finishFrom?.age === 0 ? 0 : remaining ** 3;
+        y += 20 * lift;
+        scale *= 1 - 0.04 * lift;
+        opacity *= reveal;
+        layer.style.filter = `brightness(${interpolate(0.64, 1, reveal)})`;
+      } else {
+        if (light?.style.getPropertyValue("--hero-atmosphere-light")) {
+          light.style.setProperty("--hero-atmosphere-light", "1");
+        }
+        layer.style.removeProperty("filter");
+      }
+
       layer.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)}) rotate(${rotation.toFixed(3)}deg)`;
       layer.style.opacity = opacity.toFixed(4);
 
       // The actual, eased 3D position is the only signal that arms Meowhe's
       // content. Bubbles own their animation clock after this signal fires.
       const featuredDestination = motionStates.findLast((step) => step.section === "featured")?.state;
-      const heroArrival = featuredDestination && featuredDestination.xVw !== 0
-        ? clamp01(state.xVw / featuredDestination.xVw)
-        : 0;
+      const heroOrigin = keyframes[0]?.xVw ?? 0;
+      const featuredTravel = (featuredDestination?.xVw ?? heroOrigin) - heroOrigin;
+      const heroArrival = featuredTravel ? clamp01((state.xVw - heroOrigin) / featuredTravel) : 0;
       document.documentElement.dataset.luminalHeroFeaturedArrival = heroArrival.toFixed(4);
       // Compare the moving first/featured-section seam against an actual
       // contact point on the eased 3D stage, not the Hero's horizontal orbit.
@@ -415,7 +307,10 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         const rect = element.getBoundingClientRect();
         const absoluteTop = rect.top + window.scrollY;
         const absoluteAnchor = anchor === "bottom" ? absoluteTop + rect.height : absoluteTop;
-        return [{ scrollY: Math.max(0, absoluteAnchor - viewportHeight * viewportOffset), ...state }];
+        const pose = section === "hero" && !compactMotion.matches
+          ? { ...state, xVw: (window.innerWidth / 2 - layer.offsetLeft - layer.offsetWidth / 2) * 100 / window.innerWidth, yVh: -4 }
+          : state;
+        return [{ scrollY: Math.max(0, absoluteAnchor - viewportHeight * viewportOffset), ...pose }];
       }).sort((left, right) => left.scrollY - right.scrollY);
 
       target = readMotionState(window.scrollY, keyframes);
@@ -423,9 +318,15 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       apply(current);
     };
 
-    const animate = () => {
+    const animate = (now: number) => {
       frameHandle = null;
-      const blend = compactMotion.matches ? 0.16 : 0.115;
+      if (introStart !== undefined) {
+        introAge = finishFrom
+          ? interpolate(finishFrom.age, HERO_INTRO_MS, smoothstep((now - finishFrom.start) / HERO_SCROLL_HANDOFF_MS))
+          : Math.min(HERO_INTRO_MS, Math.max(0, now - introStart));
+        if (introAge >= HERO_INTRO_MS) introStart = undefined;
+      }
+      const blend = reducedMotion.matches ? 1 : compactMotion.matches ? 0.16 : 0.115;
       current = {
         xVw: interpolate(current.xVw, target.xVw, blend),
         yVh: interpolate(current.yVh, target.yVh, blend),
@@ -434,16 +335,26 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         orbitDeg: interpolate(current.orbitDeg, target.orbitDeg, blend),
         opacity: interpolate(current.opacity, target.opacity, blend),
       };
+      const travelling = stateDistance(current, target) > MOTION_EPSILON;
+      if (!travelling) current = target;
       apply(current);
 
-      if (stateDistance(current, target) > MOTION_EPSILON) {
+      if (introStart !== undefined || travelling) {
         frameHandle = window.requestAnimationFrame(animate);
       }
     };
 
     const schedule = () => {
       const scrollY = window.scrollY;
-      if (scrollY !== previousScrollY) scrollingUp = scrollY < previousScrollY;
+      if (scrollY !== previousScrollY) {
+        scrollingUp = scrollY < previousScrollY;
+        if (Math.abs(scrollY) > 1) {
+          hasScrolled = true;
+          if (introStart !== undefined && !finishFrom) {
+            finishFrom = { start: performance.now(), age: introAge };
+          }
+        }
+      }
       previousScrollY = scrollY;
       target = readMotionState(scrollY, keyframes);
       // The pointer is tracked globally by HeroObjectStage only within Hero/Meet.
@@ -457,15 +368,49 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       schedule();
     };
 
+    startIntroRef.current = () => {
+      if (reducedMotion.matches || window.matchMedia("(max-width: 699px)").matches) return;
+      // A cached/restored page or a fast swipe reveals the object on its live scroll pose.
+      const now = performance.now();
+      const alreadyMoved = hasScrolled || window.scrollY > 1 || compactMotion.matches;
+      introStart = now;
+      introAge = 0;
+      finishFrom = alreadyMoved ? { start: now, age: 0 } : undefined;
+      layer.style.opacity = "0";
+      if (!alreadyMoved) {
+        copy?.forEach((part, index) => {
+          if (!part.animate) return;
+          copyAnimations.push(part.animate(
+            [{ opacity: 0.76, transform: "translateY(6px)" }, { opacity: 1, transform: "translateY(0)" }],
+            { duration: 520, delay: 220 + index * 100, fill: "backwards", easing: "cubic-bezier(.2,.7,.2,1)" },
+          ));
+        });
+      }
+      schedule();
+    };
+
+    const handlePreference = () => {
+      if (reducedMotion.matches) {
+        introStart = undefined;
+        introAge = HERO_INTRO_MS;
+        copyAnimations.forEach(animation => animation.cancel());
+      }
+      handleResize();
+    };
+
     rebuildKeyframes();
     schedule();
+    reducedMotion.addEventListener("change", handlePreference);
     compactMotion.addEventListener("change", handleResize);
     portraitTabletMotion.addEventListener("change", handleResize);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", handleResize);
 
     return () => {
+      startIntroRef.current = null;
       if (frameHandle !== null) window.cancelAnimationFrame(frameHandle);
+      copyAnimations.forEach(animation => animation.cancel());
+      reducedMotion.removeEventListener("change", handlePreference);
       compactMotion.removeEventListener("change", handleResize);
       portraitTabletMotion.removeEventListener("change", handleResize);
       window.removeEventListener("scroll", schedule);
@@ -473,6 +418,8 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       layer.style.pointerEvents = "";
       layer.style.transform = "";
       layer.style.opacity = "";
+      layer.style.removeProperty("filter");
+      light?.style.removeProperty("--hero-atmosphere-light");
       delete document.documentElement.dataset.luminalHeroFeaturedArrival;
     };
   }, [
@@ -482,44 +429,16 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     presentation.camera.thetaDeg,
   ]);
 
-  if (!enabled) return <HomeArrivalHeader />;
-  const waiting = phase === "loading" || phase === "docking";
-
   return (
     <>
-      <HomeArrivalHeader stage={waiting ? "waiting" : "revealed"} />
-      <div className={styles.experience} data-home-immersive-experience="true">
-        <div ref={modelLayerRef} className={styles.modelLayer} data-home-immersive-model="true">
-          <HeroObjectStage media={media} presentation={presentation} preload allowTouch3d showLoadingIndicator={false} onSettled={onObjectSettled} />
-        </div>
-      </div>
-
-      <noscript><style>{'[data-home-brand-intro="true"] { display: none !important; }'}</style></noscript>
-      <div className={styles.introRoot} data-home-brand-intro="true" data-phase={phase} aria-hidden={phase === "done" ? "true" : undefined}>
-        <div className={styles.veil}>
-          <div className={styles.progress} aria-hidden="true"><span /></div>
-          <div className={styles.blueprint} aria-hidden="true">
-            <i className={styles.ringOuter} />
-            <i className={styles.ringInner} />
-            <i className={styles.axisHorizontal} />
-            <i className={styles.axisVertical} />
-            <i className={styles.diamondOne} />
-            <i className={styles.diamondTwo} />
+      <HomeArrivalHeader />
+      {enabled && (
+        <div className={styles.experience} data-home-immersive-experience="true">
+          <div ref={modelLayerRef} className={styles.modelLayer} data-home-immersive-model="true">
+            <HeroObjectStage media={media} presentation={presentation} preload allowTouch3d showLoadingIndicator={false} onFirstFrame={onFirstFrame} />
           </div>
-          <p className={styles.loadingCopy} role="status" aria-live="polite">{tr("Preparing the object")}</p>
         </div>
-
-        <div ref={travelBrandRef} className={styles.travelBrand} aria-hidden="true">
-          <Image
-            src="/brand/luminal-factory-logo-primary.png?v=gold-20261007"
-            alt=""
-            width={1024}
-            height={1024}
-            priority
-            sizes="(max-width: 899px) 104px, 152px"
-          />
-        </div>
-      </div>
+      )}
     </>
   );
 }

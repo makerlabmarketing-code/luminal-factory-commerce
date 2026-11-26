@@ -13,30 +13,18 @@ Adapt the motion principles visible in the owner-supplied NOZO recording into Lu
 2. Add one narrow client island, `HomeImmersiveExperience`.
 3. Reuse `HeroObjectStage` and the existing Model Viewer runtime.
 4. Add an explicit Hero object-ready browser event.
-5. Mount the Hero model eagerly behind the loader for the first Home visit.
+5. Mount the Hero model eagerly in the page, independently of navigation and copy.
 6. Keep the visual 3D layer fixed on eligible desktop clients while scroll maps section positions to transform keyframes.
 7. Disable page-wide traversal for coarse pointer, narrow viewport and reduced motion.
 8. Preserve raffle-first authority: if a featured raffle is present, fall back to the current inline Hero object until a dedicated raffle/model integration is approved.
 
 ## Intro lifecycle
 
-```text
-Home hydration
-  -> lock document scroll
-  -> eager Hero object mount behind veil
-  -> minimum 2.1s identity reveal
-  -> wait for object ready OR maximum 4.8s fallback
-  -> logo settles from center to top-left
-  -> veil fades
-  -> unlock scroll
-  -> mark intro seen for current browser session
-```
-
-The timer does not pretend to measure asset progress. The object-ready event is the readiness boundary.
+The page and navigation are available on first paint. The home model starts loading immediately on eligible devices. Its first-frame callback starts a 1.6-second reveal with a 20 px lift and a scale change from 96% to 100%. The atmosphere brightens first and copy follows at 100 ms intervals. The scroll controller owns the model transform throughout. Scrolling during the intro eases out its remaining offset over 200 ms. If the first frame arrives after a scroll, the model fades into the active scroll pose.
 
 ## Desktop scroll keyframes
 
-- Hero: large object on the right.
+- Hero: horizontally centered with the character raised slightly to balance its base.
 - Meet Meowhe: settle the model on the left and hold its size/orientation.
 - Colorways: on arrival, immediately play a reversible staggered 2.96-second reveal from behind the model. Curved travel decelerates with cubic ease-out as circles grow from 8% to full size.
 - Reverse scroll: the first upward scroll immediately rewinds the timeline toward the current model position, including while the scene remains pinned. Play the exact reveal timeline backward at the same speed: circles follow the same curved paths and shrink in reverse stagger order, while the title and light fade along the same timeline. There is no accelerated return or extra hold after the last circle settles. Replay when scrolling down again.

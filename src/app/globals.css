@@ -657,6 +657,49 @@ html.luminal-motion-ready .wave-home [data-luminal-reveal="home-copy"] {
     linear-gradient(112deg, #050505 18%, #0e0910 74%, #050505);
 }
 
+@media (min-width: 1024px) {
+  .wave-home[data-home-immersive="true"] .revival-hero-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
+    column-gap: clamp(1rem, 2.25vw, 3rem);
+  }
+  .wave-home[data-home-immersive="true"] .revival-hero-copy { display: contents; }
+  .wave-home[data-home-immersive="true"] :is(.revival-hero-title, .revival-hero-details) {
+    position: relative;
+    z-index: 42;
+    grid-row: 1;
+  }
+  .wave-home[data-home-immersive="true"] .revival-hero-title { grid-column: 1; }
+  .wave-home[data-home-immersive="true"] .revival-hero-details { grid-column: 3; }
+  .wave-home[data-home-immersive="true"] .revival-hero h1 {
+    font-size: clamp(2.8rem, 4.8vw, 5.9rem);
+    margin-bottom: 0;
+  }
+  .wave-home[data-home-immersive="true"] .home-hero-object-corridor {
+    grid-column: 2;
+    grid-row: 1;
+    margin-right: 0;
+  }
+  .wave-home[data-home-immersive="true"] .hero-atmosphere {
+    background: linear-gradient(180deg, #050505, #0e0910 60%, var(--home-photo-entry-surface));
+  }
+  .wave-home[data-home-immersive="true"] .hero-atmosphere::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: var(--hero-atmosphere-light, .58);
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(138, 67, 76, .18), transparent 40%),
+      conic-gradient(from 152deg at 50% 0%, transparent 0deg, rgba(197, 137, 92, .085) 17deg, transparent 34deg);
+  }
+}
+
+@media (min-width: 1024px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  .wave-home[data-home-immersive="true"] .revival-hero-inner {
+    grid-template-columns: minmax(0, .72fr) minmax(28rem, 1.28fr);
+  }
+  .wave-home[data-home-immersive="true"] .revival-hero-copy { display: block; }
+}
+
 .home-featured-links { display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; margin-top: 1.5rem; }
 
 .featured-object-immersive > div { z-index: 20; }

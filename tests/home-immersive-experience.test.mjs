@@ -4,20 +4,14 @@ import test from "node:test";
 
 const read = (path) => readFileSync(path, "utf8");
 
-test("HOME-3D-HANDOFF-02 uses a measured logo dock before revealing Home navigation", () => {
+test("Home navigation is available while Meowhe loads", () => {
   assert.equal(existsSync("src/features/home/home-arrival-header.tsx"), true);
-  assert.equal(existsSync("src/features/home/home-arrival-header.module.css"), true);
-  const header = read("src/features/home/home-arrival-header.tsx");
   const immersive = read("src/features/home/home-immersive-experience.tsx");
-  assert.match(header, /data-home-logo-dock="true"/);
-  assert.match(header, /inert=\{stage === "waiting"\}/);
-  assert.match(immersive, /querySelector<HTMLElement>\("\[data-home-logo-dock\] img"\)/);
-  assert.match(immersive, /LOGO_DOCK_MS = 480/);
-  assert.match(immersive, /INTRO_MAXIMUM_MS = 8000/);
-  assert.match(immersive, /brandAnimation.addEventListener\("finish", finishDock/);
+  assert.match(immersive, /<HomeArrivalHeader \/>/);
+  assert.doesNotMatch(immersive, /LOGO_DOCK_MS|INTRO_MAXIMUM_MS|finishDock|waiting/);
 });
 
-test("Home header rail and desktop navigation bubbles remain unavailable until dock completion", () => {
+test("Home header rail retains its desktop navigation bubbles", () => {
   const header = read("src/features/home/home-arrival-header.tsx");
   const css = read("src/features/home/home-arrival-header.module.css");
   assert.match(header, /type HeaderStage = "waiting" \| "revealed"/);

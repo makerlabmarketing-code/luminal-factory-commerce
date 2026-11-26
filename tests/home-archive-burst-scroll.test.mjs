@@ -194,7 +194,7 @@ test("bubbles use a fixed Hero-side origin, curved flight, persistent float and 
   assert.match(css, /colorway-soap-float/);
   assert.match(css, /prefers-reduced-motion: reduce/);
   assert.match(hero, /luminal:hero-featured-arrival/);
-  assert.match(hero, /state\.xVw \/ featuredDestination\.xVw/);
+  assert.match(hero, /\(state\.xVw - heroOrigin\) \/ featuredTravel/);
 });
 
 test("clicking a landed bubble pops only that colorway, then reforms from the shared Hero-side origin", () => {

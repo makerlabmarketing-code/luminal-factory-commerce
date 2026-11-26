@@ -32,7 +32,7 @@ test("Hero renders the 3D scene without a replacement image", () => {
   assert.match(heroSource, /webGLAvailable = !reducedMotion && supportsWebGL\(\)/);
   assert.match(heroSource, /mount\.style\.opacity = "1"/);
   assert.match(heroSource, /if \(cancelled \|\| failed\) return/);
-  assert.match(heroSource, /onSettled\?\.\(\)/);
+  assert.match(heroSource, /requestAnimationFrame\(\(\) => window\.requestAnimationFrame/);
   assert.match(heroSource, /Loading 3D object/);
   assert.match(globalStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });

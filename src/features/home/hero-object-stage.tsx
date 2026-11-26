@@ -15,7 +15,7 @@ type HeroObjectStageProps = Readonly<{
   allowTouch3d?: boolean;
   mobileOnly?: boolean;
   showLoadingIndicator?: boolean;
-  onSettled?: () => void;
+  onFirstFrame?: () => void;
 }>;
 
 type NetworkInformationLike = {
@@ -97,7 +97,7 @@ export function HeroObjectStage({
   allowTouch3d = false,
   mobileOnly = false,
   showLoadingIndicator = true,
-  onSettled,
+  onFirstFrame,
 }: HeroObjectStageProps) {
   const tr = useTranslator();
   const [capabilityRevision, setCapabilityRevision] = useState(0);
@@ -116,7 +116,6 @@ export function HeroObjectStage({
     const stage = stageRef.current;
     const mount = modelMountRef.current;
     if (!stage || !mount || media.availability !== "available") {
-      onSettled?.();
       return;
     }
 
@@ -143,7 +142,6 @@ export function HeroObjectStage({
     if (phoneViewport) {
       stage.dataset.heroMode = "disabled-mobile";
       mount.style.display = "none";
-      onSettled?.();
       return;
     }
     const webGLAvailable = !reducedMotion && supportsWebGL();
@@ -151,7 +149,6 @@ export function HeroObjectStage({
     if (!canEnhance) {
       stage.dataset.heroMode = !webGLAvailable ? "static-no-webgl" : constrainedNetwork ? "static-constrained-network" : "static-coarse-pointer";
       mount.style.display = "none";
-      onSettled?.();
       return;
     }
 
@@ -303,7 +300,6 @@ export function HeroObjectStage({
       mount.replaceChildren();
       if (loaderRef.current) loaderRef.current.style.display = "none";
       mount.style.display = "none";
-      onSettled?.();
     };
 
     const mountViewer = async () => {
@@ -344,7 +340,7 @@ export function HeroObjectStage({
         viewer.setAttribute("max-field-of-view", `${presentation.camera.maxFieldOfViewDeg}deg`);
         viewer.setAttribute("camera-target", "auto auto auto");
         viewer.setAttribute("rotation-per-second", `${presentation.rotationPerSecondDeg}deg`);
-        viewer.setAttribute("auto-rotate-delay", String(presentation.autoRotateDelayMs));
+        viewer.setAttribute("auto-rotate-delay", String(onFirstFrame ? Math.max(presentation.autoRotateDelayMs, 1800) : presentation.autoRotateDelayMs));
         // Manual cursor/scroll orbit remains available when saved auto-rotate is off.
         if (presentation.autoRotate && !reducedMotion) viewer.setAttribute("auto-rotate", "");
         else viewer.removeAttribute("auto-rotate");
@@ -373,8 +369,17 @@ export function HeroObjectStage({
               if (loaderRef.current) loaderRef.current.style.display = "none";
             }, 280);
           }
-          mount.style.opacity = "1";
-          onSettled?.();
+          if (!onFirstFrame) {
+            mount.style.opacity = "1";
+            return;
+          }
+          // Let the loaded viewer render before the home timeline reveals it.
+          window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+            if (cancelled || failed) return;
+            onFirstFrame();
+            mount.style.transition = "none";
+            mount.style.opacity = "1";
+          }));
         }, { once: true });
 
         viewer.addEventListener("error", showError, { once: true });
@@ -405,7 +410,9 @@ export function HeroObjectStage({
       }, HERO_IDLE_FALLBACK_MS);
     };
 
-    if (preload) {
+    if (preload && onFirstFrame) {
+      void mountViewer();
+    } else if (preload) {
       scheduleMountViewer();
     } else {
       observer = new IntersectionObserver((entries) => {
@@ -440,7 +447,7 @@ export function HeroObjectStage({
       viewerRef.current = null;
       mount.replaceChildren();
     };
-  }, [capabilityRevision, allowTouch3d, media.alt, media.availability, mobileOnly, onSettled, preload, presentation]);
+  }, [capabilityRevision, allowTouch3d, media.alt, media.availability, mobileOnly, onFirstFrame, preload, presentation]);
 
   return (
     <div
