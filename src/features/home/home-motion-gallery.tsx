@@ -7,6 +7,8 @@ import { useTranslator } from "@/lib/i18n/client";
 import { getGalleryArrival, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGalleryStripPanel, galleryArrivalProgress, galleryEntryViewportRatio, gallerySettleProgress } from "./home-gallery-motion";
 import styles from "./home-motion-gallery.module.css";
 
+const maxSlices = 7;
+
 export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGalleryMedia[] }>) {
   const tr = useTranslator();
   const posterRef = useRef<HTMLDivElement>(null);
@@ -23,17 +25,21 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
     const viewport = chapter.querySelector<HTMLElement>("[data-home-gallery-viewport]");
     const images = Array.from(grid.querySelectorAll("img"));
     const tiles = Array.from(grid.querySelectorAll<HTMLButtonElement>("[data-home-gallery-card]"));
+    const ribbons = Array.from(grid.querySelectorAll<HTMLElement>("[data-home-gallery-ribbon]")).map(
+      ribbon => Array.from(ribbon.children) as HTMLElement[],
+    );
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const coarse = window.matchMedia("(pointer: coarse)");
     const compact = window.matchMedia("(max-width: 699px)");
     const device = navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string }; deviceMemory?: number };
     const connection = device.connection;
+    let decodedSources: string[] = [];
     let ready = false;
     let disposed = false;
     let frame = 0;
     let previous = -1;
     const motionAllowed = () => !reduced.matches && !(coarse.matches && (device.deviceMemory ?? Infinity) <= 2);
-    let dimensions: { width: number; height: number; x: number; y: number }[] = [];
+    let dimensions: { width: number; height: number; y: number; backgroundX: number; backgroundY: number }[] = [];
 
     function clearTiles() {
       for (const tile of tiles) {
@@ -45,6 +51,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       if (grid) {
         grid.inert = false;
         delete grid.dataset.moving;
+        delete grid.dataset.strip;
       }
     }
 
@@ -86,28 +93,62 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
         }
       }
       const rect = grid.getBoundingClientRect();
-      const settleOffset = getGallerySettleOffset(progress, stageHeight);
+      const sliceCount = compact.matches ? 4 : maxSlices;
+      const strip = progress < galleryArrivalProgress;
+      grid.toggleAttribute("data-strip", strip);
       if (!dimensions.length) {
-        dimensions = tiles.map(tile => {
+        dimensions = tiles.map((tile, index) => {
           const slot = tile.parentElement ?? tile;
-          return { width: slot.offsetWidth, height: slot.offsetHeight, x: slot.offsetLeft, y: slot.offsetTop };
+          const width = slot.offsetWidth;
+          const height = slot.offsetHeight;
+          const image = images[index];
+          const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+          const imageWidth = image.naturalWidth * scale;
+          const imageHeight = image.naturalHeight * scale;
+          const [positionX, positionY] = (items[index].objectPosition ?? "50% 50%").split(" ").map(value => parseFloat(value) / 100);
+          for (const piece of ribbons[index]) {
+            piece.style.setProperty("--slice-width", `${width / sliceCount}px`);
+            piece.style.height = `${height}px`;
+            piece.style.backgroundImage = `url("${image.currentSrc || decodedSources[index]}")`;
+            piece.style.backgroundSize = `${imageWidth}px ${imageHeight}px`;
+          }
+          return {
+            width, height, y: slot.offsetTop,
+            backgroundX: (width - imageWidth) * positionX,
+            backgroundY: (height - imageHeight) * positionY,
+          };
         });
       }
+      if (strip) {
+        ribbons.forEach((pieces, index) => {
+          const slot = dimensions[index];
+          if (!slot.width || !slot.height) return;
+          const panel = getGalleryStripPanel(progress, index, width, stageHeight, sliceCount);
+          const pieceWidth = slot.width / sliceCount;
+          pieces.forEach((piece, pieceIndex) => {
+            const segment = panel?.[pieceIndex];
+            const visible = segment && segment.corners[1][0] - segment.corners[0][0] > 0.12
+              && Math.max(segment.corners[2][1], segment.corners[3][1]) >= 0
+              && Math.min(segment.corners[0][1], segment.corners[1][1]) <= stageHeight;
+            piece.hidden = !visible;
+            if (!segment || !visible) return;
+            // Overlap internal edges slightly to cover subpixel raster seams.
+            piece.toggleAttribute("data-join", segment.slice < sliceCount - 1);
+            piece.style.backgroundPosition = `${slot.backgroundX - segment.slice * pieceWidth}px ${slot.backgroundY}px`;
+            piece.style.transform = getGalleryPanelTransform(segment.corners, {
+              width: pieceWidth, height: slot.height, x: rect.left, y: rect.top,
+            });
+            piece.style.zIndex = String(segment.layer);
+          });
+        });
+        return;
+      }
+
+      const settleOffset = getGallerySettleOffset(progress, stageHeight);
       tiles.forEach((tile, index) => {
         const slot = dimensions[index];
         if (!slot.width) return;
-        const x = rect.left + slot.x;
         const y = rect.top + slot.y;
-        if (progress < galleryArrivalProgress) {
-          const panel = getGalleryStripPanel(progress, index, width, stageHeight);
-          tile.style.opacity = panel ? "1" : "0";
-          if (panel) {
-            tile.style.transform = getGalleryPanelTransform(panel.corners, { ...slot, x, y });
-            tile.style.zIndex = String(panel.layer);
-          }
-          return;
-        }
-
         const arrival = getGalleryArrival(progress, index);
         const direction = index % (compact.matches ? 2 : 3) - (compact.matches ? 0.5 : 1);
         const drop = (-slot.height - y) * (1 - arrival) + settleOffset * arrival;
@@ -136,6 +177,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       for (const image of media) image.loading = "eager";
       void Promise.all(media.map(image => image.decode())).then(() => {
         if (disposed) return;
+        decodedSources = images.map(image => image.currentSrc || image.src);
         ready = true;
         schedule();
       }).catch(() => { /* Keep the normal photo grid if an image cannot decode. */ });
@@ -171,7 +213,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       chapter.removeAttribute("data-gallery-show-heading");
       clearTiles();
     };
-  }, [items.length]);
+  }, [items]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -193,6 +235,13 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
             </button>
           </div>
         ))}
+        <span className={styles.ribbons} aria-hidden="true">
+          {items.map(item => (
+            <span key={item.id} className={styles.ribbon} data-home-gallery-ribbon>
+              {Array.from({ length: maxSlices }, (_, index) => <span key={index} className={styles.slice} hidden />)}
+            </span>
+          ))}
+        </span>
       </div>
       <dialog ref={dialogRef} className={styles.dialog} aria-label={tr("Image preview")}
         onClose={() => setSelected(null)} onClick={event => { if (event.target === event.currentTarget) event.currentTarget.close(); }}>

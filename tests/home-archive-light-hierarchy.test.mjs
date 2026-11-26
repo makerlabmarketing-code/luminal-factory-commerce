@@ -70,27 +70,41 @@ test("The gallery pauses resin strokes while retaining the hero fallback", async
 });
 
 
-test("Adjacent panels share a projected edge and the complete strip exits before gallery arrival", async () => {
-  const { galleryCoverProgress, galleryArrivalProgress, gallerySettleProgress, getGalleryArrival, getGalleryHeroPose, getGalleryStripPanel } = await import("../src/features/home/home-gallery-motion.ts");
-  for (const [width, height] of [[390, 844], [1440, 900], [1920, 1030]]) {
-    const at = (progress, index) => getGalleryStripPanel(progress, index, width, height);
-    const head = at(0.2, 0);
-    const following = at(0.2, 1);
-    const nearlyEqual = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.001;
-    assert.equal(head.corners.filter(a => following.corners.some(b => nearlyEqual(a, b))).length, 2);
+test("The curved photos share one perspective and leave before gallery arrival", async () => {
+  const { galleryCoverProgress, galleryArrivalProgress, gallerySettleProgress, getGalleryArrival, getGalleryHeroPose, getGalleryProgress, getGalleryStripPanel } = await import("../src/features/home/home-gallery-motion.ts");
+  for (const [width, height, slices] of [[390, 844, 4], [1440, 900, 7], [1920, 1030, 7]]) {
+    const at = (progress, index = 0) => getGalleryStripPanel(progress, index, width, height, slices);
+    const far = at(0.215);
+    const cover = at(galleryCoverProgress);
+    const bounds = panels => panels.flatMap(segment => segment.corners);
+    const span = (panels, axis) => {
+      const coordinates = bounds(panels).map(point => point[axis]);
+      return Math.max(...coordinates) - Math.min(...coordinates);
+    };
+    assert.equal(far.length, slices);
+    assert.equal(cover.length, slices);
+    const center = Math.floor(slices / 2);
+    const [before, after] = cover.slice(center - 1, center + 1);
+    assert.deepEqual(before.corners[0], after.corners[1]);
+    assert.deepEqual(before.corners[3], after.corners[2]);
+    assert.ok(far.every(segment => segment.layer < 30));
+    assert.ok(cover.every(segment => segment.layer > 30));
+    assert.ok(bounds(cover).some(([x, y]) => x < width / 2 && y < height / 2));
+    assert.ok(bounds(cover).some(([x, y]) => x > width / 2 && y > height / 2));
+    assert.ok(span(cover, 0) > span(far, 0) * 1.7);
+    const centerEdgeRatio = panels => {
+      const { corners: [topLeft, topRight, bottomRight] } = panels[center];
+      return (topRight[0] - topLeft[0]) * slices / (bottomRight[1] - topRight[1]);
+    };
+    assert.ok(Math.abs(centerEdgeRatio(far) - centerEdgeRatio(cover)) < 0.18);
     assert.equal(getGalleryHeroPose(0.3, -22).yaw, 0);
     assert.equal(getGalleryHeroPose(galleryCoverProgress - 0.001, -22).visible, true);
     assert.equal(getGalleryHeroPose(galleryCoverProgress, -22).visible, false);
-    const cover = at(galleryCoverProgress, 0);
-    assert.ok(cover.layer > 30);
-    assert.ok(cover.corners[0][0] < width / 2 && cover.corners[1][0] > width / 2);
-    assert.ok(cover.corners[0][1] < height / 2 && cover.corners[2][1] > height / 2);
-    assert.ok(cover.corners[1][0] - cover.corners[0][0] > (head.corners[1][0] - head.corners[0][0]) * 1.4);
-    const tail = at(0.802, 8);
-    assert.ok(tail.corners.every(point => point[1] < 0));
+    assert.ok(bounds(at(0.8, 8)).every(point => point[1] < 0));
     assert.equal(at(galleryArrivalProgress, 8), null);
     assert.equal(getGalleryArrival(galleryArrivalProgress, 0), 0);
     assert.ok(getGalleryArrival(0.88, 0) > getGalleryArrival(0.88, 8));
     assert.equal(getGalleryArrival(gallerySettleProgress, 8), 1);
+    assert.ok(getGalleryProgress(-0.88 * height, height) < 0.85);
   }
 });
