@@ -26,12 +26,14 @@ test("Homepage follows the approved editorial sequence with the colorway photo c
   assert.match(home, /content\.hero\.secondaryAction/);
 });
 
-test("Homepage photo chapter renders its image without depending on WebGL", () => {
+test("Homepage gallery renders selectable photos without depending on WebGL", () => {
   const home = read("src/features/home/home-page.tsx");
-  const photo = read("src/features/home/home-resin-flow.module.css");
-  assert.match(home, /data-home-chapter-photo[\s\S]*?<Image src=\{chapterPhoto\.src\}/);
-  assert.match(photo, /var\(--photo-reveal, 1\)/);
-  assert.doesNotMatch(home, /<HomeFlexGallery/);
+  const gallery = read("src/features/home/home-motion-gallery.tsx");
+  assert.match(home, /<HomeMotionGallery items=\{galleryPhotos\}/);
+  assert.match(gallery, /<Image fill src=\{item\.src\}/);
+  assert.match(gallery, /<dialog ref=\{dialogRef\}/);
+  assert.match(gallery, /prefers-reduced-motion: reduce/);
+  assert.doesNotMatch(gallery, /getContext|webgl/i);
 });
 
 test("Wave 1 keeps the route thin and uses a server component feature boundary", () => {

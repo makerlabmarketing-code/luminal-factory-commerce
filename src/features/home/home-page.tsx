@@ -13,6 +13,7 @@ import { HomeImmersiveExperience } from "./home-immersive-experience";
 import { HeroTextMotionController } from "./hero-copy-motion";
 import { HomeArchiveBurst } from "./home-archive-burst";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
+import { HomeMotionGallery } from "./home-motion-gallery";
 import { HomeResinFlow } from "./home-resin-flow";
 import photoStyles from "./home-resin-flow.module.css";
 import { MadeAtLuminalStack } from "./made-at-luminal-stack";
@@ -55,7 +56,7 @@ export async function HomePage() {
     getHomeFeaturedRaffle(),
   ]);
   const immersive = !featuredRaffle;
-  const chapterPhoto = media.gallery.find((item) => item.id === "mono-cookie-open");
+  const galleryPhotos = media.gallery.slice(0, 6);
   const heroTitleWords = content.hero.title.trim().split(/\s+/);
 
   return (
@@ -155,17 +156,16 @@ export async function HomePage() {
           </Container>
         </section> : null}
 
-        {chapterPhoto ? (
+        {galleryPhotos.length ? (
           <section className={photoStyles.photoChapter} aria-labelledby="gallery-title" data-home-3d-section="gallery" data-home-photo-handoff>
             <HomeResinFlow direction="entry" />
-            <Container>
-              <div className={photoStyles.photoFrame} data-home-chapter-photo>
-                <Image src={chapterPhoto.src} alt={chapterPhoto.alt} fill sizes="(max-width: 1440px) calc(100vw - 32px), 1408px" style={{ objectPosition: chapterPhoto.objectPosition }} />
-              </div>
+            <span className={photoStyles.galleryViewport} data-home-gallery-viewport aria-hidden="true" />
+            <Container className={photoStyles.galleryContainer}>
               <header className={`editorial-heading ${photoStyles.photoCopy}`} data-luminal-reveal="home-copy">
-                <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("Mono Meowhe")}</h2></div>
+                <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("Meowhe colorways")}</h2></div>
                 <Link className="text-link" href="/archive/meowhe-mono">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
               </header>
+              <HomeMotionGallery items={galleryPhotos} />
             </Container>
             <HomeResinFlow direction="exit" />
           </section>

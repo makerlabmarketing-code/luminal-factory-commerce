@@ -57,11 +57,6 @@ export function HomeResinFlow({ direction }: Readonly<{ direction: ResinFlowDire
         : clamp((viewport * 0.92 - top) / (viewport * 0.38));
       if (next === progress) return;
       progress = next;
-      if (isEntry) {
-        const photoProgress = clamp((next - 0.42) / 0.58);
-        chapter.style.setProperty("--photo-reveal", String(photoProgress));
-      }
-
       context.clearRect(0, 0, width, height);
       if (next === 0) return;
       context.setLineDash(next === 1 ? [] : [length * next, length]);
@@ -125,7 +120,6 @@ export function HomeResinFlow({ direction }: Readonly<{ direction: ResinFlowDire
       reducedMotion.removeEventListener("change", schedule);
       window.removeEventListener("scroll", schedule);
       window.cancelAnimationFrame(frame);
-      if (isEntry) chapter.style.removeProperty("--photo-reveal");
     };
   }, [direction]);
 

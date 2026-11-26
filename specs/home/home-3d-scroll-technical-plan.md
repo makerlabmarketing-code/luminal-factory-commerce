@@ -65,3 +65,7 @@ Manual visual checks required before Production merge:
 ## Production gate
 
 This prototype may be Previewed for visual approval. Merge to Production only after the owner confirms motion feel, model path and loader timing.
+
+## Featured-to-gallery motion
+
+The gallery handoff begins below Meet Meowhe. The desktop object turns once on its way to the viewport center. The leading card enters from the lower left and the foreground strip takes over before it climbs and settles into a 3 × 2 grid. The same six decoded production photos occupy the strip and the final grid. Scroll position controls both directions. Phones use a low-cost photo stand-in, and reduced-motion, data-saving and constrained devices retain the normal, interactive grid. This chapter leaves the raffle-first layout and data contracts in place.

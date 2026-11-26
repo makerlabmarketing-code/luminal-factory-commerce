@@ -27,6 +27,8 @@ type NavigatorWithConnection = Navigator & {
   connection?: NetworkInformationLike;
 };
 
+type ModelViewer = HTMLElement & { jumpCameraToGoal?: () => void };
+
 type IdleCapableWindow = Window & {
   requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
   cancelIdleCallback?: (handle: number) => void;
@@ -108,7 +110,7 @@ export function HeroObjectStage({
   const stageRef = useRef<HTMLDivElement>(null);
   const modelMountRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
-  const viewerRef = useRef<HTMLElement | null>(null);
+  const viewerRef = useRef<ModelViewer | null>(null);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -165,6 +167,7 @@ export function HeroObjectStage({
     let previousPointerFrameTime = performance.now();
     let scrollOrbitProgress = 0;
     let frontAlignment = 0;
+    let galleryYaw: number | undefined;
     const dragOffset = { yawDeg: 0, phiDeg: 0 };
     let draggingPointerId: number | null = null;
     let dragX = 0;
@@ -187,8 +190,9 @@ export function HeroObjectStage({
       );
       viewer.setAttribute(
         "camera-orbit",
-        `${orbitTheta}deg ${clamp(presentation.camera.phiDeg + dragOffset.phiDeg * (1 - frontAlignment), HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
+        `${galleryYaw ?? orbitTheta}deg ${clamp(presentation.camera.phiDeg + dragOffset.phiDeg * (1 - frontAlignment), HERO_DRAG_PHI_MIN_DEG, HERO_DRAG_PHI_MAX_DEG)}deg ${presentation.camera.radiusPercent}%`,
       );
+      if (galleryYaw !== undefined) viewer.jumpCameraToGoal?.();
     };
 
     const animatePointerTilt = (time: number) => {
@@ -278,11 +282,12 @@ export function HeroObjectStage({
     };
 
     const handleScrollOrbit = (event: Event) => {
-      const detail = (event as CustomEvent<{ orbitProgress?: number; faceFront?: number }>).detail;
-      const wasTurningFront = frontAlignment > 0;
+      const detail = (event as CustomEvent<{ orbitProgress?: number; faceFront?: number; galleryYaw?: number }>).detail;
+      const wasTurningFront = frontAlignment > 0 || galleryYaw !== undefined;
       scrollOrbitProgress = clamp(detail?.orbitProgress ?? 0, 0, 1);
       frontAlignment = clamp(detail?.faceFront ?? 0, 0, 1);
-      const isTurningFront = frontAlignment > 0;
+      galleryYaw = detail?.galleryYaw;
+      const isTurningFront = frontAlignment > 0 || galleryYaw !== undefined;
       if (wasTurningFront !== isTurningFront && presentation.autoRotate && draggingPointerId === null) {
         viewerRef.current?.toggleAttribute("auto-rotate", !isTurningFront);
       }
@@ -313,7 +318,7 @@ export function HeroObjectStage({
         await ensureModelViewer();
         if (cancelled || failed || viewerRef.current) return;
 
-        const viewer = document.createElement("model-viewer") as HTMLElement & { model?: { materials: HeroModelMaterial[] } };
+        const viewer = document.createElement("model-viewer") as ModelViewer & { model?: { materials: HeroModelMaterial[] } };
         viewer.style.display = "block";
         viewer.style.width = "100%";
         viewer.style.height = "100%";

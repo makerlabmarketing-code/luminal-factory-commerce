@@ -8,6 +8,7 @@ import type { HomeMediaContract } from "@/content/homepage-media";
 import type { HeroModelPresentation } from "./hero-model-config";
 import { HeroObjectStage } from "./hero-object-stage";
 import { HomeArrivalHeader } from "./home-arrival-header";
+import { getGalleryHeroPose, getGalleryProgress } from "./home-gallery-motion";
 import { getHeroPhotoMotion } from "./home-photo-handoff";
 import styles from "./home-immersive-experience.module.css";
 
@@ -326,6 +327,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     const featuredSection = document.querySelector<HTMLElement>('[data-home-3d-section="featured"]');
     const photoChapter = document.querySelector<HTMLElement>("[data-home-photo-handoff]");
     const chapterPhoto = photoChapter?.querySelector<HTMLElement>("[data-home-chapter-photo]");
+    const galleryViewport = photoChapter?.querySelector<HTMLElement>("[data-home-gallery-viewport]");
 
     const apply = (state: MotionState) => {
       const releaseY = featuredSection ? Math.min(0, featuredSection.getBoundingClientRect().bottom - window.innerHeight) : 0;
@@ -337,18 +339,35 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
       let rotation = state.rotationDeg;
       let opacity = state.opacity;
       let faceFront = 0;
+      let galleryYaw: number | undefined;
 
       if (photoChapter && chapterPhoto) {
-        const motion = getHeroPhotoMotion(photoChapter.getBoundingClientRect().top, viewportHeight);
-        const { travel } = motion;
-        if (travel > 0) {
-          const destination = chapterPhoto.getBoundingClientRect();
-          x = interpolate(x, destination.left + destination.width * 0.5 - layer.offsetLeft - layer.offsetWidth * 0.5, travel);
-          y = interpolate(y, destination.top + Math.min(destination.height * 0.36, 138) - layer.offsetTop - layer.offsetHeight * 0.5, travel);
-          scale = interpolate(scale, 0.48, travel);
-          faceFront = motion.faceFront;
-          rotation = interpolate(rotation, 0, faceFront);
-          opacity *= motion.opacity;
+        const sectionTop = photoChapter.getBoundingClientRect().top;
+        const stableHeight = galleryViewport?.offsetHeight || viewportHeight;
+        const galleryProgress = getGalleryProgress(sectionTop, stableHeight);
+        if (photoChapter.dataset.galleryMotion === "ready" && galleryProgress > 0) {
+          const pose = getGalleryHeroPose(galleryProgress, -presentation.camera.thetaDeg);
+          const coverWidth = Math.min(viewportWidth * 0.88, stableHeight * 0.82);
+          const coverScale = Math.min(0.49, coverWidth * 0.51 / layer.offsetHeight, coverWidth * 0.78 / layer.offsetWidth);
+          x = interpolate(x, viewportWidth * 0.5 - layer.offsetLeft - layer.offsetWidth * 0.5, pose.travel);
+          y = interpolate(y, stableHeight * 0.5 - layer.offsetTop - layer.offsetHeight * 0.5, pose.travel);
+          scale = interpolate(scale, coverScale, pose.travel);
+          faceFront = pose.travel;
+          rotation = interpolate(rotation, 0, pose.travel);
+          galleryYaw = pose.yaw;
+          opacity *= Number(pose.visible);
+        } else {
+          const motion = getHeroPhotoMotion(sectionTop, viewportHeight);
+          const { travel } = motion;
+          if (travel > 0) {
+            const destination = chapterPhoto.getBoundingClientRect();
+            x = interpolate(x, destination.left + destination.width * 0.5 - layer.offsetLeft - layer.offsetWidth * 0.5, travel);
+            y = interpolate(y, destination.top + Math.min(destination.height * 0.36, 138) - layer.offsetTop - layer.offsetHeight * 0.5, travel);
+            scale = interpolate(scale, 0.48, travel);
+            faceFront = motion.faceFront;
+            rotation = interpolate(rotation, 0, faceFront);
+            opacity *= motion.opacity;
+          }
         }
       }
 
@@ -380,7 +399,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         : clamp01(state.orbitDeg / finalOrbitDeg);
       window.dispatchEvent(
         new CustomEvent("luminal:hero-orbit-offset", {
-          detail: { orbitDeg: state.orbitDeg, orbitProgress: interpolate(orbitProgress, 0.5, faceFront), faceFront },
+          detail: { orbitDeg: state.orbitDeg, orbitProgress: interpolate(orbitProgress, 0.5, faceFront), faceFront, galleryYaw },
         }),
       );
     };

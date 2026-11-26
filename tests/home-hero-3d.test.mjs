@@ -113,7 +113,7 @@ test("Hero mirrors ERP yaw at Meet Meowhe without changing vertical angle or dra
   const immersive = fs.readFileSync("src/features/home/home-immersive-experience.tsx", "utf8");
   assert.match(immersive, /const orbitProgress = finalOrbitDeg === 0/);
   assert.match(immersive, /clamp01\(state\.orbitDeg \/ finalOrbitDeg\)/);
-  assert.match(immersive, /detail: \{ orbitDeg: state\.orbitDeg, orbitProgress: interpolate\(orbitProgress, 0\.5, faceFront\), faceFront \}/);
+  assert.match(immersive, /detail: \{ orbitDeg: state\.orbitDeg, orbitProgress: interpolate\(orbitProgress, 0\.5, faceFront\), faceFront, galleryYaw \}/);
   assert.match(heroSource, /scrollOrbitProgress = clamp\(detail\?\.orbitProgress \?\? 0, 0, 1\)/);
   assert.match(heroSource, /presentation\.camera\.phiDeg \+ dragOffset\.phiDeg/);
   assert.doesNotMatch(heroSource, /scrollOrbitOffsetDeg/);

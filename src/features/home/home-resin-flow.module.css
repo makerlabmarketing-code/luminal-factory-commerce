@@ -29,29 +29,31 @@
     linear-gradient(90deg, #060606, #0d0d0f 50%, #060606);
 }
 
-.photoFrame {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 2.05;
-  border-radius: clamp(.6rem, 1.3vw, 1.15rem);
-  clip-path: inset(calc((1 - var(--photo-reveal, 1)) * 22%) 0 round clamp(.6rem, 1.3vw, 1.15rem));
-  opacity: clamp(0, calc(var(--photo-reveal, 1) * 1.65), 1);
+.galleryViewport {
+  position: absolute;
+  width: 0;
+  height: 100svh;
+  pointer-events: none;
 }
 
-.photoFrame img {
-  object-fit: cover;
-  transform: scale(calc(1.06 - .06 * var(--photo-reveal, 1)));
+.photoChapter .galleryContainer {
+  max-inline-size: min(81vw, 68rem);
+  padding-top: clamp(1rem, 4vw, 3rem);
 }
 
-.photoCopy {
-  margin-top: clamp(1.5rem, 4vw, 3rem);
-}
+.photoChapter .photoCopy { margin-bottom: clamp(1rem, 3vw, 2rem); }
 
 @media (max-width: 699px) {
-  .photoFrame { aspect-ratio: 1.35; }
+  .photoChapter .galleryContainer { max-inline-size: 100%; }
+  .photoChapter .photoCopy { gap: .75rem; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .photoFrame { clip-path: none; opacity: 1; }
-  .photoFrame img { transform: none; }
+.photoChapter[data-gallery-motion="ready"] .galleryContainer {
+  padding-top: 98svh;
+}
+
+.photoChapter[data-gallery-motion="ready"] .ribbon[data-home-resin-flow="entry"] {
+  position: absolute;
+  inset: 0 0 auto;
+  margin: 0;
 }
