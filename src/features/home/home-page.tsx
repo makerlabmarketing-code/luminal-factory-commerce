@@ -8,6 +8,7 @@ import { Container } from "@/components/ui/container";
 import { homePageContent } from "@/content/homepage";
 import { homePageMedia, type HomeMediaContract } from "@/content/homepage-media";
 import { getHeroModelPresentation } from "./hero-model-data";
+import { HomeResinFlow } from "./home-resin-flow";
 import { HeroObjectStage } from "./hero-object-stage";
 import { HomeImmersiveExperience } from "./home-immersive-experience";
 import { HomeArchiveBurst } from "./home-archive-burst";
@@ -65,6 +66,7 @@ export async function HomePage() {
       />
 
       <main id="main-content" className="wave-home" data-home-immersive={immersive ? "true" : "false"}>
+        {immersive && galleryPhotos.length > 0 && <HomeResinFlow />}
         {featuredRaffle ? <HomeRaffleSpotlight raffle={featuredRaffle} /> : null}
 
         <section className="revival-hero" aria-labelledby="hero-title" data-home-3d-section="hero">
@@ -157,7 +159,7 @@ export async function HomePage() {
               <span>{tr("Explore Lolipop, Mictlán and Mono.")}</span>
             </div>
             <Container className={photoStyles.galleryContainer}>
-              <header className={`editorial-heading ${photoStyles.photoCopy}`} data-luminal-reveal="home-copy">
+              <header className={`editorial-heading ${photoStyles.photoCopy}`} data-home-flow-mask data-luminal-reveal="home-copy">
                 <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("Meowhe colorways")}</h2></div>
                 <Link className="text-link" href="/archive/meowhe-mono">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
               </header>
