@@ -8,6 +8,7 @@ import type { HomeMediaContract } from "@/content/homepage-media";
 import type { HeroModelPresentation } from "./hero-model-config";
 import { HeroObjectStage } from "./hero-object-stage";
 import { HomeArrivalHeader } from "./home-arrival-header";
+import { getHomePhotoHandoffProgress } from "./home-photo-handoff";
 import styles from "./home-immersive-experience.module.css";
 
 type HomeImmersiveExperienceProps = Readonly<{
@@ -322,12 +323,35 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     let previousScrollY = window.scrollY;
     let scrollingUp = false;
 
+    const featuredSection = document.querySelector<HTMLElement>('[data-home-3d-section="featured"]');
+    const photoChapter = document.querySelector<HTMLElement>("[data-home-photo-handoff]");
+    const chapterPhoto = photoChapter?.querySelector<HTMLElement>("[data-home-chapter-photo]");
+
     const apply = (state: MotionState) => {
-      const featuredSection = document.querySelector<HTMLElement>('[data-home-3d-section="featured"]');
       const releaseY = featuredSection ? Math.min(0, featuredSection.getBoundingClientRect().bottom - window.innerHeight) : 0;
-      layer.style.transform =
-        `translate3d(${state.xVw.toFixed(3)}vw, calc(${state.yVh.toFixed(3)}vh + ${releaseY.toFixed(1)}px), 0) scale(${state.scale.toFixed(4)}) rotate(${state.rotationDeg.toFixed(3)}deg)`;
-      layer.style.opacity = state.opacity.toFixed(4);
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      let x = state.xVw * viewportWidth / 100;
+      let y = state.yVh * viewportHeight / 100 + releaseY;
+      let scale = state.scale;
+      let rotation = state.rotationDeg;
+      let opacity = state.opacity;
+
+      if (photoChapter && chapterPhoto) {
+        const handoff = getHomePhotoHandoffProgress(photoChapter.getBoundingClientRect().top, viewportHeight);
+        if (handoff > 0) {
+          const travel = smoothstep(handoff / 0.64);
+          const destination = chapterPhoto.getBoundingClientRect();
+          x = interpolate(x, destination.left + destination.width * 0.5 - layer.offsetLeft - layer.offsetWidth * 0.5, travel);
+          y = interpolate(y, destination.top + Math.min(destination.height * 0.36, 138) - layer.offsetTop - layer.offsetHeight * 0.5, travel);
+          scale = interpolate(scale, 0.48, travel);
+          rotation = interpolate(rotation, 0, travel);
+          opacity *= 1 - smoothstep((handoff - 0.48) / 0.40);
+        }
+      }
+
+      layer.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)}) rotate(${rotation.toFixed(3)}deg)`;
+      layer.style.opacity = opacity.toFixed(4);
 
       // The actual, eased 3D position is the only signal that arms Meowhe's
       // content. Bubbles own their animation clock after this signal fires.

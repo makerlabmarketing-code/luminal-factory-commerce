@@ -11,10 +11,10 @@ import { getHeroModelPresentation } from "./hero-model-data";
 import { HeroObjectStage } from "./hero-object-stage";
 import { HomeImmersiveExperience } from "./home-immersive-experience";
 import { HeroTextMotionController } from "./hero-copy-motion";
-import { HomeFlexGallery } from "./home-flex-gallery";
 import { HomeArchiveBurst } from "./home-archive-burst";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
 import { HomeResinFlow } from "./home-resin-flow";
+import photoStyles from "./home-resin-flow.module.css";
 import { MadeAtLuminalStack } from "./made-at-luminal-stack";
 import { getHomeFeaturedRaffle } from "@/features/raffle/raffle-home-service";
 import { CollectorGuide } from "@/features/studio/studio-editorial";
@@ -55,6 +55,7 @@ export async function HomePage() {
     getHomeFeaturedRaffle(),
   ]);
   const immersive = !featuredRaffle;
+  const chapterPhoto = media.gallery.find((item) => item.id === "mono-cookie-open");
   const heroTitleWords = content.hero.title.trim().split(/\s+/);
 
   return (
@@ -154,19 +155,21 @@ export async function HomePage() {
           </Container>
         </section> : null}
 
-        <div className="home-gallery-studio-passage relative">
-        <HomeResinFlow />
-        <section className="home-gallery section border-t border-white/10 [content-visibility:auto] [contain-intrinsic-size:auto_980px]" aria-labelledby="gallery-title" data-home-3d-section="gallery">
-          <Container>
-            <header className="editorial-heading" data-luminal-reveal="home-copy">
-              <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("One character.")}<br />{tr("Three colorways.")}</h2></div>
-              <p>{tr("Explore Lolipop, Mictlán and Mono.")}</p>
-            </header>
-            <HomeFlexGallery items={media.gallery} />
-          </Container>
-        </section>
+        {chapterPhoto ? (
+          <section className={photoStyles.photoChapter} aria-labelledby="gallery-title" data-home-3d-section="gallery" data-home-photo-handoff>
+            <HomeResinFlow />
+            <Container>
+              <div className={photoStyles.photoFrame} data-home-chapter-photo>
+                <Image src={chapterPhoto.src} alt={chapterPhoto.alt} fill sizes="(max-width: 1440px) calc(100vw - 32px), 1408px" style={{ objectPosition: chapterPhoto.objectPosition }} />
+              </div>
+              <header className={`editorial-heading ${photoStyles.photoCopy}`} data-luminal-reveal="home-copy">
+                <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("Mono Meowhe")}</h2></div>
+                <Link className="text-link" href="/archive/meowhe-mono">{tr("View object record")}<span aria-hidden="true">↗</span></Link>
+              </header>
+            </Container>
+          </section>
+        ) : null}
 
-        <HomeResinFlow reverse />
         <section className="brand-revival [content-visibility:auto] [contain-intrinsic-size:auto_620px]" aria-labelledby="revival-title" data-home-3d-section="revival">
           <Container>
             <p className="eyebrow" data-luminal-reveal="home-copy">{tr("A studio in transition")}</p>
@@ -175,7 +178,6 @@ export async function HomePage() {
           </Container>
         </section>
 
-        <HomeResinFlow />
         <section className="made-at-luminal section overflow-visible md:pb-0" aria-labelledby="making-title">
           <Container>
             <header className="editorial-heading md:sticky md:top-20 md:z-30 md:bg-transparent md:pb-8" data-made-at-luminal-header="true">
@@ -185,8 +187,6 @@ export async function HomePage() {
             <MadeAtLuminalStack steps={content.process} />
           </Container>
         </section>
-
-        </div>
 
         <Container><CollectorGuide /></Container>
         <section className="commerce-split [content-visibility:auto] [contain-intrinsic-size:auto_700px]" aria-label={tr("Raffle and commission")}>

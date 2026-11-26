@@ -4,13 +4,13 @@ import test from "node:test";
 
 const read = (path) => readFileSync(path, "utf8");
 
-test("Homepage follows the approved editorial sequence with the colorway gallery", () => {
+test("Homepage follows the approved editorial sequence with the colorway photo chapter", () => {
   const home = read("src/features/home/home-page.tsx");
   const order = [
     '<section className="revival-hero"',
     'aria-labelledby="featured-title"',
     '<section className="selected-archive',
-    '<section className="home-gallery',
+    '<section className={photoStyles.photoChapter}',
     '<section className="brand-revival',
     '<section className="made-at-luminal',
     '<section className="commerce-split',
@@ -26,15 +26,12 @@ test("Homepage follows the approved editorial sequence with the colorway gallery
   assert.match(home, /content\.hero\.secondaryAction/);
 });
 
-test("Homepage gallery keeps product photos visible without a WebGL loading state", () => {
+test("Homepage photo chapter renders its image without depending on WebGL", () => {
   const home = read("src/features/home/home-page.tsx");
-  const gallery = read("src/features/home/home-flex-gallery.tsx");
-  assert.match(home, /<HomeFlexGallery items={media\.gallery}/);
-  assert.match(gallery, /data-gallery-mode=\{showEngine \? "flex-carousel" : "compact-strip"\}/);
-  assert.match(gallery, /hidden=\{showEngine && ready\}/);
-  assert.match(gallery, /rootMargin: "240px"/);
-  assert.match(gallery, /<GlowCard customSize/);
-  assert.match(gallery, /<dialog/);
+  const photo = read("src/features/home/home-resin-flow.module.css");
+  assert.match(home, /data-home-chapter-photo[\s\S]*?<Image src=\{chapterPhoto\.src\}/);
+  assert.match(photo, /var\(--photo-reveal, 1\)/);
+  assert.doesNotMatch(home, /<HomeFlexGallery/);
 });
 
 test("Wave 1 keeps the route thin and uses a server component feature boundary", () => {

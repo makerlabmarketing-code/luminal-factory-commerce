@@ -1,30 +1,39 @@
-.flow {
-  block-size: clamp(4rem, 10vw, 9rem);
-  inline-size: min(100%, 91rem);
-  margin-inline: auto;
-  pointer-events: none;
-}
-
 .ribbon {
   display: block;
   inline-size: 100%;
-  block-size: 100%;
+  block-size: clamp(7rem, 19vw, 22rem);
+  pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .flow[data-flow-direction] .ribbon {
-    transition: clip-path 1150ms cubic-bezier(.23, 1, .32, 1);
-  }
+.photoChapter {
+  position: relative;
+  background: linear-gradient(180deg, #0b0b0e, #080808);
+  padding-bottom: clamp(3rem, 7vw, 7rem);
+}
 
-  :global(.luminal-motion-ready) .flow:not([data-luminal-visible]) .ribbon {
-    clip-path: inset(0 100% 0 0);
-  }
+.photoFrame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 2.05;
+  border-radius: clamp(.6rem, 1.3vw, 1.15rem);
+  clip-path: inset(calc((1 - var(--photo-reveal, 1)) * 22%) 0 round clamp(.6rem, 1.3vw, 1.15rem));
+  opacity: clamp(0, calc(var(--photo-reveal, 1) * 1.65), 1);
+}
 
-  :global(.luminal-motion-ready) .flow[data-flow-direction="reverse"]:not([data-luminal-visible]) .ribbon {
-    clip-path: inset(0 0 0 100%);
-  }
+.photoFrame img {
+  object-fit: cover;
+  transform: scale(calc(1.06 - .06 * var(--photo-reveal, 1)));
+}
 
-  .flow[data-luminal-visible] .ribbon {
-    clip-path: inset(0);
-  }
+.photoCopy {
+  margin-top: clamp(1.5rem, 4vw, 3rem);
+}
+
+@media (max-width: 699px) {
+  .photoFrame { aspect-ratio: 1.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photoFrame { clip-path: none; opacity: 1; }
+  .photoFrame img { transform: none; }
 }

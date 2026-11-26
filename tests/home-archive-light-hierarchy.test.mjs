@@ -35,14 +35,22 @@ test("Archive makes real colorway photographs legible and keyboard navigation st
   assert.match(archive, /styles\.colorwayLabel/);
 });
 
-test("Home resin arcs connect the editorial sections without locking readers to a scroll timeline", () => {
+test("One scroll-reversible resin curve unveils a photograph while the existing Hero reaches it", async () => {
+  const { getHomePhotoHandoffProgress } = await import("../src/features/home/home-photo-handoff.ts");
   const flow = read("src/features/home/home-resin-flow.tsx");
+  const immersive = read("src/features/home/home-immersive-experience.tsx");
   const style = read("src/features/home/home-resin-flow.module.css");
-  assert.match(home, /<HomeResinFlow \/>[\s\S]*home-gallery[\s\S]*<HomeResinFlow reverse \/>[\s\S]*brand-revival[\s\S]*<HomeResinFlow \/>[\s\S]*made-at-luminal/);
-  assert.match(flow, /getContext\("2d"\)/);
-  assert.match(flow, /ResizeObserver\(draw\)/);
+  assert.equal(home.match(/<HomeResinFlow \/>/g)?.length, 1);
+  assert.match(home, /data-home-chapter-photo/);
+  assert.doesNotMatch(home, /HomeFlexGallery/);
+  assert.match(flow, /setLineDash/);
   assert.match(flow, /aria-hidden="true"/);
-  assert.match(style, /prefers-reduced-motion: no-preference/);
-  assert.match(style, /clip-path 1150ms/);
-  assert.doesNotMatch(flow, /addEventListener\("scroll"|requestAnimationFrame|webgl/i);
+  assert.match(immersive, /getHomePhotoHandoffProgress\(photoChapter/);
+  assert.match(style, /prefers-reduced-motion: reduce/);
+  const down = [960, 540, 320, 160].map((top) => getHomePhotoHandoffProgress(top, 800));
+  assert.equal(down[0], 0);
+  assert.equal(down.at(-1), 1);
+  assert.ok(down[1] < down[2]);
+  const up = [160, 320, 540, 960].map((top) => getHomePhotoHandoffProgress(top, 800));
+  assert.deepEqual(up, down.toReversed());
 });

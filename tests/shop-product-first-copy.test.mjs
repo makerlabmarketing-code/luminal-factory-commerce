@@ -37,8 +37,8 @@ test("Single-product shelf prioritizes image without representing unavailable ch
 test("Product-first editorial copy is concise and existing colorways remain named", () => {
   assert.match(home, /Made with intention\./);
   assert.match(home, /Designed digitally\. Finished by hand\./);
-  assert.match(home, /Three colorways\./);
-  assert.match(home, /Explore Lolipop, Mictlán and Mono\./);
+  assert.match(home, /tr\("Mono Meowhe"\)/);
+  assert.match(home, /href="\/archive\/meowhe-mono"/);
   assert.match(archive, /The Meowhe Archive/);
   assert.match(archive, /Three colorways\. One character\./);
   assert.match(archive, /View colorways/);
