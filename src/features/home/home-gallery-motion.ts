@@ -3,18 +3,22 @@ const cardSpacing = 0.72;
 const cardAngle = 0.67;
 const angleStart = -1.65;
 const angleTravel = 8.8;
+const exitAngle = 7.72;
 const flightDuration = 0.40;
 const scrollDistanceRatio = 2.25;
 const extraArrivalScroll = 0.24;
+const extraSpiralScroll = 0.42;
 
 export const galleryEntryViewportRatio = 0.88;
 export const galleryCoverProgress = entryProgress + flightDuration * ((Math.PI - angleStart) / angleTravel);
 export const gallerySettleProgress = 0.99;
 export const galleryArrivalProgress = 0.84;
 
-const arrivalScrollStart = galleryArrivalProgress * scrollDistanceRatio;
+const spiralScrollStart = galleryCoverProgress * scrollDistanceRatio;
+const spiralScrollSpan = (galleryArrivalProgress - galleryCoverProgress) * scrollDistanceRatio + extraSpiralScroll;
+const arrivalScrollStart = spiralScrollStart + spiralScrollSpan;
 const arrivalScrollSpan = (gallerySettleProgress - galleryArrivalProgress) * scrollDistanceRatio + extraArrivalScroll;
-export const galleryArrivalPadding = `${147 + extraArrivalScroll * 100}svh`;
+export const galleryArrivalPadding = `${147 + (extraSpiralScroll + extraArrivalScroll) * 100}svh`;
 
 type Point = readonly [number, number];
 type Quad = readonly [Point, Point, Point, Point];
@@ -29,7 +33,8 @@ function ease(start: number, end: number, progress: number) {
 // The centerline rises as the photos orbit the same cylinder.
 const rise = [
   [-2, 1.30], [-1.65, 1.17], [-0.8, 0.88], [0, 0.74], [1.57, 0.67],
-  [3.14, 0.50], [4.71, 0.27], [5.45, 0.10], [6.0, -0.18], [7.65, -0.65],
+  [3.14, 0.50], [4.71, 0.30], [5.45, 0.25], [6.1, 0.20],
+  [6.65, 0.12], [7.02, 0.01], [7.48, -0.31], [8.1, -0.62],
 ] as const;
 
 function centerHeight(angle: number) {
@@ -56,7 +61,10 @@ const cameraScale = (angle: number) => 1.65 / (2.55 + Math.cos(angle));
 
 export function getGalleryProgress(sectionTop: number, viewport: number) {
   const distance = galleryEntryViewportRatio - sectionTop / viewport;
-  if (distance <= arrivalScrollStart) return clamp(distance / scrollDistanceRatio);
+  if (distance <= spiralScrollStart) return clamp(distance / scrollDistanceRatio);
+  if (distance <= arrivalScrollStart) {
+    return mix(galleryCoverProgress, galleryArrivalProgress, (distance - spiralScrollStart) / spiralScrollSpan);
+  }
   return clamp(galleryArrivalProgress + (distance - arrivalScrollStart) / arrivalScrollSpan
     * (gallerySettleProgress - galleryArrivalProgress));
 }
@@ -71,10 +79,8 @@ export function getGalleryHeroPose(progress: number, meetAngle: number) {
   return { travel, yaw: mix(meetAngle, 0, travel), visible: progress < galleryCoverProgress };
 }
 
-export function getGallerySideCopy(progress: number) {
-  const travel = ease(0.13, 0.74, progress);
-  const opacity = ease(0.13, 0.29, progress) * (1 - ease(0.62, 0.80, progress));
-  return { travel, opacity };
+export function getGalleryCaptionOpacity(progress: number) {
+  return ease(0.40, 0.54, progress) * (1 - ease(galleryArrivalProgress, 0.94, progress));
 }
 
 export function getGalleryCoverWidth(width: number, height: number) {
@@ -83,14 +89,15 @@ export function getGalleryCoverWidth(width: number, height: number) {
 
 export function getGalleryStripPanel(progress: number, index: number, width: number, height: number, slices: number) {
   const center = angleStart + (progress - entryProgress) / flightDuration * angleTravel - index * cardSpacing;
-  if (center < -2 || center > 7.15) return null;
+  if (center < -2 || center > exitAngle) return null;
   const radius = radiusFor(width, height);
   // Constant dimensions on the cylinder. Width and height share the camera scale.
   const halfHeight = radius * cardAngle / 3;
   const edges = Array.from({ length: slices + 1 }, (_, index) => {
     const angle = center + (index / slices - 0.5) * cardAngle;
     const zoom = cameraScale(angle);
-    const x = width / 2 + Math.sin(angle) * radius * zoom;
+    const exitSweep = ease(5.8, 7.6, angle) * width * 0.09;
+    const x = width / 2 + Math.sin(angle) * radius * zoom + exitSweep;
     const y = height * centerHeight(angle);
     return { x, top: y - halfHeight * zoom, bottom: y + halfHeight * zoom };
   });

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { HomeGalleryMedia } from "@/content/homepage-media";
 import { useTranslator } from "@/lib/i18n/client";
-import { getGalleryArrival, getGalleryCornerOffset, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGallerySideCopy, getGalleryStripPanel, galleryArrivalPadding, galleryArrivalProgress, galleryEntryViewportRatio, gallerySettleProgress } from "./home-gallery-motion";
+import { getGalleryArrival, getGalleryCornerOffset, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGalleryCaptionOpacity, getGalleryStripPanel, galleryArrivalPadding, galleryArrivalProgress, galleryEntryViewportRatio, gallerySettleProgress } from "./home-gallery-motion";
 import styles from "./home-motion-gallery.module.css";
 
 const maxSlices = 7;
@@ -12,7 +12,6 @@ const maxSlices = 7;
 export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGalleryMedia[] }>) {
   const tr = useTranslator();
   const posterRef = useRef<HTMLDivElement>(null);
-  const sideCopyRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [selected, setSelected] = useState<HomeGalleryMedia | null>(null);
@@ -22,7 +21,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
     const chapter = grid?.closest<HTMLElement>("[data-home-photo-handoff]");
     if (!grid || !chapter || !items.length) return;
     const poster = posterRef.current;
-    const sideCopy = sideCopyRef.current;
+    const caption = chapter.querySelector<HTMLElement>("[data-home-gallery-caption]");
     const model = document.querySelector<HTMLElement>("[data-home-immersive-model] [data-hero-mode]");
     const viewport = chapter.querySelector<HTMLElement>("[data-home-gallery-viewport]");
     const images = Array.from(grid.querySelectorAll("img"));
@@ -50,7 +49,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
         tile.style.removeProperty("z-index");
       }
       if (poster) poster.style.opacity = "0";
-      if (sideCopy) sideCopy.style.opacity = "0";
+      if (caption) caption.style.opacity = "0";
       if (grid) {
         grid.inert = false;
         delete grid.dataset.moving;
@@ -76,14 +75,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       if (progress === previous) return;
       previous = progress;
       chapter.toggleAttribute("data-gallery-show-heading", progress >= galleryArrivalProgress);
-      if (sideCopy) {
-        const copy = getGallerySideCopy(progress);
-        sideCopy.style.opacity = String(copy.opacity);
-        if (copy.opacity > 0) {
-          sideCopy.style.transform = `translate3d(0,${-top}px,0)`;
-          sideCopy.style.setProperty("--gallery-side-shift", `${(copy.travel - 0.5) * 13}vw`);
-        }
-      }
+      if (caption) caption.style.opacity = String(getGalleryCaptionOpacity(progress));
 
       const moving = progress < gallerySettleProgress;
       grid.inert = moving;
@@ -238,10 +230,6 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
 
   return (
     <>
-      <div ref={sideCopyRef} className={styles.sideCopy} aria-hidden="true">
-        <span>Meowhe</span>
-        <span>{tr("Colorway studies")}</span>
-      </div>
       <div ref={posterRef} className={styles.poster} aria-hidden="true">
         <Image src="/images/home/hero.webp" fill alt="" sizes="(max-width: 699px) 48vw, 420px" />
       </div>

@@ -158,6 +158,9 @@ export async function HomePage() {
         {galleryPhotos.length ? (
           <section className={photoStyles.photoChapter} aria-labelledby="gallery-title" data-home-3d-section="gallery" data-home-photo-handoff>
             <span className={photoStyles.galleryViewport} data-home-gallery-viewport aria-hidden="true" />
+            <div className={photoStyles.galleryCaption} data-home-gallery-caption aria-hidden="true">
+              <span>{tr("Explore Lolipop, Mictlán and Mono.")}</span>
+            </div>
             <Container className={photoStyles.galleryContainer}>
               <header className={`editorial-heading ${photoStyles.photoCopy}`} data-luminal-reveal="home-copy">
                 <div><p className="eyebrow">{tr("Colorway studies")}</p><h2 id="gallery-title">{tr("Meowhe colorways")}</h2></div>

@@ -100,7 +100,12 @@ test("The curved photos share one perspective and leave before gallery arrival",
     assert.equal(getGalleryHeroPose(0.3, -22).yaw, 0);
     assert.equal(getGalleryHeroPose(galleryCoverProgress - 0.001, -22).visible, true);
     assert.equal(getGalleryHeroPose(galleryCoverProgress, -22).visible, false);
-    assert.ok(bounds(at(0.8, 8)).every(point => point[1] < 0));
+    const entrance = bounds(at(0.165, 0));
+    assert.ok(entrance.every(([x]) => x < width * 0.4));
+    const exit = bounds(at(0.797, 8));
+    assert.ok(exit.every(([x]) => x > width * 0.62));
+    assert.ok(exit.some(([, y]) => y <= height * 0.08));
+    assert.ok(bounds(at(0.823, 8)).every(([, y]) => y < 0));
     assert.equal(at(galleryArrivalProgress, 8), null);
     assert.equal(getGalleryArrival(galleryArrivalProgress, 0), 0);
     assert.ok(getGalleryArrival(0.88, 0) > getGalleryArrival(0.88, 8));
@@ -134,20 +139,19 @@ test("The gallery flies in from all four viewport corners and settles on its slo
   }
 });
 
-test("The scroll keeps spiral timing and gives the four-corner arrival more room", async () => {
-  const { galleryArrivalProgress, gallerySettleProgress, getGalleryProgress, getGallerySettleOffset, getGallerySideCopy } = await import("../src/features/home/home-gallery-motion.ts");
+test("The extended spiral and four-corner arrival crossfade into the gallery", async () => {
+  const { galleryArrivalProgress, galleryCoverProgress, gallerySettleProgress, getGalleryProgress, getGallerySettleOffset, getGalleryCaptionOpacity } = await import("../src/features/home/home-gallery-motion.ts");
   const viewport = 900;
   const entry = 0.88 * viewport;
-  const topAtArrival = entry - 2.25 * galleryArrivalProgress * viewport;
+  const topAtCover = entry - 2.25 * galleryCoverProgress * viewport;
+  assert.ok(Math.abs(getGalleryProgress(topAtCover, viewport) - galleryCoverProgress) < 0.00001);
+  const topAtArrival = entry - (2.25 * galleryArrivalProgress + 0.42) * viewport;
   assert.ok(Math.abs(getGalleryProgress(topAtArrival, viewport) - galleryArrivalProgress) < 0.00001);
-  const oldSettleTop = entry - 2.25 * gallerySettleProgress * viewport;
-  assert.ok(getGalleryProgress(oldSettleTop, viewport) < gallerySettleProgress);
-  const newTop = oldSettleTop - 0.24 * viewport;
-  const easeError = Math.abs(getGalleryProgress(newTop, viewport) - gallerySettleProgress);
-  assert.ok(easeError < 0.00001);
+  const newTop = entry - (2.25 * gallerySettleProgress + 0.42 + 0.24) * viewport;
+  assert.ok(Math.abs(getGalleryProgress(newTop, viewport) - gallerySettleProgress) < 0.00001);
   assert.ok(Math.abs(getGallerySettleOffset(getGalleryProgress((newTop + topAtArrival) / 2, viewport), viewport) - (newTop - topAtArrival) / 2) < 0.00001);
-  assert.equal(getGallerySideCopy(0).opacity, 0);
-  assert.equal(getGallerySideCopy(galleryArrivalProgress).opacity, 0);
-  assert.ok(getGallerySideCopy(0.4).opacity > 0);
-  assert.ok(getGallerySideCopy(0.55).travel > getGallerySideCopy(0.3).travel);
+  assert.equal(getGalleryCaptionOpacity(0), 0);
+  assert.equal(getGalleryCaptionOpacity(galleryArrivalProgress), 1);
+  assert.ok(getGalleryCaptionOpacity(0.89) < 1 && getGalleryCaptionOpacity(0.89) > 0);
+  assert.equal(getGalleryCaptionOpacity(gallerySettleProgress), 0);
 });
