@@ -57,7 +57,11 @@ function radiusFor(width: number, height: number) {
   const spread = mix(0.46, 0.50, ease(440, 1050, width));
   return Math.min(width, height * 2) * spread;
 }
-const cameraScale = (angle: number) => 1.65 / (2.55 + Math.cos(angle));
+function cameraScale(angle: number) {
+  const rearDepth = (1 + Math.cos(angle)) / 2;
+  // Keep the foreground size at Meowhe and give the rear pass more distance.
+  return (1.65 / 1.55) / (1 + 2.18 * rearDepth);
+}
 
 export function getGalleryProgress(sectionTop: number, viewport: number) {
   const distance = galleryEntryViewportRatio - sectionTop / viewport;
@@ -96,8 +100,10 @@ export function getGalleryStripPanel(progress: number, index: number, width: num
   const edges = Array.from({ length: slices + 1 }, (_, index) => {
     const angle = center + (index / slices - 0.5) * cardAngle;
     const zoom = cameraScale(angle);
-    const exitSweep = ease(5.8, 7.6, angle) * width * 0.09;
-    const x = width / 2 + Math.sin(angle) * radius * zoom + exitSweep;
+    const exitSweep = ease(5.8, 7.6, angle) * width * 0.11;
+    const lateral = Math.sin(angle);
+    const shoulders = 1 + 0.20 * lateral ** 2;
+    const x = width / 2 + lateral * radius * shoulders * zoom + exitSweep;
     const y = height * centerHeight(angle);
     return { x, top: y - halfHeight * zoom, bottom: y + halfHeight * zoom };
   });

@@ -70,7 +70,8 @@ test("The gallery pauses resin strokes while retaining the hero fallback", async
 });
 
 
-test("The curved photos share one perspective and leave before gallery arrival", async () => {
+test("The curved photos separate front and rear depth before the inset gallery settles", async () => {
+  assert.match(read("src/features/home/home-resin-flow.module.css"), /\.galleryContainer \{\s*width: max\(72%,[^;]+;\s*max-inline-size: 86rem;/);
   const { galleryCoverProgress, galleryArrivalProgress, gallerySettleProgress, getGalleryArrival, getGalleryHeroPose, getGalleryProgress, getGalleryStripPanel } = await import("../src/features/home/home-gallery-motion.ts");
   for (const [width, height, slices] of [[390, 844, 4], [1440, 900, 7], [1920, 1030, 7]]) {
     const at = (progress, index = 0) => getGalleryStripPanel(progress, index, width, height, slices);
@@ -91,7 +92,9 @@ test("The curved photos share one perspective and leave before gallery arrival",
     assert.ok(cover.every(segment => segment.layer > 30));
     assert.ok(bounds(cover).some(([x, y]) => x < width / 2 && y < height / 2));
     assert.ok(bounds(cover).some(([x, y]) => x > width / 2 && y > height / 2));
-    assert.ok(span(cover, 0) > span(far, 0) * 1.7);
+    assert.ok(span(cover, 0) > span(far, 0) * 2.5);
+    const midpoint = panel => (panel[center].corners[1][1] + panel[center].corners[2][1]) / 2;
+    assert.ok(midpoint(far) - midpoint(cover) > height * 0.20);
     const centerEdgeRatio = panels => {
       const { corners: [topLeft, topRight, bottomRight] } = panels[center];
       return (topRight[0] - topLeft[0]) * slices / (bottomRight[1] - topRight[1]);
