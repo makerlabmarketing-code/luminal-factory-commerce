@@ -24,4 +24,8 @@ test("The rail ties desktop travel to native scroll and keeps a manual reduced-m
   assert.match(rail, /addEventListener\("scroll", schedule, \{ passive: true \}\)/);
   assert.match(css, /\.viewport \{\s*overflow-x: auto/);
   assert.match(css, /\[data-process-pinned\] \.stage \{\s*position: sticky/);
+  assert.match(home, /<MadeAtLuminalRail[\s\S]*<CollectorGuide \/>[\s\S]*<\/MadeAtLuminalRail>/);
+  assert.match(rail, /distance - travel/);
+  assert.match(rail, /nextPanel\.inert = handoff < handoffWidth - 1/);
+  assert.match(css, /transform: translateX\(var\(--process-handoff, 0px\)\)/);
 });

@@ -7,7 +7,7 @@ const read = (path) => readFileSync(path, "utf8");
 test("Home navigation is available while Meowhe loads", () => {
   assert.equal(existsSync("src/features/home/home-arrival-header.tsx"), true);
   const immersive = read("src/features/home/home-immersive-experience.tsx");
-  assert.match(immersive, /<HomeArrivalHeader \/>/);
+  assert.match(immersive, /<HomeArrivalHeader split \/>/);
   assert.doesNotMatch(immersive, /LOGO_DOCK_MS|INTRO_MAXIMUM_MS|finishDock|waiting/);
 });
 

@@ -182,3 +182,36 @@
   aspect-ratio: auto;
   height: min(calc(var(--card-width) * 2 / 3), 52svh);
 }
+
+.nextPanel {
+  background: #111012;
+}
+
+.section:not([data-process-pinned]) {
+  padding-bottom: 0;
+}
+
+.section:not([data-process-pinned]) .nextPanel {
+  margin-top: clamp(3rem, 8vw, 7rem);
+}
+
+[data-process-pinned] .stage { overflow: clip; }
+
+[data-process-pinned] :is(.viewport, .nextPanel) {
+  transform: translateX(var(--process-handoff, 0px));
+}
+
+[data-process-pinned] .nextPanel {
+  position: absolute;
+  inset: 0 auto 0 100%;
+  width: 100%;
+  display: grid;
+  align-content: center;
+  padding-top: 4.5rem;
+  box-shadow: inset 1px 0 var(--rail-divider);
+}
+
+[data-process-pinned] .nextPanel h2 {
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  letter-spacing: -.06em;
+}

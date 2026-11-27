@@ -440,7 +440,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
 
   return (
     <>
-      <HomeArrivalHeader />
+      <HomeArrivalHeader split />
       {enabled && (
         <div className={styles.experience} data-home-immersive-experience="true">
           <div ref={modelLayerRef} className={styles.modelLayer} data-home-immersive-model="true">

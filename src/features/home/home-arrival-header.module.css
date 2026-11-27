@@ -374,3 +374,14 @@
 .logoDock, .menuButton { border-width: .75px; border-color: transparent; background: linear-gradient(#0b0b0a, #070707) padding-box, var(--rim-gradient) border-box; box-shadow: var(--header-rim-bevel), 0 .85rem 2.8rem #0005; }
 .navBubble, .mobilePanel a { border-width: .75px; border-color: var(--border); box-shadow: var(--header-rim-bevel), 0 .35rem 1.6rem #0003; }
 .navBubble:hover { border-color: var(--rim-gold); }
+
+.header[data-layout="split"] .shell {
+  --dock-gutter: clamp(1rem, 2.5vw, 3rem);
+  width: 100%;
+}
+
+.header[data-layout="split"] .rail { display: none; }
+.header[data-layout="split"] .logoDock { left: var(--dock-gutter); }
+.header[data-layout="split"] .railLabel { left: calc(var(--dock-gutter) + 4.25rem); }
+.header[data-layout="split"] .desktopNav,
+.header[data-layout="split"] .menuButton { right: var(--dock-gutter); }

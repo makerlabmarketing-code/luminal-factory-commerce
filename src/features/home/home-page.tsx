@@ -185,9 +185,10 @@ export async function HomePage() {
           description={tr("Designed digitally. Finished by hand.")}
           closing={tr("From an idea to an object you can hold.")}
           steps={processSteps}
-        />
+        >
+          <Container><CollectorGuide /></Container>
+        </MadeAtLuminalRail>
 
-        <Container><CollectorGuide /></Container>
         <section className="commerce-split [content-visibility:auto] [contain-intrinsic-size:auto_700px]" aria-label={tr("Raffle and commission")}>
           <Link href="/raffle" className="commerce-door commerce-door-shop overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-spotlight="true"><span className="eyebrow">{tr("Announced releases")}</span><h2>{tr("Raffle")}</h2><p>{tr("Explore the next raffle releases.")}</p><i aria-hidden="true">↗</i></Link>
           <Link href="/commission" className="commerce-door commerce-door-commission overflow-hidden transition-[filter] duration-500 hover:brightness-110 motion-reduce:transition-none" data-luminal-reveal="card" data-luminal-delay="1" data-luminal-spotlight="true"><span className="eyebrow">{tr("Made for you")}</span><h2>{tr("Commission")}</h2><p>{tr("Begin a conversation about a custom object.")}</p><i aria-hidden="true">↗</i></Link>

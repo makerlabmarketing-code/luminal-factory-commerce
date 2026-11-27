@@ -11,7 +11,7 @@ import { RaffleHeaderNotice } from "@/features/raffle/raffle-header-notice";
 
 type HeaderStage = "waiting" | "revealed";
 
-export function HomeArrivalHeader({ stage = "revealed", rafflePreview = false }: Readonly<{ stage?: HeaderStage; rafflePreview?: boolean }>) {
+export function HomeArrivalHeader({ stage = "revealed", rafflePreview = false, split = false }: Readonly<{ stage?: HeaderStage; rafflePreview?: boolean; split?: boolean }>) {
   const tr = useTranslator();
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
@@ -101,6 +101,7 @@ export function HomeArrivalHeader({ stage = "revealed", rafflePreview = false }:
       aria-label={menuOpen ? tr("Điều hướng chính trên di động") : undefined}
       className={styles.header}
       data-stage={stage}
+      data-layout={split ? "split" : undefined}
       inert={stage === "waiting"}
       data-menu-open={menuOpen ? "true" : "false"}
     >
