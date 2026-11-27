@@ -176,6 +176,8 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     const hero = document.querySelector<HTMLElement>('[data-home-3d-section="hero"]');
     const light = hero?.querySelector<HTMLElement>(".hero-atmosphere");
     const copy = hero?.querySelectorAll<HTMLElement>("[data-hero-entrance]");
+    const title = hero?.querySelector<HTMLElement>(".revival-hero-title");
+    const details = hero?.querySelector<HTMLElement>(".revival-hero-details");
     let introStart: number | undefined;
     let finishFrom: { start: number; age: number } | undefined;
     let introAge = HERO_INTRO_MS;
@@ -301,6 +303,13 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
     const rebuildKeyframes = () => {
       const viewportHeight = window.innerHeight;
       motionStates = selectMotionStates();
+      const center = document.documentElement.clientWidth / 2;
+      const availableHalfWidth = title && details
+        ? Math.min(center - title.getBoundingClientRect().right, details.getBoundingClientRect().left - center)
+        : 0;
+      const heroScale = availableHalfWidth > 22 && layer.offsetWidth
+        ? Math.min(0.72, (availableHalfWidth - 22) * 2 / layer.offsetWidth)
+        : 0.65;
       keyframes = motionStates.flatMap(({ section, anchor, viewportOffset, state }) => {
         const element = document.querySelector<HTMLElement>(`[data-home-3d-section="${section}"]`);
         if (!element) return [];
@@ -308,7 +317,7 @@ export function HomeImmersiveExperience({ media, presentation, enabled }: HomeIm
         const absoluteTop = rect.top + window.scrollY;
         const absoluteAnchor = anchor === "bottom" ? absoluteTop + rect.height : absoluteTop;
         const pose = section === "hero" && !compactMotion.matches
-          ? { ...state, xVw: (window.innerWidth / 2 - layer.offsetLeft - layer.offsetWidth / 2) * 100 / window.innerWidth, yVh: -4 }
+          ? { ...state, xVw: (center - layer.offsetLeft - layer.offsetWidth / 2) * 100 / window.innerWidth, yVh: -4, scale: heroScale }
           : state;
         return [{ scrollY: Math.max(0, absoluteAnchor - viewportHeight * viewportOffset), ...pose }];
       }).sort((left, right) => left.scrollY - right.scrollY);

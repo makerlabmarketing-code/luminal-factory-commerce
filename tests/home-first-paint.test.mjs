@@ -83,6 +83,8 @@ function mountDesktopMotion(scrollY = 0) {
     getBoundingClientRect: () => ({ top: 70, height: 700 }),
   };
   const light = { style: makeStyle() };
+  const title = { getBoundingClientRect: () => ({ right: 414 }) };
+  const details = { getBoundingClientRect: () => ({ left: 934 }) };
   const frameQueue = { window: {
     scrollY, innerWidth: 1348, innerHeight: 900,
     matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }),
@@ -93,7 +95,7 @@ function mountDesktopMotion(scrollY = 0) {
     dispatchEvent() {},
   } };
   const sections = {
-    hero: { querySelector: () => light, querySelectorAll: () => [], getBoundingClientRect: () => ({ top: -frameQueue.window.scrollY, height: 900 }) },
+    hero: { querySelector: selector => selector === ".revival-hero-title" ? title : selector === ".revival-hero-details" ? details : light, querySelectorAll: () => [], getBoundingClientRect: () => ({ top: -frameQueue.window.scrollY, height: 900 }) },
     featured: { getBoundingClientRect: () => ({ top: 900 - frameQueue.window.scrollY, bottom: 2100 - frameQueue.window.scrollY, height: 1200 }) },
   };
   const jsx = (type, props) => ({ type, props });
@@ -104,7 +106,7 @@ function mountDesktopMotion(scrollY = 0) {
     module: fixtureModule, exports: fixtureModule.exports, ...frameQueue,
     location: { hash: '' }, performance: { now: () => clock }, CustomEvent: class {},
     document: {
-      documentElement: { dataset: {} },
+      documentElement: { dataset: {}, clientWidth: 1348 },
       querySelector: (selector) => selector.includes('"hero"') ? sections.hero : selector.includes('"featured"') ? sections.featured : null,
     },
     require: (name) => {
@@ -131,10 +133,10 @@ function mountDesktopMotion(scrollY = 0) {
 test('desktop model starts centered, then exits the intro smoothly at its current scroll position', () => {
   const model = mountDesktopMotion();
   model.frame(0);
-  assert.match(model.layer.style.transform, /translate3d\(-326\.00px, -36\.00px.*scale\(1\.0000\)/);
+  assert.match(model.layer.style.transform, /translate3d\(-326\.00px, -36\.00px.*scale\(0\.6800\)/);
   model.ready();
   model.frame(0);
-  assert.match(model.layer.style.transform, /-16\.00px.*scale\(0\.9600\)/);
+  assert.match(model.layer.style.transform, /-16\.00px.*scale\(0\.6528\)/);
   assert.equal(model.layer.style.opacity, '0.0000');
   model.frame(420);
   assert.ok(Number(model.layer.style.opacity) > 0);
@@ -147,7 +149,7 @@ test('desktop model starts centered, then exits the intro smoothly at its curren
   assert.equal(model.layer.style.opacity, '1.0000');
   model.scroll(0);
   for (let time = 1640; time < 2600; time += 16) model.frame(time);
-  assert.match(model.layer.style.transform, /translate3d\(-326\.00px, -36\.00px.*scale\(1\.0000\)/);
+  assert.match(model.layer.style.transform, /translate3d\(-326\.00px, -36\.00px.*scale\(0\.6800\)/);
   model.clean();
 });
 

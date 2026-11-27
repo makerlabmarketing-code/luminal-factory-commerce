@@ -24,7 +24,8 @@
 
 @media (min-width: 1024px) {
   .modelLayer {
-    transform: translate3d(calc(-51vw + min(29.5vw, 32rem)), -4vh, 0);
+    transform-origin: 50% 50%;
+    transform: translate3d(calc(-51vw + min(29.5vw, 32rem)), -4vh, 0) scale(.65);
   }
 }
 
