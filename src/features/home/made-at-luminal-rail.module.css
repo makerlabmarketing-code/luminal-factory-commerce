@@ -169,8 +169,7 @@
   top: 0;
   display: grid;
   min-height: 100svh;
-  align-content: center;
-  padding: 5rem 0 1.5rem;
+  overflow: clip;
 }
 
 [data-process-pinned] .viewport {
@@ -195,20 +194,23 @@
   margin-top: clamp(3rem, 8vw, 7rem);
 }
 
-[data-process-pinned] .stage { overflow: clip; }
-
-[data-process-pinned] :is(.viewport, .nextPanel) {
+[data-process-pinned] .curtain {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  padding: 5rem 0 1.5rem;
+  background: #0a0a0a;
+  box-shadow: 1px 0 var(--rail-divider);
   transform: translateX(var(--process-handoff, 0px));
 }
 
 [data-process-pinned] .nextPanel {
   position: absolute;
-  inset: 0 auto 0 100%;
-  width: 100%;
+  inset: 0;
   display: grid;
   align-content: center;
   padding-top: 4.5rem;
-  box-shadow: inset 1px 0 var(--rail-divider);
 }
 
 [data-process-pinned] .nextPanel h2 {

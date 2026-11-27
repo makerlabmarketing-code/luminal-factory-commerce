@@ -91,36 +91,38 @@ export function MadeAtLuminalRail({ eyebrow, title, description, closing, steps,
   return (
     <section ref={sectionRef} className={`made-at-luminal ${styles.section}`} aria-labelledby="making-title">
       <div className={styles.stage}>
-        <div ref={viewportRef} className={styles.viewport} role="group" aria-labelledby="making-title" tabIndex={0}>
-          <div ref={trackRef} className={styles.track}>
-            <header className={styles.intro}>
-              <p className="eyebrow">{eyebrow}</p>
-              <h2 id="making-title">{title}</h2>
-              <p>{description}</p>
-            </header>
-            <ol className={styles.steps} role="list">
-              {steps.map((step) => (
-                <li className={styles.step} key={step.number}>
-                  {step.image && (
-                    <div className={styles.image}>
-                      <Image
-                        src={step.image.src}
-                        alt={step.image.alt}
-                        fill
-                        sizes="(min-width: 900px) 48vw, 84vw"
-                        style={{ objectPosition: step.image.objectPosition }}
-                      />
+        <div className={styles.curtain} data-process-curtain>
+          <div ref={viewportRef} className={styles.viewport} role="group" aria-labelledby="making-title" tabIndex={0}>
+            <div ref={trackRef} className={styles.track}>
+              <header className={styles.intro}>
+                <p className="eyebrow">{eyebrow}</p>
+                <h2 id="making-title">{title}</h2>
+                <p>{description}</p>
+              </header>
+              <ol className={styles.steps} role="list">
+                {steps.map((step) => (
+                  <li className={styles.step} key={step.number}>
+                    {step.image && (
+                      <div className={styles.image}>
+                        <Image
+                          src={step.image.src}
+                          alt={step.image.alt}
+                          fill
+                          sizes="(min-width: 900px) 48vw, 84vw"
+                          style={{ objectPosition: step.image.objectPosition }}
+                        />
+                      </div>
+                    )}
+                    <div className={styles.copy}>
+                      <span className={styles.number}>{step.number}</span>
+                      <h3>{step.title}</h3>
+                      <p>{step.copy}</p>
                     </div>
-                  )}
-                  <div className={styles.copy}>
-                    <span className={styles.number}>{step.number}</span>
-                    <h3>{step.title}</h3>
-                    <p>{step.copy}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <p className={styles.outro}>{closing}</p>
+                  </li>
+                ))}
+              </ol>
+              <p className={styles.outro}>{closing}</p>
+            </div>
           </div>
         </div>
         <div ref={nextPanelRef} className={styles.nextPanel} data-process-next>{children}</div>

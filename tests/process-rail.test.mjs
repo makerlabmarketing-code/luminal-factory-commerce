@@ -27,5 +27,7 @@ test("The rail ties desktop travel to native scroll and keeps a manual reduced-m
   assert.match(home, /<MadeAtLuminalRail[\s\S]*<CollectorGuide \/>[\s\S]*<\/MadeAtLuminalRail>/);
   assert.match(rail, /distance - travel/);
   assert.match(rail, /nextPanel\.inert = handoff < handoffWidth - 1/);
-  assert.match(css, /transform: translateX\(var\(--process-handoff, 0px\)\)/);
+  assert.match(css, /\.curtain \{[^}]*transform: translateX\(var\(--process-handoff, 0px\)\)/);
+  assert.match(css, /\.nextPanel \{\s*position: absolute;\s*inset: 0/);
+  assert.doesNotMatch(css, /\.nextPanel[^{}]*\{[^}]*transform:/);
 });
