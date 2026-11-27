@@ -113,39 +113,51 @@ test("The curved photos separate front and rear depth before the inset gallery s
     assert.ok(getGalleryArrival(0.699, 0) > 0.30);
     assert.ok(exit.some(([, y]) => y > 0), "the last spiral card remains visible when the first gallery card enters");
     assert.equal(getGalleryArrival(galleryArrivalProgress, 0), 0);
-    assert.ok(getGalleryArrival(galleryArrivalProgress + 0.04, 0) > getGalleryArrival(galleryArrivalProgress + 0.04, 3));
-    assert.ok(getGalleryArrival(galleryArrivalProgress + 0.04, 3) > 0);
+    assert.ok(getGalleryArrival(galleryArrivalProgress + 0.04, 0) > getGalleryArrival(galleryArrivalProgress + 0.04, 1));
+    assert.ok(getGalleryArrival(galleryArrivalProgress + 0.04, 1) > 0);
+    assert.equal(getGalleryArrival(galleryArrivalProgress + 0.04, 2), 0);
     assert.equal(getGalleryArrival(gallerySettleProgress, 5), 1);
     assert.ok(getGalleryProgress(-0.88 * height, height) < 0.85);
   }
 });
 
-test("The gallery flies in from all four viewport corners and settles on its slots", async () => {
-  const { getGalleryCornerOffset } = await import("../src/features/home/home-gallery-motion.ts");
+test("Gallery tiles enter in reading order from their own viewport edges", async () => {
+  const { galleryArrivalProgress, gallerySettleProgress, getGalleryArrival, getGalleryArrivalOffset } = await import("../src/features/home/home-gallery-motion.ts");
+  const appearances = Array(6).fill(-1);
+  for (let step = 0; step <= 1000; step++) {
+    const progress = galleryArrivalProgress + step / 1000 * (gallerySettleProgress - galleryArrivalProgress);
+    for (let index = 0; index < appearances.length; index++) {
+      if (appearances[index] === -1 && getGalleryArrival(progress, index) > 0) appearances[index] = progress;
+    }
+  }
+  assert.ok(appearances.every((start, index) => start > (appearances[index - 1] ?? 0)));
+  assert.ok(appearances[5] < gallerySettleProgress);
   for (const [width, height, columns] of [[390, 844, 2], [1440, 900, 3]]) {
     const rows = Math.ceil(6 / columns);
-    const slot = { x: 40, y: 110, width: 150, height: 100 };
     const viewport = { width, height };
-    const origins = new Set();
+    const origins = [];
     for (let index = 0; index < 6; index++) {
-      const offset = getGalleryCornerOffset(0, index, columns, rows, viewport, slot, -80);
+      const slot = { x: 40 + index % columns * 160, y: 200 + Math.floor(index / columns) * 120, width: 150, height: 100 };
+      const offset = getGalleryArrivalOffset(0, index, columns, rows, viewport, slot, -80);
       const x = slot.x + offset.x;
       const y = slot.y + offset.y;
-      assert.ok(x + slot.width < 0 || x > width);
-      assert.ok(y + slot.height < 0 || y > height);
-      origins.add(`${x < 0 ? "left" : "right"} ${y < 0 ? "top" : "bottom"}`);
-      const halfway = getGalleryCornerOffset(0.5, index, columns, rows, viewport, slot, -80);
+      const horizontal = x + slot.width <= 0 ? "left" : x >= width ? "right" : "center";
+      const vertical = y + slot.height <= 0 ? "top" : y >= height ? "bottom" : "middle";
+      origins.push(`${vertical} ${horizontal}`);
+      const halfway = getGalleryArrivalOffset(0.5, index, columns, rows, viewport, slot, -80);
       assert.equal(halfway.x, offset.x / 2);
       assert.equal(halfway.y, (offset.y - 80) / 2);
-      assert.deepEqual(getGalleryCornerOffset(1, index, columns, rows, viewport, slot, 0), {
+      assert.deepEqual(getGalleryArrivalOffset(1, index, columns, rows, viewport, slot, 0), {
         x: 0, y: 0, tilt: 0,
       });
     }
-    assert.equal(origins.size, 4);
+    assert.deepEqual(origins, columns === 3
+      ? ["top left", "top center", "top right", "bottom left", "bottom center", "bottom right"]
+      : ["top left", "top right", "middle left", "middle right", "bottom left", "bottom right"]);
   }
 });
 
-test("The extended spiral and four-corner arrival crossfade into the gallery", async () => {
+test("The extended spiral overlaps the staggered gallery arrival", async () => {
   const { galleryArrivalProgress, galleryCoverProgress, gallerySettleProgress, getGalleryProgress, getGallerySettleOffset, getGalleryCaptionOpacity, getGalleryArrivalPadding, galleryStripEndProgress } = await import("../src/features/home/home-gallery-motion.ts");
   const viewport = 900;
   const entry = 0.88 * viewport;

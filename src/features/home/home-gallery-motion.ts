@@ -8,6 +8,8 @@ const flightDuration = 0.40;
 const scrollDistanceRatio = 2.25;
 const extraArrivalScroll = 0.45;
 const extraSpiralScroll = 0.42;
+const arrivalDelays = [0, 0.026, 0.063, 0.098, 0.137, 0.184] as const;
+const arrivalDuration = 0.138;
 
 export const galleryEntryViewportRatio = 0.88;
 export const galleryCoverProgress = entryProgress + flightDuration * ((Math.PI - angleStart) / angleTravel);
@@ -146,14 +148,13 @@ export function getGalleryPanelTransform(corners: Quad, slot: { x: number; y: nu
 }
 
 export function getGalleryArrival(progress: number, index: number) {
-  const order = [0, 4, 2, 1, 5, 3];
-  const start = galleryArrivalProgress + (order[index] ?? index) * 0.026;
-  const travel = clamp((progress - start) / 0.18);
-  // Let the edge appear promptly, then ease into the slot over the longer scroll.
+  // Travel across the top row first, then repeat the same order on the bottom row.
+  const start = galleryArrivalProgress + (arrivalDelays[index] ?? arrivalDelays[5]);
+  const travel = clamp((progress - start) / arrivalDuration);
   return 1 - (1 - travel) ** 2;
 }
 
-export function getGalleryCornerOffset(
+export function getGalleryArrivalOffset(
   arrival: number,
   index: number,
   columns: number,
@@ -164,14 +165,13 @@ export function getGalleryCornerOffset(
 ) {
   const column = index % columns;
   const row = Math.floor(index / columns);
-  const side = Math.sign(column * 2 - (columns - 1)) || (row % 2 ? 1 : -1);
-  const vertical = Math.sign(row * 2 - (rows - 1)) || (column % 2 ? 1 : -1);
-  const margin = Math.ceil(Math.max(slot.width, slot.height) * 0.1);
-  const edgeX = side < 0 ? -slot.width - margin : viewport.width + margin;
-  const edgeY = vertical < 0 ? -slot.height - margin : viewport.height + margin;
+  const side = Math.sign(column * 2 - (columns - 1));
+  const vertical = Math.sign(row * 2 - (rows - 1));
+  const edgeX = side < 0 ? -slot.width : viewport.width;
+  const edgeY = vertical < 0 ? -slot.height : viewport.height;
   return {
-    x: mix(edgeX - slot.x, 0, arrival),
-    y: mix(edgeY - slot.y, settleOffset, arrival),
-    tilt: (1 - arrival) * 6 * side * vertical || 0,
+    x: side ? mix(edgeX - slot.x, 0, arrival) : 0,
+    y: vertical ? mix(edgeY - slot.y, settleOffset, arrival) : settleOffset,
+    tilt: 8 * arrival * (1 - arrival) * side * vertical || 0,
   };
 }

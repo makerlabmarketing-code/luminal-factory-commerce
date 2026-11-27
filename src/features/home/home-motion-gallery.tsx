@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { HomeGalleryMedia } from "@/content/homepage-media";
 import { useTranslator } from "@/lib/i18n/client";
-import { getGalleryArrival, getGalleryArrivalPadding, getGalleryCornerOffset, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGalleryCaptionOpacity, getGalleryStripPanel, galleryEntryViewportRatio, galleryHeadingProgress, gallerySettleProgress, galleryStripEndProgress } from "./home-gallery-motion";
+import { getGalleryArrival, getGalleryArrivalPadding, getGalleryArrivalOffset, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGalleryCaptionOpacity, getGalleryStripPanel, galleryEntryViewportRatio, galleryHeadingProgress, gallerySettleProgress, galleryStripEndProgress } from "./home-gallery-motion";
 import styles from "./home-motion-gallery.module.css";
 
 const maxSlices = 7;
@@ -161,7 +161,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
         const slot = dimensions[index];
         if (!slot.width) return;
         const arrival = getGalleryArrival(progress, index);
-        const offset = getGalleryCornerOffset(arrival, index, columns, rows, { width, height }, {
+        const offset = getGalleryArrivalOffset(arrival, index, columns, rows, { width, height }, {
           x: rect.left + slot.x, y: rect.top + slot.y, width: slot.width, height: slot.height,
         }, settleOffset);
         tile.style.transform = `translate3d(${offset.x}px,${offset.y}px,0) rotate(${offset.tilt}deg)`;
