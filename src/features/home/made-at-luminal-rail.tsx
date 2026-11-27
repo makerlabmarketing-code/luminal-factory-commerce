@@ -16,10 +16,11 @@ type MadeAtLuminalRailProps = Readonly<{
   eyebrow: string;
   title: string;
   description: string;
+  closing: string;
   steps: readonly ProcessStep[];
 }>;
 
-export function MadeAtLuminalRail({ eyebrow, title, description, steps }: MadeAtLuminalRailProps) {
+export function MadeAtLuminalRail({ eyebrow, title, description, closing, steps }: MadeAtLuminalRailProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -108,6 +109,7 @@ export function MadeAtLuminalRail({ eyebrow, title, description, steps }: MadeAt
                 </li>
               ))}
             </ol>
+            <p className={styles.outro}>{closing}</p>
           </div>
         </div>
       </div>

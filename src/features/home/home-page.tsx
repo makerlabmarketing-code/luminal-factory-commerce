@@ -183,6 +183,7 @@ export async function HomePage() {
           eyebrow={tr("Made at Luminal")}
           title={tr("Made with intention.")}
           description={tr("Designed digitally. Finished by hand.")}
+          closing={tr("From an idea to an object you can hold.")}
           steps={processSteps}
         />
 
