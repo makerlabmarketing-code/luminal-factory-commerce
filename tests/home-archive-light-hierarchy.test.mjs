@@ -35,20 +35,20 @@ test("Archive makes real colorway photographs legible and keyboard navigation st
   assert.match(archive, /styles\.colorwayLabel/);
 });
 
-test("The gallery uses a single background stroke with content masks and keeps the hero fallback", async () => {
+test("The gallery pauses resin strokes while retaining the hero fallback", async () => {
   const { getHeroPhotoMotion, getHomePhotoHandoffProgress } = await import("../src/features/home/home-photo-handoff.ts");
   const flow = read("src/features/home/home-resin-flow.tsx");
   const immersive = read("src/features/home/home-immersive-experience.tsx");
   const style = read("src/features/home/home-resin-flow.module.css");
   assert.match(home, /<HomeMotionGallery/);
-  assert.match(home, /<HomeResinFlow \/>/);
+  assert.doesNotMatch(home, /<HomeResinFlow/);
   assert.doesNotMatch(home, /HomeFlexGallery/);
-  assert.match(flow, /pathLength="1" strokeDasharray="1 1"/);
-  assert.match(flow, /<mask[^>]+maskUnits="userSpaceOnUse"/);
-  assert.match(flow, /new ResizeObserver\(measure\)/);
+  assert.match(flow, /entry: \{\s*start: \[0\.025, 0\.025\]/);
+  assert.match(flow, /exit: \{\s*start: \[1\.04,[\s\S]*-0\.04/);
+  assert.match(flow, /setLineDash/);
   assert.match(flow, /aria-hidden="true"/);
   assert.match(immersive, /getHeroPhotoMotion\(sectionTop/);
-  assert.match(style, /vector-effect: non-scaling-stroke/);
+  assert.match(style, /margin-block-end: calc\(-1 \* var\(--ribbon-photo-overlap\)\)/);
   assert.match(style, /\.photoChapter\[data-gallery-motion="ready"\]/);
   const down = [960, 540, 320, 160].map((top) => getHomePhotoHandoffProgress(top, 800));
   assert.equal(down[0], 0);

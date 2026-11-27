@@ -1,24 +1,22 @@
-:global(.wave-home[data-home-immersive="true"]) { position: relative; }
-:global(.wave-home[data-home-immersive="true"] .revival-hero) { border-bottom: 0; }
-
 .ribbon {
-  position: absolute;
-  inset-inline: 0;
-  width: 100%;
-  z-index: 1;
+  display: block;
+  inline-size: 100%;
   pointer-events: none;
-  visibility: hidden;
 }
 
-.ribbon path {
-  fill: none;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
+.ribbon[data-home-resin-flow="entry"] {
+  position: relative;
+  block-size: clamp(11rem, 29vw, 28rem);
+  margin-block-end: calc(-1 * var(--ribbon-photo-overlap));
+}
+
+.ribbon[data-home-resin-flow="exit"] {
+  block-size: clamp(5rem, 12vw, 12rem);
+  margin-block-start: clamp(1rem, 3vw, 2.5rem);
 }
 
 .photoChapter {
+  --ribbon-photo-overlap: clamp(3.5rem, 8vw, 7rem);
   position: relative;
   overflow-x: clip;
   background: linear-gradient(180deg, var(--home-photo-entry-surface) 0, var(--home-photo-exit-surface) clamp(11rem, 29vw, 28rem));
@@ -45,7 +43,7 @@
   padding-top: clamp(1rem, 4vw, 3rem);
 }
 
-.photoChapter .photoCopy { position: relative; z-index: 2; margin-bottom: clamp(1rem, 3vw, 2rem); }
+.photoChapter .photoCopy { margin-bottom: clamp(1rem, 3vw, 2rem); }
 
 @media (max-width: 699px) {
   .photoChapter .galleryContainer { width: calc(100% - 2rem); }

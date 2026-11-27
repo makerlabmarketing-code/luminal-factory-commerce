@@ -219,7 +219,7 @@ export function HomeArchiveBurst({ colorways }: HomeArchiveBurstProps) {
         ))}
       </div>
 
-      <div ref={copyRef} className={styles.copy} data-home-flow-mask>
+      <div ref={copyRef} className={styles.copy}>
         <h2 id="featured-title">{tr("Meet Meowhe.")}</h2>
         <p>{tr("A character with a past. Explore three earlier colorways: Lolipop, Mictlán, and Mono.")}</p>
         <nav className={styles.records} aria-label={tr("Explore colorway records")}>
