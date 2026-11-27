@@ -4,30 +4,6 @@ import test from "node:test";
 
 const read = (file) => readFileSync(file, "utf8");
 
-test("folder tiers use real consistent card outlines without detached overlay separators", () => {
-  const stack = read("src/features/home/made-at-luminal-stack.tsx");
-  assert.match(stack, /rounded-\[1\.75rem\] border border-white\/25/);
-  assert.doesNotMatch(stack, /data-process-title-rail/);
-  assert.doesNotMatch(stack, /md:border-transparent md:shadow-none/);
-  assert.match(stack, /data-process-collapsed-label=\{step\.number\}/);
-  assert.match(stack, /STICKY_STEP_REM = 2\.35/);
-  assert.match(stack, /top-\[0\.55rem\]/);
-  assert.match(stack, /h-\[1\.5rem\]/);
-  assert.match(stack, /text-\[0\.78rem\] font-semibold/);
-  assert.match(stack, /text-white\/80/);
-  assert.match(stack, /collapsed\[index\] \? "opacity-100" : "opacity-0"/);
-  assert.match(stack, /md:sticky motion-reduce:static/);
-  assert.match(stack, /md:pb-0/);
-  assert.doesNotMatch(stack, /md:pb-\[65svh\]/);
-  assert.doesNotMatch(stack, /--process-release-y/);
-  assert.match(stack, /header\.style\.translate = release > 0/);
-  assert.match(stack, /header\?\.style\.removeProperty\("translate"\)/);
-  assert.match(stack, /ceiling \+ finalCard\.getBoundingClientRect\(\)\.height - list\.getBoundingClientRect\(\)\.bottom/);
-  assert.match(stack, /- var\(--process-stack-release, 0px\)/);
-  assert.doesNotMatch(stack, /list\.style\.translate/);
-  assert.doesNotMatch(stack, /key=\{`separator-\$\{step\.number\}\`\}/);
-});
-
 test("inactive legacy-version deletion is authorized and protects the active Hero and GLB assets", () => {
   const route = read("src/app/api/admin/v1/homepage-hero/[id]/delete/route.ts");
   assert.match(route, /authorizeCommerceAdminRoute\(request, \["commerce\.hero\.write"\]\)/);

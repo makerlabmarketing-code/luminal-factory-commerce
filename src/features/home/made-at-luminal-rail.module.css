@@ -1,0 +1,132 @@
+.section {
+  --rail-gutter: max(1.25rem, calc((100vw - 86rem) / 2));
+  --rail-gap: clamp(1rem, 3vw, 3.75rem);
+  --card-width: min(84vw, 36rem);
+  position: relative;
+  padding-block: clamp(3rem, 8vw, 7rem);
+}
+
+.viewport {
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--rail-gutter);
+  scrollbar-color: #75684e transparent;
+}
+
+.viewport:focus-visible {
+  outline-offset: -3px;
+}
+
+.track {
+  display: grid;
+  gap: 1.75rem;
+  width: max-content;
+  padding: .375rem var(--rail-gutter) 1rem;
+}
+
+.intro {
+  display: grid;
+  align-content: center;
+  gap: .85rem;
+  max-width: var(--card-width);
+}
+
+.intro h2 {
+  margin: 0;
+  max-width: 9ch;
+  font-size: clamp(2.55rem, 4.9vw, 5rem);
+  font-weight: 430;
+  line-height: .98;
+  letter-spacing: -.06em;
+}
+
+.intro p:last-child,
+.copy p {
+  margin: 0;
+  color: var(--muted-foreground);
+  line-height: 1.55;
+}
+
+.steps {
+  display: flex;
+  gap: var(--rail-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  flex: none;
+  width: var(--card-width);
+  scroll-snap-align: start;
+}
+
+.image {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 2;
+  background: #161416;
+  border-radius: var(--radius-small);
+}
+
+.image img { object-fit: cover; }
+
+.copy {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: .75rem;
+  row-gap: .4rem;
+  align-items: baseline;
+  padding-top: 1rem;
+}
+
+.number {
+  color: var(--rim-gold, var(--muted-foreground));
+  font: .7rem var(--font-mono);
+}
+
+.copy h3 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.75vw, 2.6rem);
+  font-weight: 470;
+  letter-spacing: -.045em;
+}
+
+.copy p { grid-column: 2; }
+
+@media (min-width: 900px) {
+  .section { --card-width: min(48vw, 49rem); }
+
+  .track {
+    display: flex;
+    align-items: center;
+    gap: var(--rail-gap);
+    padding-inline-end: max(var(--rail-gutter), calc((100vw - var(--card-width)) / 2));
+  }
+
+  .intro { width: clamp(12rem, 23vw, 25rem); }
+}
+
+.section[data-process-pinned] {
+  padding: 0;
+  min-height: calc(100svh + var(--process-travel));
+}
+
+[data-process-pinned] .stage {
+  position: sticky;
+  top: 0;
+  display: grid;
+  min-height: 100svh;
+  align-content: center;
+  padding: 5rem 0 1.5rem;
+}
+
+[data-process-pinned] .viewport {
+  overflow-x: hidden;
+  scroll-snap-type: none;
+}
+
+[data-process-pinned] .image {
+  aspect-ratio: auto;
+  height: min(calc(var(--card-width) * 2 / 3), 52svh);
+}

@@ -4,18 +4,8 @@ import test from "node:test";
 
 const read = (path) => readFileSync(path, "utf8");
 const home = read("src/features/home/home-page.tsx");
-const globals = read("src/app/globals.css");
 const archiveCss = read("src/app/[locale]/archive/archive-stage.module.css");
 const archive = read("src/app/[locale]/archive/page.tsx");
-
-test("Making section keeps the light visible beneath a soft scrim rather than an opaque sticky block", () => {
-  assert.match(home, /data-made-at-luminal-header="true"/);
-  assert.match(home, /editorial-heading md:sticky md:top-20 md:z-30 md:bg-transparent md:pb-8/);
-  assert.doesNotMatch(home, /md:bg-\[#0a0a0a\]/);
-  assert.match(globals, /\.made-at-luminal \[data-made-at-luminal-header\]::before/);
-  assert.match(globals, /mask-image: linear-gradient\(180deg, transparent, #000 18%, #000 78%, transparent\)/);
-  assert.match(globals, /pointer-events: none/);
-});
 
 test("Archive relies on the tent entrance light and avoids an independent misaligned directional cone", () => {
   assert.match(archiveCss, /meowhe-circus-closed\.webp/);

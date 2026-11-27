@@ -28,7 +28,7 @@ test("home follows the owner-approved Wave 1 editorial hierarchy", () => {
     '<section className="selected-archive',
     '<section className={photoStyles.photoChapter}',
     '<section className="brand-revival',
-    '<section className="made-at-luminal',
+    '<MadeAtLuminalRail',
     '<section className="commerce-split',
   ];
   let previous = -1;

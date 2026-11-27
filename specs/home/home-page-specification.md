@@ -88,7 +88,7 @@ First-slice implementation is limited to the hero shell and minimal anchor desti
 | Featured object | Explain material/story of one object | Media, material note, edition/story context | View object/release | View archive | `FeaturedObject` | Approved media/content | Reserved aspect-ratio frame | Hide details or use generic studio note | Show fallback image/content | Single column | Static callouts |
 | Raffle status/timing | Provide trust and time clarity | State label, open/close timestamps if known, time zone | View details | Add calendar/follow channel only if approved | `RaffleStatus`, `RaffleTiming` | Raffle presentation adapter | Pending state label | `No active raffle` fallback | `Status temporarily unavailable` | Place before secondary content | Static labels/timestamps |
 | Archive glimpse | Show brand memory | 1–3 approved previous objects/studies | Explore archive | View featured object | `ArchivePreview` | Archive service/curated content | Card placeholders | Link-only archive intro | Hide unavailable cards | 1–3 stacked cards | No hover dependency |
-| Craft/process | Explain material ethos | Public process copy/media | Learn about process/About | None or commission link | `CraftProcess` | Approved editorial copy | Static text first | Hide media | Text-only fallback | Ordered readable list | Static list |
+| Craft/process | Explain material ethos | Public process copy/media | Learn about process/About | None or commission link | `CraftProcess` | Approved editorial copy | Lazy-loaded editorial photos | Hide unavailable media | Text-only fallback | Native horizontal swipe | Manual horizontal scroll |
 | Shop/commission entry | Offer secondary paths | Short entries for Shop and Commission availability | Shop if available | Commission inquiry | `CommerceEntryLinks` | Route/content config; future availability services | Static links | Hide/mark unavailable per approval | Disabled safe copy | Stacked CTAs | No animation required |
 | Footer | Close with identity/utilities | Approved navigation/legal/social/contact | Navigate | None | `GlobalFooter` | Route/content config | Static | Hide unapproved utilities | Avoid broken links | Compact stack | Static |
 
@@ -470,7 +470,7 @@ This addendum supersedes the first-slice placeholder composition where it confli
 2. **Featured Object:** large real product image, name, year/collection, editorial story, and light scroll depth only when it remains inside the motion budget.
 3. **Revival:** concise `Lazy Factory → Luminal Factory` transition with `Formerly Lazy Factory` context. Lazy Factory remains historical, never the global current brand.
 4. **Selected Archive:** three to six real approved products in an editorial grid.
-5. **Made at Luminal:** customer-facing `concept → sculpt → making → finish`; no ERP process or production-master exposure.
+5. **Made at Luminal:** customer-facing `concept → sculpt → making → finish`. Present the four steps on one horizontal image rail. Desktop page scroll moves the pinned rail both ways, then releases to the following section. Touch and reduced-motion users scroll the rail manually. Use approved archive images as editorial illustrations until process photos are available.
 6. **Shop / Commission:** two clear secondary discovery doors followed by the existing minimal footer.
 
 ### Wave 1 acceptance

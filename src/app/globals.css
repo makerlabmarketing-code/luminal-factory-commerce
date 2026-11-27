@@ -100,27 +100,6 @@
 .selected-archive .editorial-heading { margin-bottom: clamp(2rem, 4vw, 3.5rem); }
 .selected-archive .archive-object:nth-child(even) { margin-top: 3rem; }
 .made-at-luminal { background: #0a0a0a; border-top: 1px solid var(--border); }
-@media (min-width: 768px) {
-  /* A feathered scrim follows the sticky copy without cutting the continuous WebGL beam. */
-  .made-at-luminal [data-made-at-luminal-header] { isolation: isolate; }
-  .made-at-luminal [data-made-at-luminal-header]::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: -1.25rem -1rem -1rem;
-    pointer-events: none;
-    background: linear-gradient(90deg, rgba(10,10,10,.94) 0%, rgba(10,10,10,.84) 40%, rgba(10,10,10,.55) 60%, transparent 88%);
-    -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
-    mask-image: linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
-  }
-  .made-at-luminal [data-made-at-luminal-header] > p:last-child {
-    color: #d0d5d7;
-    text-shadow: 0 2px 12px rgba(0,0,0,.85);
-  }
-}
-.making-steps { list-style: none; display: grid; grid-template-columns: repeat(4,1fr); padding: 0; margin: 0; border-top: 1px solid var(--border); }
-.making-steps li { min-height: 22rem; padding: 1.5rem; border-right: 1px solid var(--border); }.making-steps li:first-child { padding-left: 0; }.making-steps li:last-child { border: 0; }
-.making-steps span { color: var(--muted-foreground); font: .65rem var(--font-mono); }.making-steps h3 { margin: 6rem 0 1.5rem; font-size: clamp(1.6rem,2.6vw,2.8rem); font-weight: 420; }.making-steps p { color: var(--muted-foreground); line-height: 1.65; font-size: .9rem; }
 .commerce-split { display: grid; grid-template-columns: 1fr 1fr; min-height: 38rem; }
 .commerce-door { position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: clamp(2rem,6vw,6rem); border-top: 1px solid var(--border); background: radial-gradient(circle at 70% 25%, rgba(185,233,255,.08), transparent 30%), #050505; }
 .commerce-door + .commerce-door { border-left: 1px solid var(--border); background: radial-gradient(circle at 70% 25%, rgba(243,201,232,.08), transparent 30%), #070707; }
@@ -134,10 +113,9 @@
   .featured-object-grid { gap: 3rem; }.featured-object-media { aspect-ratio: .82; }
   .brand-revival h2 { flex-direction: column; gap: 1rem; }.brand-revival h2 i { transform: rotate(90deg); }
   .archive-editorial-grid { grid-template-columns: 1fr 1fr; }.archive-object:nth-child(even) { margin-top: 3rem; }
-  .making-steps { grid-template-columns: 1fr 1fr; }.making-steps li { min-height: 17rem; border-bottom: 1px solid var(--border); }.making-steps h3 { margin-top: 3rem; }
   .commerce-split { grid-template-columns: 1fr; }.commerce-door { min-height: 27rem; }.commerce-door + .commerce-door { border-left: 0; }
 }
-@media (max-width: 500px) { .revival-hero-inner { padding-block: 2.75rem 5rem; gap: 2.5rem; }.revival-hero h1 { font-size: clamp(2.5rem, 13vw, 4rem); }.hero-object-stage { min-height: clamp(22rem, 120vw, 30rem); }.featured-object { padding-block: 5rem; }.archive-editorial-grid, .making-steps { grid-template-columns: 1fr; }.archive-object:nth-child(even) { margin-top: 0; }.archive-object { margin-bottom: 2rem; }.making-steps li, .making-steps li:first-child { min-height: auto; padding: 1.5rem 0 2rem; border-right: 0; }.making-steps h3 { margin: 2rem 0 1rem; } }
+@media (max-width: 500px) { .revival-hero-inner { padding-block: 2.75rem 5rem; gap: 2.5rem; }.revival-hero h1 { font-size: clamp(2.5rem, 13vw, 4rem); }.hero-object-stage { min-height: clamp(22rem, 120vw, 30rem); }.featured-object { padding-block: 5rem; }.archive-editorial-grid { grid-template-columns: 1fr; }.archive-object:nth-child(even) { margin-top: 0; }.archive-object { margin-bottom: 2rem; }}
 @media (prefers-reduced-motion: reduce) { .hero-object-stage { animation: none; }.archive-object, .archive-product-image, .commerce-door i { animation: none; } }
 
 * { box-sizing: border-box; border-color: var(--border); }
@@ -904,14 +882,6 @@ html[lang="vi"] .wave-home h2 {overflow-wrap:break-word}
 }
 .language-switcher a[aria-current] { border-color: var(--rim-gold); }
 .button-secondary:hover { background: linear-gradient(#18140e, #0c0b09) padding-box, var(--rim-gradient) border-box; color: var(--rim-highlight); }
-
-/* Give the four process cards the same visible metal edge as the menu rail. */
-.made-at-luminal [data-process-collapsed] {
-  border-width: 2px;
-  border-color: transparent;
-  background: linear-gradient(#0d0d0e, #0d0d0e) padding-box, var(--rim-gradient) border-box;
-  box-shadow: var(--rim-bevel), 0 2rem 7rem rgba(0, 0, 0, .38);
-}
 
 /* Brand effects shared by selected editorial surfaces. */
 [data-luminal-bento-card] {

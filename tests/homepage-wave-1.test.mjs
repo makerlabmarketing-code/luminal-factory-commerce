@@ -12,7 +12,7 @@ test("Homepage follows the approved editorial sequence with the colorway photo c
     '<section className="selected-archive',
     '<section className={photoStyles.photoChapter}',
     '<section className="brand-revival',
-    '<section className="made-at-luminal',
+    '<MadeAtLuminalRail',
     '<section className="commerce-split',
   ];
   order.reduce((previous, marker) => {

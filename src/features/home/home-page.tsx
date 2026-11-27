@@ -14,7 +14,7 @@ import { HomeArchiveBurst } from "./home-archive-burst";
 import { HomeRaffleSpotlight } from "./home-raffle-spotlight";
 import { HomeMotionGallery } from "./home-motion-gallery";
 import photoStyles from "./home-resin-flow.module.css";
-import { MadeAtLuminalStack } from "./made-at-luminal-stack";
+import { MadeAtLuminalRail } from "./made-at-luminal-rail";
 import { getHomeFeaturedRaffle } from "@/features/raffle/raffle-home-service";
 import { CollectorGuide } from "@/features/studio/studio-editorial";
 import { StageInvitation } from "@/components/discovery/stage-invitation";
@@ -55,6 +55,11 @@ export async function HomePage() {
   ]);
   const immersive = !featuredRaffle;
   const galleryPhotos = media.gallery.slice(0, 6);
+  const processImageIds = ["lolipop-candy-stones", "mictlan-skull-study", "mictlan-keyboard", "mono-cookie-portrait"];
+  const processSteps = content.process.map((step, index) => ({
+    ...step,
+    image: media.gallery.find((image) => image.id === processImageIds[index]),
+  }));
 
   return (
     <>
@@ -174,15 +179,12 @@ export async function HomePage() {
           </Container>
         </section>
 
-        <section className="made-at-luminal section overflow-visible md:pb-0" aria-labelledby="making-title">
-          <Container>
-            <header className="editorial-heading md:sticky md:top-20 md:z-30 md:bg-transparent md:pb-8" data-made-at-luminal-header="true">
-              <div data-luminal-reveal="home-copy"><p className="eyebrow">{tr("Made at Luminal")}</p><h2 id="making-title">{tr("Made with intention.")}</h2></div>
-              <p data-luminal-reveal="home-copy">{tr("Designed digitally. Finished by hand.")}</p>
-            </header>
-            <MadeAtLuminalStack steps={content.process} />
-          </Container>
-        </section>
+        <MadeAtLuminalRail
+          eyebrow={tr("Made at Luminal")}
+          title={tr("Made with intention.")}
+          description={tr("Designed digitally. Finished by hand.")}
+          steps={processSteps}
+        />
 
         <Container><CollectorGuide /></Container>
         <section className="commerce-split [content-visibility:auto] [contain-intrinsic-size:auto_700px]" aria-label={tr("Raffle and commission")}>
