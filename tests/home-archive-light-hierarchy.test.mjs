@@ -110,9 +110,11 @@ test("The curved photos separate front and rear depth before the inset gallery s
     assert.ok(exit.every(([x]) => x > width * 0.62));
     assert.ok(exit.some(([, y]) => y <= height * 0.08));
     assert.ok(bounds(at(0.725, 5)).every(([, y]) => y < 0));
-    assert.equal(at(galleryArrivalProgress, 5), null);
+    assert.ok(getGalleryArrival(0.699, 0) > 0.30);
+    assert.ok(exit.some(([, y]) => y > 0), "the last spiral card remains visible when the first gallery card enters");
     assert.equal(getGalleryArrival(galleryArrivalProgress, 0), 0);
-    assert.ok(getGalleryArrival(galleryArrivalProgress + 0.04, 0) > getGalleryArrival(galleryArrivalProgress + 0.04, 5));
+    assert.ok(getGalleryArrival(galleryArrivalProgress + 0.04, 0) > getGalleryArrival(galleryArrivalProgress + 0.04, 3));
+    assert.ok(getGalleryArrival(galleryArrivalProgress + 0.04, 3) > 0);
     assert.equal(getGalleryArrival(gallerySettleProgress, 5), 1);
     assert.ok(getGalleryProgress(-0.88 * height, height) < 0.85);
   }
@@ -144,18 +146,22 @@ test("The gallery flies in from all four viewport corners and settles on its slo
 });
 
 test("The extended spiral and four-corner arrival crossfade into the gallery", async () => {
-  const { galleryArrivalProgress, galleryCoverProgress, gallerySettleProgress, getGalleryProgress, getGallerySettleOffset, getGalleryCaptionOpacity } = await import("../src/features/home/home-gallery-motion.ts");
+  const { galleryArrivalProgress, galleryCoverProgress, gallerySettleProgress, getGalleryProgress, getGallerySettleOffset, getGalleryCaptionOpacity, getGalleryArrivalPadding, galleryStripEndProgress } = await import("../src/features/home/home-gallery-motion.ts");
   const viewport = 900;
   const entry = 0.88 * viewport;
   const topAtCover = entry - 2.25 * galleryCoverProgress * viewport;
   assert.ok(Math.abs(getGalleryProgress(topAtCover, viewport) - galleryCoverProgress) < 0.00001);
-  const topAtArrival = entry - (2.25 * galleryArrivalProgress + 0.42) * viewport;
-  assert.ok(Math.abs(getGalleryProgress(topAtArrival, viewport) - galleryArrivalProgress) < 0.00001);
-  const newTop = entry - (2.25 * gallerySettleProgress + 0.42 + 0.24) * viewport;
+  const topAtStripEnd = entry - (2.25 * galleryStripEndProgress + 0.42) * viewport;
+  assert.ok(Math.abs(getGalleryProgress(topAtStripEnd, viewport) - galleryStripEndProgress) < 0.00001);
+  const newTop = entry - (2.25 * gallerySettleProgress + 0.42 + 0.45) * viewport;
   assert.ok(Math.abs(getGalleryProgress(newTop, viewport) - gallerySettleProgress) < 0.00001);
-  assert.ok(Math.abs(getGallerySettleOffset(getGalleryProgress((newTop + topAtArrival) / 2, viewport), viewport) - (newTop - topAtArrival) / 2) < 0.00001);
+  for (const top of [(newTop + topAtStripEnd) / 2, topAtStripEnd + 130]) {
+    assert.ok(Math.abs(getGallerySettleOffset(getGalleryProgress(top, viewport), viewport) - (newTop - top)) < 0.00001);
+  }
   assert.equal(getGalleryCaptionOpacity(0), 0);
-  assert.equal(getGalleryCaptionOpacity(galleryArrivalProgress), 1);
-  assert.ok(getGalleryCaptionOpacity(galleryArrivalProgress + 0.05) < 1 && getGalleryCaptionOpacity(galleryArrivalProgress + 0.05) > 0);
+  assert.ok(getGalleryCaptionOpacity(galleryArrivalProgress) < 1);
+  assert.equal(getGalleryCaptionOpacity(0.705), 0);
   assert.equal(getGalleryCaptionOpacity(gallerySettleProgress), 0);
+  assert.ok(Math.abs(newTop + getGalleryArrivalPadding(viewport, 660) + 330 - viewport / 2) < 0.00001);
+  assert.ok(newTop + getGalleryArrivalPadding(viewport, 1100) >= 87);
 });

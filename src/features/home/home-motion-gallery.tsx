@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { HomeGalleryMedia } from "@/content/homepage-media";
 import { useTranslator } from "@/lib/i18n/client";
-import { getGalleryArrival, getGalleryCornerOffset, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGalleryCaptionOpacity, getGalleryStripPanel, galleryArrivalPadding, galleryArrivalProgress, galleryEntryViewportRatio, gallerySettleProgress } from "./home-gallery-motion";
+import { getGalleryArrival, getGalleryArrivalPadding, getGalleryCornerOffset, getGalleryHeroPose, getGalleryPanelTransform, getGalleryProgress, getGallerySettleOffset, getGalleryCaptionOpacity, getGalleryStripPanel, galleryEntryViewportRatio, galleryHeadingProgress, gallerySettleProgress, galleryStripEndProgress } from "./home-gallery-motion";
 import styles from "./home-motion-gallery.module.css";
 
 const maxSlices = 7;
@@ -21,6 +21,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
     const chapter = grid?.closest<HTMLElement>("[data-home-photo-handoff]");
     if (!grid || !chapter || !items.length) return;
     const poster = posterRef.current;
+    const heading = chapter.querySelector<HTMLElement>("#gallery-title")?.closest("header");
     const caption = chapter.querySelector<HTMLElement>("[data-home-gallery-caption]");
     const model = document.querySelector<HTMLElement>("[data-home-immersive-model] [data-hero-mode]");
     const viewport = chapter.querySelector<HTMLElement>("[data-home-gallery-viewport]");
@@ -65,7 +66,6 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       const height = document.documentElement.clientHeight;
       const stageHeight = viewport?.offsetHeight || height;
       if (ready && motionAllowed() && !chapter.dataset.galleryMotion && top >= stageHeight * galleryEntryViewportRatio) {
-        chapter.style.setProperty("--gallery-arrival-padding", galleryArrivalPadding);
         chapter.dataset.galleryMotion = "ready";
         dimensions = [];
         previous = -1;
@@ -74,7 +74,14 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       const progress = getGalleryProgress(top, stageHeight);
       if (progress === previous) return;
       previous = progress;
-      chapter.toggleAttribute("data-gallery-show-heading", progress >= galleryArrivalProgress);
+      if (!dimensions.length) {
+        const contentHeight = heading
+          ? grid.getBoundingClientRect().bottom - heading.getBoundingClientRect().top
+          : grid.offsetHeight;
+        const padding = getGalleryArrivalPadding(stageHeight, contentHeight);
+        chapter.style.setProperty("--gallery-arrival-padding", `${padding}px`);
+      }
+      chapter.toggleAttribute("data-gallery-show-heading", progress >= galleryHeadingProgress);
       if (caption) caption.style.opacity = String(getGalleryCaptionOpacity(progress));
 
       const moving = progress < gallerySettleProgress;
@@ -98,7 +105,7 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
       }
       const rect = grid.getBoundingClientRect();
       const sliceCount = compact.matches ? 4 : maxSlices;
-      const strip = progress < galleryArrivalProgress;
+      const strip = progress < galleryStripEndProgress;
       grid.toggleAttribute("data-strip", strip);
       if (!dimensions.length) {
         dimensions = tiles.map((tile, index) => {
@@ -145,7 +152,6 @@ export function HomeMotionGallery({ items }: Readonly<{ items: readonly HomeGall
             piece.style.zIndex = String(segment.layer);
           });
         });
-        return;
       }
 
       const settleOffset = getGallerySettleOffset(progress, stageHeight);

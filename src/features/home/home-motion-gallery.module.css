@@ -31,10 +31,6 @@
 .ribbons { display: none; }
 .grid[data-strip] .ribbons,
 .ribbon { display: contents; }
-.grid[data-strip] .tile {
-  visibility: hidden;
-  transform: none !important;
-}
 .slice {
   position: absolute;
   inset: 0 auto auto 0;

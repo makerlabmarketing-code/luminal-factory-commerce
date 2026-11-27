@@ -6,19 +6,26 @@ const angleTravel = 8.8;
 const exitAngle = 7.72;
 const flightDuration = 0.40;
 const scrollDistanceRatio = 2.25;
-const extraArrivalScroll = 0.24;
+const extraArrivalScroll = 0.45;
 const extraSpiralScroll = 0.42;
 
 export const galleryEntryViewportRatio = 0.88;
 export const galleryCoverProgress = entryProgress + flightDuration * ((Math.PI - angleStart) / angleTravel);
-export const galleryArrivalProgress = 0.742;
-export const gallerySettleProgress = galleryArrivalProgress + 0.15;
+export const galleryArrivalProgress = 0.662;
+export const galleryStripEndProgress = 0.742;
+export const galleryHeadingProgress = 0.89;
+export const gallerySettleProgress = 0.99;
 
 const spiralScrollStart = galleryCoverProgress * scrollDistanceRatio;
-const spiralScrollSpan = (galleryArrivalProgress - galleryCoverProgress) * scrollDistanceRatio + extraSpiralScroll;
+const spiralScrollSpan = (galleryStripEndProgress - galleryCoverProgress) * scrollDistanceRatio + extraSpiralScroll;
 const arrivalScrollStart = spiralScrollStart + spiralScrollSpan;
-const arrivalScrollSpan = (gallerySettleProgress - galleryArrivalProgress) * scrollDistanceRatio + extraArrivalScroll;
-export const galleryArrivalPadding = `${(147 + ((gallerySettleProgress - 0.99) * scrollDistanceRatio + extraSpiralScroll + extraArrivalScroll) * 100).toFixed(2)}svh`;
+const arrivalScrollSpan = (gallerySettleProgress - galleryStripEndProgress) * scrollDistanceRatio + extraArrivalScroll;
+const settleScroll = arrivalScrollStart + arrivalScrollSpan;
+
+export function getGalleryArrivalPadding(viewport: number, contentHeight: number) {
+  const inset = Math.max(Math.min(88, viewport * 0.14), (viewport - contentHeight) / 2);
+  return (settleScroll - galleryEntryViewportRatio) * viewport + inset;
+}
 
 type Point = readonly [number, number];
 type Quad = readonly [Point, Point, Point, Point];
@@ -67,15 +74,17 @@ export function getGalleryProgress(sectionTop: number, viewport: number) {
   const distance = galleryEntryViewportRatio - sectionTop / viewport;
   if (distance <= spiralScrollStart) return clamp(distance / scrollDistanceRatio);
   if (distance <= arrivalScrollStart) {
-    return mix(galleryCoverProgress, galleryArrivalProgress, (distance - spiralScrollStart) / spiralScrollSpan);
+    return mix(galleryCoverProgress, galleryStripEndProgress, (distance - spiralScrollStart) / spiralScrollSpan);
   }
-  return clamp(galleryArrivalProgress + (distance - arrivalScrollStart) / arrivalScrollSpan
-    * (gallerySettleProgress - galleryArrivalProgress));
+  return clamp(galleryStripEndProgress + (distance - arrivalScrollStart) / arrivalScrollSpan
+    * (gallerySettleProgress - galleryStripEndProgress));
 }
 
 export function getGallerySettleOffset(progress: number, viewport: number) {
-  return -clamp((gallerySettleProgress - progress) / (gallerySettleProgress - galleryArrivalProgress))
-    * viewport * arrivalScrollSpan;
+  const distance = progress <= galleryStripEndProgress
+    ? spiralScrollStart + (progress - galleryCoverProgress) / (galleryStripEndProgress - galleryCoverProgress) * spiralScrollSpan
+    : arrivalScrollStart + (progress - galleryStripEndProgress) / (gallerySettleProgress - galleryStripEndProgress) * arrivalScrollSpan;
+  return -Math.max(0, settleScroll - distance) * viewport;
 }
 
 export function getGalleryHeroPose(progress: number, meetAngle: number) {
@@ -84,7 +93,7 @@ export function getGalleryHeroPose(progress: number, meetAngle: number) {
 }
 
 export function getGalleryCaptionOpacity(progress: number) {
-  return ease(0.40, 0.54, progress) * (1 - ease(galleryArrivalProgress, galleryArrivalProgress + 0.10, progress));
+  return ease(0.40, 0.54, progress) * (1 - ease(0.645, 0.704, progress));
 }
 
 export function getGalleryCoverWidth(width: number, height: number) {
@@ -137,8 +146,11 @@ export function getGalleryPanelTransform(corners: Quad, slot: { x: number; y: nu
 }
 
 export function getGalleryArrival(progress: number, index: number) {
-  const start = galleryArrivalProgress + index * 0.008;
-  return ease(start, start + 0.082, progress);
+  const order = [0, 4, 2, 1, 5, 3];
+  const start = galleryArrivalProgress + (order[index] ?? index) * 0.026;
+  const travel = clamp((progress - start) / 0.18);
+  // Let the edge appear promptly, then ease into the slot over the longer scroll.
+  return 1 - (1 - travel) ** 2;
 }
 
 export function getGalleryCornerOffset(
